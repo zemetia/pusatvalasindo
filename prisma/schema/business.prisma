@@ -1,0 +1,44 @@
+model Branch {
+  id             String          @id @default(cuid())
+  name           String
+  address        String?
+  phone          String?
+  isActive       Boolean         @default(true)
+  companyId      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bankAccounts   BankAccount[]
+  company        Company?        @relation(fields: [companyId], references: [id])
+  currencyStocks CurrencyStock[]
+  stockItems     StockItem[]
+  stockMutations StockMutation[]
+  users          user[]
+  attendances    Attendance[]
+}
+
+model Company {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  code          String        @unique
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  bonusMatrices BonusMatrix[]
+  branches      Branch[]
+  roleKpis      RoleKpi[]
+  custom_roles  custom_role[]
+  users         user[]
+}
+
+model Currency {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  name           String
+  symbol         String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bankAccounts   BankAccount[]
+  stocks         CurrencyStock[]
+  stockMutations StockMutation[]
+}

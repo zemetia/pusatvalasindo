@@ -1,0 +1,344 @@
+[
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Jumlah Omzet",
+    "weight": 0.3
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Tingkat complain tracking",
+    "weight": 0.15
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.2
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Laporan & Hasil Rekonsiliasi Tepat Waktu",
+    "weight": 0.15
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Laporan Compliance Tepat Waktu(ltktltkm",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "SALES/MARKETING",
+    "kpi": "Tingkat kepuasan nasabah",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Luar",
+    "kpi": "Jumlah Omzet",
+    "weight": 0.35
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Ketelitian Perhitungan",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.15
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kepuasan Pelanggan",
+    "weight": 0.3
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kebersihan",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Dalam",
+    "kpi": "Closing Tepat Waktu",
+    "weight": 0.45
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Dalam",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.2
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Teller Dalam",
+    "kpi": "Tingkat Kesesuaian Jumlah Kas",
+    "weight": 0.35
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Kurir",
+    "kpi": "Tingkat Ketepatan Waktu &Jumlah  Pengiriman",
+    "weight": 0.7
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Kurir",
+    "kpi": "Laporan serah terima barang dikirimkan tepat waktu",
+    "weight": 0.2
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Kurir",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Net Profit Margin",
+    "weight": 0.4
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Tingkat Ketersediaan Stok Mata Uang",
+    "weight": 0.2
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "COMPLAIN NASABAH",
+    "weight": 0.15
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "kurs updating",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "TEAM MANAGEMENT",
+    "weight": 0.1
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Team leader pvi",
+    "kpi": "Jumlah omzet team",
+    "weight": 0.4
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Team leader pvi",
+    "kpi": "KEPATUHAN REGULASI SOP (pengawasan operasional",
+    "weight": 0.25
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Team leader pvi",
+    "kpi": "RESIKO LIKUIDITAS",
+    "weight": 0.2
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Team leader pvi",
+    "kpi": "EFISIENSI PELAPORAN dan monitoring KURS",
+    "weight": 0.15
+  },
+  {
+    "sheet": "pusat valas indo ",
+    "role": "Team leader pvi",
+    "kpi": "TEAM MANAGEMENT",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Luar",
+    "kpi": "Jumlah Omzet",
+    "weight": 0.35
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Ketelitian Perhitungan",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.15
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kepuasan Pelanggan",
+    "weight": 0.3
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Luar",
+    "kpi": "Tingkat Kebersihan",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Dalam",
+    "kpi": "Closing Tepat Waktu",
+    "weight": 0.45
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Dalam",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Teller Dalam",
+    "kpi": "Tingkat Kesesuaian Jumlah Kas",
+    "weight": 0.35
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Kurir",
+    "kpi": "Tingkat Ketepatan Waktu &Jumlah  Pengiriman",
+    "weight": 0.7
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Kurir",
+    "kpi": "Laporan serah terima barang dikirimkan tepat waktu",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Kurir",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Net Profit Margin",
+    "weight": 0.4
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Tingkat Ketersediaan Stok Mata Uang",
+    "weight": 0.25
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Score OKR Tim Kurir",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "TEAM LEADER MARKETING",
+    "kpi": "Tingkat Resiko Likuiditas",
+    "weight": 0.15
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Team leader pvi",
+    "kpi": "Jumlah omzet team",
+    "weight": 0.4
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Team leader pvi",
+    "kpi": "KEPATUHAN REGULASI SOP (pengawasan operasional",
+    "weight": 0.25
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Team leader pvi",
+    "kpi": "COMPLAIN NASABAH",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Team leader pvi",
+    "kpi": "EFISIENSI PELAPORAN dan monitoring",
+    "weight": 0.15
+  },
+  {
+    "sheet": "PUSAT TUKAR UANG",
+    "role": "Team leader pvi",
+    "kpi": "TEAM MANAGEMENT",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Jumlah Omzet",
+    "weight": 0.3
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Tingkat complain tracking",
+    "weight": 0.15
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Tingkat Kesesuaian SOP",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Laporan & Hasil Rekonsiliasi Tepat Waktu",
+    "weight": 0.15
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Laporan Compliance Tepat Waktu(ltktltkm",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "SALES/MARKETING(nadine dan vinny)",
+    "kpi": "Tingkat kepuasan nasabah",
+    "weight": 0.1
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "Team leader PKD",
+    "kpi": "Jumlah omzet team",
+    "weight": 0.4
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "Team leader PKD",
+    "kpi": "KEPATUHAN REGULASI SOP (pengawasan operasional",
+    "weight": 0.25
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "Team leader PKD",
+    "kpi": "COMPLAIN NASABAH",
+    "weight": 0.2
+  },
+  {
+    "sheet": "PUSAT KIRIM DUIT ",
+    "role": "Team leader PKD",
+    "kpi": "EFISIENSI PELAPORAN dan monitoring",
+    "weight": 0.15
+  }
+]

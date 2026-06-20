@@ -1,0 +1,419 @@
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  PERMISSION
+  SICK
+  HOLIDAY
+}
+
+model Attendance {
+  id                String           @id @default(cuid())
+  userId            String
+  branchId          String?
+  date              DateTime         @db.Date
+  checkIn           DateTime?
+  checkOut          DateTime?
+  checkInPhotoUrl   String?
+  // GPS from browser navigator.geolocation (auto-captured)
+  checkInGpsLat     Float?
+  checkInGpsLng     Float?
+  // Second location from manual input on the form (to detect GPS spoofing)
+  checkInManualLat  Float?
+  checkInManualLng  Float?
+  isLocationSuspect Boolean          @default(false)
+  status            AttendanceStatus @default(PRESENT)
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([branchId])
+  @@index([date])
+}
+
+model account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model custom_role {
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  companyId     String?
+  permissions   String[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  bonusMatrices BonusMatrix[]
+  roleKpis      RoleKpi[]
+  company       Company?      @relation(fields: [companyId], references: [id])
+  users         user[]
+
+  @@unique([name, companyId])
+}
+
+model user {
+  id                 String             @id
+  name               String
+  email              String             @unique
+  emailVerified      Boolean
+  image              String?
+  createdAt          DateTime
+  updatedAt          DateTime
+  phone              String?
+  branchId           String?
+  baseSalary         Decimal?
+  mealAllowance      Decimal?
+  transportAllowance Decimal?
+  joinDate           DateTime?
+  isActive           Boolean            @default(true)
+  companyId          String?
+  customRoleId       String?
+  kpiLogs            KpiLog[]
+  kpiMonthlyResults  KpiMonthlyResult[]
+  revenues           Revenue[]
+  attendances        Attendance[]
+  account            account[]
+  session            session[]
+  branch             Branch?            @relation(fields: [branchId], references: [id])
+  company            Company?           @relation(fields: [companyId], references: [id])
+  customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
+
+  @@index([branchId])
+  @@index([companyId])
+  @@index([customRoleId])
+}
+
+model verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+model BankAccount {
+  id            String           @id @default(cuid())
+  branchId      String
+  bankName      String
+  accountNumber String?
+  accountName   String
+  currencyId    String
+  balance       Decimal          @default(0)
+  isActive      Boolean          @default(true)
+  sortOrder     Int              @default(0)
+  note          String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  branch        Branch           @relation(fields: [branchId], references: [id])
+  currency      Currency         @relation(fields: [currencyId], references: [id])
+  mutations     BankMutation[]
+  dailyEntries  DailyBankEntry[]
+}
+
+model BankMutation {
+  id            String           @id @default(cuid())
+  bankAccountId String
+  type          BankMutationType
+  amount        Decimal
+  balanceAfter  Decimal
+  description   String?
+  createdAt     DateTime         @default(now())
+  createdBy     String?
+  bankAccount   BankAccount      @relation(fields: [bankAccountId], references: [id])
+}
+
+model DailyBankEntry {
+  id            String      @id @default(cuid())
+  bankAccountId String
+  date          DateTime    @db.Date
+  balance       Decimal     @default(0)
+  tarikCek      Decimal     @default(0)
+  note          String?
+  createdBy     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+
+  @@unique([bankAccountId, date])
+  @@index([bankAccountId, date])
+}
+
+enum BankMutationType {
+  CREDIT
+  DEBIT
+}
+
+model Branch {
+  id             String          @id @default(cuid())
+  name           String
+  address        String?
+  phone          String?
+  isActive       Boolean         @default(true)
+  companyId      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bankAccounts   BankAccount[]
+  company        Company?        @relation(fields: [companyId], references: [id])
+  currencyStocks CurrencyStock[]
+  stockItems     StockItem[]
+  stockMutations StockMutation[]
+  users          user[]
+  attendances    Attendance[]
+}
+
+model Company {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  code          String        @unique
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  bonusMatrices BonusMatrix[]
+  branches      Branch[]
+  roleKpis      RoleKpi[]
+  custom_roles  custom_role[]
+  users         user[]
+}
+
+model Currency {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  name           String
+  symbol         String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bankAccounts   BankAccount[]
+  stocks         CurrencyStock[]
+  stockMutations StockMutation[]
+}
+
+enum StockItemType {
+  CURRENCY
+  GOLD
+  CASH
+  SILVER
+}
+
+model KpiDefinition {
+  id        String    @id @default(cuid())
+  name      String
+  type      KpiType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  logs      KpiLog[]
+  roleKpis  RoleKpi[]
+}
+
+model RoleKpi {
+  id           String        @id @default(cuid())
+  companyId    String
+  kpiId        String
+  maxScore     Decimal
+  targetValue  Decimal?
+  threshold    Decimal?
+  weight       Decimal       @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  customRoleId String?
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole   custom_role?  @relation(fields: [customRoleId], references: [id])
+  definition   KpiDefinition @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, customRoleId, kpiId])
+  @@index([companyId, customRoleId])
+}
+
+model KpiLog {
+  id         String        @id @default(cuid())
+  employeeId String
+  kpiId      String
+  value      Decimal
+  note       String?
+  createdAt  DateTime      @default(now())
+  employee   user          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  definition KpiDefinition @relation(fields: [kpiId], references: [id])
+
+  @@index([employeeId, createdAt])
+  @@index([kpiId])
+}
+
+model Revenue {
+  id         String   @id @default(cuid())
+  employeeId String
+  amount     Decimal
+  date       DateTime @db.Date
+  note       String?
+  createdAt  DateTime @default(now())
+  employee   user     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, date])
+}
+
+model BonusMatrix {
+  id           String       @id @default(cuid())
+  companyId    String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  customRoleId String?
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole   custom_role? @relation(fields: [customRoleId], references: [id])
+  tiers        BonusTier[]
+
+  @@unique([companyId, customRoleId])
+}
+
+model BonusTier {
+  id             String          @id @default(cuid())
+  matrixId       String
+  minScore       Decimal
+  maxScore       Decimal
+  resultType     BonusResultType
+  amount         Decimal?
+  isTopPerformer Boolean         @default(false)
+  matrix         BonusMatrix     @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+}
+
+model KpiMonthlyResult {
+  id            String           @id @default(cuid())
+  employeeId    String
+  month         Int
+  year          Int
+  totalScore    Decimal
+  bonusAmount   Decimal?
+  bonusResult   BonusResultType?
+  breakdownJson Json
+  calculatedAt  DateTime         @default(now())
+  employee      user             @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+  @@index([employeeId, year, month])
+}
+
+enum KpiType {
+  EVENT
+  TARGET
+}
+
+enum BonusResultType {
+  BONUS_CASH
+  SAFE_ZONE
+  PENALTY_SATURDAY
+  PENALTY_DEDUCTION
+  TOP_PERFORMER
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model CurrencyStock {
+  id         String   @id @default(cuid())
+  branchId   String
+  currencyId String
+  quantity   Decimal  @default(0)
+  buyRate    Decimal?
+  sellRate   Decimal?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  currency   Currency @relation(fields: [currencyId], references: [id])
+
+  @@unique([branchId, currencyId])
+}
+
+model StockMutation {
+  id         String            @id @default(cuid())
+  branchId   String
+  currencyId String
+  type       StockMutationType
+  quantity   Decimal
+  rate       Decimal?
+  idrValue   Decimal?
+  note       String?
+  createdAt  DateTime          @default(now())
+  createdBy  String?
+  branch     Branch            @relation(fields: [branchId], references: [id])
+  currency   Currency          @relation(fields: [currencyId], references: [id])
+}
+
+model StockItem {
+  id           String            @id @default(cuid())
+  branchId     String
+  name         String
+  code         String?
+  type         StockItemType     @default(CURRENCY)
+  sortOrder    Int               @default(0)
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  dailyEntries DailyStockEntry[]
+  branch       Branch            @relation(fields: [branchId], references: [id])
+
+  @@unique([branchId, name])
+  @@index([branchId])
+}
+
+model DailyStockEntry {
+  id          String    @id @default(cuid())
+  stockItemId String
+  date        DateTime  @db.Date
+  closingQty  Decimal   @default(0)
+  rateIdr     Decimal?
+  totalIdr    Decimal?
+  note        String?
+  createdBy   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  qty1        Decimal   @default(0)
+  qty2        Decimal   @default(0)
+  stockItem   StockItem @relation(fields: [stockItemId], references: [id])
+
+  @@unique([stockItemId, date])
+  @@index([stockItemId, date])
+}
+
+enum StockMutationType {
+  OPENING
+  BUY
+  SELL
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+}

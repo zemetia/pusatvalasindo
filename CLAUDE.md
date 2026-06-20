@@ -1,51 +1,140 @@
-# Next.js Template
+# CLAUDE.md
 
-## CRITICAL — Read Before Anything Else
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> These two files are the most important context in this project. Read them at the start of every task, before touching any blueprint section or code.
+## Project Overview
 
+This is the **Pusat Kirim Duit** management system — a web-based platform for a multi-branch money changer business in Tangerang. It is built on a Next.js + Better Auth + Prisma starter kit and is being extended into a full business management system covering attendance, payroll, KPIs, currency stock, and finance flow.
+
+See `SYSTEM_PLAN.md` for the full architecture specification and module breakdown.
+
+## Commands
+
+```bash
+# Development
+npm run dev          # Start dev server with Turbopack
+
+# Build (also runs prisma generate)
+npm run build
+
+# Linting
+npm run lint
+
+# Database
+npx prisma migrate dev           # Apply migrations and regenerate client
+npx prisma migrate dev --name <name>  # Create a named migration
+npx prisma studio                # Open database GUI
+npx prisma generate              # Regenerate client after schema changes
+
+# Database seeding (via prisma.config.ts)
+tsx prisma/seed.ts
+```
+
+## Architecture
+
+### Tech Stack
+- **Next.js 16** (App Router, React 19, Turbopack)
+- **Better Auth** — email/password authentication with session management
+- **Prisma 7** — PostgreSQL ORM using the Rust-free engine with `@prisma/adapter-pg`
+- **Tailwind CSS v4** + **shadcn/ui** (new-york style, neutral base)
+- **TypeScript** with strict mode
+
+### Path Aliases
+- `@/*` → `./src/` (e.g. `@/components` = `src/components`, `@/lib` = `src/lib`)
+- `@src/*` → `./src/` (alias for legacy imports, same target as `@/*`; used for `@src/generated/prisma`)
+
+### Key Files
 | File | Purpose |
-|---|---|
-| [docs/knowledge/THIS.md](docs/knowledge/THIS.md) | Developer style, project identity, do's & don'ts, ongoing insights |
-| [docs/knowledge/LEARN.md](docs/knowledge/LEARN.md) | Past mistakes and corrections — read to avoid repeating them |
+|------|---------|
+| `src/lib/auth.ts` | Better Auth server instance (uses Prisma adapter + PrismaPg) |
+| `src/lib/auth-client.ts` | Client-side Better Auth hooks via `createAuthClient` |
+| `src/lib/prisma.ts` | Singleton Prisma client (global instance in dev to avoid hot-reload leaks) |
+| `src/lib/supabase.ts` | Lazy Supabase client getters (photo storage) |
+| `prisma/schema/` | Modular DB schema (auth, business, kpi, attendance, bank, stock) |
+| `prisma.config.ts` | Prisma config with migrations path and seed command |
+| `src/app/api/auth/[...all]/route.ts` | Better Auth catch-all API route |
+| `src/middleware.ts` | Auth guard + i18n routing + rate limiting + security headers |
 
-**Writing rules:**
-- After any task where a new insight or preference is discovered → append to `THIS.md`
-- When the user corrects the AI, or the AI self-identifies a mistake → append to `LEARN.md` immediately using format: `[YYYY-MM-DD] - [problem] - [solution] - [lesson]`
+### Application Structure
+```
+src/
+  app/
+    [locale]/
+      layout.tsx         — Root locale layout (fonts, theme, i18n provider)
+      (dashboard)/       — Protected route group
+        layout.tsx       — Auth guard: redirects if no session; renders AppSidebar + SiteHeader
+        dashboard/       — All dashboard pages (attendance, kpi, payroll, stock, bank, etc.)
+      login/page.tsx     — Login page
+      signup/page.jsx    — Sign-up page
+    api/                 — All API routes
+    globals.css          — Tailwind CSS v4 theme tokens
+    layout.tsx           — Root layout (minimal passthrough)
+    page.tsx             — Redirects to /en
 
----
+  backend/
+    errors/              — Custom error classes
+    helpers/             — api-response, handle-error, get-admin-caller
+    middleware/          — with-auth, with-role, with-validation
+    repositories/        — Data access layer (25+ repositories)
+    services/            — Business logic (kpi, payroll, user, bank, stock...)
 
-> **AI agents — before planning any fix or feature:** identify which blueprint sections cover the affected area, read them first, then plan. Do not guess at patterns — the blueprint is the source of truth.
+  components/
+    admin/               — Admin UI components (roles, users, KPI, payroll, stock, bank)
+    attendance/          — Camera, GPS, history, live-clock
+    auth/                — Login/signup forms
+    account/             — Change password
+    premium/             — Landing page sections
+    ui/                  — shadcn/ui components (button, card, table, sidebar, etc.)
+    app-sidebar.tsx      — Main collapsible sidebar
+    site-header.tsx      — Top header bar
 
-## Blueprint
+  lib/
+    auth.ts              — Server-side auth
+    auth-client.ts       — Client-side auth hooks
+    prisma.ts            — DB client singleton
+    supabase.ts          — Lazy Supabase client getters
+    utils.ts             — cn() utility (clsx + tailwind-merge)
 
-| Section | File |
-|---|---|
-| Index + hard constraints + checklists | [docs/blueprint/INDEX.md](docs/blueprint/INDEX.md) |
-| Project structure + file locations | [docs/blueprint/STRUCTURE.md](docs/blueprint/STRUCTURE.md) |
-| Request lifecycle + integrations | [docs/blueprint/ARCHITECTURE.md](docs/blueprint/ARCHITECTURE.md) |
-| **Middleware/rate limit/security headers** | [docs/blueprint/ARCHITECTURE/04-proxy.md](docs/blueprint/ARCHITECTURE/04-proxy.md) |
-| Components + CVA + tests | [docs/blueprint/COMPONENTS.md](docs/blueprint/COMPONENTS.md) |
-| Design tokens + Tailwind v4 | [docs/blueprint/DESIGN_SYSTEM.md](docs/blueprint/DESIGN_SYSTEM.md) |
-| Services + API client + Zod | [docs/blueprint/SERVICES.md](docs/blueprint/SERVICES.md) |
-| Zustand state + persistence | [docs/blueprint/STATE.md](docs/blueprint/STATE.md) |
-| i18n + routing + translations | [docs/blueprint/I18N.md](docs/blueprint/I18N.md) |
-| TypeScript + ESLint + anti-patterns | [docs/blueprint/BEST_PRACTICE.md](docs/blueprint/BEST_PRACTICE.md) |
-| **SEO + GEO + LLMs.txt** | [docs/blueprint/SEO_GEO_LLM.md](docs/blueprint/SEO_GEO_LLM.md) |
-| **Knowledge system rules** | [docs/blueprint/KNOWLEDGE.md](docs/blueprint/KNOWLEDGE.md) |
+  hooks/                 — Custom React hooks
+  i18n/                  — next-intl routing + request config
+  generated/prisma/      — Generated Prisma client (do not edit)
 
-## Stack snapshot
+prisma/
+  schema/                — Modular schema files
+  migrations/            — Migration history
+  seed.ts + seeds/       — Seed scripts
+```
 
-Next.js 16 · TypeScript 6 (strict) · Tailwind v4 · next-intl v4 · TanStack Query v5 · Zustand v5 · Zod v4 · Sonner · Sentry · PostHog · Vitest
+### Authentication Flow
+- Server components call `auth.api.getSession({ headers: await headers() })` to get session
+- The `(dashboard)/layout.tsx` acts as the auth guard — returns early (blank) if no session
+- Client components use `authClient` from `lib/auth-client.ts` for sign-in/sign-out/sign-up
 
-## Non-negotiables
+### Prisma Client
+- Generated to `src/generated/prisma` (not the default location)
+- Uses `PrismaPg` adapter — connection via `DATABASE_URL` env var (no `url` in `schema.prisma`)
+- After any schema change: run `npx prisma migrate dev` (triggers `prisma generate` automatically), or `npx prisma generate` alone for client-only updates
+- The `build` script runs `prisma generate` before `next build`
 
-- Navigation: always `@/i18n/navigation`, never `next/navigation`
-- Server data: TanStack Query only — no `useState` for API responses
-- Colors: design tokens only — no raw hex / oklch / Tailwind color utilities
-- `npm run lint` must exit 0 (`--max-warnings 0`)
-- `'use client'` only when required (hook / event / browser API)
-- Services are plain objects — never call `fetch`/`apiClient` directly in components
-- Request intercept logic goes in `src/middleware.ts` (export `middleware`); modules in `src/proxy/` — do NOT use root `proxy.ts` (known production/Windows bugs in Next.js 16)
-- Every public page must call `buildMetadata()` in `generateMetadata()` and render `<StructuredData>` — see `docs/blueprint/SEO_GEO_LLM.md`
-- All SEO/GEO/LLMs.txt content is driven by `src/config/site.ts` — edit that file, not the route handlers
+### Environment Variables
+```
+BETTER_AUTH_SECRET=    # Random secret for session signing
+BETTER_AUTH_URL=       # Full base URL (e.g., http://localhost:3000)
+DATABASE_URL=          # PostgreSQL connection string
+```
+
+### Adding shadcn/ui Components
+```bash
+npx shadcn@latest add <component>
+```
+
+### Planned Modules (from SYSTEM_PLAN.md)
+The system will be extended with these modules (not yet implemented):
+1. **Absensi** — attendance with photo clock-in, leave/overtime workflows
+2. **Payroll & Bonus** — salary components, KPI-linked bonuses, THR, payslips
+3. **KPI** — weighted categories, monthly entry, grading (A/B/C/D)
+4. **Stock Mata Uang** — currency inventory, buy/sell rates, inter-branch transfers
+5. **Finance Flow** — accounts, transactions, daily closing, P&L
+6. **Multi-User & Multi-Branch** — role-based access (Super Admin, Owner, Kepala Cabang, Kasir, HR, Akuntan)
+
+Each new module should follow the existing pattern: server components for data fetching, Prisma for DB access, shadcn/ui for UI, with branch-scoped data isolation.

@@ -1,0 +1,341 @@
+{
+  "HomePage": {
+    "title": "Pusat Valas Indo",
+    "description": "Premium Currency Exchange Services",
+    "welcome": "Welcome to Pusat Valas Indo"
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "contact": "Contact",
+    "pusatKirimDuit": "Pusat Kirim Duit",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "Hero": {
+    "institutionNo": "Institution No. 2026/PVI",
+    "authorized": "BI Authorized.",
+    "license": "Izin 20/28/KEP.GBI",
+    "description": "Get foreign currency exchange and overseas money transfer services with competitive rates and secure transactions in Jakarta.",
+    "reviews": "130+ Google Reviews",
+    "contactUs": "Contact Us",
+    "swapEngine": "Swap Engine",
+    "iGive": "I Give",
+    "iReceive": "I Receive",
+    "liveRate": "Live Rate",
+    "idrEst": "IDR Est.",
+    "initializeTransaction": "Initialize Transaction",
+    "secureDesk": "Secure Desk • Same Day Settlement"
+  },
+  "ExchangeRates": {
+    "title": "Global Liquidity",
+    "description": "Real-time institutional spreads synchronized with global liquidity providers.",
+    "liveQuote": "Live Quote",
+    "rateVsIdr": "Rate vs IDR",
+    "requestQuote": "Request Quote",
+    "institutionalDesk": "Institutional Desk Solutions.",
+    "institutionalDesc": "Bespoke liquidity for high-net-worth individuals and corporate entities with same-day settlement guarantees.",
+    "volumeTrading": "Volume Trading",
+    "wholesaleOrders": "Orders > $10,000 USD?",
+    "wholesaleDesc": "Connect directly with our senior dealing desk for wholesale margins and priority settlement.",
+    "initializeDesk": "Initialize Desk Session"
+  },
+  "Features": {
+    "advantages": "Distinctive Advantages",
+    "standards": "Elite Standards_",
+    "narrative": "Discover Narrative",
+    "section": "Section_",
+    "items": {
+      "competitive": {
+        "title": "Competitive Pricing.",
+        "desc": "Get transparent and competitive exchange rates for every transaction."
+      },
+      "updated": {
+        "title": "Updated Rates.",
+        "desc": "Access real-time exchange rates to ensure transaction accuracy."
+      },
+      "transfer": {
+        "title": "Online Transfer.",
+        "desc": "Convenient foreign currency exchange via secure bank transfer systems."
+      },
+      "practical": {
+        "title": "Easy & Practical.",
+        "desc": "Fast, secure, and hassle-free process. We prioritize your time efficiency."
+      },
+      "remittance": {
+        "title": "International Remittance.",
+        "desc": "Overseas money transfer services with best rates and transparent fees."
+      }
+    }
+  },
+  "Locations": {
+    "reach": "Reach_",
+    "operations": "Regional Operations",
+    "presence": "Presence_",
+    "status": "Status",
+    "openNow": "Open Now",
+    "tradingTime": "Trading_Time",
+    "hotline": "Hotline",
+    "navToBranch": "Nav to Branch",
+    "directWa": "Direct WA",
+    "hq": "HQ - Cengkareng",
+    "regional": "Regional Branch"
+  },
+  "AboutPage": {
+    "legacy": "Institutional Legacy",
+    "heritage": "Authorized Heritage_",
+    "description": "Established in 2018. Jakarta's most trusted partner for secure, legal, and rapid currency exchange.",
+    "storyTitle": "The Desk Story.",
+    "storyP1": "Pusat Valas Indo is a company operating in the foreign exchange field since 2018. Strategically located in East Cengkareng, West Jakarta.",
+    "storyP2": "We are a legal and certified money changer with License No. 20/28/KEP.GBI/DKSP/2018 by Bank Indonesia. Our focus is to bring honesty, security, and exceptional friendly service.",
+    "founded": "Founded",
+    "authorized": "Authorized",
+    "visionLabel": "Institutional Vision",
+    "visionTitle": "\"Become the Most Trusted & Leading Money Changer.\"",
+    "visionDesc": "Dedicated to providing excellence in foreign exchange services with a commitment to integrity and innovation.",
+    "roadmap": "Our Full Roadmap",
+    "complianceLabel": "Legal_Framework",
+    "complianceTitle": "100% Authorized Compliance.",
+    "complianceDesc": "Pusat Valas Indo operates under the direct supervision of Bank Indonesia. Our rigorous KYC and AML protocols ensure your wealth is exchanged within the highest legal standards.",
+    "licenseNo": "License No.",
+    "licenseDesc": "This license authorizes Pusat Valas Indo to conduct KUPVA BB (Non-Bank Foreign Exchange Business Activities).",
+    "verify": "Verify Credentials"
+  },
+  "ServicesPage": {
+    "intelligence": "Service Intelligence",
+    "capability": "Strategic Capability_",
+    "description": "From high-speed digital quotations to institutional physical settlements—we provide the bridge for your global capital.",
+    "onlineTitle": "Online Velocity.",
+    "onlineDesc": "Visit our social media pages to get the latest rates, activities, and other information in real-time.",
+    "digitalSupport": "Full Digital Support",
+    "waIntegration": "WhatsApp Desk Integration",
+    "features": {
+      "tickers": "Live Rate Tickers",
+      "instant": "Instant Quote Requests",
+      "social": "Social Intelligence Updates"
+    },
+    "presenceTitle": "Instant Presence.",
+    "presenceDesc": "Our office is open to everyone who wants to conduct manual transactions instantly with full security.",
+    "premiumLounges": "Premium Lounges",
+    "personalService": "Secure Personal Service",
+    "settlementLabel": "Physical_Settlement",
+    "staffHelp": "\"Our staff will be happy to assist you directly at our treasury center.\"",
+    "locateDesk": "Locate Physical Desk",
+    "remitTitle": "Global Remit.",
+    "remitDesc": "Control your international capital flow with our fully integrated \"Pusat Kirim Duit\" service.",
+    "settlement": "Same Day Settlement",
+    "access": "Global Corridor Access",
+    "remitLongDesc": "Overseas money transfer service that provides honesty, security, and exceptional friendly fast service.",
+    "ready": "Ready to Transact?",
+    "viewFaq": "View FAQ Desk"
+  },
+  "ContactPage": {
+    "hotlines": "Global Hotlines",
+    "connect": "Direct Connect_",
+    "description": "Connect with our senior dealing desk for immediate currency settlement and specialized corporate treasury support.",
+    "hub": "Hub_",
+    "locate": "Locate Branch",
+    "inquiryTitle": "Institutional Inquiry_",
+    "inquiryDesc": "For enterprise account openings, high-volume settlement requests, or compliance inquiries, please utilize the secure desk form.",
+    "responseTime": "Response Time",
+    "under15": "Under 15 Minutes",
+    "identity": "Full Identity",
+    "identityPlaceholder": "Corporate or Individual Name",
+    "contact": "Direct Contact",
+    "contactPlaceholder": "Email or Phone Number",
+    "subject": "Inquiry Subject",
+    "subjectPlaceholder": "Nature of your inquiry (Exchange, Settlement, Partnership)",
+    "dispatch": "Dispatch to Dealing Desk"
+  },
+  "Auth": {
+    "login": {
+      "title": "Login to your account",
+      "description": "Enter your email below to login to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgot": "Forgot your password?",
+      "submit": "Login",
+      "google": "Login with Google",
+      "noAccount": "Don't have an account?",
+      "signup": "Sign up"
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Get started with your new account",
+      "fullname": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign Up",
+      "google": "Sign Up with Google",
+      "haveAccount": "Already have an account?",
+      "login": "Login"
+    }
+  },
+  "PusatKirimDuit": {
+    "header": {
+      "back": "← PVI Group",
+      "wa": "WhatsApp"
+    },
+    "hero": {
+      "status": "PTD Licensed by OJK • Est. 2024",
+      "title": "Send Money to the World_",
+      "ojkLabel": "OJK",
+      "ojkSub": "Money Transfer Operator",
+      "description": "International money transfer solution for Indonesian entrepreneurs. Safe, transparent, real-time.",
+      "stats": "10 Destination Countries",
+      "cta": "Contact via WhatsApp"
+    },
+    "stats": {
+      "label": "Quick_Stats",
+      "title": "At a Glance",
+      "destinations": "Destination Countries",
+      "currencies": "Currencies",
+      "businessDays": "Business Days",
+      "licensed": "OJK Licensed",
+      "hours": "Mon–Fri 08.00–16.30"
+    },
+    "destinations": {
+      "label": "Transfer Destinations",
+      "title": "Countries_",
+      "description": "Minimum transfer USD 1,000 (equivalent). Estimated transfer 2–4 business days.",
+      "est": "Estimated 2–4 Business Days",
+      "min": "Minimum USD 1,000 Equivalent",
+      "rate": "Real-Time Rates"
+    },
+    "howItWorks": {
+      "label": "How to Send",
+      "title": "Easy Steps_",
+      "step": "Step_",
+      "steps": {
+        "wa": {
+          "title": "Contact via WhatsApp",
+          "desc": "Send your transfer request via WhatsApp. Can be done online, no need to visit the office."
+        },
+        "docs": {
+          "title": "Prepare Documents",
+          "desc": "ID Card + recipient data. For amounts above USD 24,000, include underlying documents."
+        },
+        "finish": {
+          "title": "Transfer Complete",
+          "desc": "Estimated 2–4 business days. Recipient can withdraw funds at local bank/ATM."
+        }
+      }
+    },
+    "fees": {
+      "label": "Transfer Fees",
+      "title": "Transparent_",
+      "description": "No hidden fees. All fees are clearly stated upfront.",
+      "tier": "Tier_",
+      "tiers": {
+        "under10kFull": {
+          "label": "Below USD 10,000",
+          "sublabel": "Full Amount",
+          "fee": "USD 40 + Rp 200,000",
+          "desc": "Recipient receives the full amount sent without any deductions from the destination bank."
+        },
+        "under10kNonFull": {
+          "label": "Below USD 10,000",
+          "sublabel": "Non-Full Amount",
+          "fee": "USD 15 + Rp 200,000",
+          "desc": "Destination bank fees will be deducted from the amount received."
+        },
+        "above10k": {
+          "label": "Above USD 10,000",
+          "sublabel": "Full & Non-Full",
+          "fee": "USD 40 / USD 15",
+          "desc": "No other additional fees. Full amount USD 40, non-full amount USD 15."
+        }
+      }
+    },
+    "requirements": {
+      "label": "Requirements",
+      "title": "Documents_",
+      "personal": "Personal",
+      "business": "Business",
+      "docs": {
+        "ktp": "ID Card (Mandatory)",
+        "underlying": "Underlying document (Mandatory for amounts above USD 24,000)",
+        "directorKtp": "Director ID Card",
+        "nib": "Business Identification Number (NIB)",
+        "npwp": "Business Tax ID (NPWP)",
+        "underlyingBiz": "Underlying document (Mandatory)"
+      },
+      "onlineInfo": "Can be done online: Transactions can be made via WhatsApp without visiting the office. Documents are sent digitally."
+    },
+    "contact": {
+      "label": "Location & Contact",
+      "title": "Meet Us_",
+      "addressLabel": "Address",
+      "hoursLabel": "Operational Hours",
+      "waLabel": "WhatsApp",
+      "ctaTitle": "Start Now",
+      "ctaSub": "Send via WhatsApp",
+      "ctaDesc": "No need to visit the office. Contact us via WhatsApp and the transfer process starts from anywhere.",
+      "chat": "Chat WhatsApp",
+      "maps": "View on Google Maps",
+      "footer": "PT Pusat Kirim Duit — Money Transfer Operator, OJK"
+    },
+    "footer": {
+      "partOf": "Part of",
+      "group": "Pusat Valas Indo Group",
+      "copyright": "© 2024 PT Pusat Kirim Duit. Licensed by OJK. Est. July 18, 2024.",
+      "back": "← Back to PVI"
+    }
+  },
+  "Common": {
+    "readyMargins": "Ready for Best Margins?",
+    "contactDesk": "Contact Dealing Desk",
+    "viewBranches": "View Our Branches",
+    "licensedBy": "Licensed by BANK INDONESIA • Safe & Secure"
+  },
+  "Dashboard": {
+    "Account": {
+      "title": "Account Settings",
+      "description": "Edit your account information",
+      "fullName": "Full Name",
+      "email": "Email",
+      "save": "Save",
+      "changePassword": {
+        "title": "Change Password",
+        "description": "Ensure your account is secure by using a strong password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "submit": "Update Password",
+        "success": "Password updated successfully",
+        "error": "Failed to update password",
+        "mismatch": "New passwords do not match",
+        "tooShort": "Password must be at least 8 characters"
+      }
+      },
+      "Attendance": {
+        "title": "Self Attendance",
+        "description": "Mark your daily attendance quickly and securely.",
+        "checkIn": "Daily Check-In",
+        "checkInDesc": "Ensure your face is clearly visible and you are at the correct location.",
+        "confirm": "Confirm Attendance",
+        "processing": "Processing...",
+        "alreadyCheckedIn": "You've already checked in",
+        "history": "Attendance History",
+        "noHistory": "No attendance history for this month.",
+        "status": {
+          "present": "Present",
+          "late": "Late",
+          "absent": "Absent",
+          "permission": "Permission",
+          "sick": "Sick",
+          "holiday": "Holiday"
+        },
+        "alerts": {
+          "noPhoto": "Please take a photo first.",
+          "noLocation": "Location not detected. Ensure GPS is active.",
+          "success": "Attendance successfully recorded!",
+          "uploadError": "Failed to upload photo.",
+          "submitError": "Failed to record attendance."
+        }
+      }
+    }
+  }
+}
+

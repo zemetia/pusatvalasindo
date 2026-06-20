@@ -1,0 +1,37 @@
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  PERMISSION
+  SICK
+  HOLIDAY
+}
+
+model Attendance {
+  id                 String           @id @default(cuid())
+  userId             String
+  branchId           String?
+  date               DateTime         @db.Date
+  checkIn            DateTime?
+  checkOut           DateTime?
+  checkInPhotoUrl    String?
+  // GPS from browser navigator.geolocation (auto-captured)
+  checkInGpsLat      Float?
+  checkInGpsLng      Float?
+  // Second location from manual input on the form (to detect GPS spoofing)
+  checkInManualLat   Float?
+  checkInManualLng   Float?
+  isLocationSuspect  Boolean          @default(false)
+  status             AttendanceStatus @default(PRESENT)
+  notes              String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([branchId])
+  @@index([date])
+}

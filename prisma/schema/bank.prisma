@@ -1,0 +1,51 @@
+model BankAccount {
+  id            String           @id @default(cuid())
+  branchId      String
+  bankName      String
+  accountNumber String?
+  accountName   String
+  currencyId    String
+  balance       Decimal          @default(0)
+  isActive      Boolean          @default(true)
+  sortOrder     Int              @default(0)
+  note          String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  branch        Branch           @relation(fields: [branchId], references: [id])
+  currency      Currency         @relation(fields: [currencyId], references: [id])
+  mutations     BankMutation[]
+  dailyEntries  DailyBankEntry[]
+}
+
+model BankMutation {
+  id            String           @id @default(cuid())
+  bankAccountId String
+  type          BankMutationType
+  amount        Decimal
+  balanceAfter  Decimal
+  description   String?
+  createdAt     DateTime         @default(now())
+  createdBy     String?
+  bankAccount   BankAccount      @relation(fields: [bankAccountId], references: [id])
+}
+
+model DailyBankEntry {
+  id            String      @id @default(cuid())
+  bankAccountId String
+  date          DateTime    @db.Date
+  balance       Decimal     @default(0)
+  tarikCek      Decimal     @default(0)
+  note          String?
+  createdBy     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+
+  @@unique([bankAccountId, date])
+  @@index([bankAccountId, date])
+}
+
+enum BankMutationType {
+  CREDIT
+  DEBIT
+}

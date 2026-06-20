@@ -1,0 +1,32 @@
+{
+  "project_name": "Pusat Valas Indo",
+  "theme": {
+    "colors": {
+      "primary": "#3b82f6",
+      "primary_gradient": "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+      "background": "#ffffff",
+      "background_dark": "#09090b",
+      "surface": "rgba(255, 255, 255, 0.8)",
+      "surface_dark": "rgba(9, 9, 11, 0.7)",
+      "border": "rgba(0, 0, 0, 0.1)",
+      "border_dark": "rgba(255, 255, 255, 0.1)",
+      "text": "#09090b",
+      "text_muted": "#71717a"
+    },
+    "effects": {
+      "blur": "backdrop-blur-xl",
+      "shadow_premium": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      "shadow_inner": "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)"
+    },
+    "typography": {
+      "font_family_primary": "Inter, sans-serif",
+      "headings": {
+        "title": { "size": "1.5rem", "weight": "700", "letterSpacing": "-0.025em" },
+        "description": { "size": "1rem", "weight": "400" }
+      }
+    },
+    "spacing": { "unit": "4px", "container_padding": "32px" },
+    "borderRadius": "24px"
+  },
+  "raw_research_notes": "Focused on glassmorphism and high-depth shadows. The design should feel 'airy' yet grounded. Using staggered Framer Motion animations for all form fields."
+}

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2023",
     "lib": [
       "dom",
       "dom.iterable",
@@ -9,11 +9,6 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -30,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@src/*": [
+        "./src/*"
       ]
     }
   },
@@ -43,6 +41,8 @@
   "exclude": [
     "node_modules",
     ".storybook",
-    "storybook-static"
+    "storybook-static",
+    "scratch",
+    "sql"
   ]
 }

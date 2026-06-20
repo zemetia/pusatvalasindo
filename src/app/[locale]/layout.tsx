@@ -1,74 +1,66 @@
-import type { Metadata } from 'next';
-import { JetBrains_Mono, Outfit } from 'next/font/google';
-import { notFound } from 'next/navigation';
+import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Inter, Outfit } from "next/font/google";
+import { Analytics } from "@/components/Analytics";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@src/i18n/routing';
+import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/providers/QueryProvider";
+import "../globals.css";
 
-import { routing } from '@/i18n/routing';
-import type { Locale } from '@/i18n/routing';
-import { Toaster } from '@/components/ui/Sonner';
-import { PostHogProvider } from '@/providers';
-
-import '../globals.css';
+const inter = Inter({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
 
 const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-outfit',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: "--font-display",
+  subsets: ["latin"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
-  display: 'swap',
-  weight: ['400', '500', '600'],
-});
-
-type Props = {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+export const metadata: Metadata = {
+  title: "Home - Authorized Money Changer in Jakarta | Pusat Valas Indo",
+  description: "Authorized Money Changer in Jakarta. Dapatkan layanan penukaran valuta asing dan pengiriman uang ke luar negeri dengan kurs kompetitif dan transaksi aman di Jakarta. Bersertifikat Bank Indonesia (Izin 20/28/KEP.GBI/DKSP/2018).",
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'home.meta' });
-
-  return {
-    title: {
-      template: `%s | ${t('title')}`,
-      default: t('title'),
-    },
-    description: t('description'),
-    metadataBase: new URL(process.env['NEXT_PUBLIC_APP_URL'] ?? 'http://localhost:3000'),
-  };
-}
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
-
-export default async function LocaleLayout({ children, params }: Props) {
+export default async function RootLayout({
+  children,
+  params
+}: {
+  children: React.ReactNode;
+  params: Promise<{locale: string}>;
+}) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as Locale)) {
+  // Ensure that the incoming `locale` is valid
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
+  // Providing all messages to the client
+  // side is the easiest way to get started
   const messages = await getMessages();
 
   return (
-    <html
-      lang={locale}
-      className={`${outfit.variable} ${jetbrainsMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body>
+    <html lang={locale} suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${outfit.variable} antialiased grain`}
+        suppressHydrationWarning
+      >
         <NextIntlClientProvider messages={messages}>
-          <PostHogProvider>
-            {children}
-          </PostHogProvider>
-          <Toaster />
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem={false}
+            >
+              {children}
+              <Toaster position="bottom-right" richColors />
+            </ThemeProvider>
+          </QueryProvider>
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,0 +1,85 @@
+model account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model custom_role {
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  companyId     String?
+  permissions   String[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  bonusMatrices BonusMatrix[]
+  roleKpis      RoleKpi[]
+  company       Company?      @relation(fields: [companyId], references: [id])
+  users         user[]
+
+  @@unique([name, companyId])
+}
+
+model user {
+  id                String             @id
+  name              String
+  email             String             @unique
+  emailVerified     Boolean
+  image             String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  phone             String?
+  branchId          String?
+  baseSalary        Decimal?
+  mealAllowance     Decimal?
+  transportAllowance Decimal?
+  joinDate          DateTime?
+  isActive          Boolean            @default(true)
+  companyId         String?
+  customRoleId      String?
+  kpiLogs           KpiLog[]
+  kpiMonthlyResults KpiMonthlyResult[]
+  revenues          Revenue[]
+  attendances       Attendance[]
+  account           account[]
+  session           session[]
+  branch            Branch?            @relation(fields: [branchId], references: [id])
+  company           Company?           @relation(fields: [companyId], references: [id])
+  customRole        custom_role?       @relation(fields: [customRoleId], references: [id])
+
+  @@index([branchId])
+  @@index([companyId])
+  @@index([customRoleId])
+}
+
+model verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}

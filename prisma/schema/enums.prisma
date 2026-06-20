@@ -1,0 +1,6 @@
+enum StockItemType {
+  CURRENCY
+  GOLD
+  CASH
+  SILVER
+}

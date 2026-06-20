@@ -1,0 +1,31 @@
+import {
+  bankAccountRepository,
+  CreateBankAccountInput,
+  UpdateBankAccountInput,
+} from "@/backend/repositories/bank-account.repository";
+import { NotFoundError } from "@/backend/errors/app-error";
+
+export const bankAccountService = {
+  getAll: (branchId?: string, onlyActive = false) =>
+    bankAccountRepository.findAll(branchId, onlyActive),
+
+  getById: async (id: string) => {
+    const account = await bankAccountRepository.findById(id);
+    if (!account) throw new NotFoundError("Bank account not found");
+    return account;
+  },
+
+  create: (data: CreateBankAccountInput) => bankAccountRepository.create(data),
+
+  update: async (id: string, data: UpdateBankAccountInput) => {
+    const account = await bankAccountRepository.findById(id);
+    if (!account) throw new NotFoundError("Bank account not found");
+    return bankAccountRepository.update(id, data);
+  },
+
+  deactivate: async (id: string) => {
+    const account = await bankAccountRepository.findById(id);
+    if (!account) throw new NotFoundError("Bank account not found");
+    return bankAccountRepository.softDelete(id);
+  },
+};

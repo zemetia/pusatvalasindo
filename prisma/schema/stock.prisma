@@ -1,0 +1,74 @@
+model CurrencyStock {
+  id         String   @id @default(cuid())
+  branchId   String
+  currencyId String
+  quantity   Decimal  @default(0)
+  buyRate    Decimal?
+  sellRate   Decimal?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  currency   Currency @relation(fields: [currencyId], references: [id])
+
+  @@unique([branchId, currencyId])
+}
+
+model StockMutation {
+  id         String            @id @default(cuid())
+  branchId   String
+  currencyId String
+  type       StockMutationType
+  quantity   Decimal
+  rate       Decimal?
+  idrValue   Decimal?
+  note       String?
+  createdAt  DateTime          @default(now())
+  createdBy  String?
+  branch     Branch            @relation(fields: [branchId], references: [id])
+  currency   Currency          @relation(fields: [currencyId], references: [id])
+}
+
+model StockItem {
+  id           String            @id @default(cuid())
+  branchId     String
+  name         String
+  code         String?
+  type         StockItemType     @default(CURRENCY)
+  sortOrder    Int               @default(0)
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  dailyEntries DailyStockEntry[]
+  branch       Branch            @relation(fields: [branchId], references: [id])
+
+  @@unique([branchId, name])
+  @@index([branchId])
+}
+
+model DailyStockEntry {
+  id          String    @id @default(cuid())
+  stockItemId String
+  date        DateTime  @db.Date
+  closingQty  Decimal   @default(0)
+  rateIdr     Decimal?
+  totalIdr    Decimal?
+  note        String?
+  createdBy   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  qty1        Decimal   @default(0)
+  qty2        Decimal   @default(0)
+  stockItem   StockItem @relation(fields: [stockItemId], references: [id])
+
+  @@unique([stockItemId, date])
+  @@index([stockItemId, date])
+}
+
+enum StockMutationType {
+  OPENING
+  BUY
+  SELL
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+}

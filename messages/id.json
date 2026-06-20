@@ -1,0 +1,341 @@
+{
+  "HomePage": {
+    "title": "Pusat Valas Indo",
+    "description": "Layanan Penukaran Mata Uang Premium",
+    "welcome": "Selamat datang di Pusat Valas Indo"
+  },
+  "Navigation": {
+    "home": "Beranda",
+    "about": "Tentang Kami",
+    "services": "Layanan",
+    "contact": "Kontak",
+    "pusatKirimDuit": "Pusat Kirim Duit",
+    "login": "Masuk",
+    "signup": "Daftar"
+  },
+  "Hero": {
+    "institutionNo": "Institusi No. 2026/PVI",
+    "authorized": "Berizin BI.",
+    "license": "Izin 20/28/KEP.GBI",
+    "description": "Dapatkan layanan penukaran valuta asing dan pengiriman uang ke luar negeri dengan kurs kompetitif dan transaksi aman di Jakarta.",
+    "reviews": "130+ Ulasan Google",
+    "contactUs": "Hubungi Kami",
+    "swapEngine": "Mesin Tukar",
+    "iGive": "Saya Memberi",
+    "iReceive": "Saya Menerima",
+    "liveRate": "Kurs Live",
+    "idrEst": "Estimasi IDR",
+    "initializeTransaction": "Inisialisasi Transaksi",
+    "secureDesk": "Meja Aman • Penyelesaian Hari yang Sama"
+  },
+  "ExchangeRates": {
+    "title": "Likuiditas Global",
+    "description": "Spread institusional waktu nyata yang disinkronkan dengan penyedia likuiditas global.",
+    "liveQuote": "Kutipan Langsung",
+    "rateVsIdr": "Kurs vs IDR",
+    "requestQuote": "Minta Kutipan",
+    "institutionalDesk": "Solusi Meja Institusional.",
+    "institutionalDesc": "Likuiditas pesanan khusus untuk individu dengan kekayaan bersih tinggi dan entitas korporat dengan jaminan penyelesaian hari yang sama.",
+    "volumeTrading": "Perdagangan Volume",
+    "wholesaleOrders": "Pesanan > $10,000 USD?",
+    "wholesaleDesc": "Hubungkan langsung dengan meja transaksi senior kami untuk margin grosir dan prioritas penyelesaian.",
+    "initializeDesk": "Inisialisasi Sesi Meja"
+  },
+  "Features": {
+    "advantages": "Keunggulan Utama",
+    "standards": "Standar Elit_",
+    "narrative": "Temukan Narasi",
+    "section": "Bagian_",
+    "items": {
+      "competitive": {
+        "title": "Harga Kompetitif.",
+        "desc": "Dapatkan nilai tukar yang transparan dan bersaing untuk setiap transaksi Anda."
+      },
+      "updated": {
+        "title": "Kurs Terupdate.",
+        "desc": "Akses nilai tukar terbaru secara real-time untuk memastikan akurasi transaksi."
+      },
+      "transfer": {
+        "title": "Transfer Online.",
+        "desc": "Kemudahan penukaran valuta asing melalui sistem transfer bank yang aman."
+      },
+      "practical": {
+        "title": "Mudah & Praktis.",
+        "desc": "Proses cepat, aman, dan tanpa ribet. Kami mengutamakan efisiensi waktu Anda."
+      },
+      "remittance": {
+        "title": "Kirim Internasional.",
+        "desc": "Layanan pengiriman uang ke luar negeri dengan kurs terbaik dan biaya transparan."
+      }
+    }
+  },
+  "Locations": {
+    "reach": "Jangkauan_",
+    "operations": "Operasional Regional",
+    "presence": "Kehadiran_",
+    "status": "Status",
+    "openNow": "Buka Sekarang",
+    "tradingTime": "Waktu_Transaksi",
+    "hotline": "Hotline",
+    "navToBranch": "Navigasi ke Cabang",
+    "directWa": "WhatsApp Langsung",
+    "hq": "Pusat - Cengkareng",
+    "regional": "Cabang Regional"
+  },
+  "AboutPage": {
+    "legacy": "Warisan Institusional",
+    "heritage": "Warisan Berizin_",
+    "description": "Didirikan pada tahun 2018. Mitra terpercaya Jakarta untuk penukaran mata uang yang aman, legal, dan cepat.",
+    "storyTitle": "Cerita Kami.",
+    "storyP1": "Pusat Valas Indo adalah perusahaan yang bergerak di bidang valuta asing sejak tahun 2018. Berlokasi strategis di Cengkareng Timur, Jakarta Barat.",
+    "storyP2": "Kami adalah money changer legal dan bersertifikat dengan Izin No. 20/28/KEP.GBI/DKSP/2018 oleh Bank Indonesia. Fokus kami adalah menghadirkan rasa kejujuran, keamanan, dan pelayanan yang ramah luar biasa.",
+    "founded": "Didirikan",
+    "authorized": "Berizin",
+    "visionLabel": "Visi Institusional",
+    "visionTitle": "\"Menjadi Money Changer Terpercaya & Terdepan.\"",
+    "visionDesc": "Berdedikasi untuk memberikan keunggulan dalam layanan valuta asing dengan komitmen terhadap integritas dan inovasi.",
+    "roadmap": "Roadmap Lengkap Kami",
+    "complianceLabel": "Kerangka_Hukum",
+    "complianceTitle": "Kepatuhan 100% Berizin.",
+    "complianceDesc": "Pusat Valas Indo beroperasi di bawah pengawasan langsung Bank Indonesia. Protokol KYC dan AML kami yang ketat memastikan kekayaan Anda ditukarkan dalam standar hukum tertinggi.",
+    "licenseNo": "No. Izin",
+    "licenseDesc": "Izin ini memberikan wewenang kepada Pusat Valas Indo untuk menyelenggarakan KUPVA BB (Kegiatan Usaha Penukaran Valuta Asing Bukan Bank).",
+    "verify": "Verifikasi Kredensial"
+  },
+  "ServicesPage": {
+    "intelligence": "Intelijen Layanan",
+    "capability": "Kapabilitas Strategis_",
+    "description": "Dari kutipan digital berkecepatan tinggi hingga penyelesaian fisik institusional—kami menyediakan jembatan untuk modal global Anda.",
+    "onlineTitle": "Kecepatan Online.",
+    "onlineDesc": "Kunjungi halaman media sosial kami untuk mendapatkan tarif terbaru, aktivitas, dan informasi lain secara real-time.",
+    "digitalSupport": "Dukungan Digital Penuh",
+    "waIntegration": "Integrasi Meja WhatsApp",
+    "features": {
+      "tickers": "Ticker Kurs Langsung",
+      "instant": "Permintaan Kutipan Instan",
+      "social": "Pembaruan Intelijen Sosial"
+    },
+    "presenceTitle": "Kehadiran Instan.",
+    "presenceDesc": "Kantor kami terbuka untuk semua orang yang ingin melakukan transaksi manual secara instan dengan keamanan penuh.",
+    "premiumLounges": "Lounge Premium",
+    "personalService": "Layanan Pribadi Aman",
+    "settlementLabel": "Penyelesaian_Fisik",
+    "staffHelp": "\"Staf kami dengan senang hati akan membantu anda secara langsung di pusat treasury kami.\"",
+    "locateDesk": "Cari Meja Fisik",
+    "remitTitle": "Kirim Global.",
+    "remitDesc": "Kendalikan aliran modal internasional Anda dengan jasa \"Pusat Kirim Duit\" yang terintegrasi penuh.",
+    "settlement": "Penyelesaian Hari yang Sama",
+    "access": "Akses Koridor Global",
+    "remitLongDesc": "Layanan kirim uang luar negeri yang memberikan rasa kejujuran, keamanan dan pelayanan yang ramah luar biasa cepat.",
+    "ready": "Siap Bertransaksi?",
+    "viewFaq": "Lihat Meja FAQ"
+  },
+  "ContactPage": {
+    "hotlines": "Hotline Global",
+    "connect": "Hubungkan Langsung_",
+    "description": "Terhubung dengan meja transaksi senior kami untuk penyelesaian mata uang segera dan dukungan treasury perusahaan khusus.",
+    "hub": "Hub_",
+    "locate": "Cari Cabang",
+    "inquiryTitle": "Inkuiri Institusional_",
+    "inquiryDesc": "Untuk pembukaan akun perusahaan, permintaan penyelesaian volume tinggi, atau inkuiri kepatuhan, silakan gunakan formulir meja aman.",
+    "responseTime": "Waktu Respon",
+    "under15": "Di Bawah 15 Menit",
+    "identity": "Identitas Lengkap",
+    "identityPlaceholder": "Nama Perusahaan atau Individu",
+    "contact": "Kontak Langsung",
+    "contactPlaceholder": "Email atau Nomor Telepon",
+    "subject": "Subjek Inkuiri",
+    "subjectPlaceholder": "Sifat inkuiri Anda (Penukaran, Penyelesaian, Kemitraan)",
+    "dispatch": "Kirim ke Meja Transaksi"
+  },
+  "Auth": {
+    "login": {
+      "title": "Masuk ke akun Anda",
+      "description": "Masukkan email Anda di bawah ini untuk masuk ke akun Anda",
+      "email": "Email",
+      "password": "Kata Sandi",
+      "forgot": "Lupa kata sandi?",
+      "submit": "Masuk",
+      "google": "Masuk dengan Google",
+      "noAccount": "Belum punya akun?",
+      "signup": "Daftar"
+    },
+    "signup": {
+      "title": "Buat akun baru",
+      "description": "Mulai dengan akun baru Anda",
+      "fullname": "Nama Lengkap",
+      "email": "Email",
+      "password": "Kata Sandi",
+      "submit": "Daftar",
+      "google": "Daftar dengan Google",
+      "haveAccount": "Sudah punya akun?",
+      "login": "Masuk"
+    }
+  },
+  "PusatKirimDuit": {
+    "header": {
+      "back": "← PVI Group",
+      "wa": "WhatsApp"
+    },
+    "hero": {
+      "status": "PTD Berizin OJK • Est. 2024",
+      "title": "Kirim Uang ke Dunia_",
+      "ojkLabel": "OJK",
+      "ojkSub": "Penyelenggara Transfer Dana",
+      "description": "Solusi pengiriman uang internasional untuk pengusaha Indonesia. Aman, transparan, real-time.",
+      "stats": "10 Negara Tujuan",
+      "cta": "Hubungi via WhatsApp"
+    },
+    "stats": {
+      "label": "Statistik_Cepat",
+      "title": "Sekilas Informasi",
+      "destinations": "Negara Tujuan",
+      "currencies": "Mata Uang",
+      "businessDays": "Hari Kerja",
+      "licensed": "Berizin OJK",
+      "hours": "Senin–Jumat 08.00–16.30"
+    },
+    "destinations": {
+      "label": "Tujuan Pengiriman",
+      "title": "Negara_",
+      "description": "Minimal pengiriman USD 1.000 (ekuivalen). Estimasi transfer 2–4 hari kerja.",
+      "est": "Estimasi 2–4 Hari Kerja",
+      "min": "Minimal USD 1.000 Ekuivalen",
+      "rate": "Kurs Real-Time"
+    },
+    "howItWorks": {
+      "label": "Cara Kirim",
+      "title": "Langkah Mudah_",
+      "step": "Langkah_",
+      "steps": {
+        "wa": {
+          "title": "Hubungi via WhatsApp",
+          "desc": "Kirimkan permintaan transfer melalui WhatsApp. Bisa online, tidak perlu datang ke kantor."
+        },
+        "docs": {
+          "title": "Siapkan Dokumen",
+          "desc": "KTP + data penerima. Untuk nominal di atas USD 24.000, sertakan dokumen underlying."
+        },
+        "finish": {
+          "title": "Transfer Selesai",
+          "desc": "Estimasi 2–4 hari kerja. Penerima dapat mengambil dana di bank/ATM setempat."
+        }
+      }
+    },
+    "fees": {
+      "label": "Biaya Transfer",
+      "title": "Transparan_",
+      "description": "Tidak ada biaya tersembunyi. Semua biaya tertera jelas di awal.",
+      "tier": "Tier_",
+      "tiers": {
+        "under10kFull": {
+          "label": "Di bawah USD 10.000",
+          "sublabel": "Full Amount",
+          "fee": "USD 40 + Rp 200.000",
+          "desc": "Penerima menerima penuh nominal yang dikirim tanpa potongan di sisi bank tujuan."
+        },
+        "under10kNonFull": {
+          "label": "Di bawah USD 10.000",
+          "sublabel": "Non-Full Amount",
+          "fee": "USD 15 + Rp 200.000",
+          "desc": "Biaya bank tujuan akan dipotong dari jumlah yang diterima."
+        },
+        "above10k": {
+          "label": "Di atas USD 10.000",
+          "sublabel": "Full & Non-Full",
+          "fee": "USD 40 / USD 15",
+          "desc": "Tanpa biaya tambahan lainnya. Full amount USD 40, non-full amount USD 15."
+        }
+      }
+    },
+    "requirements": {
+      "label": "Persyaratan",
+      "title": "Dokumen_",
+      "personal": "Pribadi",
+      "business": "Perusahaan",
+      "docs": {
+        "ktp": "KTP (wajib)",
+        "underlying": "Dokumen underlying (wajib jika nominal di atas USD 24.000)",
+        "directorKtp": "KTP Direktur",
+        "nib": "NIB Perusahaan",
+        "npwp": "NPWP Perusahaan",
+        "underlyingBiz": "Dokumen underlying (wajib)"
+      },
+      "onlineInfo": "Bisa online: Transaksi dapat dilakukan via WhatsApp tanpa perlu datang ke kantor. Dokumen dikirimkan secara digital."
+    },
+    "contact": {
+      "label": "Lokasi & Kontak",
+      "title": "Temui Kami_",
+      "addressLabel": "Alamat",
+      "hoursLabel": "Jam Operasional",
+      "waLabel": "WhatsApp",
+      "ctaTitle": "Mulai Sekarang",
+      "ctaSub": "Kirim via WhatsApp",
+      "ctaDesc": "Tidak perlu datang ke kantor. Hubungi kami via WhatsApp dan proses transfer dimulai dari mana saja.",
+      "chat": "Chat WhatsApp",
+      "maps": "Lihat di Google Maps",
+      "footer": "PT Pusat Kirim Duit — Penyelenggara Transfer Dana, OJK"
+    },
+    "footer": {
+      "partOf": "Bagian dari",
+      "group": "Pusat Valas Indo Group",
+      "copyright": "© 2024 PT Pusat Kirim Duit. Berizin OJK. Est. 18 Juli 2024.",
+      "back": "← Kembali ke PVI"
+    }
+  },
+  "Common": {
+    "readyMargins": "Siap untuk Margin Terbaik?",
+    "contactDesk": "Hubungi Meja Transaksi",
+    "viewBranches": "Lihat Cabang Kami",
+    "licensedBy": "Berizin oleh BANK INDONESIA • Aman & Terjamin"
+  },
+  "Dashboard": {
+    "Account": {
+      "title": "Pengaturan Akun",
+      "description": "Ubah informasi akun Anda",
+      "fullName": "Nama Lengkap",
+      "email": "Email",
+      "save": "Simpan",
+      "changePassword": {
+        "title": "Ubah Kata Sandi",
+        "description": "Pastikan akun Anda aman dengan menggunakan kata sandi yang kuat",
+        "currentPassword": "Kata Sandi Saat Ini",
+        "newPassword": "Kata Sandi Baru",
+        "confirmPassword": "Konfirmasi Kata Sandi Baru",
+        "submit": "Perbarui Kata Sandi",
+        "success": "Kata sandi berhasil diperbarui",
+        "error": "Gagal memperbarui kata sandi",
+        "mismatch": "Kata sandi baru tidak cocok",
+        "tooShort": "Kata sandi harus minimal 8 karakter"
+      }
+      },
+      "Attendance": {
+        "title": "Presensi Mandiri",
+        "description": "Lakukan presensi harian Anda dengan cepat dan aman.",
+        "checkIn": "Check-In Harian",
+        "checkInDesc": "Pastikan wajah terlihat jelas dan berada di lokasi yang sesuai.",
+        "confirm": "Konfirmasi Kehadiran",
+        "processing": "Memproses...",
+        "alreadyCheckedIn": "Anda Sudah Check-In",
+        "history": "Riwayat Kehadiran",
+        "noHistory": "Belum ada riwayat kehadiran bulan ini.",
+        "status": {
+          "present": "Hadir",
+          "late": "Terlambat",
+          "absent": "Alpa",
+          "permission": "Izin",
+          "sick": "Sakit",
+          "holiday": "Libur"
+        },
+        "alerts": {
+          "noPhoto": "Silakan ambil foto terlebih dahulu.",
+          "noLocation": "Lokasi tidak terdeteksi. Pastikan GPS aktif.",
+          "success": "Presensi berhasil dicatat!",
+          "uploadError": "Gagal mengunggah foto.",
+          "submitError": "Gagal mencatat presensi."
+        }
+      }
+    }
+  }
+}
+

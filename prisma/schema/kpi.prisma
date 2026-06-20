@@ -1,0 +1,107 @@
+model KpiDefinition {
+  id        String    @id @default(cuid())
+  name      String
+  type      KpiType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  logs      KpiLog[]
+  roleKpis  RoleKpi[]
+}
+
+model RoleKpi {
+  id           String        @id @default(cuid())
+  companyId    String
+  kpiId        String
+  maxScore     Decimal
+  targetValue  Decimal?
+  threshold    Decimal?
+  weight       Decimal       @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  customRoleId String?
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole   custom_role?  @relation(fields: [customRoleId], references: [id])
+  definition   KpiDefinition @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, customRoleId, kpiId])
+  @@index([companyId, customRoleId])
+}
+
+model KpiLog {
+  id         String        @id @default(cuid())
+  employeeId String
+  kpiId      String
+  value      Decimal
+  note       String?
+  createdAt  DateTime      @default(now())
+  employee   user          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  definition KpiDefinition @relation(fields: [kpiId], references: [id])
+
+  @@index([employeeId, createdAt])
+  @@index([kpiId])
+}
+
+model Revenue {
+  id         String   @id @default(cuid())
+  employeeId String
+  amount     Decimal
+  date       DateTime @db.Date
+  note       String?
+  createdAt  DateTime @default(now())
+  employee   user     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, date])
+}
+
+model BonusMatrix {
+  id           String        @id @default(cuid())
+  companyId    String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  customRoleId String?
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole   custom_role?  @relation(fields: [customRoleId], references: [id])
+  tiers        BonusTier[]
+
+  @@unique([companyId, customRoleId])
+}
+
+model BonusTier {
+  id             String          @id @default(cuid())
+  matrixId       String
+  minScore       Decimal
+  maxScore       Decimal
+  resultType     BonusResultType
+  amount         Decimal?
+  isTopPerformer Boolean         @default(false)
+  matrix         BonusMatrix     @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+}
+
+model KpiMonthlyResult {
+  id            String           @id @default(cuid())
+  employeeId    String
+  month         Int
+  year          Int
+  totalScore    Decimal
+  bonusAmount   Decimal?
+  bonusResult   BonusResultType?
+  breakdownJson Json
+  calculatedAt  DateTime         @default(now())
+  employee      user             @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+  @@index([employeeId, year, month])
+}
+
+enum KpiType {
+  EVENT
+  TARGET
+}
+
+enum BonusResultType {
+  BONUS_CASH
+  SAFE_ZONE
+  PENALTY_SATURDAY
+  PENALTY_DEDUCTION
+  TOP_PERFORMER
+}
