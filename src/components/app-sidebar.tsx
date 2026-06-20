@@ -3,19 +3,13 @@
 import * as React from "react";
 import {
   IconBuilding,
-  IconCamera,
+  IconBuildingBank,
   IconCoin,
+  IconCurrencyDollar,
   IconDashboard,
   IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
   IconListDetails,
   IconReport,
-  IconSearch,
   IconSettings,
   IconUserCircle,
   IconUsers,
@@ -23,9 +17,10 @@ import {
   IconTargetArrow,
   IconBrandTabler,
   IconFingerprint,
+  IconPencil,
+  type Icon,
 } from "@tabler/icons-react";
 
-import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -36,128 +31,197 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import { user } from "@src/generated/prisma/client";
+import { PERMISSIONS, can } from "@/lib/permissions";
 
-const data = {
-  navMain: [
+interface NavItem {
+  title: string;
+  url: string;
+  icon?: Icon;
+  exact?: boolean;
+}
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: user;
+  permissions: string[];
+}
+
+export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
+  if (!user) {
+    throw new Error("AppSidebar requires a user but received undefined.");
+  }
+
+  const navMain: NavItem[] = [
     {
       title: "Dashboard",
       url: "/dashboard",
       icon: IconDashboard,
     },
-    {
+  ];
+
+  if (can(permissions, PERMISSIONS.ATTENDANCE_VIEW_OWN)) {
+    navMain.push({
       title: "Presensi",
       url: "/dashboard/attendance",
       icon: IconFingerprint,
-    },
-  ],
-  navKPI: [
-    {
+    });
+  }
+
+  // ── KPI ────────────────────────────────────────────────────────────────────
+  const navKPI: NavItem[] = [];
+
+  if (can(permissions, PERMISSIONS.KPI_MANAGE)) {
+    navKPI.push({
       title: "Konfigurasi",
       url: "/dashboard/kpi",
       icon: IconTargetArrow,
       exact: true,
-    },
-    {
+    });
+    navKPI.push({
       title: "Definisi KPI",
       url: "/dashboard/kpi/definitions",
       icon: IconListDetails,
-    },
-    {
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.KPI_VIEW_ALL)) {
+    navKPI.push({
       title: "Log KPI",
       url: "/dashboard/kpi/log",
       icon: IconReport,
-    },
-  ],
-  navPayroll: [
-    {
+    });
+  }
+
+  // Karyawan biasa hanya bisa self-fill
+  if (
+    can(permissions, PERMISSIONS.KPI_FILL_OWN) &&
+    !can(permissions, PERMISSIONS.KPI_VIEW_ALL)
+  ) {
+    navKPI.push({
+      title: "Isi KPI Saya",
+      url: "/dashboard/kpi/self",
+      icon: IconPencil,
+    });
+  }
+
+  // ── Payroll ────────────────────────────────────────────────────────────────
+  const navPayroll: NavItem[] = [];
+
+  if (can(permissions, PERMISSIONS.PAYROLL_MANAGE)) {
+    navPayroll.push({
       title: "Hitung Gaji",
       url: "/dashboard/payroll",
       icon: IconCoin,
-    },
-  ],
-  navStock: [
-    {
+    });
+  }
+
+  // ── Stock ──────────────────────────────────────────────────────────────────
+  const navStock: NavItem[] = [];
+
+  if (can(permissions, PERMISSIONS.STOCK_VIEW)) {
+    navStock.push({
       title: "Stock Management",
       url: "/dashboard/stock-management",
       icon: IconDatabase,
-    },
-    {
+    });
+    navStock.push({
       title: "Stok Harian",
       url: "/dashboard/stok-harian",
       icon: IconListDetails,
-    },
-  ],
-  navManagement: [
-    {
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+    navStock.push({
+      title: "Rekening Bank",
+      url: "/dashboard/bank-accounts",
+      icon: IconBuildingBank,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
+    navStock.push({
+      title: "Mata Uang",
+      url: "/dashboard/currencies",
+      icon: IconCurrencyDollar,
+    });
+  }
+
+  // ── Management ─────────────────────────────────────────────────────────────
+  const navManagement: NavItem[] = [];
+
+  if (can(permissions, PERMISSIONS.USERS_VIEW)) {
+    navManagement.push({
       title: "Pengguna",
       url: "/dashboard/users",
       icon: IconUsers,
-    },
-    {
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.BRANCHES_VIEW)) {
+    navManagement.push({
       title: "Cabang",
       url: "/dashboard/branches",
       icon: IconBuilding,
-    },
-    {
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.ROLES_VIEW)) {
+    navManagement.push({
       title: "Role & Akses",
       url: "/dashboard/roles",
       icon: IconId,
-    },
-    {
-      title: "Account",
-      url: "/dashboard/account",
-      icon: IconUserCircle,
-    },
-  ],
-  navSecondary: [
+    });
+  }
+
+  // Account selalu tersedia
+  navManagement.push({
+    title: "Account",
+    url: "/dashboard/account",
+    icon: IconUserCircle,
+  });
+
+  const navSecondary: NavItem[] = [
     {
       title: "Setting",
       url: "/dashboard/setting",
       icon: IconSettings,
     },
-  ],
-};
+  ];
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: user;
-}
-
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  if (!user) {
-    throw new Error("AppSidebar requires a user but received undefined.");
-  }
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="py-4 px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg">
-            <IconBrandTabler className="size-5" />
-          </div>
-          <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="truncate font-display text-base font-bold tracking-tight text-premium">
-              Pusat Valas Indo
-            </span>
-            <span className="truncate text-xs text-muted-foreground font-medium">
-              Enterprise Suite
-            </span>
-          </div>
-        </div>
+      <SidebarHeader className="py-3 px-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" className="pointer-events-none select-none">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg">
+                <IconBrandTabler className="size-5" />
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">Pusat Valas Indo</span>
+                <span className="truncate text-xs text-muted-foreground">Enterprise Suite</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavMain items={data.navKPI} label="KPI Management" />
-        <NavMain items={data.navPayroll} label="Payroll" />
-        <NavMain items={data.navStock} label="Inventory & Treasury" />
-        <NavMain items={data.navManagement} label="Management" />
+        <NavMain items={navMain} />
+        {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
+        {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
+        {navStock.length > 0 && <NavMain items={navStock} label="Inventory & Treasury" />}
+        <NavMain items={navManagement} label="Management" />
         <div className="mt-auto">
-          <NavMain items={data.navSecondary} label="System" />
+          <NavMain items={navSecondary} label="System" />
         </div>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

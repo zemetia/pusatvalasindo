@@ -22,6 +22,7 @@ model Attendance {
   checkInManualLat   Float?
   checkInManualLng   Float?
   isLocationSuspect  Boolean          @default(false)
+  isWithDoctorNote   Boolean          @default(false)
   status             AttendanceStatus @default(PRESENT)
   notes              String?
   createdAt          DateTime         @default(now())

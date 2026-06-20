@@ -133,6 +133,7 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   checkInManualLat: 'checkInManualLat',
   checkInManualLng: 'checkInManualLng',
   isLocationSuspect: 'isLocationSuspect',
+  isWithDoctorNote: 'isWithDoctorNote',
   status: 'status',
   notes: 'notes',
   createdAt: 'createdAt',

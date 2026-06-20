@@ -69,6 +69,7 @@ export default async function KpiDetailPage({ params }: PageProps) {
       <RoleKpiDetailClient
         company={company}
         roleName={roleName}
+        displayRoleName={displayRoleName}
         roleKpis={serializedRoleKpis}
         definitions={serializedDefinitions}
       />

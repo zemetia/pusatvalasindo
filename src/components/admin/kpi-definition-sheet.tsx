@@ -3,14 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect } from "./premium-field";
 import { BarChart2, Tag, Layers } from "lucide-react";
 
@@ -37,7 +31,6 @@ const empty = { name: "", type: "" };
 export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(empty);
 
   const isEdit = !!definition;
@@ -50,32 +43,38 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
     }
   }, [open, definition]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const saveMutation = useMutation({
+    mutationFn: async (body: typeof form) => {
+      const url = isEdit
+        ? `/api/kpi-definitions/${definition!.id}`
+        : "/api/kpi-definitions";
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Gagal menyimpan");
+      return data.data;
+    },
+    onSuccess: () => {
+      toast.success(
+        isEdit ? "Definisi KPI diperbarui" : "Definisi KPI ditambahkan"
+      );
+      setOpen(false);
+      onSaved?.();
+      router.refresh();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.type) {
       toast.error("Nama dan tipe KPI wajib diisi");
       return;
     }
-    setLoading(true);
-    try {
-      const url = isEdit ? `/api/kpi-definitions/${definition.id}` : "/api/kpi-definitions";
-      const res = await fetch(url, {
-        method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.message || "Gagal menyimpan");
-        return;
-      }
-      toast.success(isEdit ? "Definisi KPI diperbarui" : "Definisi KPI ditambahkan");
-      setOpen(false);
-      onSaved?.();
-      router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    saveMutation.mutate(form);
   };
 
   return (
@@ -92,7 +91,13 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <button
+            style={{
+              background: "linear-gradient(to right, #dc2626, #f43f5e)",
+              boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)",
+            }}
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200"
+          >
             <BarChart2 className="w-4 h-4" />
             Tambah Definisi KPI
           </button>
@@ -101,7 +106,7 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
       footer={
         <AdminFormFooter
           onCancel={() => setOpen(false)}
-          loading={loading}
+          loading={saveMutation.isPending}
           submitLabel={isEdit ? "Simpan Perubahan" : "Tambah"}
         />
       }
@@ -122,7 +127,9 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
         onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
         disabled={isEdit}
       >
-        <option value="" disabled>Pilih tipe</option>
+        <option value="" disabled>
+          Pilih tipe
+        </option>
         {Object.entries(KPI_TYPE_LABELS).map(([val, label]) => (
           <option key={val} value={val}>
             {label}
@@ -143,3 +150,4 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
     </AdminFormSidebar>
   );
 }
+

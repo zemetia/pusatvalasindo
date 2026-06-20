@@ -3455,6 +3455,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
+    isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
     createdAt: Date | null
@@ -3474,6 +3475,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
+    isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
     createdAt: Date | null
@@ -3493,6 +3495,7 @@ export namespace Prisma {
     checkInManualLat: number
     checkInManualLng: number
     isLocationSuspect: number
+    isWithDoctorNote: number
     status: number
     notes: number
     createdAt: number
@@ -3528,6 +3531,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    isWithDoctorNote?: true
     status?: true
     notes?: true
     createdAt?: true
@@ -3547,6 +3551,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    isWithDoctorNote?: true
     status?: true
     notes?: true
     createdAt?: true
@@ -3566,6 +3571,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    isWithDoctorNote?: true
     status?: true
     notes?: true
     createdAt?: true
@@ -3672,6 +3678,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean
+    isWithDoctorNote: boolean
     status: $Enums.AttendanceStatus
     notes: string | null
     createdAt: Date
@@ -3710,6 +3717,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -3731,6 +3739,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -3752,6 +3761,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
     createdAt?: boolean
@@ -3773,13 +3783,14 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
@@ -3812,6 +3823,7 @@ export namespace Prisma {
       checkInManualLat: number | null
       checkInManualLng: number | null
       isLocationSuspect: boolean
+      isWithDoctorNote: boolean
       status: $Enums.AttendanceStatus
       notes: string | null
       createdAt: Date
@@ -4253,6 +4265,7 @@ export namespace Prisma {
     readonly checkInManualLat: FieldRef<"Attendance", 'Float'>
     readonly checkInManualLng: FieldRef<"Attendance", 'Float'>
     readonly isLocationSuspect: FieldRef<"Attendance", 'Boolean'>
+    readonly isWithDoctorNote: FieldRef<"Attendance", 'Boolean'>
     readonly status: FieldRef<"Attendance", 'AttendanceStatus'>
     readonly notes: FieldRef<"Attendance", 'String'>
     readonly createdAt: FieldRef<"Attendance", 'DateTime'>
@@ -30545,6 +30558,7 @@ export namespace Prisma {
     checkInManualLat: 'checkInManualLat',
     checkInManualLng: 'checkInManualLng',
     isLocationSuspect: 'isLocationSuspect',
+    isWithDoctorNote: 'isWithDoctorNote',
     status: 'status',
     notes: 'notes',
     createdAt: 'createdAt',
@@ -31112,6 +31126,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
@@ -31133,6 +31148,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrderInput | SortOrder
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
+    isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -31158,6 +31174,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
@@ -31179,6 +31196,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrderInput | SortOrder
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
+    isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -31206,6 +31224,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolWithAggregatesFilter<"Attendance"> | boolean
+    isWithDoctorNote?: BoolWithAggregatesFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusWithAggregatesFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
@@ -32954,6 +32973,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -32975,6 +32995,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -32992,6 +33013,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33013,6 +33035,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33032,6 +33055,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -33049,6 +33073,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33068,6 +33093,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35042,6 +35068,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -35068,6 +35095,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -35087,6 +35115,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
@@ -39536,6 +39565,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -39555,6 +39585,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -39857,6 +39888,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
@@ -40710,6 +40742,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -40729,6 +40762,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -43002,6 +43036,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -43125,6 +43160,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43144,6 +43180,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43162,6 +43199,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43404,6 +43442,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
     createdAt?: Date | string
@@ -43634,6 +43673,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43653,6 +43693,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43671,6 +43712,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

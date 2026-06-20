@@ -4,7 +4,7 @@ import * as React from "react"
 import { usePathname as useNextPathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { X, Globe, Search, ArrowRight } from "lucide-react"
+import { X, Globe, Search, ArrowRight, LogIn } from "lucide-react"
 import { Link, routing, usePathname, useRouter } from "@src/i18n/routing"
 import { useLocale, useTranslations } from "next-intl"
 
@@ -54,12 +54,20 @@ export function Header() {
             </div>
           </Link>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
              <div className="hidden md:flex items-center gap-4 px-6 py-3 bg-neutral-900 text-white rounded-2xl shadow-xl hover:bg-primary transition-all group cursor-pointer">
                 <span className="text-[10px] font-black uppercase tracking-widest">Connect Desk</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
              </div>
-             
+
+             <Link
+               href="/login"
+               className="flex items-center gap-2 px-5 py-3 bg-white border border-black/10 rounded-2xl shadow-xl hover:bg-primary hover:text-white hover:border-primary transition-all group"
+             >
+               <LogIn className="w-4 h-4" />
+               <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t("login")}</span>
+             </Link>
+
              <button
                className="p-4 bg-white rounded-3xl text-neutral-900 border border-black/5 shadow-xl hover:scale-110 active:scale-95 transition-all"
                onClick={() => setIsOpen(true)}

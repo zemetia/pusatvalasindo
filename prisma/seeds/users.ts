@@ -1,5 +1,6 @@
 import { hashPassword } from 'better-auth/crypto'
 import type { PrismaClient } from '../../src/generated/prisma/client'
+import { getPermissionsForRole } from '../../src/lib/permissions'
 
 const MOCK_USERS = [
   { id: 'user_superadmin', name: 'Super Admin', email: 'superadmin@zemetia.com', companyCode: null, branchName: null, systemRole: 'SUPER_ADMIN' },
@@ -8,9 +9,12 @@ const MOCK_USERS = [
 ]
 
 async function getOrCreateSystemRole(prisma: PrismaClient, name: string): Promise<string> {
+  const permissions = getPermissionsForRole(name)
   let role = await prisma.custom_role.findFirst({ where: { name, companyId: null } })
   if (!role) {
-    role = await prisma.custom_role.create({ data: { name, companyId: null, permissions: [] } })
+    role = await prisma.custom_role.create({ data: { name, companyId: null, permissions } })
+  } else if (role.permissions.length === 0) {
+    role = await prisma.custom_role.update({ where: { id: role.id }, data: { permissions } })
   }
   return role.id
 }

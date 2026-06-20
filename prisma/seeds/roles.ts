@@ -2,6 +2,7 @@
 import type { PrismaClient } from '../../src/generated/prisma/client';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
+import { getPermissionsForRole } from '../../src/lib/permissions';
 
 export async function seedRoles(prisma: PrismaClient, companyIds: Record<string, string>) {
   console.log('  🗑️ Cleaning up old roles and matrices...')
@@ -59,6 +60,7 @@ export async function seedRoles(prisma: PrismaClient, companyIds: Record<string,
     console.log(`  🌱 Seeding roles for ${companyCode}: ${roles.join(', ')}`);
 
     for (const roleName of roles) {
+      const permissions = getPermissionsForRole(roleName);
       await prisma.custom_role.upsert({
         where: {
           name_companyId: {
@@ -66,11 +68,11 @@ export async function seedRoles(prisma: PrismaClient, companyIds: Record<string,
             companyId: companyId,
           },
         },
-        update: {},
+        update: { permissions },
         create: {
           name: roleName,
           companyId: companyId,
-          permissions: [], // Default empty
+          permissions,
         },
       });
     }

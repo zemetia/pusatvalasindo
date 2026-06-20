@@ -1,6 +1,10 @@
 import prisma from "@/lib/prisma";
 import { kpiService } from "./kpi.service";
 import { NotFoundError } from "@/backend/errors/app-error";
+import type { BreakdownItem } from "@/lib/kpi-utils";
+
+const WORK_START_HOUR = 17;
+const WORK_START_MINUTE = 40;
 
 export const payrollService = {
   calculateMonthlyPayroll: async (
@@ -11,7 +15,6 @@ export const payrollService = {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 1);
 
-    // 1. Fetch Employee Data (Salary Components)
     const employee = await prisma.user.findUnique({
       where: { id: employeeId },
       select: {
@@ -25,16 +28,13 @@ export const payrollService = {
 
     if (!employee) throw new NotFoundError("Karyawan tidak ditemukan");
 
-    // 2. Get KPI Results (Bonus & Score)
-    // This will call the kpiService logic we previously separated
+    // KPI calculation also saves/updates the KpiMonthlyResult record
     const kpiResult = await kpiService.calculateMonthlyResult(employeeId, month, year);
 
-    // 3. Fetch Attendance Data
     const attendances = await prisma.attendance.findMany({
       where: { userId: employeeId, date: { gte: startDate, lt: endDate } },
     });
 
-    // 4. Payroll Calculation Logic
     const base = Number(employee.baseSalary ?? 0);
     const meal = Number(employee.mealAllowance ?? 0);
     const transport = Number(employee.transportAllowance ?? 0);
@@ -43,41 +43,39 @@ export const payrollService = {
 
     let totalLateDeduction = 0;
     let totalAbsenceDeduction = 0;
-    
-    // Constant for late check (Matching app/api/attendance/route.ts)
-    const WORK_START_HOUR = 17;
-    const WORK_START_MINUTE = 40;
 
     for (const att of attendances) {
-      // A. Late Deduction (1 min = 1000)
       if (att.status === "LATE" && att.checkIn) {
         const checkIn = new Date(att.checkIn);
         const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
         const targetMinutes = WORK_START_HOUR * 60 + WORK_START_MINUTE;
-        
         if (checkInMinutes > targetMinutes) {
-          const lateMinutes = checkInMinutes - targetMinutes;
-          totalLateDeduction += lateMinutes * 1000;
+          totalLateDeduction += (checkInMinutes - targetMinutes) * 1_000;
         }
       }
 
-      // B. Status Based Deduction
       if (att.status === "SICK") {
-        totalAbsenceDeduction += dailyRate; // Ijin Sakit = 1 hari
+        totalAbsenceDeduction += dailyRate;
       } else if (att.status === "PERMISSION") {
-        // Detect "Tanpa Surat Dokter" from notes
-        const isWithoutNote = att.notes?.toLowerCase().includes("tanpa surat");
-        if (isWithoutNote) {
-          totalAbsenceDeduction += dailyRate * 2; // Tanpa S. Dokter = 2 hari
-        } else {
-          totalAbsenceDeduction += dailyRate; // Ijin ACC Bos = 1 hari
-        }
+        // Tanpa surat dokter = potong 2 hari; dengan surat = 1 hari
+        totalAbsenceDeduction += att.isWithDoctorNote ? dailyRate : dailyRate * 2;
       } else if (att.status === "ABSENT") {
-        totalAbsenceDeduction += dailyRate * 2; // Alfa = 2 hari
+        totalAbsenceDeduction += dailyRate * 2;
       }
     }
 
-    const bonusKpi = Number(kpiResult.bonusAmount ?? 0);
+    // Determine signed KPI adjustment based on result type
+    const bonusRaw = Number(kpiResult.bonusAmount ?? 0);
+    const resultType = kpiResult.bonusResult;
+    let bonusKpi: number;
+    if (resultType === "PENALTY_DEDUCTION" || resultType === "PENALTY_SATURDAY") {
+      bonusKpi = -bonusRaw;
+    } else if (resultType === "BONUS_CASH" || resultType === "TOP_PERFORMER") {
+      bonusKpi = bonusRaw;
+    } else {
+      bonusKpi = 0; // SAFE_ZONE or undefined
+    }
+
     const totalDeductions = totalLateDeduction + totalAbsenceDeduction;
     const takeHomePay = totalGrossFixed - totalDeductions + bonusKpi;
 
@@ -96,8 +94,11 @@ export const payrollService = {
       },
       kpi: {
         score: Number(kpiResult.totalScore),
-        bonus: bonusKpi,
-        resultType: kpiResult.bonusResult,
+        bonusAmount: bonusRaw,
+        bonusKpi,
+        resultType,
+        breakdownJson: kpiResult.breakdownJson as { items: BreakdownItem[] },
+        calculatedAt: kpiResult.calculatedAt.toISOString(),
       },
       deductions: {
         late: totalLateDeduction,
@@ -109,7 +110,7 @@ export const payrollService = {
       },
       attendanceDetail: {
         totalDaysLogged: attendances.length,
-      }
+      },
     };
   },
 };

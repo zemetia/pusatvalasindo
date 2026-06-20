@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import {
   Sheet,
   SheetContent,
@@ -20,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { KpiDefinitionRow, KPI_TYPE_LABELS } from "../kpi-definition-sheet";
 
 export type RoleKpiDetailRow = {
@@ -35,14 +42,39 @@ export type RoleKpiDetailRow = {
 
 interface Props {
   companyId: string;
-   customRoleId: string;
+  customRoleId: string;
   definitions: KpiDefinitionRow[];
   roleKpi?: RoleKpiDetailRow;
   configuredKpiIds: string[];
+  currentTotalPct: number;
   trigger?: React.ReactNode;
 }
 
-const empty = { kpiId: "", maxScore: "", targetValue: "", threshold: "" };
+const empty = { kpiId: "", bobot: "", targetValue: "", threshold: "" };
+
+function FieldLabel({
+  children,
+  tooltip,
+}: {
+  children: React.ReactNode;
+  tooltip: string;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <Label>{children}</Label>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" className="text-muted-foreground hover:text-foreground">
+            <IconInfoCircle className="size-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-56 text-xs">
+          {tooltip}
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
 
 export function RoleKpiDetailSheet({
   companyId,
@@ -50,11 +82,11 @@ export function RoleKpiDetailSheet({
   definitions,
   roleKpi,
   configuredKpiIds,
+  currentTotalPct,
   trigger,
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(empty);
 
   const isEdit = !!roleKpi;
@@ -73,8 +105,10 @@ export function RoleKpiDetailSheet({
     if (open && roleKpi) {
       setForm({
         kpiId: roleKpi.kpiId,
-        maxScore: String(Number(roleKpi.maxScore)),
-        targetValue: roleKpi.targetValue ? String(Number(roleKpi.targetValue)) : "",
+        bobot: String(Math.round(Number(roleKpi.maxScore) * 100)),
+        targetValue: roleKpi.targetValue
+          ? String(Number(roleKpi.targetValue))
+          : "",
         threshold: roleKpi.threshold ? String(Number(roleKpi.threshold)) : "",
       });
     } else if (!open) {
@@ -82,17 +116,45 @@ export function RoleKpiDetailSheet({
     }
   }, [open, roleKpi]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const saveMutation = useMutation({
+    mutationFn: async (body: Record<string, unknown>) => {
+      const url = isEdit
+        ? `/api/role-kpis/${roleKpi!.id}`
+        : "/api/role-kpis";
+      const res = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Gagal menyimpan");
+      return data.data;
+    },
+    onSuccess: () => {
+      toast.success(isEdit ? "KPI diperbarui" : "KPI ditambahkan");
+      setOpen(false);
+      router.refresh();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const bobotNum = parseFloat(form.bobot) || 0;
+  const remaining = 100 - currentTotalPct;
+  const afterFill = currentTotalPct + bobotNum;
+  const barOverflow = afterFill > 100;
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isEdit && !form.kpiId) {
-      toast.error("Pilih definisi KPI");
+      toast.error("Pilih KPI terlebih dahulu");
       return;
     }
-    const maxScore = parseFloat(form.maxScore);
-    if (!form.maxScore || isNaN(maxScore) || maxScore <= 0 || maxScore > 1) {
-      toast.error("Max score harus antara 0 dan 1 (contoh: 0.4)");
+    if (!form.bobot || isNaN(bobotNum) || bobotNum <= 0 || bobotNum > 100) {
+      toast.error("Bobot harus antara 1% dan 100%");
       return;
     }
+
+    const maxScore = bobotNum / 100;
 
     const body: Record<string, unknown> = isEdit
       ? {
@@ -107,29 +169,13 @@ export function RoleKpiDetailSheet({
           kpiId: form.kpiId,
           maxScore,
           weight: maxScore,
-          targetValue: form.targetValue ? parseFloat(form.targetValue) : undefined,
+          targetValue: form.targetValue
+            ? parseFloat(form.targetValue)
+            : undefined,
           threshold: form.threshold ? parseFloat(form.threshold) : undefined,
         };
 
-    setLoading(true);
-    try {
-      const url = isEdit ? `/api/role-kpis/${roleKpi!.id}` : "/api/role-kpis";
-      const res = await fetch(url, {
-        method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.message || "Gagal menyimpan");
-        return;
-      }
-      toast.success(isEdit ? "KPI diperbarui" : "KPI ditambahkan");
-      setOpen(false);
-      router.refresh();
-    } finally {
-      setLoading(false);
-    }
+    saveMutation.mutate(body);
   };
 
   return (
@@ -139,11 +185,15 @@ export function RoleKpiDetailSheet({
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Konfigurasi Bobot KPI" : "Tambah KPI"}</SheetTitle>
+          <SheetTitle>
+            {isEdit ? "Edit Bobot KPI" : "Tambah KPI ke Jabatan Ini"}
+          </SheetTitle>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6 px-1">
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-6 px-1">
+          {/* KPI selector */}
           <div className="grid gap-1.5">
-            <Label>Definisi KPI *</Label>
+            <Label>KPI *</Label>
             <Select
               value={form.kpiId}
               onValueChange={(v) => setForm((f) => ({ ...f, kpiId: v }))}
@@ -155,69 +205,140 @@ export function RoleKpiDetailSheet({
               <SelectContent>
                 {availableDefinitions.map((d) => (
                   <SelectItem key={d.id} value={d.id}>
-                    {d.name} — {KPI_TYPE_LABELS[d.type] ?? d.type}
+                    {d.name}
+                    <span className="ml-1 text-muted-foreground">
+                      — {KPI_TYPE_LABELS[d.type] ?? d.type}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {!isEdit && availableDefinitions.length === 0 && (
               <p className="text-xs text-muted-foreground">
-                Semua definisi KPI sudah dikonfigurasi untuk jabatan ini.
+                Semua KPI sudah dikonfigurasi untuk jabatan ini.
               </p>
             )}
           </div>
 
-          <div className="grid gap-1.5">
-            <Label>Bobot * (0–1, total bobot per jabatan harus = 1)</Label>
-            <Input
-              type="number"
-              min="0.01"
-              max="1"
-              step="0.01"
-              placeholder="Contoh: 0.4"
-              value={form.maxScore}
-              onChange={(e) => setForm((f) => ({ ...f, maxScore: e.target.value }))}
-            />
+          {/* Bobot % + live bar */}
+          <div className="grid gap-2">
+            <FieldLabel tooltip="Persentase kontribusi KPI ini terhadap total skor. Jumlah semua bobot harus mencapai 100%.">
+              Bobot (%)
+            </FieldLabel>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                placeholder="Contoh: 40"
+                value={form.bobot}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, bobot: e.target.value }))
+                }
+                className="w-28"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
+
+            {/* Live progress bar */}
+            <div className="flex flex-col gap-1">
+              <div className="h-2 rounded-full bg-muted overflow-hidden flex">
+                <div
+                  className="h-full bg-muted-foreground/30 transition-all"
+                  style={{ width: `${Math.min(currentTotalPct, 100)}%` }}
+                />
+                {bobotNum > 0 && (
+                  <div
+                    className={`h-full transition-all ${
+                      barOverflow ? "bg-destructive" : "bg-primary"
+                    }`}
+                    style={{
+                      width: `${Math.min(bobotNum, Math.max(100 - currentTotalPct, 0))}%`,
+                    }}
+                  />
+                )}
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>
+                  Total setelah disimpan:{" "}
+                  <span
+                    className={`font-medium ${
+                      barOverflow ? "text-destructive" : "text-foreground"
+                    }`}
+                  >
+                    {afterFill.toFixed(0)}%
+                  </span>
+                </span>
+                <span>
+                  Sisa:{" "}
+                  <span
+                    className={`font-medium ${
+                      remaining <= 0 ? "text-destructive" : "text-foreground"
+                    }`}
+                  >
+                    {Math.max(remaining, 0).toFixed(0)}%
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
 
+          {/* EVENT: Batas Poin */}
           {currentType === "EVENT" && (
             <div className="grid gap-1.5">
-              <Label>Threshold (total poin sebelum skor 0)</Label>
+              <FieldLabel tooltip="Jika total poin pelanggaran melebihi angka ini dalam satu bulan, skor KPI menjadi 0.">
+                Batas Poin Pelanggaran
+              </FieldLabel>
               <Input
                 type="number"
                 min="1"
                 placeholder="Contoh: 100"
                 value={form.threshold}
-                onChange={(e) => setForm((f) => ({ ...f, threshold: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, threshold: e.target.value }))
+                }
               />
               <p className="text-xs text-muted-foreground">
-                Skor = bobot × MAX((threshold − total_pelanggaran) / threshold, 0)
+                Contoh: batas 100, pelanggaran 40 poin → skor 60% dari bobot.
               </p>
             </div>
           )}
 
+          {/* TARGET: Target Omzet */}
           {currentType === "TARGET" && (
             <div className="grid gap-1.5">
-              <Label>Target Value (target revenue dalam IDR)</Label>
+              <FieldLabel tooltip="Target omzet yang harus dicapai karyawan per bulan. Pencapaian di atas 120% tidak dihitung lebih.">
+                Target Omzet per Bulan (Rp)
+              </FieldLabel>
               <Input
                 type="number"
                 min="1"
-                placeholder="Contoh: 100000000"
+                placeholder="Contoh: 50000000"
                 value={form.targetValue}
-                onChange={(e) => setForm((f) => ({ ...f, targetValue: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, targetValue: e.target.value }))
+                }
               />
               <p className="text-xs text-muted-foreground">
-                Skor = bobot × MIN(actual / target, 1.2)
+                Contoh: target Rp 50jt, omzet Rp 40jt → pencapaian 80% dari
+                bobot.
               </p>
             </div>
           )}
 
           <Button
             type="submit"
-            disabled={loading || (!isEdit && availableDefinitions.length === 0)}
-            className="mt-2"
+            disabled={
+              saveMutation.isPending ||
+              (!isEdit && availableDefinitions.length === 0)
+            }
           >
-            {loading ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Tambah"}
+            {saveMutation.isPending
+              ? "Menyimpan..."
+              : isEdit
+              ? "Simpan Perubahan"
+              : "Tambah KPI"}
           </Button>
         </form>
       </SheetContent>

@@ -70,6 +70,25 @@ function KonfigurasiTab({
                   (s) => s.companyId === c.id && s.customRoleId === role.id
                 );
                 const isComplete = !!summary && Math.abs(summary.totalWeight - 1) < 0.001;
+                if (!summary) {
+                  return (
+                    <Card
+                      key={role.id}
+                      className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50 border-dashed"
+                      onClick={() => router.push(`/dashboard/kpi/${c.id}/custom_${role.id}`)}
+                    >
+                      <CardContent className="py-6 flex flex-col items-center gap-2 text-center">
+                        <span className="text-2xl">📋</span>
+                        <CardTitle className="text-sm font-semibold">{role.name}</CardTitle>
+                        <p className="text-xs text-muted-foreground">Belum ada KPI</p>
+                        <span className="mt-1 inline-flex items-center rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs font-medium text-primary">
+                          + Atur KPI Jabatan Ini
+                        </span>
+                      </CardContent>
+                    </Card>
+                  );
+                }
+
                 return (
                   <Card
                     key={role.id}
@@ -80,18 +99,11 @@ function KonfigurasiTab({
                       <CardTitle className="text-sm font-semibold">{role.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="pb-4 flex flex-wrap gap-2">
-                      {summary ? (
-                        <>
-                          <Badge variant="secondary">{summary.kpiCount} KPI</Badge>
-                          <Badge variant={isComplete ? "default" : "destructive"}>
-                            {(summary.totalWeight * 100).toFixed(0)}%
-                          </Badge>
-                        </>
-                      ) : (
-                        <Badge variant="outline" className="text-muted-foreground">
-                          Belum dikonfigurasi
-                        </Badge>
-                      )}
+                      <Badge variant="secondary">{summary.kpiCount} KPI</Badge>
+                      <Badge variant={isComplete ? "default" : "destructive"}>
+                        {(summary.totalWeight * 100).toFixed(0)}%
+                        {isComplete ? " ✓" : " — belum 100%"}
+                      </Badge>
                     </CardContent>
                   </Card>
                 );

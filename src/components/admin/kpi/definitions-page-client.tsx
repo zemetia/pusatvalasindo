@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,26 +27,36 @@ export function DefinitionsPageClient({
 }) {
   const router = useRouter();
 
-  const handleDelete = async (id: string, name: string) => {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/kpi-definitions/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Gagal menghapus");
+    },
+    onSuccess: () => {
+      toast.success("Definisi KPI dihapus");
+      router.refresh();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleDelete = (id: string, name: string) => {
     if (!confirm(`Hapus definisi KPI "${name}"?`)) return;
-    const res = await fetch(`/api/kpi-definitions/${id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (!res.ok) {
-      toast.error(data.message || "Gagal menghapus");
-      return;
-    }
-    toast.success("Definisi KPI dihapus");
-    router.refresh();
+    deleteMutation.mutate(id);
   };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak jabatan.
+          Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak
+          jabatan.
         </p>
         <KpiDefinitionSheet trigger={<Button size="sm">+ Tambah</Button>} />
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -94,6 +105,7 @@ export function DefinitionsPageClient({
                         size="icon"
                         variant="ghost"
                         className="text-destructive hover:text-destructive"
+                        disabled={deleteMutation.isPending}
                         onClick={() => handleDelete(d.id, d.name)}
                       >
                         <IconTrash className="size-4" />

@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import { auth } from "@/lib/auth"; // path to your Better Auth server instance
+import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 import { redirect } from "next/navigation";
@@ -19,20 +19,25 @@ export default async function layout({
 }>) {
   const { locale } = await params;
   const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
+    headers: await headers(),
   });
 
   if (!session?.user) {
     redirect(`/${locale}/login`);
   }
-  
+
   const fullUser = await prisma.user.findUnique({
     where: { id: session.user.id },
+    include: {
+      customRole: { select: { name: true, permissions: true } },
+    },
   });
 
   if (!fullUser) {
     redirect(`/${locale}/login`);
   }
+
+  const permissions = fullUser.customRole?.permissions ?? [];
 
   return (
     <SidebarProvider
@@ -43,10 +48,7 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar
-        user={fullUser}
-        variant="inset"
-      />
+      <AppSidebar user={fullUser} permissions={permissions} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
