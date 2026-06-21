@@ -1,3 +1,5 @@
+export const maxDuration = 30; // extend Vercel function timeout to 30s
+
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
