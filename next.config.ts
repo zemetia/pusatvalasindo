@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [],
   },
+  serverExternalPackages: ["pg", "@prisma/adapter-pg"],
 };
 
 export default withNextIntl(nextConfig);
