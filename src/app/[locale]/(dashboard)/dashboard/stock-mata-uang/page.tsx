@@ -27,14 +27,27 @@ function fmtRate(val: unknown): string {
 }
 
 export default async function StockMataUangPage() {
-  const [stocks, branches, currencies] = await Promise.all([
-    prisma.currencyStock.findMany({
-      include: { branch: true, currency: true },
-      orderBy: [{ branch: { name: "asc" } }, { currency: { code: "asc" } }],
-    }),
-    prisma.branch.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
-    prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: "asc" } }),
-  ]);
+  let result;
+  try {
+    result = await Promise.all([
+      prisma.currencyStock.findMany({
+        include: { branch: true, currency: true },
+        orderBy: [{ branch: { name: "asc" } }, { currency: { code: "asc" } }],
+      }),
+      prisma.branch.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
+      prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: "asc" } }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[stock-mata-uang/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [stocks, branches, currencies] = result;
 
   const serializedBranches = branches.map((b) => ({ id: b.id, name: b.name }));
   const serializedCurrencies = currencies.map((c) => ({

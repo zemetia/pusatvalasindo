@@ -14,14 +14,26 @@ export default async function KpiSelfPage({
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect(`/${locale}/login`);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      name: true,
-      customRole: { select: { id: true, name: true, permissions: true } },
-    },
-  });
+  let user;
+  try {
+    user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        customRole: { select: { id: true, name: true, permissions: true } },
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[kpi/self/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
 
   if (!user) redirect(`/${locale}/login`);
 
@@ -38,15 +50,27 @@ export default async function KpiSelfPage({
   }
 
   const customRoleId = user.customRole?.id;
-  const roleKpisRaw = customRoleId
-    ? await prisma.roleKpi.findMany({
-        where: { customRoleId },
-        select: {
-          kpiId: true,
-          definition: { select: { name: true, type: true } },
-        },
-      })
-    : [];
+  let roleKpisRaw;
+  try {
+    roleKpisRaw = customRoleId
+      ? await prisma.roleKpi.findMany({
+          where: { customRoleId },
+          select: {
+            kpiId: true,
+            definition: { select: { name: true, type: true } },
+          },
+        })
+      : [];
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[kpi/self/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
 
   const roleKpis = roleKpisRaw.map((rk) => ({
     kpiId: rk.kpiId,

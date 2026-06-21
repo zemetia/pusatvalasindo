@@ -14,33 +14,46 @@ export default async function KpiDetailPage({ params }: PageProps) {
   }
   const customRoleId = roleName.replace("custom_", "");
 
-  const [company, roleKpisRaw, definitions, customRole] = await Promise.all([
-    prisma.company.findUnique({
-      where: { id: companyId },
-      select: { id: true, name: true, code: true },
-    }),
-    prisma.roleKpi.findMany({
-      where: { 
-        companyId, 
-        customRoleId: customRoleId
-      },
-      select: {
-        id: true,
-        kpiId: true,
-        customRoleId: true,
-        maxScore: true,
-        targetValue: true,
-        threshold: true,
-        weight: true,
-        definition: { select: { id: true, name: true, type: true } },
-      },
-      orderBy: { definition: { name: "asc" } },
-    }),
-    prisma.kpiDefinition.findMany({
-      orderBy: [{ type: "asc" }, { name: "asc" }],
-    }),
-    prisma.custom_role.findUnique({ where: { id: customRoleId } })
-  ]);
+  let kpiDetailData;
+  try {
+    kpiDetailData = await Promise.all([
+      prisma.company.findUnique({
+        where: { id: companyId },
+        select: { id: true, name: true, code: true },
+      }),
+      prisma.roleKpi.findMany({
+        where: {
+          companyId,
+          customRoleId: customRoleId
+        },
+        select: {
+          id: true,
+          kpiId: true,
+          customRoleId: true,
+          maxScore: true,
+          targetValue: true,
+          threshold: true,
+          weight: true,
+          definition: { select: { id: true, name: true, type: true } },
+        },
+        orderBy: { definition: { name: "asc" } },
+      }),
+      prisma.kpiDefinition.findMany({
+        orderBy: [{ type: "asc" }, { name: "asc" }],
+      }),
+      prisma.custom_role.findUnique({ where: { id: customRoleId } })
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[kpi/[companyId]/[roleName]/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [company, roleKpisRaw, definitions, customRole] = kpiDetailData;
 
   if (!company || !customRole) notFound();
   

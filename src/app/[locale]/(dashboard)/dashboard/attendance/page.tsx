@@ -40,18 +40,30 @@ export default async function AttendancePage({
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  const initialRecords = await prisma.attendance.findMany({
-    where: {
-      userId: session.user.id,
-      date: {
-        gte: startOfMonth,
-        lte: endOfMonth,
+  let initialRecords;
+  try {
+    initialRecords = await prisma.attendance.findMany({
+      where: {
+        userId: session.user.id,
+        date: {
+          gte: startOfMonth,
+          lte: endOfMonth,
+        },
       },
-    },
-    orderBy: {
-      date: "desc",
-    },
-  });
+      orderBy: {
+        date: "desc",
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[attendance/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
 
   return (
     <div className="container max-w-4xl px-4 mx-auto">

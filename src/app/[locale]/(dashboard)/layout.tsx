@@ -26,12 +26,24 @@ export default async function layout({
     redirect(`/${locale}/login`);
   }
 
-  const fullUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: {
-      customRole: { select: { name: true, permissions: true } },
-    },
-  });
+  let fullUser;
+  try {
+    fullUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        customRole: { select: { name: true, permissions: true } },
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return (
+      <div className="flex min-h-screen items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[Dashboard layout — DB error]\n\n${msg}`}
+        </pre>
+      </div>
+    );
+  }
 
   if (!fullUser) {
     redirect(`/${locale}/login`);

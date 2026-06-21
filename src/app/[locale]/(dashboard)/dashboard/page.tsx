@@ -83,6 +83,113 @@ export default async function DashboardPage({
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
 
+  let dashboardData;
+  try {
+    dashboardData = await Promise.all([
+      prisma.user.count({ where: { isActive: true } }),
+
+      prisma.branch.count({ where: { isActive: true } }),
+
+      prisma.attendance.count({
+        where: { date: todayDate, status: { in: ["PRESENT", "LATE"] } },
+      }),
+
+      prisma.bankAccount.findMany({
+        where: { isActive: true },
+        include: { branch: true, currency: true },
+        orderBy: [{ branch: { name: "asc" } }, { bankName: "asc" }],
+      }),
+
+      prisma.currencyStock.findMany({
+        include: { branch: true, currency: true },
+        orderBy: [{ branch: { name: "asc" } }, { currency: { code: "asc" } }],
+      }),
+
+      prisma.bankMutation.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        include: { bankAccount: { include: { branch: true, currency: true } } },
+      }),
+
+      prisma.kpiMonthlyResult.findMany({
+        where: { month: currentMonth, year: currentYear },
+        include: {
+          employee: {
+            select: { name: true, branch: { select: { name: true } } },
+          },
+        },
+        orderBy: { totalScore: "desc" },
+        take: 5,
+      }),
+
+      prisma.attendance.findMany({
+        where: { date: todayDate },
+        include: {
+          user: { select: { name: true, branch: { select: { name: true } } } },
+        },
+        orderBy: { checkIn: "desc" },
+        take: 8,
+      }),
+
+      prisma.kpiLog.count({
+        where: {
+          createdAt: {
+            gte: new Date(currentYear, currentMonth - 1, 1),
+            lt: new Date(currentYear, currentMonth, 1),
+          },
+        },
+      }),
+
+      // #1 — karyawan aktif yang belum punya record attendance hari ini
+      prisma.user.findMany({
+        where: {
+          isActive: true,
+          attendances: { none: { date: todayDate } },
+        },
+        select: {
+          id: true,
+          name: true,
+          branch: { select: { name: true } },
+        },
+        orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
+      }),
+
+      // #2 — total nilai stok hari ini (semua cabang)
+      prisma.dailyStockEntry.aggregate({
+        where: { date: todayDate },
+        _sum: { totalIdr: true },
+      }),
+
+      // #2 — nilai stok per cabang
+      prisma.dailyStockEntry.findMany({
+        where: { date: todayDate },
+        include: { stockItem: { include: { branch: true } } },
+      }),
+
+      // #3 — presensi mencurigakan hari ini
+      prisma.attendance.findMany({
+        where: { date: todayDate, isLocationSuspect: true },
+        include: {
+          user: { select: { name: true, branch: { select: { name: true } } } },
+        },
+      }),
+
+      // #5 — berapa karyawan sudah dihitung KPI bulan ini
+      prisma.kpiMonthlyResult.count({
+        where: { month: currentMonth, year: currentYear },
+      }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[dashboard/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+
   const [
     totalEmployees,
     totalBranches,
@@ -102,100 +209,7 @@ export default async function DashboardPage({
     suspectAttendance,
     // #5 - status payroll
     kpiCalculatedCount,
-  ] = await Promise.all([
-    prisma.user.count({ where: { isActive: true } }),
-
-    prisma.branch.count({ where: { isActive: true } }),
-
-    prisma.attendance.count({
-      where: { date: todayDate, status: { in: ["PRESENT", "LATE"] } },
-    }),
-
-    prisma.bankAccount.findMany({
-      where: { isActive: true },
-      include: { branch: true, currency: true },
-      orderBy: [{ branch: { name: "asc" } }, { bankName: "asc" }],
-    }),
-
-    prisma.currencyStock.findMany({
-      include: { branch: true, currency: true },
-      orderBy: [{ branch: { name: "asc" } }, { currency: { code: "asc" } }],
-    }),
-
-    prisma.bankMutation.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      include: { bankAccount: { include: { branch: true, currency: true } } },
-    }),
-
-    prisma.kpiMonthlyResult.findMany({
-      where: { month: currentMonth, year: currentYear },
-      include: {
-        employee: {
-          select: { name: true, branch: { select: { name: true } } },
-        },
-      },
-      orderBy: { totalScore: "desc" },
-      take: 5,
-    }),
-
-    prisma.attendance.findMany({
-      where: { date: todayDate },
-      include: {
-        user: { select: { name: true, branch: { select: { name: true } } } },
-      },
-      orderBy: { checkIn: "desc" },
-      take: 8,
-    }),
-
-    prisma.kpiLog.count({
-      where: {
-        createdAt: {
-          gte: new Date(currentYear, currentMonth - 1, 1),
-          lt: new Date(currentYear, currentMonth, 1),
-        },
-      },
-    }),
-
-    // #1 — karyawan aktif yang belum punya record attendance hari ini
-    prisma.user.findMany({
-      where: {
-        isActive: true,
-        attendances: { none: { date: todayDate } },
-      },
-      select: {
-        id: true,
-        name: true,
-        branch: { select: { name: true } },
-      },
-      orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
-    }),
-
-    // #2 — total nilai stok hari ini (semua cabang)
-    prisma.dailyStockEntry.aggregate({
-      where: { date: todayDate },
-      _sum: { totalIdr: true },
-    }),
-
-    // #2 — nilai stok per cabang
-    prisma.dailyStockEntry.findMany({
-      where: { date: todayDate },
-      include: { stockItem: { include: { branch: true } } },
-    }),
-
-    // #3 — presensi mencurigakan hari ini
-    prisma.attendance.findMany({
-      where: { date: todayDate, isLocationSuspect: true },
-      include: {
-        user: { select: { name: true, branch: { select: { name: true } } } },
-      },
-    }),
-
-    // #5 — berapa karyawan sudah dihitung KPI bulan ini
-    prisma.kpiMonthlyResult.count({
-      where: { month: currentMonth, year: currentYear },
-    }),
-  ]);
+  ] = dashboardData;
 
   // Aggregate stok per cabang dari data mentah
   const stockByBranch = todayStockByBranch.reduce<

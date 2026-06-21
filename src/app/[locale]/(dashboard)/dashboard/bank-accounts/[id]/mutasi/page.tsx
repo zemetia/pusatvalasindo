@@ -7,10 +7,22 @@ type Params = { params: Promise<{ id: string }> };
 export default async function BankMutasiPage({ params }: Params) {
   const { id } = await params;
 
-  const account = await prisma.bankAccount.findUnique({
-    where: { id },
-    include: { branch: true, currency: true, mutations: { orderBy: { createdAt: "desc" } } },
-  });
+  let account;
+  try {
+    account = await prisma.bankAccount.findUnique({
+      where: { id },
+      include: { branch: true, currency: true, mutations: { orderBy: { createdAt: "desc" } } },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[bank-accounts/[id]/mutasi/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
 
   if (!account) notFound();
 

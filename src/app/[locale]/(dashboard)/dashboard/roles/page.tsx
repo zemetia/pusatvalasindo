@@ -3,17 +3,30 @@ import { RolesPageClient } from "@/components/admin/roles-page-client";
 import { IconShieldLock } from "@tabler/icons-react";
 
 export default async function RolesPage() {
-  const [roles, companies] = await Promise.all([
-    prisma.custom_role.findMany({
-      orderBy: { name: "asc" },
-      include: {
-        _count: { select: { users: true } },
-      },
-    }),
-    prisma.company.findMany({
-      orderBy: { name: "asc" },
-    }),
-  ]);
+  let result;
+  try {
+    result = await Promise.all([
+      prisma.custom_role.findMany({
+        orderBy: { name: "asc" },
+        include: {
+          _count: { select: { users: true } },
+        },
+      }),
+      prisma.company.findMany({
+        orderBy: { name: "asc" },
+      }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[roles/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [roles, companies] = result;
 
   return (
     <div className="flex flex-col gap-8 px-4 lg:px-8 py-6">

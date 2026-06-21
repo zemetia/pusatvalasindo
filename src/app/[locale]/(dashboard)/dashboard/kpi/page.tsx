@@ -6,19 +6,32 @@ import {
 } from "@/components/admin/kpi-page-client";
 
 export default async function KpiPage() {
-  const [companies, roleKpisRaw, customRoles] = await Promise.all([
-    prisma.company.findMany({ orderBy: { name: "asc" } }),
-    prisma.roleKpi.findMany({
-      select: {
-        companyId: true,
-        customRoleId: true,
-        maxScore: true,
-      },
-    }),
-    prisma.custom_role.findMany({
-      orderBy: { name: "asc" },
-    }),
-  ]);
+  let result;
+  try {
+    result = await Promise.all([
+      prisma.company.findMany({ orderBy: { name: "asc" } }),
+      prisma.roleKpi.findMany({
+        select: {
+          companyId: true,
+          customRoleId: true,
+          maxScore: true,
+        },
+      }),
+      prisma.custom_role.findMany({
+        orderBy: { name: "asc" },
+      }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[kpi/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [companies, roleKpisRaw, customRoles] = result;
 
   const summaryMap: Record<string, RoleKpiSummaryRow> = {};
   for (const rk of roleKpisRaw) {

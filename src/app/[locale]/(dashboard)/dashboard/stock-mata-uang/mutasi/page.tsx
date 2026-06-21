@@ -40,15 +40,28 @@ function fmtIDR(val: unknown): string {
 }
 
 export default async function MutasiStokPage() {
-  const [mutations, branches, currencies] = await Promise.all([
-    prisma.stockMutation.findMany({
-      include: { branch: true, currency: true },
-      orderBy: { createdAt: "desc" },
-      take: 200,
-    }),
-    prisma.branch.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
-    prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: "asc" } }),
-  ]);
+  let result;
+  try {
+    result = await Promise.all([
+      prisma.stockMutation.findMany({
+        include: { branch: true, currency: true },
+        orderBy: { createdAt: "desc" },
+        take: 200,
+      }),
+      prisma.branch.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
+      prisma.currency.findMany({ where: { isActive: true }, orderBy: { code: "asc" } }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[stock-mata-uang/mutasi/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [mutations, branches, currencies] = result;
 
   const serializedBranches = branches.map((b) => ({ id: b.id, name: b.name }));
   const serializedCurrencies = currencies.map((c) => ({

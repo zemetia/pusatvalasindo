@@ -28,20 +28,33 @@ interface PageProps {
 export default async function BranchItemsPage({ params }: PageProps) {
   const { id } = await params;
 
-    const [branch, items, companies] = await Promise.all([
-    prisma.branch.findUnique({
-      where: { id },
-      select: { id: true, name: true, companyId: true },
-    }),
-    prisma.stockItem.findMany({
-      where: { branchId: id },
-      orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
-    }),
-    prisma.company.findMany({
-      where: { isActive: true },
-      select: { id: true, name: true },
-    }),
-  ]);
+  let result;
+  try {
+    result = await Promise.all([
+      prisma.branch.findUnique({
+        where: { id },
+        select: { id: true, name: true, companyId: true },
+      }),
+      prisma.stockItem.findMany({
+        where: { branchId: id },
+        orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
+      }),
+      prisma.company.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true },
+      }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    return (
+      <div className="flex min-h-[400px] items-center justify-center p-8">
+        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
+          {`[branches/[id]/items/page — fetch error]\n\n${msg}`}
+        </pre>
+      </div>
+    )
+  }
+  const [branch, items, companies] = result;
 
   if (!branch) notFound();
 
