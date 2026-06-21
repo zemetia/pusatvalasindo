@@ -94,7 +94,7 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* Sidebar Premium Styles */
-  --sidebar-background: oklch(0.98 0.01 23);
+  --sidebar-background: oklch(1 0 0);
   --sidebar-foreground: oklch(0.15 0.02 23);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
