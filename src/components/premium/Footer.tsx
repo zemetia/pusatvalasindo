@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "@src/i18n/routing"
 import { Landmark, ArrowUpRight, Instagram, Facebook, Globe, Phone, Mail } from "lucide-react"
 
 const footerLinks = [

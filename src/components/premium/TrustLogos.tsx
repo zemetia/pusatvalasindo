@@ -19,17 +19,17 @@ export function TrustLogos() {
           <div className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60 whitespace-nowrap">
             Regulated by
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-12 lg:gap-24 grayscale brightness-[5]">
+          <div className="flex flex-wrap items-center justify-center gap-12 lg:gap-24">
             {partners.map((partner) => (
               <motion.div
                 key={partner.id}
-                whileHover={{ scale: 1.1, filter: "none" }}
-                className="flex items-center gap-3 group px-4 py-2"
+                whileHover={{ scale: 1.1 }}
+                className="flex items-center gap-3 group px-4 py-2 opacity-60 hover:opacity-100 transition-opacity"
               >
-                <div className="w-8 h-8 rounded-full border-2 border-black/10 group-hover:border-primary transition-colors flex items-center justify-center font-black text-[8px] bg-white backdrop-blur-md">
+                <div className="w-8 h-8 rounded-full border-2 border-white/40 group-hover:border-white transition-colors flex items-center justify-center font-black text-[8px] bg-white/10 text-white backdrop-blur-md">
                   {partner.id.toUpperCase()}
                 </div>
-                <span className="text-sm font-black uppercase tracking-widest text-neutral-500 group-hover:text-neutral-900 transition-colors">
+                <span className="text-sm font-black uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">
                   {partner.name}
                 </span>
               </motion.div>

@@ -38,6 +38,7 @@ export default async function layout({
   }
 
   const permissions = fullUser.customRole?.permissions ?? [];
+  const sidebarUser = { name: fullUser.name, email: fullUser.email };
 
   return (
     <SidebarProvider
@@ -48,7 +49,7 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={fullUser} permissions={permissions} />
+      <AppSidebar user={sidebarUser} permissions={permissions} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

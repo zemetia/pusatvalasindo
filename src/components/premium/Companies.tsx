@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import Link from "next/link"
+import { Link } from "@src/i18n/routing"
 import { motion } from "framer-motion"
 import { ArrowUpRight, Landmark, Globe, SendHorizontal, ShieldCheck, ExternalLink } from "lucide-react"
 

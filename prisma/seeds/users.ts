@@ -13,7 +13,7 @@ async function getOrCreateSystemRole(prisma: PrismaClient, name: string): Promis
   let role = await prisma.custom_role.findFirst({ where: { name, companyId: null } })
   if (!role) {
     role = await prisma.custom_role.create({ data: { name, companyId: null, permissions } })
-  } else if (role.permissions.length === 0) {
+  } else {
     role = await prisma.custom_role.update({ where: { id: role.id }, data: { permissions } })
   }
   return role.id

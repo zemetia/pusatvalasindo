@@ -33,7 +33,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { user } from "@src/generated/prisma/client";
 import { PERMISSIONS, can } from "@/lib/permissions";
 
 interface NavItem {
@@ -43,8 +42,10 @@ interface NavItem {
   exact?: boolean;
 }
 
+type SidebarUser = { name: string; email: string };
+
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  user: user;
+  user: SidebarUser;
   permissions: string[];
 }
 

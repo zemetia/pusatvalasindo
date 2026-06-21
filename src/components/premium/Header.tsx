@@ -60,14 +60,6 @@ export function Header() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
              </div>
 
-             <Link
-               href="/login"
-               className="flex items-center gap-2 px-5 py-3 bg-white border border-black/10 rounded-2xl shadow-xl hover:bg-primary hover:text-white hover:border-primary transition-all group"
-             >
-               <LogIn className="w-4 h-4" />
-               <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">{t("login")}</span>
-             </Link>
-
              <button
                className="p-4 bg-white rounded-3xl text-neutral-900 border border-black/5 shadow-xl hover:scale-110 active:scale-95 transition-all"
                onClick={() => setIsOpen(true)}
@@ -95,27 +87,46 @@ export function Header() {
             </div>
 
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-               <nav className="flex flex-col gap-2">
-                 {navLinks.map((link, i) => (
-                    <motion.div
-                      key={link.href}
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                    >
-                      <Link
-                        href={link.href as any}
-                        className={cn(
-                         "text-3xl sm:text-4xl lg:text-5xl xl:text-5xl font-display font-black italic tracking-tighter hover:text-primary transition-all uppercase leading-none block py-2",
-                         pathname === link.href ? "text-primary" : "text-neutral-900"
-                        )}
-                        onClick={() => setIsOpen(false)}
+               <div className="flex flex-col gap-2">
+                 <nav className="flex flex-col gap-2">
+                   {navLinks.map((link, i) => (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
                       >
-                        {link.name}.
-                      </Link>
-                    </motion.div>
-                 ))}
-               </nav>
+                        <Link
+                          href={link.href as any}
+                          className={cn(
+                           "text-3xl sm:text-4xl lg:text-5xl xl:text-5xl font-display font-black italic tracking-tighter hover:text-primary transition-all uppercase leading-none block py-2",
+                           pathname === link.href ? "text-primary" : "text-neutral-900"
+                          )}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {link.name}.
+                        </Link>
+                      </motion.div>
+                   ))}
+                 </nav>
+
+                 <motion.div
+                   initial={{ opacity: 0, x: -50 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   transition={{ delay: navLinks.length * 0.1 + 0.1 }}
+                   className="mt-8 pt-8 border-t border-black/5"
+                 >
+                   <Link
+                     href="/login"
+                     onClick={() => setIsOpen(false)}
+                     className="inline-flex items-center gap-4 px-8 py-5 bg-neutral-900 text-white rounded-2xl hover:bg-primary transition-all group"
+                   >
+                     <LogIn className="w-5 h-5" />
+                     <span className="font-black uppercase tracking-[0.3em] text-sm">{t("login")}</span>
+                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                   </Link>
+                 </motion.div>
+               </div>
 
                <div className="hidden lg:flex flex-col justify-center gap-12 border-l border-black/5 pl-12 xl:pl-24">
                   <div className="space-y-4">
