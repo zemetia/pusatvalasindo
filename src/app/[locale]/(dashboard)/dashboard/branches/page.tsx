@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { BranchesPageClient } from "@/components/admin/branches-page-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconBuilding } from "@tabler/icons-react";
 
 export default async function BranchesPage() {
   let result;
@@ -29,12 +31,11 @@ export default async function BranchesPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Cabang</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Kelola seluruh cabang bisnis per perusahaan
-        </p>
-      </div>
+      <PageHeader
+        title="Cabang"
+        description="Kelola seluruh cabang bisnis per perusahaan"
+        icon={<IconBuilding className="size-5" />}
+      />
 
       <BranchesPageClient
         companies={companies}

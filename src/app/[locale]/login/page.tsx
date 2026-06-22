@@ -1,7 +1,20 @@
 import { LoginForm } from "@/components/auth/login-form";
 import Image from "next/image";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Page() {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session?.user) {
+    redirect(`/${locale}/dashboard`);
+  }
+
   return (
     <div className="relative min-h-svh w-full flex items-center justify-center overflow-hidden bg-zinc-50">
       {/* Background Soft Accents */}

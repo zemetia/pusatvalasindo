@@ -9,6 +9,11 @@ import { applySecurityHeaders } from './proxy/security-headers';
 
 const intlMiddleware = createMiddleware(routing);
 
+function extractLocale(pathname: string): string {
+  const match = pathname.match(/^\/(en|id)(\/|$)/);
+  return match ? match[1] : "en";
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -47,21 +52,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Handle Auth Redirects (locale-aware)
-  const isAuthPage = ["/login", "/signup"].some(p =>
-    pathname === p || pathname.startsWith(`/en${p}`) || pathname.startsWith(`/id${p}`)
-  );
+  const locale = extractLocale(pathname);
+
   const isDashboardPage =
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/") ||
     pathname.startsWith("/en/dashboard") ||
     pathname.startsWith("/id/dashboard");
 
-  if (isAuthPage && sessionCookie) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
+  // Guard: redirect to login if no session cookie at all.
+  // We do NOT redirect away from login/signup here — that check lives in the login
+  // page itself using a real session validation, preventing stale-cookie redirect loops.
   if (isDashboardPage && !sessionCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url));
   }
 
   // 3. Handle i18n + security headers

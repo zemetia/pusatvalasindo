@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { RoleSheet, RoleRow } from "./role-sheet";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 
@@ -17,7 +18,6 @@ export function RoleActions({ role, currentCompanyId }: Props) {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus role "${role.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/roles/${role.id}`, { method: "DELETE" });
@@ -45,15 +45,22 @@ export function RoleActions({ role, currentCompanyId }: Props) {
         }
       />
 
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/5 transition-colors"
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/5 transition-colors"
+            disabled={deleting}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus role "${role.name}"?`}
+        description="Tindakan ini tidak bisa dibatalkan."
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   );
 }

@@ -41,8 +41,8 @@ export const PUT = withValidation(updateAccountSchema)(
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
-    await bankAccountService.deactivate(id);
-    return NextResponse.json(ok(null, "Bank account deactivated"));
+    await bankAccountService.delete(id);
+    return NextResponse.json(ok(null, "Rekening berhasil dihapus"));
   } catch (e) {
     return handleError(e);
   }

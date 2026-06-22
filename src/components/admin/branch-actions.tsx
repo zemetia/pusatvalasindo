@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BranchSheet, BranchRow } from "./branch-sheet";
 import { IconPencil, IconTrash, IconPackage } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import Link from "next/link";
 
 interface Props {
@@ -33,7 +34,6 @@ export function BranchActions({ branch, companies }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus cabang "${branch.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/branches/${branch.id}`, { method: "DELETE" });
@@ -71,15 +71,22 @@ export function BranchActions({ branch, companies }: Props) {
         }
       />
 
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-destructive hover:text-destructive"
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={deleting}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus cabang "${branch.name}"?`}
+        description="Tindakan ini tidak bisa dibatalkan."
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   );
 }

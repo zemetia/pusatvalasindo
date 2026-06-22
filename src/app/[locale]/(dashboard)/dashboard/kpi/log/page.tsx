@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { LogPageClient } from "@/components/admin/kpi/log-page-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconReport } from "@tabler/icons-react";
 
 export default async function KpiLogPage() {
   let result;
@@ -63,12 +65,11 @@ export default async function KpiLogPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Log KPI</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Catat pelanggaran dan target / omset karyawan.
-        </p>
-      </div>
+      <PageHeader
+        title="Log KPI"
+        description="Catat pelanggaran dan target / omset karyawan."
+        icon={<IconReport className="size-5" />}
+      />
       <LogPageClient
         users={serializedUsers}
         roleKpis={serializedRoleKpis}

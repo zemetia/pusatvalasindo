@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -13,7 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IconTrash, IconPencil } from "@tabler/icons-react";
+import { IconTrash, IconPencil, IconSearch } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import {
   KpiDefinitionSheet,
   KpiDefinitionRow,
@@ -26,6 +29,17 @@ export function DefinitionsPageClient({
   definitions: KpiDefinitionRow[];
 }) {
   const router = useRouter();
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    if (!q) return definitions;
+    return definitions.filter((d) =>
+      [d.name, KPI_TYPE_LABELS[d.type] ?? d.type].some((v) =>
+        v?.toLowerCase().includes(q)
+      )
+    );
+  }, [definitions, search]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -42,8 +56,7 @@ export function DefinitionsPageClient({
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const handleDelete = (id: string, name: string) => {
-    if (!confirm(`Hapus definisi KPI "${name}"?`)) return;
+  const handleDelete = (id: string) => {
     deleteMutation.mutate(id);
   };
 
@@ -56,6 +69,19 @@ export function DefinitionsPageClient({
         </p>
         <KpiDefinitionSheet trigger={<Button size="sm">+ Tambah</Button>} />
       </div>
+
+      {definitions.length > 0 && (
+        <div className="relative max-w-xs">
+          <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          <Input
+            type="search"
+            placeholder="Cari nama atau tipe KPI..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -77,8 +103,14 @@ export function DefinitionsPageClient({
                   Belum ada definisi KPI.
                 </TableCell>
               </TableRow>
+            ) : filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  Tidak ada hasil untuk &ldquo;{search}&rdquo;
+                </TableCell>
+              </TableRow>
             ) : (
-              definitions.map((d) => (
+              filtered.map((d) => (
                 <TableRow key={d.id}>
                   <TableCell className="font-medium">{d.name}</TableCell>
                   <TableCell>
@@ -101,15 +133,22 @@ export function DefinitionsPageClient({
                           </Button>
                         }
                       />
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        disabled={deleteMutation.isPending}
-                        onClick={() => handleDelete(d.id, d.name)}
-                      >
-                        <IconTrash className="size-4" />
-                      </Button>
+                      <DeleteConfirmDialog
+                        trigger={
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive"
+                            disabled={deleteMutation.isPending}
+                          >
+                            <IconTrash className="size-4" />
+                          </Button>
+                        }
+                        title={`Hapus definisi KPI "${d.name}"?`}
+                        description="Tindakan ini tidak dapat dibatalkan."
+                        onConfirm={() => handleDelete(d.id)}
+                        loading={deleteMutation.isPending}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

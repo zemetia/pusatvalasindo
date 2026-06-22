@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -13,7 +12,6 @@ import {
 } from "@/components/ui/table";
 import { StockItemSheet } from "@/components/admin/stock-item-sheet";
 import { StockItemActions } from "@/components/admin/stock-item-actions";
-import { IconArrowLeft } from "@tabler/icons-react";
 
 const TYPE_LABELS: Record<string, string> = {
   CURRENCY: "Mata Uang",
@@ -62,19 +60,15 @@ export default async function BranchItemsPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" asChild className="-ml-2">
-              <Link href="/dashboard/branches">
-                <IconArrowLeft className="size-4" />
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-semibold">Item Stok — {branch.name}</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
+            <Link href="/dashboard/branches" className="hover:text-foreground transition-colors">Cabang</Link>
+            <span>/</span>
+            <span className="text-foreground font-medium">{branch.name}</span>
           </div>
-          <p className="text-sm text-muted-foreground ml-10">
-            Kelola item stok untuk cabang ini
-          </p>
+          <h1 className="text-2xl font-semibold">Item Stok — {branch.name}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Kelola item stok untuk cabang ini</p>
         </div>
         <StockItemSheet branches={branches} companies={companies} defaultBranchId={branch.id} />
       </div>

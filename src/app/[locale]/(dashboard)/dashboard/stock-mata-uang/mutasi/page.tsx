@@ -1,6 +1,5 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -72,18 +71,15 @@ export default async function MutasiStokPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/stock-mata-uang">← Stok</Link>
-            </Button>
-            <span className="text-muted-foreground">/</span>
-            <h1 className="text-2xl font-semibold">Riwayat Mutasi Stok</h1>
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
+            <Link href="/dashboard/stock-mata-uang" className="hover:text-foreground transition-colors">Stok Mata Uang</Link>
+            <span>/</span>
+            <span className="text-foreground font-medium">Riwayat Mutasi</span>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            200 mutasi terbaru
-          </p>
+          <h1 className="text-2xl font-semibold">Riwayat Mutasi Stok</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">200 mutasi terbaru</p>
         </div>
         <StockMutationSheet
           branches={serializedBranches}

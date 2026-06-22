@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -38,7 +39,9 @@ import {
   IconAlertTriangle,
   IconUserOff,
   IconChartBar,
+  IconDashboard,
 } from "@tabler/icons-react";
+import { PageHeader } from "@/components/admin/page-header";
 
 type Numeric = { toString(): string } | string | number | null | undefined;
 
@@ -243,18 +246,16 @@ export default async function DashboardPage({
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Ringkasan operasional Pusat Valas Indo —{" "}
-          {now.toLocaleDateString("id-ID", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description={`Ringkasan operasional Pusat Valas Indo — ${now.toLocaleDateString("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })}`}
+        icon={<IconDashboard className="size-5" />}
+      />
 
       {/* #3 — Alert: Presensi Mencurigakan */}
       {suspectAttendance.length > 0 && (

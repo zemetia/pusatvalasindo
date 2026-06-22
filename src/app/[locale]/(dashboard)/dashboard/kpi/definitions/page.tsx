@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { DefinitionsPageClient } from "@/components/admin/kpi/definitions-page-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconListDetails } from "@tabler/icons-react";
 
 export default async function KpiDefinitionsPage() {
   let definitions;
@@ -28,12 +30,11 @@ export default async function KpiDefinitionsPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Definisi KPI</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak jabatan.
-        </p>
-      </div>
+      <PageHeader
+        title="Definisi KPI"
+        description="Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak jabatan."
+        icon={<IconListDetails className="size-5" />}
+      />
       <DefinitionsPageClient definitions={serialized} />
     </div>
   );

@@ -43,8 +43,10 @@ type BankAccount = {
   bankName: string;
   accountName: string;
   accountNumber: string | null;
+  currencyId: string;
   balance: any; // Decimal
   currency: { code: string };
+  note: string | null;
   isActive: boolean;
 };
 
@@ -85,15 +87,21 @@ export function StockManagementClient({ companies, branches, currencies }: Props
 
   const filteredItems = currentBranch ? [
     ...currentBranch.stockItems.map(i => ({ ...i, category: 'ITEM', currency: undefined, balance: undefined })),
-    ...currentBranch.bankAccounts.map(a => ({ 
-      id: a.id, 
-      name: `${a.bankName} - ${a.accountName}`, 
-      code: a.accountNumber, 
-      type: 'BANK_ACCOUNT', 
-      isActive: a.isActive, 
+    ...currentBranch.bankAccounts.map(a => ({
+      id: a.id,
+      name: `${a.bankName} - ${a.accountName}`,
+      code: a.accountNumber,
+      type: 'BANK_ACCOUNT',
+      isActive: a.isActive,
       category: 'BANK',
       currency: a.currency.code,
-      balance: a.balance
+      balance: a.balance,
+      // Full fields needed for the edit form
+      bankName: a.bankName,
+      accountName: a.accountName,
+      accountNumber: a.accountNumber,
+      currencyId: a.currencyId,
+      note: a.note,
     }))
   ].filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { RolesPageClient } from "@/components/admin/roles-page-client";
+import { PageHeader } from "@/components/admin/page-header";
 import { IconShieldLock } from "@tabler/icons-react";
 
 export default async function RolesPage() {
@@ -29,18 +30,12 @@ export default async function RolesPage() {
   const [roles, companies] = result;
 
   return (
-    <div className="flex flex-col gap-8 px-4 lg:px-8 py-6">
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-primary/10 text-primary shadow-sm border border-primary/20">
-            <IconShieldLock className="size-6" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Role</h1>
-        </div>
-        <p className="text-[14px] text-slate-500 font-medium max-w-2xl leading-relaxed mt-1">
-          Kelola hak akses dan tanggung jawab personel berdasarkan perusahaan untuk memastikan keamanan dan efisiensi operasional.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6 px-4 lg:px-6">
+      <PageHeader
+        title="Manajemen Role"
+        description="Kelola hak akses dan tanggung jawab personel berdasarkan perusahaan."
+        icon={<IconShieldLock className="size-5" />}
+      />
 
       <RolesPageClient
         companies={companies}

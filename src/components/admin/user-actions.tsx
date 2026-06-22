@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserSheet, UserRow } from "./user-sheet";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 
 type Branch = { id: string; name: string; companyId: string | null };
 type Company = { id: string; name: string };
@@ -38,12 +39,6 @@ export function UserActions({ user, branches, companies, roles }: Props) {
   };
 
   const handleDelete = async () => {
-    if (
-      !confirm(
-        `Hapus pengguna "${user.name}" (${user.email})? Semua sesi akan dihapus dan tindakan ini tidak bisa dibatalkan.`
-      )
-    )
-      return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/users/${user.id}`, { method: "DELETE" });
@@ -77,15 +72,22 @@ export function UserActions({ user, branches, companies, roles }: Props) {
         }
       />
 
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-destructive hover:text-destructive"
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={deleting}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus pengguna "${user.name}"?`}
+        description={`Akun ${user.email} dan semua sesi akan dihapus. Tindakan ini tidak bisa dibatalkan.`}
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   );
 }

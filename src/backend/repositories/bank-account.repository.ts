@@ -48,4 +48,14 @@ export const bankAccountRepository = {
       where: { id },
       data: { isActive: false },
     }),
+
+  countRelated: async (id: string) => {
+    const [mutations, dailyEntries] = await Promise.all([
+      prisma.bankMutation.count({ where: { bankAccountId: id } }),
+      prisma.dailyBankEntry.count({ where: { bankAccountId: id } }),
+    ]);
+    return mutations + dailyEntries;
+  },
+
+  hardDelete: (id: string) => prisma.bankAccount.delete({ where: { id } }),
 };

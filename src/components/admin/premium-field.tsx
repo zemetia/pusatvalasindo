@@ -3,9 +3,6 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import {
-  SelectTrigger,
-} from "@/components/ui/select";
 
 // ─── Floating-Label Input ──────────────────────────────────────────────────────
 

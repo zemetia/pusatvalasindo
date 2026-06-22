@@ -4,6 +4,8 @@ import {
   CompanyRow,
   RoleKpiSummaryRow,
 } from "@/components/admin/kpi-page-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconTargetArrow } from "@tabler/icons-react";
 
 export default async function KpiPage() {
   let result;
@@ -77,12 +79,11 @@ export default async function KpiPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Konfigurasi KPI</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Konfigurasi KPI per perusahaan dan jabatan.
-        </p>
-      </div>
+      <PageHeader
+        title="Konfigurasi KPI"
+        description="Konfigurasi KPI per perusahaan dan jabatan."
+        icon={<IconTargetArrow className="size-5" />}
+      />
       <KpiPageClient
         companies={serializedCompanies}
         customRoles={serializedCustomRoles}

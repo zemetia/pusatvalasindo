@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { KpiSelfFillClient } from "@/components/kpi-self-fill-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconPencil } from "@tabler/icons-react";
 
 export default async function KpiSelfPage({
   params,
@@ -80,12 +82,11 @@ export default async function KpiSelfPage({
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">KPI Saya</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Catat kejadian atau pelanggaran KPI yang terjadi pada diri Anda.
-        </p>
-      </div>
+      <PageHeader
+        title="KPI Saya"
+        description="Catat kejadian atau pelanggaran KPI yang terjadi pada diri Anda."
+        icon={<IconPencil className="size-5" />}
+      />
       <KpiSelfFillClient
         userId={user.id}
         userName={user.name}

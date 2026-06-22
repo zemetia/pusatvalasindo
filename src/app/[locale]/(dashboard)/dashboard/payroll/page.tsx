@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { PayrollPageClient } from "@/components/admin/payroll/payroll-page-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconCoin } from "@tabler/icons-react";
 
 export default async function PayrollPage() {
   let users;
@@ -36,12 +38,11 @@ export default async function PayrollPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Hitung Gaji</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Hitung gaji bulanan karyawan berdasarkan gaji pokok dan hasil KPI.
-        </p>
-      </div>
+      <PageHeader
+        title="Hitung Gaji"
+        description="Hitung gaji bulanan karyawan berdasarkan gaji pokok dan hasil KPI."
+        icon={<IconCoin className="size-5" />}
+      />
       <PayrollPageClient users={serializedUsers} />
     </div>
   );

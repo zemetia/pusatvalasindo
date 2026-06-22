@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma";
 import { StockManagementClient } from "@/components/admin/stock-management-client";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconDatabase } from "@tabler/icons-react";
 
 export default async function StockManagementPage() {
   let result;
@@ -45,12 +47,11 @@ export default async function StockManagementPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Stock Management</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Unified management for currencies, assets, and bank accounts across all branches
-        </p>
-      </div>
+      <PageHeader
+        title="Stock Management"
+        description="Kelola mata uang, aset, dan rekening bank di seluruh cabang."
+        icon={<IconDatabase className="size-5" />}
+      />
 
       <StockManagementClient
         companies={companies}

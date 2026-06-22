@@ -5,6 +5,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconFingerprint } from "@tabler/icons-react";
 
 export async function generateMetadata({
   params,
@@ -66,18 +68,16 @@ export default async function AttendancePage({
   }
 
   return (
-    <div className="container max-w-4xl px-4 mx-auto">
-      <div className="flex flex-col gap-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{t("title")}</h1>
-          <p className="text-slate-500 font-medium">{t("description")}</p>
-        </div>
-        
-        <AttendanceClient 
-          userId={session.user.id} 
-          initialRecords={JSON.parse(JSON.stringify(initialRecords))} 
-        />
-      </div>
+    <div className="flex flex-col gap-6 px-4 lg:px-6">
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        icon={<IconFingerprint className="size-5" />}
+      />
+      <AttendanceClient
+        userId={session.user.id}
+        initialRecords={JSON.parse(JSON.stringify(initialRecords))}
+      />
     </div>
   );
 }

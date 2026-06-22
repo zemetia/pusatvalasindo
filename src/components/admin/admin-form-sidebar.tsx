@@ -3,6 +3,7 @@
 import { ReactNode, Children } from "react";
 import { motion } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -158,24 +159,21 @@ export function AdminFormFooter({
 }: AdminFormFooterProps) {
   return (
     <div className="flex gap-3">
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={onCancel}
-        className="flex-1 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200 transition-all duration-150"
+        className="flex-1"
       >
         {cancelLabel}
-      </button>
-      <button
+      </Button>
+      <Button
         type="submit"
         disabled={loading}
-        style={{
-          background: loading ? "#a78bfa" : "linear-gradient(to right, #7c3aed, #6366f1)",
-          boxShadow: loading ? "none" : "0 4px 14px 0 rgba(124,58,237,0.35)",
-        }}
-        className="flex-[2] h-10 rounded-xl text-[12.5px] font-bold uppercase tracking-widest text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-[2]"
       >
         {loading ? loadingLabel : submitLabel}
-      </button>
+      </Button>
     </div>
   );
 }

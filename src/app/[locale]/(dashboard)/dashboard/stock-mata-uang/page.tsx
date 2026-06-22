@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StockMutationSheet } from "@/components/admin/stock-mutation-sheet";
+import { PageHeader } from "@/components/admin/page-header";
+import { IconCoin } from "@tabler/icons-react";
 
 function fmt(val: unknown): string {
   if (val == null) return "—";
@@ -58,23 +60,22 @@ export default async function StockMataUangPage() {
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Stok Mata Uang</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Posisi stok per cabang dan mata uang
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/stock-mata-uang/mutasi">Riwayat Mutasi</Link>
-          </Button>
-          <StockMutationSheet
-            branches={serializedBranches}
-            currencies={serializedCurrencies}
-          />
-        </div>
-      </div>
+      <PageHeader
+        title="Stok Mata Uang"
+        description="Posisi stok per cabang dan mata uang"
+        icon={<IconCoin className="size-5" />}
+        action={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/stock-mata-uang/mutasi">Riwayat Mutasi</Link>
+            </Button>
+            <StockMutationSheet
+              branches={serializedBranches}
+              currencies={serializedCurrencies}
+            />
+          </div>
+        }
+      />
 
       {stocks.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">

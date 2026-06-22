@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StockItemSheet, StockItemRow } from "./stock-item-sheet";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 
 type Branch = { id: string; name: string; companyId: string | null };
 type Company = { id: string; name: string };
@@ -44,7 +45,6 @@ export function StockItemActions({ item, branches, companies }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus item "${item.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/stock-items/${item.id}`, { method: "DELETE" });
@@ -77,15 +77,22 @@ export function StockItemActions({ item, branches, companies }: Props) {
         }
       />
 
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-destructive hover:text-destructive"
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={deleting}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus item "${item.name}"?`}
+        description="Tindakan ini tidak bisa dibatalkan."
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   );
 }

@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IconTrash, IconAlertCircle } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { RoleKpiDetailRow as RoleKpiRow } from "./role-kpi-detail-sheet";
 import { MONTH_NAMES, getGrade, type MonthlyResult } from "@/lib/kpi-utils";
 
@@ -223,7 +224,6 @@ export function LogPageClient({
   };
 
   const handleDeleteLog = (id: string) => {
-    if (!confirm("Hapus log ini?")) return;
     deleteLogMutation.mutate(id);
   };
 
@@ -239,7 +239,6 @@ export function LogPageClient({
   };
 
   const handleDeleteTarget = (id: string) => {
-    if (!confirm("Hapus entri ini?")) return;
     deleteTargetMutation.mutate(id);
   };
 
@@ -460,15 +459,22 @@ export function LogPageClient({
                           {new Date(l.createdAt).toLocaleString("id-ID")}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            disabled={deleteLogMutation.isPending}
-                            onClick={() => handleDeleteLog(l.id)}
-                          >
-                            <IconTrash className="size-4" />
-                          </Button>
+                          <DeleteConfirmDialog
+                            trigger={
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                disabled={deleteLogMutation.isPending}
+                              >
+                                <IconTrash className="size-4" />
+                              </Button>
+                            }
+                            title="Hapus log KPI ini?"
+                            description="Tindakan ini tidak dapat dibatalkan."
+                            onConfirm={() => handleDeleteLog(l.id)}
+                            loading={deleteLogMutation.isPending}
+                          />
                         </TableCell>
                       </TableRow>
                     ))
@@ -546,15 +552,22 @@ export function LogPageClient({
                           {r.note ?? "—"}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            disabled={deleteTargetMutation.isPending}
-                            onClick={() => handleDeleteTarget(r.id)}
-                          >
-                            <IconTrash className="size-4" />
-                          </Button>
+                          <DeleteConfirmDialog
+                            trigger={
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                disabled={deleteTargetMutation.isPending}
+                              >
+                                <IconTrash className="size-4" />
+                              </Button>
+                            }
+                            title="Hapus entri target ini?"
+                            description="Tindakan ini tidak dapat dibatalkan."
+                            onConfirm={() => handleDeleteTarget(r.id)}
+                            loading={deleteTargetMutation.isPending}
+                          />
                         </TableCell>
                       </TableRow>
                     ))

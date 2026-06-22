@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconPencil, IconTrash, IconPower } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { UnifiedStockSheet } from "./unified-stock-sheet";
 
 interface Props {
@@ -39,7 +40,6 @@ export function UnifiedStockActions({ item, branchId, currencies }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus "${item.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
     setLoading(true);
     try {
       const res = await fetch(baseUrl, { method: "DELETE" });
@@ -76,15 +76,22 @@ export function UnifiedStockActions({ item, branchId, currencies }: Props) {
         }
       />
 
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-        disabled={loading}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            disabled={loading}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus "${item.name}"?`}
+        description="Tindakan ini tidak bisa dibatalkan."
+        onConfirm={handleDelete}
+        loading={loading}
+      />
     </div>
   );
 }

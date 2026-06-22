@@ -3,7 +3,7 @@ import {
   CreateBankAccountInput,
   UpdateBankAccountInput,
 } from "@/backend/repositories/bank-account.repository";
-import { NotFoundError } from "@/backend/errors/app-error";
+import { ConflictError, NotFoundError } from "@/backend/errors/app-error";
 
 export const bankAccountService = {
   getAll: (branchId?: string, onlyActive = false) =>
@@ -27,5 +27,15 @@ export const bankAccountService = {
     const account = await bankAccountRepository.findById(id);
     if (!account) throw new NotFoundError("Bank account not found");
     return bankAccountRepository.softDelete(id);
+  },
+
+  delete: async (id: string) => {
+    const account = await bankAccountRepository.findById(id);
+    if (!account) throw new NotFoundError("Bank account not found");
+    const related = await bankAccountRepository.countRelated(id);
+    if (related > 0) {
+      throw new ConflictError("Rekening tidak dapat dihapus karena masih memiliki riwayat mutasi atau data stok harian");
+    }
+    return bankAccountRepository.hardDelete(id);
   },
 };

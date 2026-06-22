@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { CurrencySheet, CurrencyRow } from "./currency-sheet";
 
 interface Props {
@@ -31,7 +32,6 @@ export function CurrencyActions({ currency }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus mata uang "${currency.code}"? Tindakan ini tidak bisa dibatalkan.`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/currencies/${currency.id}`, { method: "DELETE" });
@@ -60,15 +60,22 @@ export function CurrencyActions({ currency }: Props) {
           </Button>
         }
       />
-      <Button
-        size="icon"
-        variant="ghost"
-        className="text-destructive hover:text-destructive"
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        <IconTrash className="size-4" />
-      </Button>
+      <DeleteConfirmDialog
+        trigger={
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={deleting}
+          >
+            <IconTrash className="size-4" />
+          </Button>
+        }
+        title={`Hapus mata uang "${currency.code}"?`}
+        description="Tindakan ini tidak bisa dibatalkan."
+        onConfirm={handleDelete}
+        loading={deleting}
+      />
     </div>
   );
 }

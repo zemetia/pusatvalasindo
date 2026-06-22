@@ -61,11 +61,10 @@ export function UnifiedStockSheet({ branchId, currencies, item, trigger }: Props
       if (item) {
         setType(item.type);
         if (item.type === 'BANK_ACCOUNT') {
-          // It's a bank account (reconstructed from active data)
           setBankForm({
             bankName: item.bankName || "",
             accountName: item.accountName || "",
-            accountNumber: item.code || "",
+            accountNumber: item.accountNumber ?? item.code ?? "",
             currencyId: item.currencyId || currencies[0]?.id || "",
             note: item.note || "",
           });
@@ -210,6 +209,7 @@ export function UnifiedStockSheet({ branchId, currencies, item, trigger }: Props
                 <Select
                   value={bankForm.currencyId}
                   onValueChange={(v) => setBankForm({ ...bankForm, currencyId: v })}
+                  disabled={isEdit}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Pilih mata uang" />
@@ -220,6 +220,14 @@ export function UnifiedStockSheet({ branchId, currencies, item, trigger }: Props
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="grid gap-1.5">
+                <Label>Catatan</Label>
+                <Input
+                  placeholder="Opsional"
+                  value={bankForm.note}
+                  onChange={(e) => setBankForm({ ...bankForm, note: e.target.value })}
+                />
               </div>
             </>
           ) : (

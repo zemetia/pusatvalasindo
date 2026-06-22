@@ -26,7 +26,7 @@ export const dailyStockEntryRepository = {
       createdBy?: string | null
     }[]
   ) {
-    return prisma.$transaction(
+    return Promise.all(
       entries.map((e) =>
         prisma.dailyStockEntry.upsert({
           where: { stockItemId_date: { stockItemId: e.stockItemId, date: e.date } },
@@ -77,7 +77,7 @@ export const dailyBankEntryRepository = {
       createdBy?: string | null
     }[]
   ) {
-    return prisma.$transaction(
+    return Promise.all(
       entries.map((e) =>
         prisma.dailyBankEntry.upsert({
           where: { bankAccountId_date: { bankAccountId: e.bankAccountId, date: e.date } },

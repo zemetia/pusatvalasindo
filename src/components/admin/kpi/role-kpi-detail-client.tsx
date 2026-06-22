@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IconTrash, IconPencil, IconArrowLeft } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { KpiDefinitionRow, KPI_TYPE_LABELS } from "../kpi-definition-sheet";
 import { RoleKpiDetailSheet, RoleKpiDetailRow } from "./role-kpi-detail-sheet";
 
@@ -61,8 +62,7 @@ export function RoleKpiDetailClient({
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const handleDelete = (id: string, name: string) => {
-    if (!confirm(`Hapus KPI "${name}" dari konfigurasi ini?`)) return;
+  const handleDelete = (id: string) => {
     deleteMutation.mutate(id);
   };
 
@@ -256,15 +256,22 @@ export function RoleKpiDetailClient({
                           </Button>
                         }
                       />
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        disabled={deleteMutation.isPending}
-                        onClick={() => handleDelete(rk.id, rk.definition.name)}
-                      >
-                        <IconTrash className="size-4" />
-                      </Button>
+                      <DeleteConfirmDialog
+                        trigger={
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive"
+                            disabled={deleteMutation.isPending}
+                          >
+                            <IconTrash className="size-4" />
+                          </Button>
+                        }
+                        title={`Hapus KPI "${rk.definition.name}" dari konfigurasi ini?`}
+                        description="Tindakan ini tidak dapat dibatalkan."
+                        onConfirm={() => handleDelete(rk.id)}
+                        loading={deleteMutation.isPending}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

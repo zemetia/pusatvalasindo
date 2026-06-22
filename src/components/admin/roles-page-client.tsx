@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconShieldLock, IconUsers, IconChecklist, IconBuilding } from "@tabler/icons-react";
+import { IconShieldLock, IconUsers, IconSearch, IconBuilding } from "@tabler/icons-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -57,8 +58,8 @@ export function RolesPageClient({ companies, roles }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <TabsList className="w-fit h-12 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200/50">
             {companies.map((c) => (
-              <TabsTrigger 
-                key={c.id} 
+              <TabsTrigger
+                key={c.id}
                 value={c.id}
                 className="rounded-xl px-5 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all font-bold text-[13px] tracking-tight"
               >
@@ -66,7 +67,7 @@ export function RolesPageClient({ companies, roles }: Props) {
               </TabsTrigger>
             ))}
             {unassignedRoles.length > 0 && (
-              <TabsTrigger 
+              <TabsTrigger
                 value="unassigned"
                 className="rounded-xl px-5 py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all font-bold text-[13px] tracking-tight"
               >
@@ -74,7 +75,7 @@ export function RolesPageClient({ companies, roles }: Props) {
               </TabsTrigger>
             )}
           </TabsList>
-          
+
           <RoleSheet currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined} />
         </div>
 
@@ -99,9 +100,17 @@ export function RolesPageClient({ companies, roles }: Props) {
 }
 
 function RoleTable({ roles, currentCompanyId, emptyText }: { roles: RoleWithCount[], currentCompanyId?: string, emptyText: string }) {
+  const [search, setSearch] = useState("");
+
+  const filtered = search
+    ? roles.filter((r) =>
+        [r.name, r.description].some((v) => v?.toLowerCase().includes(search.toLowerCase()))
+      )
+    : roles;
+
   if (roles.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center justify-center py-24 border border-dashed rounded-3xl bg-slate-50/40 transition-colors hover:bg-slate-50"
@@ -118,68 +127,89 @@ function RoleTable({ roles, currentCompanyId, emptyText }: { roles: RoleWithCoun
   }
 
   return (
-    <div className="rounded-3xl border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden bg-white">
-      <Table>
-        <TableHeader className="bg-slate-50/50">
-          <TableRow className="hover:bg-transparent border-slate-200">
-            <TableHead className="font-bold text-slate-900 h-14 pl-6 uppercase text-[11px] tracking-widest">Detail Role</TableHead>
-            <TableHead className="font-bold text-slate-900 h-14 uppercase text-[11px] tracking-widest">Hak Akses</TableHead>
-            <TableHead className="text-right font-bold text-slate-900 h-14 uppercase text-[11px] tracking-widest">Pengguna</TableHead>
-            <TableHead className="w-[100px] h-14 pr-6" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <AnimatePresence mode="popLayout">
-            {roles.map((role) => (
-              <TableRow 
-                key={role.id} 
-                className="group border-slate-100 transition-colors hover:bg-slate-50/30"
-              >
-                <TableCell className="py-5 pl-6">
-                  <div className="flex flex-col gap-1">
-                    <span className="font-bold text-slate-900 tracking-tight text-[15px]">{role.name}</span>
-                    <span className="text-[12px] text-slate-500 leading-relaxed max-w-[300px]">
-                      {role.description || "Tidak ada deskripsi"}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="py-5">
-                  <div className="flex flex-wrap gap-1.5 max-w-[400px]">
-                    {role.permissions.length > 0 ? (
-                      role.permissions.map((p) => (
-                        <Badge 
-                          key={p} 
-                          variant="secondary" 
-                          className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight"
-                        >
-                          {p.replace(/_/g, ' ')}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-[11px] text-slate-400 font-medium">Tanpa Hak Akses</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="py-5 text-right">
-                  <div className="flex items-center justify-end gap-2 text-[15px] font-bold text-slate-900">
-                    <IconUsers className="size-4 text-primary/60" />
-                    <span>{role._count.users}</span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Personel</p>
-                </TableCell>
-                <TableCell className="py-5 pr-6">
-                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-2 group-hover:translate-x-0">
-                    <RoleActions
-                      role={role}
-                      currentCompanyId={currentCompanyId}
-                    />
-                  </div>
+    <div className="flex flex-col gap-4">
+      <div className="relative max-w-xs">
+        <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
+        <Input
+          type="search"
+          placeholder="Cari nama role..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-8"
+        />
+      </div>
+
+      <div className="rounded-3xl border border-slate-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden bg-white">
+        <Table>
+          <TableHeader className="bg-slate-50/50">
+            <TableRow className="hover:bg-transparent border-slate-200">
+              <TableHead className="font-bold text-slate-900 h-14 pl-6 uppercase text-[11px] tracking-widest">Detail Role</TableHead>
+              <TableHead className="font-bold text-slate-900 h-14 uppercase text-[11px] tracking-widest">Hak Akses</TableHead>
+              <TableHead className="text-right font-bold text-slate-900 h-14 uppercase text-[11px] tracking-widest">Pengguna</TableHead>
+              <TableHead className="w-[100px] h-14 pr-6" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-8 text-slate-400">
+                  Tidak ada hasil untuk &ldquo;{search}&rdquo;
                 </TableCell>
               </TableRow>
-            ))}
-          </AnimatePresence>
-        </TableBody>
-      </Table>
+            ) : (
+              <AnimatePresence mode="popLayout">
+                {filtered.map((role) => (
+                  <TableRow
+                    key={role.id}
+                    className="group border-slate-100 transition-colors hover:bg-slate-50/30"
+                  >
+                    <TableCell className="py-5 pl-6">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-bold text-slate-900 tracking-tight text-[15px]">{role.name}</span>
+                        <span className="text-[12px] text-slate-500 leading-relaxed max-w-[300px]">
+                          {role.description || "Tidak ada deskripsi"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-5">
+                      <div className="flex flex-wrap gap-1.5 max-w-[400px]">
+                        {role.permissions.length > 0 ? (
+                          role.permissions.map((p) => (
+                            <Badge
+                              key={p}
+                              variant="secondary"
+                              className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight"
+                            >
+                              {p.replace(/_/g, ' ')}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-medium">Tanpa Hak Akses</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-5 text-right">
+                      <div className="flex items-center justify-end gap-2 text-[15px] font-bold text-slate-900">
+                        <IconUsers className="size-4 text-primary/60" />
+                        <span>{role._count.users}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Personel</p>
+                    </TableCell>
+                    <TableCell className="py-5 pr-6">
+                      <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-2 group-hover:translate-x-0">
+                        <RoleActions
+                          role={role}
+                          currentCompanyId={currentCompanyId}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </AnimatePresence>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
