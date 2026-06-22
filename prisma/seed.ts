@@ -1,4 +1,7 @@
-import 'dotenv/config'
+// Prioritas sama dengan Next.js: .env.local > .env
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+config()
 import { PrismaClient } from '../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
@@ -12,7 +15,13 @@ import { seedRoleKpis } from './seeds/role-kpi'
 import { seedUsers } from './seeds/users'
 import { seedRoles } from './seeds/roles'
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 3,
+  idleTimeoutMillis: 60_000,
+  connectionTimeoutMillis: 10_000,
+  keepAlive: true,
+})
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 

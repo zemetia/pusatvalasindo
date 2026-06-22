@@ -22,14 +22,75 @@ interface Props {
   currentCompanyId?: string;
 }
 
-const AVAILABLE_PERMISSIONS = [
-  { id: "view_dashboard", label: "Lihat Dashboard", description: "Akses ke halaman dashboard utama" },
-  { id: "manage_users", label: "Kelola Pengguna", description: "Tambah, edit, dan hapus pengguna" },
-  { id: "manage_branches", label: "Kelola Cabang", description: "Manajemen data kantor cabang" },
-  { id: "manage_roles", label: "Kelola Role", description: "Manajemen hak akses dan role" },
-  { id: "manage_stock", label: "Kelola Stok", description: "Manajemen inventaris dan kas" },
-  { id: "manage_kpi", label: "Kelola KPI", description: "Pengaturan dan penilaian KPI" },
-  { id: "view_reports", label: "Lihat Laporan", description: "Akses ke laporan keuangan dan operasional" },
+type PermissionGroup = {
+  group: string;
+  items: { id: string; label: string; description: string }[];
+};
+
+const AVAILABLE_PERMISSIONS: PermissionGroup[] = [
+  {
+    group: "Dashboard",
+    items: [
+      { id: "dashboard.view", label: "Lihat Dashboard", description: "Akses ke halaman dashboard utama" },
+    ],
+  },
+  {
+    group: "Presensi",
+    items: [
+      { id: "attendance.view_own", label: "Lihat Presensi Sendiri", description: "Lihat data kehadiran milik sendiri" },
+      { id: "attendance.view_all", label: "Lihat Semua Presensi", description: "Lihat presensi seluruh karyawan" },
+      { id: "attendance.manage", label: "Kelola Presensi", description: "Koreksi dan manajemen data presensi" },
+    ],
+  },
+  {
+    group: "KPI",
+    items: [
+      { id: "kpi.fill_own", label: "Isi KPI Sendiri", description: "Mengisi KPI untuk akun sendiri" },
+      { id: "kpi.view_own", label: "Lihat KPI Sendiri", description: "Melihat hasil KPI milik sendiri" },
+      { id: "kpi.view_all", label: "Lihat Semua KPI", description: "Lihat KPI seluruh karyawan" },
+      { id: "kpi.manage", label: "Kelola KPI", description: "Konfigurasi definisi dan bobot KPI" },
+    ],
+  },
+  {
+    group: "Payroll",
+    items: [
+      { id: "payroll.view_own", label: "Lihat Slip Gaji Sendiri", description: "Akses slip gaji milik sendiri" },
+      { id: "payroll.view_all", label: "Lihat Semua Payroll", description: "Lihat data gaji seluruh karyawan" },
+      { id: "payroll.manage", label: "Kelola Payroll", description: "Hitung dan proses pembayaran gaji" },
+    ],
+  },
+  {
+    group: "Stok & Inventory",
+    items: [
+      { id: "stock.view", label: "Lihat Stok", description: "Lihat stok mata uang dan barang" },
+      { id: "stock.manage", label: "Kelola Stok", description: "Input, mutasi, dan manajemen stok" },
+    ],
+  },
+  {
+    group: "Rekening Bank",
+    items: [
+      { id: "bank.view", label: "Lihat Rekening", description: "Lihat data rekening bank" },
+      { id: "bank.manage", label: "Kelola Rekening", description: "Tambah dan edit rekening bank" },
+    ],
+  },
+  {
+    group: "Mata Uang",
+    items: [
+      { id: "currency.view", label: "Lihat Mata Uang", description: "Lihat daftar dan kurs mata uang" },
+      { id: "currency.manage", label: "Kelola Mata Uang", description: "Tambah dan edit data mata uang" },
+    ],
+  },
+  {
+    group: "Manajemen",
+    items: [
+      { id: "users.view", label: "Lihat Pengguna", description: "Lihat daftar pengguna sistem" },
+      { id: "users.manage", label: "Kelola Pengguna", description: "Tambah, edit, dan nonaktifkan pengguna" },
+      { id: "branches.view", label: "Lihat Cabang", description: "Lihat daftar kantor cabang" },
+      { id: "branches.manage", label: "Kelola Cabang", description: "Tambah dan edit data cabang" },
+      { id: "roles.view", label: "Lihat Role", description: "Lihat daftar role dan hak akses" },
+      { id: "roles.manage", label: "Kelola Role", description: "Tambah dan edit role beserta permission" },
+    ],
+  },
 ];
 
 const emptyForm = { name: "", description: "", permissions: [] as string[] };
@@ -144,40 +205,47 @@ export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
       </FormSection>
 
       <FormSection title="Hak Akses / Permissions" icon={<CheckCircle2 className="w-3.5 h-3.5" />}>
-        <div className="grid gap-3">
-          {AVAILABLE_PERMISSIONS.map((p) => {
-            const isSelected = form.permissions.includes(p.id);
-            return (
-              <div
-                key={p.id}
-                onClick={() => togglePermission(p.id)}
-                className={cn(
-                  "flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer group",
-                  isSelected 
-                    ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20" 
-                    : "bg-white/50 border-slate-200/60 hover:border-primary/20 hover:bg-slate-50"
-                )}
-              >
-                <div className={cn(
-                  "mt-0.5 transition-colors",
-                  isSelected ? "text-primary" : "text-slate-300 group-hover:text-slate-400"
-                )}>
-                  {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
-                </div>
-                <div className="flex-1">
-                  <p className={cn(
-                    "text-[13px] font-bold transition-colors",
-                    isSelected ? "text-slate-900" : "text-slate-600"
-                  )}>
-                    {p.label}
-                  </p>
-                  <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">
-                    {p.description}
-                  </p>
-                </div>
+        <div className="flex flex-col gap-5">
+          {AVAILABLE_PERMISSIONS.map((group) => (
+            <div key={group.group}>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2 pl-1">{group.group}</p>
+              <div className="grid gap-2">
+                {group.items.map((p) => {
+                  const isSelected = form.permissions.includes(p.id);
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => togglePermission(p.id)}
+                      className={cn(
+                        "flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer group",
+                        isSelected
+                          ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
+                          : "bg-white/50 border-slate-200/60 hover:border-primary/20 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className={cn(
+                        "mt-0.5 transition-colors",
+                        isSelected ? "text-primary" : "text-slate-300 group-hover:text-slate-400"
+                      )}>
+                        {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className={cn(
+                          "text-[13px] font-bold transition-colors",
+                          isSelected ? "text-slate-900" : "text-slate-600"
+                        )}>
+                          {p.label}
+                        </p>
+                        <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">
+                          {p.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </FormSection>
     </AdminFormSidebar>
