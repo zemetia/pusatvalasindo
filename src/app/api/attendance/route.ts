@@ -125,6 +125,72 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(attendance, { status: 201 });
 }
 
+export async function PATCH(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { date, checkOut, checkOutPhotoUrl } = body as {
+      date: string;
+      checkOut: string;
+      checkOutPhotoUrl?: string;
+    };
+
+    if (!date || !checkOut) {
+      return NextResponse.json(
+        { error: "date and checkOut are required" },
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.attendance.findUnique({
+      where: { userId_date: { userId: session.user.id, date: new Date(date) } },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { error: "No check-in record found for today" },
+        { status: 404 }
+      );
+    }
+
+    if (!existing.checkIn) {
+      return NextResponse.json(
+        { error: "Cannot check out without checking in first" },
+        { status: 400 }
+      );
+    }
+
+    if (existing.checkOut) {
+      return NextResponse.json(
+        { error: "Already checked out today" },
+        { status: 409 }
+      );
+    }
+
+    const checkOutTime = new Date(checkOut);
+    if (checkOutTime <= existing.checkIn) {
+      return NextResponse.json(
+        { error: "Check-out time must be after check-in time" },
+        { status: 400 }
+      );
+    }
+
+    const updated = await prisma.attendance.update({
+      where: { userId_date: { userId: session.user.id, date: new Date(date) } },
+      data: { checkOut: checkOutTime, checkOutPhotoUrl },
+    });
+
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("[PATCH /api/attendance]", err);
+    return NextResponse.json({ error: "Terjadi kesalahan server." }, { status: 500 });
+  }
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {

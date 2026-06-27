@@ -225,7 +225,9 @@ export const StockMutationType: typeof $Enums.StockMutationType
  * Type-safe database client for TypeScript & Node.js
  * @example
  * ```
- * const prisma = new PrismaClient()
+ * const prisma = new PrismaClient({
+ *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+ * })
  * // Fetch zero or more Attendances
  * const attendances = await prisma.attendance.findMany()
  * ```
@@ -246,7 +248,9 @@ export class PrismaClient<
    * Type-safe database client for TypeScript & Node.js
    * @example
    * ```
-   * const prisma = new PrismaClient()
+   * const prisma = new PrismaClient({
+   *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   * })
    * // Fetch zero or more Attendances
    * const attendances = await prisma.attendance.findMany()
    * ```
@@ -326,9 +330,9 @@ export class PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
@@ -615,8 +619,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.1.0
-   * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
+   * Prisma Client JS version: 7.8.0
+   * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
    */
   export type PrismaVersion = {
     client: string
@@ -3446,6 +3450,7 @@ export namespace Prisma {
     checkIn: Date | null
     checkOut: Date | null
     checkInPhotoUrl: string | null
+    checkOutPhotoUrl: string | null
     checkInGpsLat: number | null
     checkInGpsLng: number | null
     checkInManualLat: number | null
@@ -3466,6 +3471,7 @@ export namespace Prisma {
     checkIn: Date | null
     checkOut: Date | null
     checkInPhotoUrl: string | null
+    checkOutPhotoUrl: string | null
     checkInGpsLat: number | null
     checkInGpsLng: number | null
     checkInManualLat: number | null
@@ -3486,6 +3492,7 @@ export namespace Prisma {
     checkIn: number
     checkOut: number
     checkInPhotoUrl: number
+    checkOutPhotoUrl: number
     checkInGpsLat: number
     checkInGpsLng: number
     checkInManualLat: number
@@ -3522,6 +3529,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     checkInPhotoUrl?: true
+    checkOutPhotoUrl?: true
     checkInGpsLat?: true
     checkInGpsLng?: true
     checkInManualLat?: true
@@ -3542,6 +3550,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     checkInPhotoUrl?: true
+    checkOutPhotoUrl?: true
     checkInGpsLat?: true
     checkInGpsLng?: true
     checkInManualLat?: true
@@ -3562,6 +3571,7 @@ export namespace Prisma {
     checkIn?: true
     checkOut?: true
     checkInPhotoUrl?: true
+    checkOutPhotoUrl?: true
     checkInGpsLat?: true
     checkInGpsLng?: true
     checkInManualLat?: true
@@ -3669,6 +3679,7 @@ export namespace Prisma {
     checkIn: Date | null
     checkOut: Date | null
     checkInPhotoUrl: string | null
+    checkOutPhotoUrl: string | null
     checkInGpsLat: number | null
     checkInGpsLng: number | null
     checkInManualLat: number | null
@@ -3708,6 +3719,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     checkInPhotoUrl?: boolean
+    checkOutPhotoUrl?: boolean
     checkInGpsLat?: boolean
     checkInGpsLng?: boolean
     checkInManualLat?: boolean
@@ -3730,6 +3742,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     checkInPhotoUrl?: boolean
+    checkOutPhotoUrl?: boolean
     checkInGpsLat?: boolean
     checkInGpsLng?: boolean
     checkInManualLat?: boolean
@@ -3752,6 +3765,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     checkInPhotoUrl?: boolean
+    checkOutPhotoUrl?: boolean
     checkInGpsLat?: boolean
     checkInGpsLng?: boolean
     checkInManualLat?: boolean
@@ -3774,6 +3788,7 @@ export namespace Prisma {
     checkIn?: boolean
     checkOut?: boolean
     checkInPhotoUrl?: boolean
+    checkOutPhotoUrl?: boolean
     checkInGpsLat?: boolean
     checkInGpsLng?: boolean
     checkInManualLat?: boolean
@@ -3786,7 +3801,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
@@ -3814,6 +3829,7 @@ export namespace Prisma {
       checkIn: Date | null
       checkOut: Date | null
       checkInPhotoUrl: string | null
+      checkOutPhotoUrl: string | null
       checkInGpsLat: number | null
       checkInGpsLng: number | null
       checkInManualLat: number | null
@@ -4256,6 +4272,7 @@ export namespace Prisma {
     readonly checkIn: FieldRef<"Attendance", 'DateTime'>
     readonly checkOut: FieldRef<"Attendance", 'DateTime'>
     readonly checkInPhotoUrl: FieldRef<"Attendance", 'String'>
+    readonly checkOutPhotoUrl: FieldRef<"Attendance", 'String'>
     readonly checkInGpsLat: FieldRef<"Attendance", 'Float'>
     readonly checkInGpsLng: FieldRef<"Attendance", 'Float'>
     readonly checkInManualLat: FieldRef<"Attendance", 'Float'>
@@ -4462,6 +4479,11 @@ export namespace Prisma {
      * Skip the first `n` Attendances.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Attendances.
+     */
     distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
   }
 
@@ -5643,6 +5665,11 @@ export namespace Prisma {
      * Skip the first `n` accounts.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of accounts.
+     */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
   }
 
@@ -6740,6 +6767,11 @@ export namespace Prisma {
      * Skip the first `n` sessions.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of sessions.
+     */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[]
   }
 
@@ -7834,6 +7866,11 @@ export namespace Prisma {
      * Skip the first `n` custom_roles.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of custom_roles.
+     */
     distinct?: Custom_roleScalarFieldEnum | Custom_roleScalarFieldEnum[]
   }
 
@@ -8159,12 +8196,16 @@ export namespace Prisma {
     baseSalary: Decimal | null
     mealAllowance: Decimal | null
     transportAllowance: Decimal | null
+    positionAllowance: Decimal | null
+    bpjsKesehatan: Decimal | null
   }
 
   export type UserSumAggregateOutputType = {
     baseSalary: Decimal | null
     mealAllowance: Decimal | null
     transportAllowance: Decimal | null
+    positionAllowance: Decimal | null
+    bpjsKesehatan: Decimal | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -8180,6 +8221,8 @@ export namespace Prisma {
     baseSalary: Decimal | null
     mealAllowance: Decimal | null
     transportAllowance: Decimal | null
+    positionAllowance: Decimal | null
+    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean | null
     companyId: string | null
@@ -8199,6 +8242,8 @@ export namespace Prisma {
     baseSalary: Decimal | null
     mealAllowance: Decimal | null
     transportAllowance: Decimal | null
+    positionAllowance: Decimal | null
+    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean | null
     companyId: string | null
@@ -8218,6 +8263,8 @@ export namespace Prisma {
     baseSalary: number
     mealAllowance: number
     transportAllowance: number
+    positionAllowance: number
+    bpjsKesehatan: number
     joinDate: number
     isActive: number
     companyId: number
@@ -8230,12 +8277,16 @@ export namespace Prisma {
     baseSalary?: true
     mealAllowance?: true
     transportAllowance?: true
+    positionAllowance?: true
+    bpjsKesehatan?: true
   }
 
   export type UserSumAggregateInputType = {
     baseSalary?: true
     mealAllowance?: true
     transportAllowance?: true
+    positionAllowance?: true
+    bpjsKesehatan?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -8251,6 +8302,8 @@ export namespace Prisma {
     baseSalary?: true
     mealAllowance?: true
     transportAllowance?: true
+    positionAllowance?: true
+    bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
     companyId?: true
@@ -8270,6 +8323,8 @@ export namespace Prisma {
     baseSalary?: true
     mealAllowance?: true
     transportAllowance?: true
+    positionAllowance?: true
+    bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
     companyId?: true
@@ -8289,6 +8344,8 @@ export namespace Prisma {
     baseSalary?: true
     mealAllowance?: true
     transportAllowance?: true
+    positionAllowance?: true
+    bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
     companyId?: true
@@ -8395,6 +8452,8 @@ export namespace Prisma {
     baseSalary: Decimal | null
     mealAllowance: Decimal | null
     transportAllowance: Decimal | null
+    positionAllowance: Decimal | null
+    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean
     companyId: string | null
@@ -8433,6 +8492,8 @@ export namespace Prisma {
     baseSalary?: boolean
     mealAllowance?: boolean
     transportAllowance?: boolean
+    positionAllowance?: boolean
+    bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
     companyId?: boolean
@@ -8462,6 +8523,8 @@ export namespace Prisma {
     baseSalary?: boolean
     mealAllowance?: boolean
     transportAllowance?: boolean
+    positionAllowance?: boolean
+    bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
     companyId?: boolean
@@ -8484,6 +8547,8 @@ export namespace Prisma {
     baseSalary?: boolean
     mealAllowance?: boolean
     transportAllowance?: boolean
+    positionAllowance?: boolean
+    bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
     companyId?: boolean
@@ -8506,13 +8571,15 @@ export namespace Prisma {
     baseSalary?: boolean
     mealAllowance?: boolean
     transportAllowance?: boolean
+    positionAllowance?: boolean
+    bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
     companyId?: boolean
     customRoleId?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "joinDate" | "isActive" | "companyId" | "customRoleId", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "joinDate" | "isActive" | "companyId" | "customRoleId", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kpiLogs?: boolean | user$kpiLogsArgs<ExtArgs>
     kpiMonthlyResults?: boolean | user$kpiMonthlyResultsArgs<ExtArgs>
@@ -8562,6 +8629,8 @@ export namespace Prisma {
       baseSalary: Prisma.Decimal | null
       mealAllowance: Prisma.Decimal | null
       transportAllowance: Prisma.Decimal | null
+      positionAllowance: Prisma.Decimal | null
+      bpjsKesehatan: Prisma.Decimal | null
       joinDate: Date | null
       isActive: boolean
       companyId: string | null
@@ -9010,6 +9079,8 @@ export namespace Prisma {
     readonly baseSalary: FieldRef<"user", 'Decimal'>
     readonly mealAllowance: FieldRef<"user", 'Decimal'>
     readonly transportAllowance: FieldRef<"user", 'Decimal'>
+    readonly positionAllowance: FieldRef<"user", 'Decimal'>
+    readonly bpjsKesehatan: FieldRef<"user", 'Decimal'>
     readonly joinDate: FieldRef<"user", 'DateTime'>
     readonly isActive: FieldRef<"user", 'Boolean'>
     readonly companyId: FieldRef<"user", 'String'>
@@ -9210,6 +9281,11 @@ export namespace Prisma {
      * Skip the first `n` users.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of users.
+     */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
@@ -10447,6 +10523,11 @@ export namespace Prisma {
      * Skip the first `n` verifications.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of verifications.
+     */
     distinct?: VerificationScalarFieldEnum | VerificationScalarFieldEnum[]
   }
 
@@ -11624,6 +11705,11 @@ export namespace Prisma {
      * Skip the first `n` BankAccounts.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankAccounts.
+     */
     distinct?: BankAccountScalarFieldEnum | BankAccountScalarFieldEnum[]
   }
 
@@ -12807,6 +12893,11 @@ export namespace Prisma {
      * Skip the first `n` BankMutations.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankMutations.
+     */
     distinct?: BankMutationScalarFieldEnum | BankMutationScalarFieldEnum[]
   }
 
@@ -13955,6 +14046,11 @@ export namespace Prisma {
      * Skip the first `n` DailyBankEntries.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DailyBankEntries.
+     */
     distinct?: DailyBankEntryScalarFieldEnum | DailyBankEntryScalarFieldEnum[]
   }
 
@@ -15078,6 +15174,11 @@ export namespace Prisma {
      * Skip the first `n` Branches.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Branches.
+     */
     distinct?: BranchScalarFieldEnum | BranchScalarFieldEnum[]
   }
 
@@ -16324,6 +16425,11 @@ export namespace Prisma {
      * Skip the first `n` Companies.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Companies.
+     */
     distinct?: CompanyScalarFieldEnum | CompanyScalarFieldEnum[]
   }
 
@@ -17524,6 +17630,11 @@ export namespace Prisma {
      * Skip the first `n` Currencies.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Currencies.
+     */
     distinct?: CurrencyScalarFieldEnum | CurrencyScalarFieldEnum[]
   }
 
@@ -18646,6 +18757,11 @@ export namespace Prisma {
      * Skip the first `n` KpiDefinitions.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiDefinitions.
+     */
     distinct?: KpiDefinitionScalarFieldEnum | KpiDefinitionScalarFieldEnum[]
   }
 
@@ -19871,6 +19987,11 @@ export namespace Prisma {
      * Skip the first `n` RoleKpis.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleKpis.
+     */
     distinct?: RoleKpiScalarFieldEnum | RoleKpiScalarFieldEnum[]
   }
 
@@ -21003,6 +21124,11 @@ export namespace Prisma {
      * Skip the first `n` KpiLogs.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiLogs.
+     */
     distinct?: KpiLogScalarFieldEnum | KpiLogScalarFieldEnum[]
   }
 
@@ -22108,6 +22234,11 @@ export namespace Prisma {
      * Skip the first `n` Revenues.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Revenues.
+     */
     distinct?: RevenueScalarFieldEnum | RevenueScalarFieldEnum[]
   }
 
@@ -23180,6 +23311,11 @@ export namespace Prisma {
      * Skip the first `n` BonusMatrices.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BonusMatrices.
+     */
     distinct?: BonusMatrixScalarFieldEnum | BonusMatrixScalarFieldEnum[]
   }
 
@@ -24349,6 +24485,11 @@ export namespace Prisma {
      * Skip the first `n` BonusTiers.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BonusTiers.
+     */
     distinct?: BonusTierScalarFieldEnum | BonusTierScalarFieldEnum[]
   }
 
@@ -25501,6 +25642,11 @@ export namespace Prisma {
      * Skip the first `n` KpiMonthlyResults.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiMonthlyResults.
+     */
     distinct?: KpiMonthlyResultScalarFieldEnum | KpiMonthlyResultScalarFieldEnum[]
   }
 
@@ -26648,6 +26794,11 @@ export namespace Prisma {
      * Skip the first `n` CurrencyStocks.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyStocks.
+     */
     distinct?: CurrencyStockScalarFieldEnum | CurrencyStockScalarFieldEnum[]
   }
 
@@ -27821,6 +27972,11 @@ export namespace Prisma {
      * Skip the first `n` StockMutations.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockMutations.
+     */
     distinct?: StockMutationScalarFieldEnum | StockMutationScalarFieldEnum[]
   }
 
@@ -28971,6 +29127,11 @@ export namespace Prisma {
      * Skip the first `n` StockItems.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockItems.
+     */
     distinct?: StockItemScalarFieldEnum | StockItemScalarFieldEnum[]
   }
 
@@ -30194,6 +30355,11 @@ export namespace Prisma {
      * Skip the first `n` DailyStockEntries.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DailyStockEntries.
+     */
     distinct?: DailyStockEntryScalarFieldEnum | DailyStockEntryScalarFieldEnum[]
   }
 
@@ -30434,6 +30600,7 @@ export namespace Prisma {
     checkIn: 'checkIn',
     checkOut: 'checkOut',
     checkInPhotoUrl: 'checkInPhotoUrl',
+    checkOutPhotoUrl: 'checkOutPhotoUrl',
     checkInGpsLat: 'checkInGpsLat',
     checkInGpsLng: 'checkInGpsLng',
     checkInManualLat: 'checkInManualLat',
@@ -30508,6 +30675,8 @@ export namespace Prisma {
     baseSalary: 'baseSalary',
     mealAllowance: 'mealAllowance',
     transportAllowance: 'transportAllowance',
+    positionAllowance: 'positionAllowance',
+    bpjsKesehatan: 'bpjsKesehatan',
     joinDate: 'joinDate',
     isActive: 'isActive',
     companyId: 'companyId',
@@ -31002,6 +31171,7 @@ export namespace Prisma {
     checkIn?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkOut?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkInPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
+    checkOutPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
     checkInGpsLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInGpsLng?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
@@ -31024,6 +31194,7 @@ export namespace Prisma {
     checkIn?: SortOrderInput | SortOrder
     checkOut?: SortOrderInput | SortOrder
     checkInPhotoUrl?: SortOrderInput | SortOrder
+    checkOutPhotoUrl?: SortOrderInput | SortOrder
     checkInGpsLat?: SortOrderInput | SortOrder
     checkInGpsLng?: SortOrderInput | SortOrder
     checkInManualLat?: SortOrderInput | SortOrder
@@ -31050,6 +31221,7 @@ export namespace Prisma {
     checkIn?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkOut?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkInPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
+    checkOutPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
     checkInGpsLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInGpsLng?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
@@ -31072,6 +31244,7 @@ export namespace Prisma {
     checkIn?: SortOrderInput | SortOrder
     checkOut?: SortOrderInput | SortOrder
     checkInPhotoUrl?: SortOrderInput | SortOrder
+    checkOutPhotoUrl?: SortOrderInput | SortOrder
     checkInGpsLat?: SortOrderInput | SortOrder
     checkInGpsLng?: SortOrderInput | SortOrder
     checkInManualLat?: SortOrderInput | SortOrder
@@ -31100,6 +31273,7 @@ export namespace Prisma {
     checkIn?: DateTimeNullableWithAggregatesFilter<"Attendance"> | Date | string | null
     checkOut?: DateTimeNullableWithAggregatesFilter<"Attendance"> | Date | string | null
     checkInPhotoUrl?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
+    checkOutPhotoUrl?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     checkInGpsLat?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     checkInGpsLng?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     checkInManualLat?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
@@ -31368,6 +31542,8 @@ export namespace Prisma {
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
     companyId?: StringNullableFilter<"user"> | string | null
@@ -31396,6 +31572,8 @@ export namespace Prisma {
     baseSalary?: SortOrderInput | SortOrder
     mealAllowance?: SortOrderInput | SortOrder
     transportAllowance?: SortOrderInput | SortOrder
+    positionAllowance?: SortOrderInput | SortOrder
+    bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     isActive?: SortOrder
     companyId?: SortOrderInput | SortOrder
@@ -31427,6 +31605,8 @@ export namespace Prisma {
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
     companyId?: StringNullableFilter<"user"> | string | null
@@ -31455,6 +31635,8 @@ export namespace Prisma {
     baseSalary?: SortOrderInput | SortOrder
     mealAllowance?: SortOrderInput | SortOrder
     transportAllowance?: SortOrderInput | SortOrder
+    positionAllowance?: SortOrderInput | SortOrder
+    bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     isActive?: SortOrder
     companyId?: SortOrderInput | SortOrder
@@ -31482,6 +31664,8 @@ export namespace Prisma {
     baseSalary?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableWithAggregatesFilter<"user"> | Date | string | null
     isActive?: BoolWithAggregatesFilter<"user"> | boolean
     companyId?: StringNullableWithAggregatesFilter<"user"> | string | null
@@ -32849,6 +33033,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -32871,6 +33056,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -32889,6 +33075,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -32911,6 +33098,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -32931,6 +33119,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -32949,6 +33138,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -32969,6 +33159,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -33261,6 +33452,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -33287,6 +33480,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -33311,6 +33506,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -33337,6 +33534,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33362,6 +33561,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -33380,6 +33581,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
   }
@@ -33397,6 +33600,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34944,6 +35149,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     checkInPhotoUrl?: SortOrder
+    checkOutPhotoUrl?: SortOrder
     checkInGpsLat?: SortOrder
     checkInGpsLng?: SortOrder
     checkInManualLat?: SortOrder
@@ -34971,6 +35177,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     checkInPhotoUrl?: SortOrder
+    checkOutPhotoUrl?: SortOrder
     checkInGpsLat?: SortOrder
     checkInGpsLng?: SortOrder
     checkInManualLat?: SortOrder
@@ -34991,6 +35198,7 @@ export namespace Prisma {
     checkIn?: SortOrder
     checkOut?: SortOrder
     checkInPhotoUrl?: SortOrder
+    checkOutPhotoUrl?: SortOrder
     checkInGpsLat?: SortOrder
     checkInGpsLng?: SortOrder
     checkInManualLat?: SortOrder
@@ -35354,6 +35562,8 @@ export namespace Prisma {
     baseSalary?: SortOrder
     mealAllowance?: SortOrder
     transportAllowance?: SortOrder
+    positionAllowance?: SortOrder
+    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
@@ -35364,6 +35574,8 @@ export namespace Prisma {
     baseSalary?: SortOrder
     mealAllowance?: SortOrder
     transportAllowance?: SortOrder
+    positionAllowance?: SortOrder
+    bpjsKesehatan?: SortOrder
   }
 
   export type userMaxOrderByAggregateInput = {
@@ -35379,6 +35591,8 @@ export namespace Prisma {
     baseSalary?: SortOrder
     mealAllowance?: SortOrder
     transportAllowance?: SortOrder
+    positionAllowance?: SortOrder
+    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
@@ -35398,6 +35612,8 @@ export namespace Prisma {
     baseSalary?: SortOrder
     mealAllowance?: SortOrder
     transportAllowance?: SortOrder
+    positionAllowance?: SortOrder
+    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
@@ -35408,6 +35624,8 @@ export namespace Prisma {
     baseSalary?: SortOrder
     mealAllowance?: SortOrder
     transportAllowance?: SortOrder
+    positionAllowance?: SortOrder
+    bpjsKesehatan?: SortOrder
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -38664,6 +38882,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -38689,6 +38909,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -38765,6 +38987,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -38790,6 +39014,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38856,6 +39082,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -38881,6 +39109,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -38920,6 +39150,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -38945,6 +39177,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38968,6 +39202,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -38993,6 +39229,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -39032,6 +39270,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -39057,6 +39297,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39171,6 +39413,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -39196,6 +39440,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -39345,6 +39591,8 @@ export namespace Prisma {
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
     companyId?: StringNullableFilter<"user"> | string | null
@@ -39441,6 +39689,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -39461,6 +39710,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -39764,6 +40014,7 @@ export namespace Prisma {
     checkIn?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkOut?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     checkInPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
+    checkOutPhotoUrl?: StringNullableFilter<"Attendance"> | string | null
     checkInGpsLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInGpsLng?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
@@ -40566,6 +40817,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -40590,6 +40843,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -40618,6 +40873,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -40638,6 +40894,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -41004,6 +41261,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -41029,6 +41288,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     customRoleId?: string | null
@@ -41599,6 +41860,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
@@ -41624,6 +41887,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -41686,6 +41951,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
@@ -41711,6 +41978,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41763,6 +42032,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -41788,6 +42059,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -41827,6 +42100,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -41852,6 +42127,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42112,6 +42389,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
@@ -42137,6 +42416,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -42176,6 +42457,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -42201,6 +42484,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42748,6 +43033,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -42824,6 +43111,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -42849,6 +43138,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42873,6 +43164,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42912,6 +43205,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -43036,6 +43330,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43056,6 +43351,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43075,6 +43371,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43305,6 +43602,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     companyId?: string | null
@@ -43318,6 +43617,7 @@ export namespace Prisma {
     checkIn?: Date | string | null
     checkOut?: Date | string | null
     checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
     checkInGpsLat?: number | null
     checkInGpsLng?: number | null
     checkInManualLat?: number | null
@@ -43489,6 +43789,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -43513,6 +43815,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43537,6 +43841,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43549,6 +43855,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43569,6 +43876,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43588,6 +43896,7 @@ export namespace Prisma {
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -43651,6 +43960,8 @@ export namespace Prisma {
     baseSalary?: Decimal | DecimalJsLike | number | string | null
     mealAllowance?: Decimal | DecimalJsLike | number | string | null
     transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
     customRoleId?: string | null
@@ -43802,6 +44113,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
@@ -43827,6 +44140,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43851,6 +44166,8 @@ export namespace Prisma {
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null

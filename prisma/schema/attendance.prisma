@@ -15,6 +15,7 @@ model Attendance {
   checkIn            DateTime?
   checkOut           DateTime?
   checkInPhotoUrl    String?
+  checkOutPhotoUrl   String?
   // GPS from browser navigator.geolocation (auto-captured)
   checkInGpsLat      Float?
   checkInGpsLng      Float?

@@ -15,6 +15,7 @@ model Attendance {
   checkIn           DateTime?
   checkOut          DateTime?
   checkInPhotoUrl   String?
+  checkOutPhotoUrl  String?
   // GPS from browser navigator.geolocation (auto-captured)
   checkInGpsLat     Float?
   checkInGpsLng     Float?
@@ -95,6 +96,8 @@ model user {
   baseSalary         Decimal?
   mealAllowance      Decimal?
   transportAllowance Decimal?
+  positionAllowance  Decimal?
+  bpjsKesehatan      Decimal?
   joinDate           DateTime?
   isActive           Boolean            @default(true)
   companyId          String?

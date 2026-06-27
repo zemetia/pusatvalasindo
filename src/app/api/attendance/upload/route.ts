@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const type = req.nextUrl.searchParams.get("type") === "checkout" ? "check-out" : "check-in";
   const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `check-in/${session.user.id}/${Date.now()}.${ext}`;
+  const path = `${type}/${session.user.id}/${Date.now()}.${ext}`;
 
   const { error } = await getSupabaseAdmin().storage
     .from(ATTENDANCE_BUCKET)

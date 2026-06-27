@@ -9,7 +9,7 @@ import { AttendanceHistory } from "@/components/attendance/attendance-history";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
-import { IconFingerprint, IconLoader2 } from "@tabler/icons-react";
+import { IconFingerprint, IconLoader2, IconLogout } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
@@ -26,6 +26,11 @@ export function AttendanceClient({ userId, initialRecords }: AttendanceClientPro
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Checkout state
+  const [checkoutFile, setCheckoutFile] = useState<File | null>(null);
+  const [checkoutImage, setCheckoutImage] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
   const todayRecord = useMemo(() => {
     const today = format(new Date(), "yyyy-MM-dd");
     return records.find((r) => format(new Date(r.date), "yyyy-MM-dd") === today);
@@ -33,6 +38,64 @@ export function AttendanceClient({ userId, initialRecords }: AttendanceClientPro
 
   const handleCapture = (file: File) => {
     setCapturedFile(file);
+  };
+
+  const handleCheckout = async () => {
+    if (!checkoutFile) {
+      toast.error("Ambil foto dulu sebelum checkout.");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    try {
+      const formData = new FormData();
+      formData.append("photo", checkoutFile);
+
+      const uploadRes = await fetch("/api/attendance/upload?type=checkout", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        let msg = "Gagal upload foto checkout.";
+        try { const d = await uploadRes.json(); msg = d.error || msg; } catch {}
+        throw new Error(msg);
+      }
+
+      const { url } = await uploadRes.json();
+
+      const localDate = format(new Date(), "yyyy-MM-dd");
+      const checkoutRes = await fetch("/api/attendance", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: localDate,
+          checkOut: new Date().toISOString(),
+          checkOutPhotoUrl: url,
+        }),
+      });
+
+      if (!checkoutRes.ok) {
+        let msg = "Gagal menyimpan checkout.";
+        try { const d = await checkoutRes.json(); msg = d.error || msg; } catch {}
+        throw new Error(msg);
+      }
+
+      const updated = await checkoutRes.json();
+      setRecords((prev) =>
+        prev.map((r) =>
+          format(new Date(r.date), "yyyy-MM-dd") === localDate ? updated : r
+        )
+      );
+      setCheckoutFile(null);
+      setCheckoutImage(null);
+      toast.success("Checkout berhasil!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message);
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -106,30 +169,32 @@ export function AttendanceClient({ userId, initialRecords }: AttendanceClientPro
         <Card className="border-none shadow-xl bg-white/50 backdrop-blur-xl ring-1 ring-slate-200">
           <CardHeader>
             <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <div className="p-2 bg-primary rounded-lg text-white">
-                <IconFingerprint size={20} />
+              <div className={`p-2 rounded-lg text-white ${todayRecord && !todayRecord.checkOut ? "bg-amber-500" : "bg-primary"}`}>
+                {todayRecord && !todayRecord.checkOut ? <IconLogout size={20} /> : <IconFingerprint size={20} />}
               </div>
-              {t("checkIn")}
+              {todayRecord && !todayRecord.checkOut ? "Check Out" : t("checkIn")}
             </CardTitle>
             <CardDescription>
-              {t("checkInDesc")}
+              {todayRecord && !todayRecord.checkOut
+                ? "Ambil foto dan konfirmasi check out Anda."
+                : t("checkInDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <LiveClock />
-            
+
             {!todayRecord ? (
               <>
-                <CameraCapture 
-                  onCapture={handleCapture} 
+                <CameraCapture
+                  onCapture={handleCapture}
                   capturedImage={capturedImage}
                   setCapturedImage={setCapturedImage}
                 />
-                
+
                 <LocationStatus onLocationChange={(lat, lng) => setLocation({ lat, lng })} />
-                
-                <Button 
-                  onClick={handleSubmit} 
+
+                <Button
+                  onClick={handleSubmit}
                   disabled={isSubmitting || !capturedFile || !location}
                   className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
@@ -143,17 +208,70 @@ export function AttendanceClient({ userId, initialRecords }: AttendanceClientPro
                   )}
                 </Button>
               </>
+            ) : todayRecord.checkOut ? (
+              /* Already checked in AND checked out */
+              <div className="flex flex-col items-center justify-center py-10 space-y-4 bg-slate-50 rounded-3xl border border-slate-200 animate-in zoom-in duration-500">
+                <div className="flex gap-6">
+                  <div className="text-center">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">Check In</p>
+                    <p className="text-lg font-bold text-slate-700">
+                      {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
+                    </p>
+                  </div>
+                  <div className="w-px bg-slate-200" />
+                  <div className="text-center">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">Check Out</p>
+                    <p className="text-lg font-bold text-slate-700">
+                      {format(new Date(todayRecord.checkOut), "HH:mm")} WIB
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-500 font-medium">Presensi hari ini selesai.</p>
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10 space-y-4 bg-emerald-50 rounded-3xl border border-emerald-100 animate-in zoom-in duration-500">
-                <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
-                  <IconFingerprint size={48} />
+              /* Checked in, waiting for checkout */
+              <div className="space-y-6">
+                <div className="flex items-center justify-between px-4 py-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                      <IconFingerprint size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Check In</p>
+                      <p className="text-sm font-bold text-emerald-900">
+                        Pukul {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-emerald-900">{t("alreadyCheckedIn")}</h3>
-                  <p className="text-emerald-700/70 font-medium">
-                    Pukul {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
-                  </p>
+
+                <div>
+                  <p className="text-sm font-semibold text-slate-600 mb-3">Foto Check Out</p>
+                  <CameraCapture
+                    onCapture={setCheckoutFile}
+                    capturedImage={checkoutImage}
+                    setCapturedImage={setCheckoutImage}
+                  />
                 </div>
+
+                <Button
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut || !checkoutFile}
+                  variant="secondary"
+                  className="w-full h-14 text-lg font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-200"
+                >
+                  {isCheckingOut ? (
+                    <>
+                      <IconLoader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    <>
+                      <IconLogout className="mr-2 h-5 w-5" />
+                      Check Out
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </CardContent>
