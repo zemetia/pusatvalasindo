@@ -7,7 +7,7 @@ export function applySecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
+    'camera=(self), microphone=(self), geolocation=(self)'
   );
 
   // HSTS only in production — localhost does not support HTTPS
