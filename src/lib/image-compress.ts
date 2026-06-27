@@ -9,7 +9,7 @@ export async function compressPhoto(file: File): Promise<File> {
   const compressed = await imageCompression(file, {
     maxSizeMB: MAX_SIZE_KB / 1024,
     maxWidthOrHeight: MAX_DIMENSION_PX,
-    useWebWorker: true,
+    useWebWorker: false,
     fileType: "image/jpeg",
     initialQuality: 0.85,
   });
