@@ -253,6 +253,9 @@ exports.Prisma.BranchScalarFieldEnum = {
   phone: 'phone',
   isActive: 'isActive',
   companyId: 'companyId',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  attendanceRadiusM: 'attendanceRadiusM',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

@@ -179,21 +179,25 @@ enum BankMutationType {
 }
 
 model Branch {
-  id             String          @id @default(cuid())
-  name           String
-  address        String?
-  phone          String?
-  isActive       Boolean         @default(true)
-  companyId      String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  bankAccounts   BankAccount[]
-  company        Company?        @relation(fields: [companyId], references: [id])
-  currencyStocks CurrencyStock[]
-  stockItems     StockItem[]
-  stockMutations StockMutation[]
-  users          user[]
-  attendances    Attendance[]
+  id                String          @id @default(cuid())
+  name              String
+  address           String?
+  phone             String?
+  isActive          Boolean         @default(true)
+  companyId         String?
+  // Geofence for attendance check-in validation
+  latitude          Float?
+  longitude         Float?
+  attendanceRadiusM Int?            @default(20)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  bankAccounts      BankAccount[]
+  company           Company?        @relation(fields: [companyId], references: [id])
+  currencyStocks    CurrencyStock[]
+  stockItems        StockItem[]
+  stockMutations    StockMutation[]
+  users             user[]
+  attendances       Attendance[]
 }
 
 model Company {

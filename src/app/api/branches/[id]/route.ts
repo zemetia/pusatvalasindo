@@ -11,6 +11,9 @@ const updateBranchSchema = z.object({
   phone: z.string().max(20).optional(),
   companyId: z.string().cuid().optional().nullable(),
   isActive: z.boolean().optional(),
+  latitude: z.number().min(-90).max(90).optional().nullable(),
+  longitude: z.number().min(-180).max(180).optional().nullable(),
+  attendanceRadiusM: z.number().int().min(1).max(10000).optional().nullable(),
 });
 
 type Params = { params: Promise<{ id: string }> };

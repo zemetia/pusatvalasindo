@@ -13,18 +13,42 @@ import { IconFingerprint, IconLoader2, IconLogout } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
+interface BranchGeofence {
+  latitude: number;
+  longitude: number;
+  radiusM: number;
+  name: string;
+}
+
 interface AttendanceClientProps {
   userId: string;
   initialRecords: Attendance[];
+  branchGeofence?: BranchGeofence | null;
 }
 
-export function AttendanceClient({ userId, initialRecords }: AttendanceClientProps) {
+export function AttendanceClient({ userId, initialRecords, branchGeofence }: AttendanceClientProps) {
   const t = useTranslations("Dashboard.Attendance");
   const [records, setRecords] = useState<Attendance[]>(initialRecords);
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Geofence: whether user is inside their branch radius
+  const isOutsideRadius = branchGeofence && location
+    ? (() => {
+        const R = 6371000;
+        const dLat = ((location.lat - branchGeofence.latitude) * Math.PI) / 180;
+        const dLng = ((location.lng - branchGeofence.longitude) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos((branchGeofence.latitude * Math.PI) / 180) *
+            Math.cos((location.lat * Math.PI) / 180) *
+            Math.sin(dLng / 2) ** 2;
+        const distM = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return distM > branchGeofence.radiusM;
+      })()
+    : false;
 
   // Checkout state
   const [checkoutFile, setCheckoutFile] = useState<File | null>(null);
@@ -191,11 +215,14 @@ export function AttendanceClient({ userId, initialRecords }: AttendanceClientPro
                   setCapturedImage={setCapturedImage}
                 />
 
-                <LocationStatus onLocationChange={(lat, lng) => setLocation({ lat, lng })} />
+                <LocationStatus
+                  onLocationChange={(lat, lng) => setLocation({ lat, lng })}
+                  geofence={branchGeofence}
+                />
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={isSubmitting || !capturedFile || !location}
+                  disabled={isSubmitting || !capturedFile || !location || !!isOutsideRadius}
                   className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isSubmitting ? (

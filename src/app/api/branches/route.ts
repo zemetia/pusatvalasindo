@@ -10,6 +10,9 @@ const createBranchSchema = z.object({
   address: z.string().max(500).optional(),
   phone: z.string().max(20).optional(),
   companyId: z.string().cuid().optional().nullable(),
+  latitude: z.number().min(-90).max(90).optional().nullable(),
+  longitude: z.number().min(-180).max(180).optional().nullable(),
+  attendanceRadiusM: z.number().int().min(1).max(10000).optional().nullable(),
 });
 
 type CreateBody = z.infer<typeof createBranchSchema>;

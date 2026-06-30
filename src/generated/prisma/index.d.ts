@@ -14275,8 +14275,22 @@ export namespace Prisma {
 
   export type AggregateBranch = {
     _count: BranchCountAggregateOutputType | null
+    _avg: BranchAvgAggregateOutputType | null
+    _sum: BranchSumAggregateOutputType | null
     _min: BranchMinAggregateOutputType | null
     _max: BranchMaxAggregateOutputType | null
+  }
+
+  export type BranchAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    attendanceRadiusM: number | null
+  }
+
+  export type BranchSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    attendanceRadiusM: number | null
   }
 
   export type BranchMinAggregateOutputType = {
@@ -14286,6 +14300,9 @@ export namespace Prisma {
     phone: string | null
     isActive: boolean | null
     companyId: string | null
+    latitude: number | null
+    longitude: number | null
+    attendanceRadiusM: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14297,6 +14314,9 @@ export namespace Prisma {
     phone: string | null
     isActive: boolean | null
     companyId: string | null
+    latitude: number | null
+    longitude: number | null
+    attendanceRadiusM: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14308,11 +14328,26 @@ export namespace Prisma {
     phone: number
     isActive: number
     companyId: number
+    latitude: number
+    longitude: number
+    attendanceRadiusM: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
+
+  export type BranchAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    attendanceRadiusM?: true
+  }
+
+  export type BranchSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    attendanceRadiusM?: true
+  }
 
   export type BranchMinAggregateInputType = {
     id?: true
@@ -14321,6 +14356,9 @@ export namespace Prisma {
     phone?: true
     isActive?: true
     companyId?: true
+    latitude?: true
+    longitude?: true
+    attendanceRadiusM?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14332,6 +14370,9 @@ export namespace Prisma {
     phone?: true
     isActive?: true
     companyId?: true
+    latitude?: true
+    longitude?: true
+    attendanceRadiusM?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14343,6 +14384,9 @@ export namespace Prisma {
     phone?: true
     isActive?: true
     companyId?: true
+    latitude?: true
+    longitude?: true
+    attendanceRadiusM?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -14386,6 +14430,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: BranchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BranchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: BranchMinAggregateInputType
@@ -14416,6 +14472,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: BranchCountAggregateInputType | true
+    _avg?: BranchAvgAggregateInputType
+    _sum?: BranchSumAggregateInputType
     _min?: BranchMinAggregateInputType
     _max?: BranchMaxAggregateInputType
   }
@@ -14427,9 +14485,14 @@ export namespace Prisma {
     phone: string | null
     isActive: boolean
     companyId: string | null
+    latitude: number | null
+    longitude: number | null
+    attendanceRadiusM: number | null
     createdAt: Date
     updatedAt: Date
     _count: BranchCountAggregateOutputType | null
+    _avg: BranchAvgAggregateOutputType | null
+    _sum: BranchSumAggregateOutputType | null
     _min: BranchMinAggregateOutputType | null
     _max: BranchMaxAggregateOutputType | null
   }
@@ -14455,6 +14518,9 @@ export namespace Prisma {
     phone?: boolean
     isActive?: boolean
     companyId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    attendanceRadiusM?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     bankAccounts?: boolean | Branch$bankAccountsArgs<ExtArgs>
@@ -14474,6 +14540,9 @@ export namespace Prisma {
     phone?: boolean
     isActive?: boolean
     companyId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    attendanceRadiusM?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | Branch$companyArgs<ExtArgs>
@@ -14486,6 +14555,9 @@ export namespace Prisma {
     phone?: boolean
     isActive?: boolean
     companyId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    attendanceRadiusM?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | Branch$companyArgs<ExtArgs>
@@ -14498,11 +14570,14 @@ export namespace Prisma {
     phone?: boolean
     isActive?: boolean
     companyId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    attendanceRadiusM?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BranchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "address" | "phone" | "isActive" | "companyId" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
+  export type BranchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "address" | "phone" | "isActive" | "companyId" | "latitude" | "longitude" | "attendanceRadiusM" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
   export type BranchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bankAccounts?: boolean | Branch$bankAccountsArgs<ExtArgs>
     company?: boolean | Branch$companyArgs<ExtArgs>
@@ -14538,6 +14613,9 @@ export namespace Prisma {
       phone: string | null
       isActive: boolean
       companyId: string | null
+      latitude: number | null
+      longitude: number | null
+      attendanceRadiusM: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["branch"]>
@@ -14976,6 +15054,9 @@ export namespace Prisma {
     readonly phone: FieldRef<"Branch", 'String'>
     readonly isActive: FieldRef<"Branch", 'Boolean'>
     readonly companyId: FieldRef<"Branch", 'String'>
+    readonly latitude: FieldRef<"Branch", 'Float'>
+    readonly longitude: FieldRef<"Branch", 'Float'>
+    readonly attendanceRadiusM: FieldRef<"Branch", 'Int'>
     readonly createdAt: FieldRef<"Branch", 'DateTime'>
     readonly updatedAt: FieldRef<"Branch", 'DateTime'>
   }
@@ -30752,6 +30833,9 @@ export namespace Prisma {
     phone: 'phone',
     isActive: 'isActive',
     companyId: 'companyId',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    attendanceRadiusM: 'attendanceRadiusM',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -31990,6 +32074,9 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Branch"> | string | null
     isActive?: BoolFilter<"Branch"> | boolean
     companyId?: StringNullableFilter<"Branch"> | string | null
+    latitude?: FloatNullableFilter<"Branch"> | number | null
+    longitude?: FloatNullableFilter<"Branch"> | number | null
+    attendanceRadiusM?: IntNullableFilter<"Branch"> | number | null
     createdAt?: DateTimeFilter<"Branch"> | Date | string
     updatedAt?: DateTimeFilter<"Branch"> | Date | string
     bankAccounts?: BankAccountListRelationFilter
@@ -32008,6 +32095,9 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     isActive?: SortOrder
     companyId?: SortOrderInput | SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    attendanceRadiusM?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     bankAccounts?: BankAccountOrderByRelationAggregateInput
@@ -32029,6 +32119,9 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Branch"> | string | null
     isActive?: BoolFilter<"Branch"> | boolean
     companyId?: StringNullableFilter<"Branch"> | string | null
+    latitude?: FloatNullableFilter<"Branch"> | number | null
+    longitude?: FloatNullableFilter<"Branch"> | number | null
+    attendanceRadiusM?: IntNullableFilter<"Branch"> | number | null
     createdAt?: DateTimeFilter<"Branch"> | Date | string
     updatedAt?: DateTimeFilter<"Branch"> | Date | string
     bankAccounts?: BankAccountListRelationFilter
@@ -32047,11 +32140,16 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     isActive?: SortOrder
     companyId?: SortOrderInput | SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    attendanceRadiusM?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: BranchCountOrderByAggregateInput
+    _avg?: BranchAvgOrderByAggregateInput
     _max?: BranchMaxOrderByAggregateInput
     _min?: BranchMinOrderByAggregateInput
+    _sum?: BranchSumOrderByAggregateInput
   }
 
   export type BranchScalarWhereWithAggregatesInput = {
@@ -32064,6 +32162,9 @@ export namespace Prisma {
     phone?: StringNullableWithAggregatesFilter<"Branch"> | string | null
     isActive?: BoolWithAggregatesFilter<"Branch"> | boolean
     companyId?: StringNullableWithAggregatesFilter<"Branch"> | string | null
+    latitude?: FloatNullableWithAggregatesFilter<"Branch"> | number | null
+    longitude?: FloatNullableWithAggregatesFilter<"Branch"> | number | null
+    attendanceRadiusM?: IntNullableWithAggregatesFilter<"Branch"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"Branch"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Branch"> | Date | string
   }
@@ -33947,6 +34048,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -33965,6 +34069,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -33981,6 +34088,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -33999,6 +34109,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -34016,6 +34129,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34026,6 +34142,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34037,6 +34156,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -35926,6 +36048,17 @@ export namespace Prisma {
     tarikCek?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type BankAccountListRelationFilter = {
     every?: BankAccountWhereInput
     some?: BankAccountWhereInput
@@ -35973,8 +36106,17 @@ export namespace Prisma {
     phone?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    attendanceRadiusM?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type BranchAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    attendanceRadiusM?: SortOrder
   }
 
   export type BranchMaxOrderByAggregateInput = {
@@ -35984,6 +36126,9 @@ export namespace Prisma {
     phone?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    attendanceRadiusM?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -35995,8 +36140,33 @@ export namespace Prisma {
     phone?: SortOrder
     isActive?: SortOrder
     companyId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    attendanceRadiusM?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type BranchSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    attendanceRadiusM?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type BranchListRelationFilter = {
@@ -37543,6 +37713,14 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type BankAccountUpdateManyWithoutBranchNestedInput = {
     create?: XOR<BankAccountCreateWithoutBranchInput, BankAccountUncheckedCreateWithoutBranchInput> | BankAccountCreateWithoutBranchInput[] | BankAccountUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutBranchInput | BankAccountCreateOrConnectWithoutBranchInput[]
@@ -38762,6 +38940,22 @@ export namespace Prisma {
     _max?: NestedEnumBankMutationTypeFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumKpiTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.KpiType | EnumKpiTypeFieldRefInput<$PrismaModel>
     in?: $Enums.KpiType[] | ListEnumKpiTypeFieldRefInput<$PrismaModel>
@@ -38933,6 +39127,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -38950,6 +39147,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -39044,6 +39244,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -39061,6 +39264,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -39809,6 +40015,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -39826,6 +40035,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -40109,6 +40321,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -40126,6 +40341,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -40213,6 +40431,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company?: CompanyCreateNestedOneWithoutBranchesInput
@@ -40230,6 +40451,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     currencyStocks?: CurrencyStockUncheckedCreateNestedManyWithoutBranchInput
@@ -40352,6 +40576,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneWithoutBranchesNestedInput
@@ -40369,6 +40596,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     currencyStocks?: CurrencyStockUncheckedUpdateManyWithoutBranchNestedInput
@@ -41145,6 +41375,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -41161,6 +41394,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -41353,6 +41589,9 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Branch"> | string | null
     isActive?: BoolFilter<"Branch"> | boolean
     companyId?: StringNullableFilter<"Branch"> | string | null
+    latitude?: FloatNullableFilter<"Branch"> | number | null
+    longitude?: FloatNullableFilter<"Branch"> | number | null
+    attendanceRadiusM?: IntNullableFilter<"Branch"> | number | null
     createdAt?: DateTimeFilter<"Branch"> | Date | string
     updatedAt?: DateTimeFilter<"Branch"> | Date | string
   }
@@ -42503,6 +42742,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -42520,6 +42762,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -42580,6 +42825,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -42597,6 +42845,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -42647,6 +42898,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -42664,6 +42918,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -42724,6 +42981,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -42741,6 +43001,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -42829,6 +43092,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutBranchInput
@@ -42846,6 +43112,9 @@ export namespace Prisma {
     phone?: string | null
     isActive?: boolean
     companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutBranchInput
@@ -42911,6 +43180,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -42928,6 +43200,9 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -43922,6 +44197,9 @@ export namespace Prisma {
     address?: string | null
     phone?: string | null
     isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43996,6 +44274,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutBranchNestedInput
@@ -44012,6 +44293,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutBranchNestedInput
@@ -44028,6 +44312,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

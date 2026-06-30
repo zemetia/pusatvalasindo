@@ -37,34 +37,52 @@ export default async function AttendancePage({
 
   const t = await getTranslations("Dashboard.Attendance");
 
-  // Get current month records
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
   let initialRecords;
+  let branchGeofence: { latitude: number; longitude: number; radiusM: number; name: string } | null = null;
+
   try {
-    initialRecords = await prisma.attendance.findMany({
-      where: {
-        userId: session.user.id,
-        date: {
-          gte: startOfMonth,
-          lte: endOfMonth,
+    const [records, userWithBranch] = await Promise.all([
+      prisma.attendance.findMany({
+        where: {
+          userId: session.user.id,
+          date: { gte: startOfMonth, lte: endOfMonth },
         },
-      },
-      orderBy: {
-        date: "desc",
-      },
-    });
+        orderBy: { date: "desc" },
+      }),
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          branch: {
+            select: { latitude: true, longitude: true, attendanceRadiusM: true, name: true },
+          },
+        },
+      }),
+    ]);
+
+    initialRecords = records;
+
+    const branch = userWithBranch?.branch;
+    if (branch?.latitude != null && branch?.longitude != null) {
+      branchGeofence = {
+        latitude: branch.latitude,
+        longitude: branch.longitude,
+        radiusM: branch.attendanceRadiusM ?? 20,
+        name: branch.name,
+      };
+    }
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (
       <div className="flex min-h-[400px] items-center justify-center p-8">
         <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
           {`[attendance/page — fetch error]\n\n${msg}`}
         </pre>
       </div>
-    )
+    );
   }
 
   return (
@@ -77,6 +95,7 @@ export default async function AttendancePage({
       <AttendanceClient
         userId={session.user.id}
         initialRecords={JSON.parse(JSON.stringify(initialRecords))}
+        branchGeofence={branchGeofence}
       />
     </div>
   );

@@ -5,6 +5,9 @@ export type CreateBranchInput = {
   address?: string;
   phone?: string;
   companyId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  attendanceRadiusM?: number | null;
 };
 
 export type UpdateBranchInput = Partial<CreateBranchInput & { isActive: boolean }>;

@@ -56,6 +56,8 @@ model user {
   baseSalary        Decimal?
   mealAllowance     Decimal?
   transportAllowance Decimal?
+  positionAllowance  Decimal?
+  bpjsKesehatan     Decimal?
   joinDate          DateTime?
   isActive          Boolean            @default(true)
   companyId         String?

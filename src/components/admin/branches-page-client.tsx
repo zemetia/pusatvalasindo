@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { BranchSheet, BranchRow } from "./branch-sheet";
 import { BranchActions } from "./branch-actions";
+import { IconRadar } from "@tabler/icons-react";
 
 type Company = {
   id: string;
@@ -24,6 +25,9 @@ type Company = {
 };
 
 type BranchWithCount = BranchRow & {
+  latitude?: number | null;
+  longitude?: number | null;
+  attendanceRadiusM?: number | null;
   _count: {
     users: number;
     stockItems: number;
@@ -133,6 +137,7 @@ function BranchTable({ branches, companies, emptyText }: { branches: BranchWithC
             <TableRow>
               <TableHead className="font-semibold">Nama Cabang</TableHead>
               <TableHead className="font-semibold">Informasi Kontak</TableHead>
+              <TableHead className="font-semibold">Geofence Absensi</TableHead>
               <TableHead className="text-right font-semibold">Statistik</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="w-[100px]" />
@@ -141,7 +146,7 @@ function BranchTable({ branches, companies, emptyText }: { branches: BranchWithC
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Tidak ada hasil untuk &ldquo;{search}&rdquo;
                 </TableCell>
               </TableRow>
@@ -172,6 +177,21 @@ function BranchTable({ branches, companies, emptyText }: { branches: BranchWithC
                           <span className="font-mono">{branch.phone ?? "—"}</span>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {branch.latitude != null && branch.longitude != null ? (
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                            <IconRadar className="size-3.5" />
+                            <span>Radius {branch.attendanceRadiusM ?? 20} m</span>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground font-mono">
+                            {branch.latitude.toFixed(5)}, {branch.longitude.toFixed(5)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground/60 italic">Tidak aktif</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-3">
@@ -211,6 +231,9 @@ function BranchTable({ branches, companies, emptyText }: { branches: BranchWithC
                             phone: branch.phone,
                             isActive: branch.isActive,
                             companyId: branch.companyId,
+                            latitude: branch.latitude,
+                            longitude: branch.longitude,
+                            attendanceRadiusM: branch.attendanceRadiusM,
                           }}
                         />
                       </div>
