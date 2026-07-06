@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Attendance } from "@src/generated/prisma";
 import { LiveClock } from "@/components/attendance/live-clock";
 import { CameraCapture } from "@/components/attendance/camera-capture";
@@ -26,6 +26,35 @@ interface AttendanceClientProps {
   branchGeofence?: BranchGeofence | null;
 }
 
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Fresh reading taken at the moment of submit, rather than reusing the last
+// background watchPosition tick — the position used for the geofence check
+// should reflect where the user is right now, not a few seconds ago.
+function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolokasi tidak didukung oleh browser Anda."));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({ lat: position.coords.latitude, lng: position.coords.longitude }),
+      () => reject(new Error("Gagal mendapatkan lokasi terkini. Pastikan GPS aktif.")),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+}
+
 export function AttendanceClient({ userId, initialRecords, branchGeofence }: AttendanceClientProps) {
   const t = useTranslations("Dashboard.Attendance");
   const [records, setRecords] = useState<Attendance[]>(initialRecords);
@@ -33,22 +62,6 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Geofence: whether user is inside their branch radius
-  const isOutsideRadius = branchGeofence && location
-    ? (() => {
-        const R = 6371000;
-        const dLat = ((location.lat - branchGeofence.latitude) * Math.PI) / 180;
-        const dLng = ((location.lng - branchGeofence.longitude) * Math.PI) / 180;
-        const a =
-          Math.sin(dLat / 2) ** 2 +
-          Math.cos((branchGeofence.latitude * Math.PI) / 180) *
-            Math.cos((location.lat * Math.PI) / 180) *
-            Math.sin(dLng / 2) ** 2;
-        const distM = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return distM > branchGeofence.radiusM;
-      })()
-    : false;
 
   // Checkout state
   const [checkoutFile, setCheckoutFile] = useState<File | null>(null);
@@ -63,6 +76,10 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
   const handleCapture = (file: File) => {
     setCapturedFile(file);
   };
+
+  const handleLocationChange = useCallback((lat: number, lng: number) => {
+    setLocation({ lat, lng });
+  }, []);
 
   const handleCheckout = async () => {
     if (!checkoutFile) {
@@ -134,6 +151,23 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
 
     setIsSubmitting(true);
     try {
+      // Re-check the GPS position right now, at the moment of submit
+      const currentLocation = await getCurrentLocation();
+      setLocation(currentLocation);
+
+      if (branchGeofence) {
+        const distM = haversineMeters(
+          currentLocation.lat,
+          currentLocation.lng,
+          branchGeofence.latitude,
+          branchGeofence.longitude
+        );
+        if (distM > branchGeofence.radiusM) {
+          toast.error("Tidak bisa absen karena di luar dari area kantor.");
+          return;
+        }
+      }
+
       // 1. Upload photo to Supabase
       const formData = new FormData();
       formData.append("photo", capturedFile);
@@ -159,10 +193,10 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
           date: localDate,
           checkIn: new Date().toISOString(),
           checkInPhotoUrl: url,
-          checkInGpsLat: location.lat,
-          checkInGpsLng: location.lng,
-          checkInManualLat: location.lat,
-          checkInManualLng: location.lng,
+          checkInGpsLat: currentLocation.lat,
+          checkInGpsLng: currentLocation.lng,
+          checkInManualLat: currentLocation.lat,
+          checkInManualLng: currentLocation.lng,
           notes: "Presensi mandiri",
         }),
       });
@@ -216,13 +250,13 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
                 />
 
                 <LocationStatus
-                  onLocationChange={(lat, lng) => setLocation({ lat, lng })}
+                  onLocationChange={handleLocationChange}
                   geofence={branchGeofence}
                 />
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={isSubmitting || !capturedFile || !location || !!isOutsideRadius}
+                  disabled={isSubmitting || !capturedFile || !location}
                   className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isSubmitting ? (

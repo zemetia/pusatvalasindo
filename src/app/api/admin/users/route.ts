@@ -17,6 +17,8 @@ const createUserSchema = z.object({
   baseSalary: z.number().positive().optional(),
   mealAllowance: z.number().positive().optional(),
   transportAllowance: z.number().positive().optional(),
+  positionAllowance: z.number().positive().optional(),
+  bpjsKesehatan: z.number().positive().optional(),
   joinDate: z.string().optional(),
 });
 
@@ -28,7 +30,7 @@ export const POST = withValidation(createUserSchema)(
       const caller = await getAdminCaller();
       if (caller instanceof NextResponse) return caller;
 
-      let { name, email, password, customRoleId, branchId, phone, baseSalary, mealAllowance, transportAllowance, joinDate } = ctx.body;
+      let { name, email, password, customRoleId, branchId, phone, baseSalary, mealAllowance, transportAllowance, positionAllowance, bpjsKesehatan, joinDate } = ctx.body;
 
       if (!password) {
         const emailPrefix = email.split("@")[0];
@@ -57,6 +59,8 @@ export const POST = withValidation(createUserSchema)(
           baseSalary: baseSalary ?? null,
           mealAllowance: mealAllowance ?? null,
           transportAllowance: transportAllowance ?? null,
+          positionAllowance: positionAllowance ?? null,
+          bpjsKesehatan: bpjsKesehatan ?? null,
           joinDate: joinDate ? new Date(joinDate) : new Date(),
           emailVerified: true,
           updatedAt: new Date(),

@@ -8,7 +8,7 @@ import { withValidation } from "@/backend/middleware/with-validation";
 const updateRoleSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
-  companyId: z.string().cuid().optional().nullable(),
+  companyId: z.string().min(1).optional().nullable(),
   permissions: z.array(z.string()).optional(),
 });
 

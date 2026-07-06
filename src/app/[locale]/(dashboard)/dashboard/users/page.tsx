@@ -51,6 +51,8 @@ export default async function UsersPage() {
     baseSalary: u.baseSalary?.toString() ?? null,
     mealAllowance: u.mealAllowance?.toString() ?? null,
     transportAllowance: u.transportAllowance?.toString() ?? null,
+    positionAllowance: u.positionAllowance?.toString() ?? null,
+    bpjsKesehatan: u.bpjsKesehatan?.toString() ?? null,
     joinDate: u.joinDate?.toISOString() ?? null,
     isActive: u.isActive,
     createdAt: u.createdAt.toISOString(),

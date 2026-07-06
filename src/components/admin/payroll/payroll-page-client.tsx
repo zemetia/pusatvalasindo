@@ -43,6 +43,8 @@ export type UserRow = {
   baseSalary: number | null;
   mealAllowance: number | null;
   transportAllowance: number | null;
+  positionAllowance: number | null;
+  bpjsKesehatan: number | null;
   isActive: boolean;
 };
 
@@ -280,6 +282,24 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                   <span className="text-muted-foreground">Uang Transport</span>
                   <span className="font-mono">
                     {formatCurrency(result.components.transportAllowance)}
+                  </span>
+                </div>
+              )}
+
+              {result.components.positionAllowance > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Uang Jabatan</span>
+                  <span className="font-mono">
+                    {formatCurrency(result.components.positionAllowance)}
+                  </span>
+                </div>
+              )}
+
+              {result.components.bpjsKesehatan > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">BPJS Kesehatan</span>
+                  <span className="font-mono">
+                    {formatCurrency(result.components.bpjsKesehatan)}
                   </span>
                 </div>
               )}

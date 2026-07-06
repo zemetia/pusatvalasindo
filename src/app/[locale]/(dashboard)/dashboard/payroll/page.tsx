@@ -33,6 +33,8 @@ export default async function PayrollPage() {
     baseSalary: u.baseSalary ? Number(u.baseSalary) : null,
     mealAllowance: u.mealAllowance ? Number(u.mealAllowance) : null,
     transportAllowance: u.transportAllowance ? Number(u.transportAllowance) : null,
+    positionAllowance: u.positionAllowance ? Number(u.positionAllowance) : null,
+    bpjsKesehatan: u.bpjsKesehatan ? Number(u.bpjsKesehatan) : null,
     isActive: u.isActive,
   }));
 

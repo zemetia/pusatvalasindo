@@ -23,6 +23,8 @@ export const payrollService = {
         baseSalary: true,
         mealAllowance: true,
         transportAllowance: true,
+        positionAllowance: true,
+        bpjsKesehatan: true,
       },
     });
 
@@ -38,7 +40,9 @@ export const payrollService = {
     const base = Number(employee.baseSalary ?? 0);
     const meal = Number(employee.mealAllowance ?? 0);
     const transport = Number(employee.transportAllowance ?? 0);
-    const totalGrossFixed = base + meal + transport;
+    const position = Number(employee.positionAllowance ?? 0);
+    const bpjs = Number(employee.bpjsKesehatan ?? 0);
+    const totalGrossFixed = base + meal + transport + position + bpjs;
     const dailyRate = totalGrossFixed / 24;
 
     let totalLateDeduction = 0;
@@ -89,6 +93,8 @@ export const payrollService = {
         baseSalary: base,
         mealAllowance: meal,
         transportAllowance: transport,
+        positionAllowance: position,
+        bpjsKesehatan: bpjs,
         totalGrossFixed,
         dailyRate,
       },

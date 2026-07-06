@@ -70,6 +70,14 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
     });
   }
 
+  if (can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
+    navMain.push({
+      title: "Isi KPI Saya",
+      url: "/dashboard/kpi/self",
+      icon: IconPencil,
+    });
+  }
+
   // ── KPI ────────────────────────────────────────────────────────────────────
   const navKPI: NavItem[] = [];
 
@@ -92,18 +100,6 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
       title: "Log KPI",
       url: "/dashboard/kpi/log",
       icon: IconReport,
-    });
-  }
-
-  // Karyawan biasa hanya bisa self-fill
-  if (
-    can(permissions, PERMISSIONS.KPI_FILL_OWN) &&
-    !can(permissions, PERMISSIONS.KPI_VIEW_ALL)
-  ) {
-    navKPI.push({
-      title: "Isi KPI Saya",
-      url: "/dashboard/kpi/self",
-      icon: IconPencil,
     });
   }
 

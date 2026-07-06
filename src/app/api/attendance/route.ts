@@ -70,31 +70,38 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Geofence validation: user must be within their branch's attendance radius
-  if (checkInGpsLat != null && checkInGpsLng != null) {
-    const userWithBranch = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        branch: {
-          select: { latitude: true, longitude: true, attendanceRadiusM: true, name: true },
-        },
+  // Geofence validation: user must be within their branch's attendance radius.
+  // Branch lookup runs regardless of whether GPS was sent, so a request that
+  // omits checkInGpsLat/Lng can't silently skip enforcement for a branch that
+  // requires it.
+  const userWithBranch = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      branch: {
+        select: { latitude: true, longitude: true, attendanceRadiusM: true, name: true },
       },
-    });
-    const branch = userWithBranch?.branch;
-    if (branch?.latitude != null && branch?.longitude != null) {
-      const radiusM = branch.attendanceRadiusM ?? 20;
-      const distKm = haversineKm(checkInGpsLat, checkInGpsLng, branch.latitude, branch.longitude);
-      const distM = distKm * 1000;
-      if (distM > radiusM) {
-        return NextResponse.json(
-          {
-            error: `Anda berada ${Math.round(distM)} m dari cabang ${branch.name}. Absensi hanya diizinkan dalam radius ${radiusM} m.`,
-            distanceM: Math.round(distM),
-            radiusM,
-          },
-          { status: 403 }
-        );
-      }
+    },
+  });
+  const branch = userWithBranch?.branch;
+  if (branch?.latitude != null && branch?.longitude != null) {
+    if (checkInGpsLat == null || checkInGpsLng == null) {
+      return NextResponse.json(
+        { error: `Lokasi GPS wajib diaktifkan untuk absen di cabang ${branch.name}.` },
+        { status: 403 }
+      );
+    }
+    const radiusM = branch.attendanceRadiusM ?? 20;
+    const distKm = haversineKm(checkInGpsLat, checkInGpsLng, branch.latitude, branch.longitude);
+    const distM = distKm * 1000;
+    if (distM > radiusM) {
+      return NextResponse.json(
+        {
+          error: `Anda berada ${Math.round(distM)} m dari cabang ${branch.name}. Absensi hanya diizinkan dalam radius ${radiusM} m.`,
+          distanceM: Math.round(distM),
+          radiusM,
+        },
+        { status: 403 }
+      );
     }
   }
 

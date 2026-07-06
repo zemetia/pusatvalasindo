@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import {
-  IconCreditCard,
   IconDotsVertical,
+  IconLoader2,
   IconLogout,
-  IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
+import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,12 +26,41 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import LogoutButton from "./auth/logout-button";
+import { authClient } from "@/lib/auth-client";
 
 type NavUserData = { name: string; email: string };
 
 export function NavUser({ user }: { user: NavUserData }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  function handleLogOut(e: Event) {
+    e.preventDefault(); // jangan tutup dropdown dulu
+    setLoggingOut(true);
+    const toastId = toast.loading("Sedang keluar...");
+    authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Berhasil keluar", { id: toastId });
+          router.push(`/${locale}/login`);
+        },
+        onError: () => {
+          toast.error("Gagal keluar, coba lagi", { id: toastId });
+          setLoggingOut(false);
+        },
+      },
+    });
+  }
+
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <SidebarMenu>
@@ -41,9 +72,8 @@ export function NavUser({ user }: { user: NavUserData }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground transition-all duration-300 rounded-xl"
             >
               <Avatar className="h-9 w-9 rounded-lg border border-primary/10 shadow-sm">
-                {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                 <AvatarFallback className="rounded-lg bg-primary/5 text-primary font-bold text-xs">
-                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight ml-1">
@@ -65,14 +95,12 @@ export function NavUser({ user }: { user: NavUserData }) {
               <div className="flex items-center gap-3 px-2 py-2 text-left text-sm">
                 <Avatar className="h-10 w-10 rounded-lg border border-primary/5">
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">
-                    {user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-bold tracking-tight text-premium">{user.name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
+                  <span className="text-muted-foreground truncate text-xs">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -84,9 +112,19 @@ export function NavUser({ user }: { user: NavUserData }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator className="my-2" />
-            <DropdownMenuItem className="rounded-lg text-red-600 focus:bg-red-50 focus:text-red-700 transition-colors">
-              <IconLogout className="size-4" />
-              <LogoutButton />
+            <DropdownMenuItem
+              onSelect={handleLogOut}
+              disabled={loggingOut}
+              className="rounded-lg text-red-600 focus:bg-red-50 focus:text-red-700 transition-colors"
+            >
+              {loggingOut ? (
+                <IconLoader2 className="size-4 animate-spin" />
+              ) : (
+                <IconLogout className="size-4" />
+              )}
+              <span className="font-medium">
+                {loggingOut ? "Sedang keluar..." : "Log out"}
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

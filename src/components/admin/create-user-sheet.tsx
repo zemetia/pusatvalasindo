@@ -49,6 +49,8 @@ const emptyForm = {
   baseSalary: "",
   mealAllowance: "",
   transportAllowance: "",
+  positionAllowance: "",
+  bpjsKesehatan: "",
   joinDate: "",
 };
 
@@ -102,6 +104,8 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           baseSalary: form.baseSalary ? parseFloat(form.baseSalary) : undefined,
           mealAllowance: form.mealAllowance ? parseFloat(form.mealAllowance) : undefined,
           transportAllowance: form.transportAllowance ? parseFloat(form.transportAllowance) : undefined,
+          positionAllowance: form.positionAllowance ? parseFloat(form.positionAllowance) : undefined,
+          bpjsKesehatan: form.bpjsKesehatan ? parseFloat(form.bpjsKesehatan) : undefined,
           joinDate: form.joinDate || undefined,
         }),
       });
@@ -238,7 +242,6 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           label="Gaji Pokok (IDR)"
           type="number"
           min="0"
-          step="1000"
           placeholder="0"
           value={form.baseSalary}
           onChange={(e) => set("baseSalary")(e.target.value)}
@@ -249,7 +252,6 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
             label="Uang Makan (IDR)"
             type="number"
             min="0"
-            step="1000"
             placeholder="0"
             value={form.mealAllowance}
             onChange={(e) => set("mealAllowance")(e.target.value)}
@@ -259,10 +261,27 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
             label="Uang Transport (IDR)"
             type="number"
             min="0"
-            step="1000"
             placeholder="0"
             value={form.transportAllowance}
             onChange={(e) => set("transportAllowance")(e.target.value)}
+            icon={<Banknote className="w-4 h-4" />}
+          />
+          <PremiumField
+            label="Uang Jabatan (IDR)"
+            type="number"
+            min="0"
+            placeholder="0"
+            value={form.positionAllowance}
+            onChange={(e) => set("positionAllowance")(e.target.value)}
+            icon={<Banknote className="w-4 h-4" />}
+          />
+          <PremiumField
+            label="BPJS Kesehatan (IDR)"
+            type="number"
+            min="0"
+            placeholder="0"
+            value={form.bpjsKesehatan}
+            onChange={(e) => set("bpjsKesehatan")(e.target.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
         </div>

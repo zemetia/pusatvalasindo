@@ -23,6 +23,7 @@ export default async function KpiSelfPage({
       select: {
         id: true,
         name: true,
+        companyId: true,
         customRole: { select: { id: true, name: true, permissions: true } },
       },
     });
@@ -40,11 +41,6 @@ export default async function KpiSelfPage({
   if (!user) redirect(`/${locale}/login`);
 
   const permissions = user.customRole?.permissions ?? [];
-
-  // Redirect karyawan yang punya akses penuh KPI ke halaman log
-  if (can(permissions, PERMISSIONS.KPI_VIEW_ALL)) {
-    redirect(`/${locale}/dashboard/kpi/log`);
-  }
 
   // Karyawan tanpa permission fill tidak bisa masuk halaman ini
   if (!can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
@@ -92,6 +88,8 @@ export default async function KpiSelfPage({
         userName={user.name}
         roleName={user.customRole?.name ?? "—"}
         roleKpis={roleKpis}
+        companyId={user.companyId ?? ""}
+        customRoleId={user.customRole?.id ?? ""}
       />
     </div>
   );

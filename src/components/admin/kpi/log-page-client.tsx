@@ -370,55 +370,64 @@ export function LogPageClient({
 
           {/* ── Tab: Log Pelanggaran ───────────────────────────── */}
           <TabsContent value="events" className="mt-0 flex flex-col gap-4">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 border rounded-lg bg-muted/30">
-              <div className="sm:col-span-2 grid gap-1.5">
-                <Label>KPI Pelanggaran</Label>
-                <Select value={newKpiId} onValueChange={setNewKpiId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih KPI event" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {eventKpisForRole.length === 0 ? (
-                      <SelectItem value="__none__" disabled>
-                        Tidak ada KPI event untuk jabatan ini
-                      </SelectItem>
-                    ) : (
-                      eventKpisForRole.map((rk) => (
+            {eventKpisForRole.length === 0 && selectedUser ? (
+              <div className="flex flex-col gap-2 p-4 border rounded-lg bg-muted/30">
+                <p className="text-sm font-medium">Belum ada KPI pelanggaran untuk jabatan ini</p>
+                <p className="text-sm text-muted-foreground">
+                  Jabatan <span className="font-medium">{selectedUser.role}</span> belum memiliki KPI bertipe EVENT.
+                  Tambahkan KPI event terlebih dahulu di halaman konfigurasi KPI jabatan.
+                </p>
+                <Button asChild size="sm" variant="outline" className="w-fit mt-1">
+                  <Link href={`/dashboard/kpi`}>
+                    Buka Konfigurasi KPI →
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 border rounded-lg bg-muted/30">
+                <div className="sm:col-span-2 grid gap-1.5">
+                  <Label>KPI Pelanggaran</Label>
+                  <Select value={newKpiId} onValueChange={setNewKpiId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih KPI event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eventKpisForRole.map((rk) => (
                         <SelectItem key={rk.kpiId} value={rk.kpiId}>
                           {rk.definition.name}
                         </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Nilai Poin</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    placeholder="Contoh: 4"
+                    value={newValue}
+                    onChange={(e) => setNewValue(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label>Catatan</Label>
+                  <Input
+                    placeholder="Opsional"
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                  />
+                </div>
+                <div className="sm:col-span-4">
+                  <Button
+                    onClick={handleAddLog}
+                    disabled={addLogMutation.isPending}
+                  >
+                    {addLogMutation.isPending ? "Menyimpan..." : "+ Catat Pelanggaran"}
+                  </Button>
+                </div>
               </div>
-              <div className="grid gap-1.5">
-                <Label>Nilai Poin</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  placeholder="Contoh: 4"
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Catatan</Label>
-                <Input
-                  placeholder="Opsional"
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                />
-              </div>
-              <div className="sm:col-span-4">
-                <Button
-                  onClick={handleAddLog}
-                  disabled={addLogMutation.isPending}
-                >
-                  {addLogMutation.isPending ? "Menyimpan..." : "+ Catat Pelanggaran"}
-                </Button>
-              </div>
-            </div>
+            )}
 
             <div className="rounded-md border">
               <Table>

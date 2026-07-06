@@ -9,6 +9,8 @@ export type UpdateUserInput = Partial<{
   baseSalary: number | null;
   mealAllowance: number | null;
   transportAllowance: number | null;
+  positionAllowance: number | null;
+  bpjsKesehatan: number | null;
   joinDate: Date;
   isActive: boolean;
 }>;
@@ -25,6 +27,8 @@ const select = {
   baseSalary: true,
   mealAllowance: true,
   transportAllowance: true,
+  positionAllowance: true,
+  bpjsKesehatan: true,
   joinDate: true,
   isActive: true,
   createdAt: true,

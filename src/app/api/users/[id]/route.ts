@@ -14,6 +14,8 @@ const updateUserSchema = z.object({
   baseSalary: z.number().positive().optional().nullable(),
   mealAllowance: z.number().positive().optional().nullable(),
   transportAllowance: z.number().positive().optional().nullable(),
+  positionAllowance: z.number().positive().optional().nullable(),
+  bpjsKesehatan: z.number().positive().optional().nullable(),
   joinDate: z.string().optional(),
   isActive: z.boolean().optional(),
 });

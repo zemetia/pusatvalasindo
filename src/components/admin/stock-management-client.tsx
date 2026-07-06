@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -44,7 +44,7 @@ type BankAccount = {
   accountName: string;
   accountNumber: string | null;
   currencyId: string;
-  balance: any; // Decimal
+  balance: string;
   currency: { code: string };
   note: string | null;
   isActive: boolean;
@@ -77,11 +77,15 @@ export function StockManagementClient({ companies, branches, currencies }: Props
 
   const activeCompany = companies.find((c) => c.id === activeCompanyId);
   const companyBranches = activeCompany?.branches || [];
-  
-  // Auto-select first branch when company changes
-  if (activeCompanyId && !activeBranchId && companyBranches.length > 0) {
-    setActiveBranchId(companyBranches[0].id);
-  }
+
+  useEffect(() => {
+    if (activeCompanyId && companyBranches.length > 0) {
+      setActiveBranchId(companyBranches[0].id);
+    } else {
+      setActiveBranchId("");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCompanyId]);
 
   const currentBranch = branches.find((b) => b.id === activeBranchId);
 

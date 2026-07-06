@@ -32,6 +32,8 @@ type User = {
   baseSalary: string | null;
   mealAllowance: string | null;
   transportAllowance: string | null;
+  positionAllowance: string | null;
+  bpjsKesehatan: string | null;
   joinDate: string | null;
   isActive: boolean;
   createdAt: string;

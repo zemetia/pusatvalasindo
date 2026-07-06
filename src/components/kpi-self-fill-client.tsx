@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -86,11 +87,15 @@ export function KpiSelfFillClient({
   userName,
   roleName,
   roleKpis,
+  companyId,
+  customRoleId,
 }: {
   userId: string;
   userName: string;
   roleName: string;
   roleKpis: RoleKpiItem[];
+  companyId: string;
+  customRoleId: string;
 }) {
   const now = new Date();
   const queryClient = useQueryClient();
@@ -106,6 +111,9 @@ export function KpiSelfFillClient({
   // Revenue state
   const [newAmount, setNewAmount] = useState("");
   const [newRevenueNote, setNewRevenueNote] = useState("");
+
+  const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
+  const [deletingRevenueId, setDeletingRevenueId] = useState<string | null>(null);
 
   const eventKpis = roleKpis.filter((k) => k.type === "EVENT");
 
@@ -142,12 +150,16 @@ export function KpiSelfFillClient({
   });
 
   const deleteLogMutation = useMutation({
-    mutationFn: (id: string) => mutateJson(`/api/kpi-logs/self/${id}`, "DELETE"),
+    mutationFn: (id: string) => {
+      setDeletingLogId(id);
+      return mutateJson(`/api/kpi-logs/self/${id}`, "DELETE");
+    },
     onSuccess: () => {
       toast.success("Log dihapus");
       queryClient.invalidateQueries({ queryKey: logsKey });
     },
     onError: (err: Error) => toast.error(err.message),
+    onSettled: () => setDeletingLogId(null),
   });
 
   const addRevenueMutation = useMutation({
@@ -163,12 +175,16 @@ export function KpiSelfFillClient({
   });
 
   const deleteRevenueMutation = useMutation({
-    mutationFn: (id: string) => mutateJson(`/api/revenues/self/${id}`, "DELETE"),
+    mutationFn: (id: string) => {
+      setDeletingRevenueId(id);
+      return mutateJson(`/api/revenues/self/${id}`, "DELETE");
+    },
     onSuccess: () => {
       toast.success("Entri dihapus");
       queryClient.invalidateQueries({ queryKey: revenuesKey });
     },
     onError: (err: Error) => toast.error(err.message),
+    onSettled: () => setDeletingRevenueId(null),
   });
 
   const handleAddLog = () => {
@@ -305,8 +321,19 @@ export function KpiSelfFillClient({
               </Button>
             </div>
           ) : (
-            <div className="px-4 py-3 border rounded-lg text-sm text-muted-foreground">
-              Tidak ada KPI pelanggaran yang dapat diisi untuk jabatan ini.
+            <div className="flex flex-col gap-2 px-4 py-3 border rounded-lg bg-muted/30">
+              <p className="text-sm font-medium">Belum ada KPI pelanggaran untuk jabatan ini</p>
+              <p className="text-sm text-muted-foreground">
+                Jabatan <span className="font-medium">{roleName}</span> belum memiliki KPI bertipe EVENT.
+                Admin perlu menambahkan minimal satu KPI event di halaman konfigurasi KPI jabatan.
+              </p>
+              {companyId && customRoleId && (
+                <Button asChild size="sm" variant="outline" className="w-fit mt-1">
+                  <Link href={`/dashboard/kpi/${companyId}/custom_${customRoleId}`}>
+                    Buka Konfigurasi KPI Jabatan →
+                  </Link>
+                </Button>
+              )}
             </div>
           )}
 
@@ -353,7 +380,7 @@ export function KpiSelfFillClient({
                           size="icon"
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
-                          disabled={deleteLogMutation.isPending}
+                          disabled={deletingLogId === l.id}
                           onClick={() => handleDeleteLog(l.id)}
                         >
                           <IconTrash className="size-4" />
@@ -437,7 +464,7 @@ export function KpiSelfFillClient({
                           size="icon"
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
-                          disabled={deleteRevenueMutation.isPending}
+                          disabled={deletingRevenueId === r.id}
                           onClick={() => handleDeleteRevenue(r.id)}
                         >
                           <IconTrash className="size-4" />

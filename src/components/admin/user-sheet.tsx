@@ -42,6 +42,8 @@ export type UserRow = {
   baseSalary: unknown;
   mealAllowance: unknown;
   transportAllowance: unknown;
+  positionAllowance: unknown;
+  bpjsKesehatan: unknown;
   joinDate: string | null;
   isActive: boolean;
   createdAt: string;
@@ -77,6 +79,8 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
     baseSalary: "",
     mealAllowance: "",
     transportAllowance: "",
+    positionAllowance: "",
+    bpjsKesehatan: "",
     joinDate: "",
   });
 
@@ -91,6 +95,8 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
         baseSalary: user.baseSalary ? String(user.baseSalary) : "",
         mealAllowance: user.mealAllowance ? String(user.mealAllowance) : "",
         transportAllowance: user.transportAllowance ? String(user.transportAllowance) : "",
+        positionAllowance: user.positionAllowance ? String(user.positionAllowance) : "",
+        bpjsKesehatan: user.bpjsKesehatan ? String(user.bpjsKesehatan) : "",
         joinDate: toDateInput(user.joinDate),
       });
     }
@@ -127,6 +133,8 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
           baseSalary: form.baseSalary ? parseFloat(form.baseSalary) : null,
           mealAllowance: form.mealAllowance ? parseFloat(form.mealAllowance) : null,
           transportAllowance: form.transportAllowance ? parseFloat(form.transportAllowance) : null,
+          positionAllowance: form.positionAllowance ? parseFloat(form.positionAllowance) : null,
+          bpjsKesehatan: form.bpjsKesehatan ? parseFloat(form.bpjsKesehatan) : null,
           joinDate: form.joinDate || undefined,
         }),
       });
@@ -237,7 +245,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
           label="Gaji Pokok (IDR)"
           type="number"
           min="0"
-          step="1000"
           placeholder="0"
           value={form.baseSalary}
           onChange={(e) => set("baseSalary")(e.target.value)}
@@ -248,7 +255,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
             label="Uang Makan (IDR)"
             type="number"
             min="0"
-            step="1000"
             placeholder="0"
             value={form.mealAllowance}
             onChange={(e) => set("mealAllowance")(e.target.value)}
@@ -258,10 +264,27 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
             label="Uang Transport (IDR)"
             type="number"
             min="0"
-            step="1000"
             placeholder="0"
             value={form.transportAllowance}
             onChange={(e) => set("transportAllowance")(e.target.value)}
+            icon={<Banknote className="w-4 h-4" />}
+          />
+          <PremiumField
+            label="Uang Jabatan (IDR)"
+            type="number"
+            min="0"
+            placeholder="0"
+            value={form.positionAllowance}
+            onChange={(e) => set("positionAllowance")(e.target.value)}
+            icon={<Banknote className="w-4 h-4" />}
+          />
+          <PremiumField
+            label="BPJS Kesehatan (IDR)"
+            type="number"
+            min="0"
+            placeholder="0"
+            value={form.bpjsKesehatan}
+            onChange={(e) => set("bpjsKesehatan")(e.target.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
         </div>

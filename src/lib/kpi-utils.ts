@@ -61,6 +61,8 @@ export type PayrollResult = {
     baseSalary: number;
     mealAllowance: number;
     transportAllowance: number;
+    positionAllowance: number;
+    bpjsKesehatan: number;
     totalGrossFixed: number;
     dailyRate: number;
   };

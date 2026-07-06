@@ -45,6 +45,14 @@ export default async function StockManagementPage() {
   }
   const [companies, branches, currencies] = result;
 
+  const serializedBranches = branches.map((b) => ({
+    ...b,
+    bankAccounts: b.bankAccounts.map((a) => ({
+      ...a,
+      balance: a.balance.toString(),
+    })),
+  }));
+
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       <PageHeader
@@ -55,7 +63,7 @@ export default async function StockManagementPage() {
 
       <StockManagementClient
         companies={companies}
-        branches={branches}
+        branches={serializedBranches}
         currencies={currencies}
       />
     </div>
