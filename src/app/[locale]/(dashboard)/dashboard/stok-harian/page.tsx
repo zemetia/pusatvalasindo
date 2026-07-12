@@ -34,7 +34,7 @@ export default async function StokHarianPage() {
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       <PageHeader
         title="Isi Stok Harian"
-        description="Input posisi stok penutupan dan saldo rekening per hari per cabang"
+        description="Input posisi stok penutupan per hari per cabang"
         icon={<IconListDetails className="size-5" />}
       />
       <DailyStockForm companies={companies} branches={branches} />

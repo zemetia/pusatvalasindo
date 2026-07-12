@@ -15,6 +15,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StockistGridClient } from "@/components/admin/stockist/stockist-grid-client"
 import { KasGridClient } from "@/components/admin/stockist/kas-grid-client"
+import { BankGridClient } from "@/components/admin/stockist/bank-grid-client"
 import { IconDownload, IconLoader2 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
@@ -39,13 +40,22 @@ interface Props {
   companies: Company[]
   defaultCompanyId: string | null
   canManage: boolean
+  showBank: boolean
+  canManageBank: boolean
 }
 
-export function StockistTabs({ companies, defaultCompanyId, canManage }: Props) {
+export function StockistTabs({
+  companies,
+  defaultCompanyId,
+  canManage,
+  showBank,
+  canManageBank,
+}: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? "")
   const [date, setDate] = useState(toDate(new Date()))
   const [mataUangAlert, setMataUangAlert] = useState({ beda: 0, belumReview: 0, belumIsi: 0 })
   const [kasUnfilled, setKasUnfilled] = useState(0)
+  const [bankUnfilled, setBankUnfilled] = useState(0)
   const [exporting, setExporting] = useState(false)
 
   // Remember the last PT an unscoped user (Admin/Owner/Akuntan) picked, so they
@@ -186,6 +196,16 @@ export function StockistTabs({ companies, defaultCompanyId, canManage }: Props) 
                 </Badge>
               )}
             </TabsTrigger>
+            {showBank && (
+              <TabsTrigger value="bank" className="gap-1.5">
+                Bank
+                {bankUnfilled > 0 && (
+                  <Badge className="h-4 min-w-4 rounded-full bg-amber-500 px-1 text-[10px]">
+                    {bankUnfilled}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            )}
           </TabsList>
           <TabsContent value="mata-uang">
             <StockistGridClient
@@ -203,6 +223,16 @@ export function StockistTabs({ companies, defaultCompanyId, canManage }: Props) 
               onUnfilledChange={setKasUnfilled}
             />
           </TabsContent>
+          {showBank && (
+            <TabsContent value="bank">
+              <BankGridClient
+                companyId={companyId}
+                date={date}
+                canManage={canManageBank}
+                onUnfilledChange={setBankUnfilled}
+              />
+            </TabsContent>
+          )}
         </Tabs>
       )}
     </div>

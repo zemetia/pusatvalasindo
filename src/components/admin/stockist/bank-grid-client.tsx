@@ -1,17 +1,18 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+  type KeyboardEvent,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { NumberInput } from "@/components/ui/number-input"
 import { Badge } from "@/components/ui/badge"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -22,8 +23,6 @@ import {
 } from "@/components/ui/table"
 import { IconAlertTriangle, IconCheck, IconLoader2, IconMinus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
-
-type Company = { id: string; name: string }
 
 type Account = {
   id: string
@@ -64,26 +63,25 @@ function parseNum(s: string): number {
   return parseFloat(cleaned) || 0
 }
 
-function toDate(d: Date) {
-  return d.toISOString().slice(0, 10)
-}
-
 interface Props {
-  companies: Company[]
-  defaultCompanyId: string | null
-  canInput: boolean
+  companyId: string
+  date: string
+  canManage: boolean
+  onUnfilledChange?: (count: number) => void
 }
 
-export function DailyBankForm({ companies, defaultCompanyId, canInput }: Props) {
-  const [companyId, setCompanyId] = useState(defaultCompanyId ?? "")
-  const [date, setDate] = useState(toDate(new Date()))
+export function BankGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
   const [rows, setRows] = useState<Row[]>([])
   const [fetching, setFetching] = useState(false)
+  const rowsRef = useRef<Row[]>([])
+  rowsRef.current = rows
+  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map())
 
-  const loadData = useCallback(async (cid: string, d: string) => {
+  const loadData = useCallback(async () => {
+    if (!companyId || !date) return
     setFetching(true)
     try {
-      const res = await fetch(`/api/bank-harian?companyId=${cid}&date=${d}`)
+      const res = await fetch(`/api/bank-harian?companyId=${companyId}&date=${date}`)
       const data = await res.json()
       if (!res.ok || !data.success) {
         toast.error(data.error || data.message || "Gagal memuat data")
@@ -127,27 +125,27 @@ export function DailyBankForm({ companies, defaultCompanyId, canInput }: Props) 
     } finally {
       setFetching(false)
     }
-  }, [])
+  }, [companyId, date])
 
   useEffect(() => {
-    if (companyId && date) loadData(companyId, date)
-  }, [companyId, date, loadData])
+    loadData()
+  }, [loadData])
 
   const updateRow = (id: string, field: "balance" | "tarikCek" | "note", val: string) => {
     setRows((prev) => prev.map((r) => (r.bankAccountId === id ? { ...r, [field]: val } : r)))
   }
 
-  const saveRow = async (row: Row) => {
-    if (!canInput) return
+  const saveRow = async (id: string) => {
+    const row = rowsRef.current.find((r) => r.bankAccountId === id)
+    if (!row || !canManage) return
     if (
       row.balance === row.savedBalance &&
       row.tarikCek === row.savedTarikCek &&
       row.note === row.savedNote
     ) {
-      return // tidak ada perubahan, skip autosave
+      return
     }
 
-    const id = row.bankAccountId
     setRows((prev) =>
       prev.map((r) => (r.bankAccountId === id ? { ...r, saveState: "saving" } : r))
     )
@@ -211,131 +209,83 @@ export function DailyBankForm({ companies, defaultCompanyId, canInput }: Props) 
     return { totalBalance, totalTarikCek, totalDelta, unfilled }
   }, [rows])
 
+  const onUnfilledChangeRef = useRef(onUnfilledChange)
+  onUnfilledChangeRef.current = onUnfilledChange
+  useEffect(() => {
+    onUnfilledChangeRef.current?.(totals.unfilled)
+  }, [totals.unfilled])
+
+  if (fetching && rows.length === 0) {
+    return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  }
+
+  if (!fetching && rows.length === 0) {
+    return <p className="text-sm text-muted-foreground">Belum ada rekening bank aktif untuk PT ini.</p>
+  }
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* Controls */}
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-            Tanggal
-          </label>
-          <Input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-44 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus-visible:ring-red-500/20 focus-visible:border-red-500"
-          />
-        </div>
-        {!defaultCompanyId && (
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-              Pilih PT
-            </label>
-            <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="w-52 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
-                <SelectValue placeholder="Pilih PT" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-        {defaultCompanyId && companies.length > 0 && (
-          <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-              PT
-            </label>
-            <div className="h-10 flex items-center px-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-sm font-medium">
-              {companies.find((c) => c.id === defaultCompanyId)?.name ?? "-"}
-            </div>
-          </div>
-        )}
-        {!canInput && (
-          <Badge variant="outline" className="h-10 px-3 flex items-center">
-            Read-only
-          </Badge>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {totals.unfilled > 0 ? (
+          <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+            <IconAlertTriangle className="size-4" />
+            {totals.unfilled} rekening belum diisi hari ini.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">Semua rekening sudah diisi hari ini.</p>
         )}
       </div>
 
-      {fetching && rows.length === 0 && (
-        <p className="text-sm text-muted-foreground">Memuat data...</p>
-      )}
-
-      {!fetching && companyId && rows.length === 0 && (
-        <p className="text-sm text-muted-foreground">Belum ada rekening bank aktif untuk PT ini.</p>
-      )}
-
-      {!companyId && (
-        <p className="text-sm text-muted-foreground">Pilih PT dan tanggal terlebih dahulu.</p>
-      )}
-
-      {rows.length > 0 && (
-        <>
-          {totals.unfilled > 0 ? (
-            <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
-              <IconAlertTriangle className="size-4" />
-              {totals.unfilled} rekening belum diisi hari ini.
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">Semua rekening sudah diisi hari ini.</p>
-          )}
-        </>
-      )}
-
-      {rows.length > 0 && (
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rekening PT</TableHead>
-                <TableHead>Bank</TableHead>
-                <TableHead className="w-40 text-right">Saldo Kemarin</TableHead>
-                <TableHead className="w-52 text-right">Saldo Hari Ini</TableHead>
-                <TableHead className="w-36 text-right">Delta</TableHead>
-                <TableHead className="w-36 text-right">Tarik Cek</TableHead>
-                <TableHead className="w-44">Catatan</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((r) => (
-                <BankRowEdit
-                  key={r.bankAccountId}
-                  row={r}
-                  canInput={canInput}
-                  onChange={updateRow}
-                  onBlurSave={saveRow}
-                />
-              ))}
-              <TableRow className="font-medium bg-muted/50">
-                <TableCell colSpan={3} className="text-right">
-                  Total
-                </TableCell>
-                <TableCell className="text-right font-mono">Rp {fmt(totals.totalBalance)}</TableCell>
-                <TableCell
-                  className={cn(
-                    "text-right font-mono",
-                    totals.totalDelta > 0 && "text-emerald-600 dark:text-emerald-500",
-                    totals.totalDelta < 0 && "text-destructive"
-                  )}
-                >
-                  {totals.totalDelta > 0 ? "+" : ""}
-                  {fmt(totals.totalDelta)}
-                </TableCell>
-                <TableCell className="text-right font-mono text-destructive">
-                  ({fmt(totals.totalTarikCek)})
-                </TableCell>
-                <TableCell colSpan={2} />
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <div className="rounded-md border max-h-[65vh] overflow-y-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="sticky top-0 z-20 bg-background">Rekening PT</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background">Bank</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Saldo Kemarin</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Saldo Hari Ini</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Tarik Cek</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-10" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map((r, i) => (
+              <BankRowEdit
+                key={r.bankAccountId}
+                row={r}
+                canManage={canManage}
+                onChange={updateRow}
+                onBlurSave={saveRow}
+                inputRefs={inputRefs}
+                rowIndex={i}
+                rowCount={rows.length}
+              />
+            ))}
+            <TableRow className="font-medium bg-muted/50">
+              <TableCell colSpan={3} className="text-right">
+                Total
+              </TableCell>
+              <TableCell className="text-right font-mono">Rp {fmt(totals.totalBalance)}</TableCell>
+              <TableCell
+                className={cn(
+                  "text-right font-mono",
+                  totals.totalDelta > 0 && "text-emerald-600 dark:text-emerald-500",
+                  totals.totalDelta < 0 && "text-destructive"
+                )}
+              >
+                {totals.totalDelta > 0 ? "+" : ""}
+                {fmt(totals.totalDelta)}
+              </TableCell>
+              <TableCell className="text-right font-mono text-destructive">
+                ({fmt(totals.totalTarikCek)})
+              </TableCell>
+              <TableCell colSpan={2} />
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
@@ -349,22 +299,54 @@ function SaveIndicator({ state }: { state: SaveState }) {
 
 function BankRowEdit({
   row,
-  canInput,
+  canManage,
   onChange,
   onBlurSave,
+  inputRefs,
+  rowIndex,
+  rowCount,
 }: {
   row: Row
-  canInput: boolean
+  canManage: boolean
   onChange: (id: string, field: "balance" | "tarikCek" | "note", val: string) => void
-  onBlurSave: (row: Row) => void
+  onBlurSave: (id: string) => void
+  inputRefs: RefObject<Map<string, HTMLInputElement>>
+  rowIndex: number
+  rowCount: number
 }) {
   const balance = parseNum(row.balance)
   const reference = row.previousBalance ?? row.fallbackBalance
   const delta = balance - reference
+  const isUnfilled = !row.hasEntry
+
+  const registerRef = (field: "balance" | "tarikCek" | "note") => (el: HTMLInputElement | null) => {
+    const key = `${rowIndex}:${field}`
+    if (el) inputRefs.current.set(key, el)
+    else inputRefs.current.delete(key)
+  }
+
+  const focusNextRow = (field: "balance" | "tarikCek" | "note") => {
+    if (rowIndex >= rowCount - 1) return
+    inputRefs.current.get(`${rowIndex + 1}:${field}`)?.focus()
+  }
+
+  const handleEnter = (field: "balance" | "tarikCek" | "note") => (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return
+    e.preventDefault()
+    focusNextRow(field)
+  }
 
   return (
-    <TableRow>
-      <TableCell className="font-medium text-sm">{row.accountName}</TableCell>
+    <TableRow className={cn(isUnfilled && "bg-amber-50/60 dark:bg-amber-950/20")}>
+      <TableCell className="font-medium text-sm">
+        <span
+          className={cn(
+            "inline-block size-1.5 rounded-full mr-1.5 align-middle",
+            isUnfilled ? "bg-amber-500" : "bg-emerald-500"
+          )}
+        />
+        {row.accountName}
+      </TableCell>
       <TableCell>
         <Badge variant="outline">{row.bankName}</Badge>
       </TableCell>
@@ -376,10 +358,12 @@ function BankRowEdit({
       </TableCell>
       <TableCell className="text-right">
         <NumberInput
+          ref={registerRef("balance")}
           value={row.balance}
-          disabled={!canInput}
+          disabled={!canManage}
           onValueChange={(val) => onChange(row.bankAccountId, "balance", val === undefined ? "" : String(val))}
-          onBlur={() => onBlurSave(row)}
+          onBlur={() => onBlurSave(row.bankAccountId)}
+          onKeyDown={handleEnter("balance")}
           className="text-right font-mono w-full"
         />
       </TableCell>
@@ -395,21 +379,25 @@ function BankRowEdit({
       </TableCell>
       <TableCell className="text-right">
         <NumberInput
+          ref={registerRef("tarikCek")}
           value={row.tarikCek}
-          disabled={!canInput}
+          disabled={!canManage}
           onValueChange={(val) => onChange(row.bankAccountId, "tarikCek", val === undefined ? "" : String(val))}
-          onBlur={() => onBlurSave(row)}
+          onBlur={() => onBlurSave(row.bankAccountId)}
+          onKeyDown={handleEnter("tarikCek")}
           className="text-right font-mono w-full"
         />
       </TableCell>
       <TableCell>
         <Input
+          ref={registerRef("note")}
           type="text"
           value={row.note}
-          disabled={!canInput}
+          disabled={!canManage}
           placeholder="Opsional"
           onChange={(e) => onChange(row.bankAccountId, "note", e.target.value)}
-          onBlur={() => onBlurSave(row)}
+          onBlur={() => onBlurSave(row.bankAccountId)}
+          onKeyDown={handleEnter("note")}
           className="w-full text-sm"
         />
       </TableCell>

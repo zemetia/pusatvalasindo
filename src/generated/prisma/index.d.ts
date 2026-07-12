@@ -39446,6 +39446,7 @@ export namespace Prisma {
     isDefault: boolean | null
     sortOrder: number | null
     isActive: boolean | null
+    deletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -39458,6 +39459,7 @@ export namespace Prisma {
     isDefault: boolean | null
     sortOrder: number | null
     isActive: boolean | null
+    deletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -39470,6 +39472,7 @@ export namespace Prisma {
     isDefault: number
     sortOrder: number
     isActive: number
+    deletedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -39492,6 +39495,7 @@ export namespace Prisma {
     isDefault?: true
     sortOrder?: true
     isActive?: true
+    deletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -39504,6 +39508,7 @@ export namespace Prisma {
     isDefault?: true
     sortOrder?: true
     isActive?: true
+    deletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -39516,6 +39521,7 @@ export namespace Prisma {
     isDefault?: true
     sortOrder?: true
     isActive?: true
+    deletedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -39615,6 +39621,7 @@ export namespace Prisma {
     isDefault: boolean
     sortOrder: number
     isActive: boolean
+    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: StockistPocketCountAggregateOutputType | null
@@ -39646,6 +39653,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: boolean
     isActive?: boolean
+    deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -39663,6 +39671,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: boolean
     isActive?: boolean
+    deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -39676,6 +39685,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: boolean
     isActive?: boolean
+    deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -39689,11 +39699,12 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: boolean
     isActive?: boolean
+    deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type StockistPocketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "name" | "code" | "isDefault" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["stockistPocket"]>
+  export type StockistPocketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "name" | "code" | "isDefault" | "sortOrder" | "isActive" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["stockistPocket"]>
   export type StockistPocketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
     balances?: boolean | StockistPocket$balancesArgs<ExtArgs>
@@ -39724,6 +39735,7 @@ export namespace Prisma {
       isDefault: boolean
       sortOrder: number
       isActive: boolean
+      deletedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["stockistPocket"]>
@@ -40160,6 +40172,7 @@ export namespace Prisma {
     readonly isDefault: FieldRef<"StockistPocket", 'Boolean'>
     readonly sortOrder: FieldRef<"StockistPocket", 'Int'>
     readonly isActive: FieldRef<"StockistPocket", 'Boolean'>
+    readonly deletedAt: FieldRef<"StockistPocket", 'DateTime'>
     readonly createdAt: FieldRef<"StockistPocket", 'DateTime'>
     readonly updatedAt: FieldRef<"StockistPocket", 'DateTime'>
   }
@@ -46905,6 +46918,7 @@ export namespace Prisma {
     isDefault: 'isDefault',
     sortOrder: 'sortOrder',
     isActive: 'isActive',
+    deletedAt: 'deletedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -49795,6 +49809,7 @@ export namespace Prisma {
     isDefault?: BoolFilter<"StockistPocket"> | boolean
     sortOrder?: IntFilter<"StockistPocket"> | number
     isActive?: BoolFilter<"StockistPocket"> | boolean
+    deletedAt?: DateTimeNullableFilter<"StockistPocket"> | Date | string | null
     createdAt?: DateTimeFilter<"StockistPocket"> | Date | string
     updatedAt?: DateTimeFilter<"StockistPocket"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -49811,6 +49826,7 @@ export namespace Prisma {
     isDefault?: SortOrder
     sortOrder?: SortOrder
     isActive?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     company?: CompanyOrderByWithRelationInput
@@ -49831,6 +49847,7 @@ export namespace Prisma {
     isDefault?: BoolFilter<"StockistPocket"> | boolean
     sortOrder?: IntFilter<"StockistPocket"> | number
     isActive?: BoolFilter<"StockistPocket"> | boolean
+    deletedAt?: DateTimeNullableFilter<"StockistPocket"> | Date | string | null
     createdAt?: DateTimeFilter<"StockistPocket"> | Date | string
     updatedAt?: DateTimeFilter<"StockistPocket"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -49847,6 +49864,7 @@ export namespace Prisma {
     isDefault?: SortOrder
     sortOrder?: SortOrder
     isActive?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: StockistPocketCountOrderByAggregateInput
@@ -49867,6 +49885,7 @@ export namespace Prisma {
     isDefault?: BoolWithAggregatesFilter<"StockistPocket"> | boolean
     sortOrder?: IntWithAggregatesFilter<"StockistPocket"> | number
     isActive?: BoolWithAggregatesFilter<"StockistPocket"> | boolean
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"StockistPocket"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StockistPocket"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StockistPocket"> | Date | string
   }
@@ -52953,6 +52972,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutStockistPocketsInput
@@ -52969,6 +52989,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     balances?: StockistBalanceUncheckedCreateNestedManyWithoutPocketInput
@@ -52983,6 +53004,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutStockistPocketsNestedInput
@@ -52999,6 +53021,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: StockistBalanceUncheckedUpdateManyWithoutPocketNestedInput
@@ -53014,6 +53037,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -53025,6 +53049,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -53037,6 +53062,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55787,6 +55813,7 @@ export namespace Prisma {
     isDefault?: SortOrder
     sortOrder?: SortOrder
     isActive?: SortOrder
+    deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -55803,6 +55830,7 @@ export namespace Prisma {
     isDefault?: SortOrder
     sortOrder?: SortOrder
     isActive?: SortOrder
+    deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -55815,6 +55843,7 @@ export namespace Prisma {
     isDefault?: SortOrder
     sortOrder?: SortOrder
     isActive?: SortOrder
+    deletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -61808,6 +61837,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     balances?: StockistBalanceCreateNestedManyWithoutPocketInput
@@ -61822,6 +61852,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     balances?: StockistBalanceUncheckedCreateNestedManyWithoutPocketInput
@@ -62088,6 +62119,7 @@ export namespace Prisma {
     isDefault?: BoolFilter<"StockistPocket"> | boolean
     sortOrder?: IntFilter<"StockistPocket"> | number
     isActive?: BoolFilter<"StockistPocket"> | boolean
+    deletedAt?: DateTimeNullableFilter<"StockistPocket"> | Date | string | null
     createdAt?: DateTimeFilter<"StockistPocket"> | Date | string
     updatedAt?: DateTimeFilter<"StockistPocket"> | Date | string
   }
@@ -64922,6 +64954,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutStockistPocketsInput
@@ -64937,6 +64970,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     mutations?: StockistMutationUncheckedCreateNestedManyWithoutPocketInput
@@ -64999,6 +65033,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutStockistPocketsNestedInput
@@ -65014,6 +65049,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mutations?: StockistMutationUncheckedUpdateManyWithoutPocketNestedInput
@@ -65066,6 +65102,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutStockistPocketsInput
@@ -65081,6 +65118,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     balances?: StockistBalanceUncheckedCreateNestedManyWithoutPocketInput
@@ -65143,6 +65181,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutStockistPocketsNestedInput
@@ -65158,6 +65197,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: StockistBalanceUncheckedUpdateManyWithoutPocketNestedInput
@@ -65210,6 +65250,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutStockistPocketsInput
@@ -65225,6 +65266,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     balances?: StockistBalanceUncheckedCreateNestedManyWithoutPocketInput
@@ -65287,6 +65329,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutStockistPocketsNestedInput
@@ -65302,6 +65345,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: StockistBalanceUncheckedUpdateManyWithoutPocketNestedInput
@@ -66533,6 +66577,7 @@ export namespace Prisma {
     isDefault?: boolean
     sortOrder?: number
     isActive?: boolean
+    deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -66794,6 +66839,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: StockistBalanceUpdateManyWithoutPocketNestedInput
@@ -66808,6 +66854,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     balances?: StockistBalanceUncheckedUpdateManyWithoutPocketNestedInput
@@ -66822,6 +66869,7 @@ export namespace Prisma {
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

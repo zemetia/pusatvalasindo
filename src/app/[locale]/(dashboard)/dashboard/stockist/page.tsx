@@ -33,6 +33,8 @@ export default async function StockistPage({
     redirect(`/${locale}/dashboard`);
   }
   const canManage = can(permissions, PERMISSIONS.STOCKIST_MANAGE);
+  const showBank = can(permissions, PERMISSIONS.BANK_VIEW);
+  const canManageBank = can(permissions, PERMISSIONS.BANK_DAILY_INPUT);
 
   // Stockist & Kas dimiliki 1 PT, dipakai bersama semua cabangnya. Scoped ke PT sendiri kalau
   // user punya companyId; kalau tidak (Admin/Owner/Akuntan), bisa pilih semua PT aktif.
@@ -49,7 +51,7 @@ export default async function StockistPage({
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       <PageHeader
         title="Stockist"
-        description="Stock mata uang & kas tunai per pocket, per PT — terpisah dari rekening bank."
+        description="Stock mata uang, kas tunai, & saldo bank harian per PT."
         icon={<IconWallet className="size-5" />}
         action={
           <Button variant="outline" size="sm" asChild>
@@ -64,6 +66,8 @@ export default async function StockistPage({
         companies={companies}
         defaultCompanyId={user.companyId}
         canManage={canManage}
+        showBank={showBank}
+        canManageBank={canManageBank}
       />
     </div>
   );

@@ -206,16 +206,16 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
         )}
       </div>
 
-      <div className="rounded-md border overflow-x-auto">
+      <div className="rounded-md border max-h-[65vh] overflow-y-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Pocket</TableHead>
-              <TableHead className="w-40 text-right">Saldo Kemarin</TableHead>
-              <TableHead className="w-52 text-right">Saldo Hari Ini</TableHead>
-              <TableHead className="w-36 text-right">Delta</TableHead>
-              <TableHead className="w-44">Catatan</TableHead>
-              <TableHead className="w-10" />
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="sticky top-0 z-20 bg-background">Pocket</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Saldo Kemarin</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Saldo Hari Ini</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>

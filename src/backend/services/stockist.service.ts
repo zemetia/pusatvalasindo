@@ -7,7 +7,6 @@ import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket
 import { stockistBalanceRepository } from "@/backend/repositories/stockist-balance.repository";
 import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
 import { companyStockItemRepository } from "@/backend/repositories/company-stock-item.repository";
-import { CompanyStockItemType } from "@src/generated/prisma/client";
 
 type TxClient = Prisma.TransactionClient;
 
@@ -37,6 +36,12 @@ async function applyMutationInTx(tx: TxClient, input: ApplyMutationInput) {
     if (input.quantity === 0) throw new ValidationError("Quantity koreksi tidak boleh 0");
   } else if (input.quantity <= 0) {
     throw new ValidationError("Quantity harus lebih besar dari 0");
+  }
+
+  const pocket = await tx.stockistPocket.findUnique({ where: { id: input.pocketId } });
+  if (!pocket || pocket.deletedAt) throw new NotFoundError("Pocket tidak ditemukan");
+  if (pocket.isDefault) {
+    throw new ValidationError("Pocket Total dihitung otomatis dan tidak bisa diisi/mutasi manual");
   }
 
   const existing = await tx.stockistBalance.findUnique({
@@ -95,6 +100,15 @@ function todayDateOnly(): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 }
 
+// Grid & export show Logam Mulia rows before Currency rows — repository's default order
+// (type asc) puts CURRENCY first, so re-sort here rather than changing the shared repository.
+function sortLogamMuliaFirst<T extends { type: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    if (a.type === b.type) return 0;
+    return a.type === "LOGAM_MULIA" ? -1 : 1;
+  });
+}
+
 export const stockistService = {
   applyStockistMutation: (input: ApplyMutationInput) =>
     prisma.$transaction((tx) => applyMutationInTx(tx, input)),
@@ -131,21 +145,49 @@ export const stockistService = {
   // Grid lengkap untuk satu tanggal. Baris check TIDAK di-auto-create lagi untuk semua sel —
   // sel baru punya baris check setelah user benar-benar mengisi opname (lihat fillDailyCheck).
   getOrCreateGridForDate: async (companyId: string, date: Date) => {
-    const [pockets, currencies] = await Promise.all([
+    await stockistPocketRepository.ensureTotalPocket(companyId);
+
+    const [pockets, rawCurrencies] = await Promise.all([
       stockistPocketRepository.findAllByCompany(companyId, true),
-      companyStockItemRepository.findByCompanyAndType(companyId, CompanyStockItemType.CURRENCY, true),
+      companyStockItemRepository.findByCompany(companyId, true),
     ]);
-    if (pockets.length === 0 || currencies.length === 0) {
-      return { pockets, currencies, balances: [], checks: [], serverDate: todayDateOnly().toISOString().slice(0, 10) };
+    const currencies = sortLogamMuliaFirst(rawCurrencies);
+    const totalPocket = pockets.find((p) => p.isDefault);
+    const realPockets = pockets.filter((p) => !p.isDefault);
+    const serverDate = todayDateOnly().toISOString().slice(0, 10);
+    if (realPockets.length === 0 || currencies.length === 0) {
+      return { pockets, currencies, balances: [], checks: [], serverDate };
     }
 
-    const pocketIds = pockets.map((p) => p.id);
-    const [balances, checks] = await Promise.all([
-      stockistBalanceRepository.findByPocketIds(pocketIds),
-      stockistDailyCheckRepository.findByPocketsAndDate(pocketIds, date),
+    const realPocketIds = realPockets.map((p) => p.id);
+    const [rawBalances, checks] = await Promise.all([
+      stockistBalanceRepository.findByPocketIds(realPocketIds),
+      stockistDailyCheckRepository.findByPocketsAndDate(realPocketIds, date),
     ]);
 
-    return { pockets, currencies, balances, checks, serverDate: todayDateOnly().toISOString().slice(0, 10) };
+    const balances = rawBalances.map((b) => ({
+      pocketId: b.pocketId,
+      companyStockItemId: b.companyStockItemId,
+      quantity: Number(b.quantity),
+    }));
+
+    // Saldo pocket "Total" dihitung ulang di sini setiap request — sengaja tidak pernah ditulis
+    // ke StockistBalance, supaya selalu akurat & tidak butuh sinkronisasi tiap ada mutasi pocket lain.
+    if (totalPocket) {
+      const sums = new Map<string, number>();
+      for (const b of balances) {
+        sums.set(b.companyStockItemId, (sums.get(b.companyStockItemId) ?? 0) + b.quantity);
+      }
+      for (const currency of currencies) {
+        balances.push({
+          pocketId: totalPocket.id,
+          companyStockItemId: currency.id,
+          quantity: sums.get(currency.id) ?? 0,
+        });
+      }
+    }
+
+    return { pockets, currencies, balances, checks, serverDate };
   },
 
   // Isi opname hari itu — hanya boleh untuk tanggal hari ini, dan hanya sekali (tidak bisa diubah
@@ -161,15 +203,15 @@ export const stockistService = {
       throw new ValidationError("Opname hanya bisa diisi untuk tanggal hari ini");
     }
 
-    const existing = await stockistDailyCheckRepository.findByPocketItemDate(
-      input.pocketId,
-      input.companyStockItemId,
-      input.date
-    );
-    if (existing?.enteredQuantity !== null && existing?.enteredQuantity !== undefined) {
-      throw new ValidationError("Sel ini sudah diisi dan tidak bisa diubah");
+    const pocket = await stockistPocketRepository.findById(input.pocketId);
+    if (!pocket || pocket.deletedAt) throw new NotFoundError("Pocket tidak ditemukan");
+    if (pocket.isDefault) {
+      throw new ValidationError("Pocket Total dihitung otomatis dan tidak bisa diisi manual");
     }
 
+    // Sel yang sudah diisi hari ini masih boleh diubah selama tanggalnya belum ganti (dijamin
+    // oleh pengecekan isToday di atas) — begitu hari berganti, sel itu masuk alur review dan
+    // dikunci dari edit ulang lewat endpoint ini.
     return prisma.stockistDailyCheck.upsert({
       where: {
         pocketId_companyStockItemId_date: {
@@ -260,10 +302,12 @@ export const stockistService = {
   },
 
   getCompanyAlerts: async (companyId: string, date: Date) => {
-    const [pockets, currencies] = await Promise.all([
+    const [allPockets, currencies] = await Promise.all([
       stockistPocketRepository.findAllByCompany(companyId, true),
-      companyStockItemRepository.findByCompanyAndType(companyId, CompanyStockItemType.CURRENCY, true),
+      companyStockItemRepository.findByCompany(companyId, true),
     ]);
+    // Pocket Total tidak pernah punya baris opname sendiri — jangan ikut dihitung di sini.
+    const pockets = allPockets.filter((p) => !p.isDefault);
     const totalCells = pockets.length * currencies.length;
     const isToday = date.getTime() === todayDateOnly().getTime();
     if (totalCells === 0) {

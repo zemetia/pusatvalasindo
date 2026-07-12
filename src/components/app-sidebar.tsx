@@ -17,7 +17,6 @@ import {
   IconBrandTabler,
   IconFingerprint,
   IconPencil,
-  IconReportMoney,
   IconWallet,
   type Icon,
 } from "@tabler/icons-react";
@@ -123,17 +122,6 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
       title: "Rekening Bank",
       url: "/dashboard/bank-accounts",
       icon: IconBuildingBank,
-    });
-  }
-
-  if (
-    can(permissions, PERMISSIONS.BANK_DAILY_INPUT) ||
-    can(permissions, PERMISSIONS.BANK_VIEW)
-  ) {
-    navStock.push({
-      title: "Bank Harian",
-      url: "/dashboard/bank-harian",
-      icon: IconReportMoney,
     });
   }
 

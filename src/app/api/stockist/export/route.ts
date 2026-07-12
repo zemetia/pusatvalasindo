@@ -84,6 +84,8 @@ export async function GET(req: NextRequest) {
     const stockSheet = wb.addWorksheet("Stock (Mata Uang)", {
       views: [{ state: "frozen", xSplit: 1, ySplit: 1 }],
     });
+    // Pocket "Total" (isDefault) sudah termasuk di activePockets dan otomatis jadi kolom
+    // paling akhir (sortOrder-nya sengaja dibuat tinggi) — saldonya sudah dihitung backend.
     stockSheet.columns = [
       { header: "Mata Uang", key: "currency", width: 26 },
       ...activePockets.map((p) => ({ header: p.name, key: p.id, width: 16 })),
@@ -99,14 +101,23 @@ export async function GET(req: NextRequest) {
     stockHeaderRow.height = 22;
 
     for (const currency of grid.currencies) {
-      const rowValues: Record<string, string | number> = { currency: currency.name };
+      const currencyLabel =
+        currency.type === "LOGAM_MULIA" ? `${currency.name} (gram)` : currency.name;
+      const rowValues: Record<string, string | number> = { currency: currencyLabel };
       for (const pocket of activePockets) {
         const check = checkMap.get(`${pocket.id}:${currency.id}`);
         const entered = check?.enteredQuantity;
-        rowValues[pocket.id] =
-          entered !== null && entered !== undefined ? Number(entered) : balanceMap.get(`${pocket.id}:${currency.id}`) ?? 0;
+        const balance = balanceMap.get(`${pocket.id}:${currency.id}`) ?? 0;
+        rowValues[pocket.id] = entered !== null && entered !== undefined ? Number(entered) : balance;
       }
       const row = stockSheet.addRow(rowValues);
+
+      const totalPocket = activePockets.find((p) => p.isDefault);
+      if (totalPocket) {
+        const totalCell = row.getCell(totalPocket.id);
+        totalCell.font = { bold: true };
+        totalCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFEDEFF2" } };
+      }
 
       row.getCell("currency").font = { bold: true };
       row.getCell("currency").alignment = { vertical: "middle", horizontal: "left" };

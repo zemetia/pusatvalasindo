@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { NumberInput } from "@/components/ui/number-input"
@@ -22,13 +22,14 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer"
+import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { IconAlertTriangle, IconCheck, IconChecks, IconLoader2, IconX } from "@tabler/icons-react"
+import { IconAlertTriangle, IconCheck, IconChecks, IconLoader2, IconSearch, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
 
-type Pocket = { id: string; name: string; code: string | null; isActive: boolean }
-type StockItem = { id: string; code: string | null; name: string }
+type Pocket = { id: string; name: string; code: string | null; isActive: boolean; isDefault: boolean }
+type StockItem = { id: string; code: string | null; name: string; type: "CURRENCY" | "LOGAM_MULIA" }
 type CheckStatus = "BELUM_REVIEW" | "BENAR" | "BEDA"
 type Check = {
   pocketId: string
@@ -62,12 +63,14 @@ function cellState(check: Check | undefined, isToday: boolean): CellState {
   return check.status
 }
 
-function stateBg(state: CellState) {
+// `silver` marks Logam Mulia rows so they're visually distinct from currency rows — only
+// applied to neutral states, since review-status colors (Benar/Beda/Belum Review) matter more.
+function stateBg(state: CellState, silver?: boolean) {
   if (state === "BENAR") return "bg-emerald-50 dark:bg-emerald-950/40"
   if (state === "BEDA") return "bg-red-50 dark:bg-red-950/40"
   if (state === "BELUM_REVIEW") return "bg-amber-50 dark:bg-amber-950/30"
-  if (state === "filled_today") return "bg-muted/50"
-  return "bg-background"
+  if (state === "filled_today") return silver ? "bg-slate-200 dark:bg-slate-700/50" : "bg-muted/50"
+  return silver ? "bg-slate-100 dark:bg-slate-800/40" : "bg-background"
 }
 
 function stateText(state: CellState) {
@@ -81,7 +84,7 @@ function stateLabel(state: CellState) {
   if (state === "BENAR") return "Benar"
   if (state === "BEDA") return "Beda"
   if (state === "BELUM_REVIEW") return "Klik untuk review"
-  if (state === "filled_today") return "Sudah diisi"
+  if (state === "filled_today") return "Klik untuk ubah"
   if (state === "empty_fillable") return "Klik untuk isi"
   return "Tidak diisi"
 }
@@ -98,6 +101,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
   const [activeCell, setActiveCell] = useState<{ pocketId: string; companyStockItemId: string } | null>(
     null
   )
+  const [currencyFilter, setCurrencyFilter] = useState("")
 
   const isToday = serverDate !== null && date === serverDate
 
@@ -226,9 +230,21 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     [checks, date]
   )
 
+  // Pocket "Total" tidak pernah punya baris opname — kecualikan dari alur review/manage manual.
+  const managePockets = useMemo(() => pockets.filter((p) => !p.isDefault), [pockets])
+
+  // Filter mata uang di frontend saja — tidak perlu request ulang ke server.
+  const filteredCurrencies = useMemo(() => {
+    const q = currencyFilter.trim().toLowerCase()
+    if (!q) return currencies
+    return currencies.filter(
+      (c) => c.name.toLowerCase().includes(q) || (c.code ?? "").toLowerCase().includes(q)
+    )
+  }, [currencies, currencyFilter])
+
   const markAllBenar = useCallback(async () => {
     const pending: { pocketId: string; companyStockItemId: string }[] = []
-    for (const p of pockets) {
+    for (const p of managePockets) {
       for (const cur of currencies) {
         const key = `${p.id}:${cur.id}`
         if (cellState(checks[key], isToday) === "BELUM_REVIEW") {
@@ -252,7 +268,21 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     } finally {
       setMarkingAll(false)
     }
-  }, [pockets, currencies, checks, isToday, markCheck])
+  }, [managePockets, currencies, checks, isToday, markCheck])
+
+  // Pocket "Total" dihitung live di frontend dari isian opname (checks) tiap pocket — bukan
+  // dari saldo resmi (StockistBalance) — supaya langsung ikut berubah begitu user isi/ubah cell,
+  // tanpa nunggu proses review "Benar/Beda".
+  const totalMap = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const p of managePockets) {
+      for (const cur of currencies) {
+        const qty = checks[`${p.id}:${cur.id}`]?.enteredQuantity ?? 0
+        map[cur.id] = (map[cur.id] ?? 0) + qty
+      }
+    }
+    return map
+  }, [managePockets, currencies, checks])
 
   const activePocket = activeCell ? pockets.find((p) => p.id === activeCell.pocketId) : undefined
   const activeCurrency = activeCell
@@ -260,7 +290,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     : undefined
   const activeKey = activeCell ? `${activeCell.pocketId}:${activeCell.companyStockItemId}` : null
   const activeState = activeCell ? cellState(checks[activeKey!], isToday) : undefined
-  const activeIsFillable = activeState === "empty_fillable"
+  const activeIsFillable = activeState === "empty_fillable" || activeState === "filled_today"
   const activeIsReviewable =
     activeState === "BELUM_REVIEW" || activeState === "BENAR" || activeState === "BEDA"
 
@@ -268,7 +298,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     return <p className="text-sm text-muted-foreground">Memuat data...</p>
   }
 
-  if (!loading && (pockets.length === 0 || currencies.length === 0)) {
+  if (!loading && (managePockets.length === 0 || currencies.length === 0)) {
     return (
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
@@ -276,7 +306,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
         </p>
         {canManage && (
           <div>
-            <StockistPocketSheet kind="stockist" companyId={companyId} pockets={pockets} onChanged={load} />
+            <StockistPocketSheet kind="stockist" companyId={companyId} pockets={managePockets} onChanged={load} />
           </div>
         )}
       </div>
@@ -312,6 +342,15 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
           <p className="text-sm text-muted-foreground">Semua sel yang diisi tanggal ini sudah direview.</p>
         )}
         <div className="flex items-center gap-2">
+          <div className="relative w-48">
+            <IconSearch className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={currencyFilter}
+              onChange={(e) => setCurrencyFilter(e.target.value)}
+              placeholder="Cari mata uang..."
+              className="h-9 pl-8"
+            />
+          </div>
           {canManage && !isToday && alerts.belumReview > 0 && (
             <Button size="sm" variant="outline" disabled={markingAll} onClick={markAllBenar}>
               {markingAll ? (
@@ -323,12 +362,12 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
             </Button>
           )}
           {canManage && (
-            <StockistPocketSheet kind="stockist" companyId={companyId} pockets={pockets} onChanged={load} />
+            <StockistPocketSheet kind="stockist" companyId={companyId} pockets={managePockets} onChanged={load} />
           )}
         </div>
       </div>
 
-      <div className="rounded-md border max-h-[65vh] overflow-y-auto">
+      <div className="rounded-md border max-h-[65vh] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -336,28 +375,70 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                 Mata Uang
               </TableHead>
               {pockets.map((p) => (
-                <TableHead key={p.id} className="sticky top-0 z-20 bg-background text-center min-w-[104px]">
+                <TableHead
+                  key={p.id}
+                  className={cn(
+                    "sticky top-0 z-20 bg-background text-center min-w-[104px]",
+                    p.isDefault && "font-semibold"
+                  )}
+                >
                   {p.name}
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currencies.map((cur) => (
+            {filteredCurrencies.length === 0 && (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={pockets.length + 1}
+                  className="text-center text-sm text-muted-foreground py-6"
+                >
+                  Tidak ada mata uang yang cocok dengan &quot;{currencyFilter}&quot;.
+                </TableCell>
+              </TableRow>
+            )}
+            {filteredCurrencies.map((cur) => {
+              const isLogam = cur.type === "LOGAM_MULIA"
+              return (
               <TableRow key={cur.id}>
-                <TableCell className="sticky left-0 z-10 bg-background border-r font-medium whitespace-nowrap">
+                <TableCell
+                  className={cn(
+                    "sticky left-0 z-10 border-r font-medium whitespace-nowrap",
+                    isLogam ? "bg-slate-100 dark:bg-slate-800/40" : "bg-background"
+                  )}
+                >
                   <div>{cur.name}</div>
-                  {cur.code && (
-                    <div className="text-[10px] text-muted-foreground font-normal">{cur.code}</div>
+                  {(cur.code || isLogam) && (
+                    <div className="text-[10px] text-muted-foreground font-normal">
+                      {cur.code}
+                      {isLogam && (cur.code ? " · gram" : "gram")}
+                    </div>
                   )}
                 </TableCell>
                 {pockets.map((p) => {
+                  if (p.isDefault) {
+                    // Pocket "Total" — read-only, saldonya dihitung backend dari pocket lain.
+                    return (
+                      <TableCell
+                        key={p.id}
+                        className={cn(
+                          "p-0 min-w-[104px]",
+                          isLogam ? "bg-slate-200 dark:bg-slate-700/50" : "bg-muted/40"
+                        )}
+                      >
+                        <div className="w-full h-full px-2 py-2 text-right font-mono text-sm font-semibold">
+                          {fmt(totalMap[cur.id] ?? 0)}
+                        </div>
+                      </TableCell>
+                    )
+                  }
+
                   const key = `${p.id}:${cur.id}`
                   const check = checks[key]
                   const state = cellState(check, isToday)
                   const qty = check?.enteredQuantity ?? null
-                  const clickable =
-                    canManage && state !== "not_filled" && state !== "filled_today"
+                  const clickable = canManage && state !== "not_filled"
                   const isActive =
                     activeCell?.pocketId === p.id && activeCell?.companyStockItemId === cur.id
 
@@ -370,7 +451,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                       }
                       className={cn(
                         "w-full h-full px-2 py-2 text-right font-mono text-sm transition-colors",
-                        stateBg(state),
+                        stateBg(state, isLogam),
                         clickable && "cursor-pointer hover:brightness-95 dark:hover:brightness-110",
                         !clickable && "cursor-default"
                       )}
@@ -395,10 +476,11 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                         >
                           <PopoverTrigger asChild>{cellInner}</PopoverTrigger>
                           <PopoverContent align="center" className="w-72">
-                            {state === "empty_fillable" ? (
+                            {state === "empty_fillable" || state === "filled_today" ? (
                               <FillCellForm
                                 pocketName={p.name}
                                 currencyCode={cur.code ?? cur.name}
+                                initialQuantity={qty ?? undefined}
                                 onSubmit={(quantity) => fillCell(p.id, cur.id, quantity)}
                               />
                             ) : (
@@ -421,7 +503,8 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                   )
                 })}
               </TableRow>
-            ))}
+              )
+            })}
           </TableBody>
         </Table>
       </div>
@@ -446,6 +529,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                     <FillCellForm
                       pocketName={activePocket.name}
                       currencyCode={activeCurrency.code ?? activeCurrency.name}
+                      initialQuantity={checks[activeKey]?.enteredQuantity ?? undefined}
                       onSubmit={(quantity) => fillCell(activeCell.pocketId, activeCell.companyStockItemId, quantity)}
                       hideHeader
                     />
@@ -476,15 +560,18 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
 function FillCellForm({
   pocketName,
   currencyCode,
+  initialQuantity,
   onSubmit,
   hideHeader,
 }: {
   pocketName: string
   currencyCode: string
+  initialQuantity?: number
   onSubmit: (quantity: number) => Promise<unknown> | void
   hideHeader?: boolean
 }) {
-  const [draft, setDraft] = useState<number | undefined>(undefined)
+  const isEdit = initialQuantity !== undefined
+  const [draft, setDraft] = useState<number | undefined>(initialQuantity)
   const [submitting, setSubmitting] = useState(false)
 
   const submit = async () => {
@@ -504,7 +591,9 @@ function FillCellForm({
           <p className="text-sm font-medium">
             {currencyCode} — {pocketName}
           </p>
-          <p className="text-xs text-muted-foreground">Belum diisi hari ini</p>
+          <p className="text-xs text-muted-foreground">
+            {isEdit ? "Sudah diisi hari ini — masih bisa diubah" : "Belum diisi hari ini"}
+          </p>
         </div>
       )}
       <div className="grid gap-1">

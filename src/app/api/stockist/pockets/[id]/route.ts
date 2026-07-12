@@ -8,7 +8,7 @@ import { withValidation } from "@/backend/middleware/with-validation";
 import { PERMISSIONS } from "@/lib/permissions";
 import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
-import { NotFoundError } from "@/backend/errors/app-error";
+import { NotFoundError, ValidationError } from "@/backend/errors/app-error";
 
 const updatePocketSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -31,6 +31,9 @@ export const PATCH = withValidation(updatePocketSchema)(
       const existing = await stockistPocketRepository.findById(id);
       if (!existing) throw new NotFoundError("Pocket tidak ditemukan");
       assertCompanyAccess(caller, existing.companyId);
+      if (existing.isDefault) {
+        throw new ValidationError("Pocket Total tidak bisa diubah");
+      }
 
       const pocket = await stockistPocketRepository.update(id, ctx.body);
       return NextResponse.json(ok(pocket, "Pocket berhasil diperbarui"));
@@ -39,3 +42,24 @@ export const PATCH = withValidation(updatePocketSchema)(
     }
   }
 );
+
+// DELETE /api/stockist/pockets/[id] — soft delete pocket (stockist.manage). Pocket Total tidak bisa dihapus.
+export async function DELETE(_req: NextRequest, ctx: Params) {
+  try {
+    const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+    if (caller instanceof NextResponse) return caller;
+
+    const { id } = await ctx.params;
+    const existing = await stockistPocketRepository.findById(id);
+    if (!existing || existing.deletedAt) throw new NotFoundError("Pocket tidak ditemukan");
+    assertCompanyAccess(caller, existing.companyId);
+    if (existing.isDefault) {
+      throw new ValidationError("Pocket Total tidak bisa dihapus");
+    }
+
+    await stockistPocketRepository.softDelete(id);
+    return NextResponse.json(ok(null, "Pocket berhasil dihapus"));
+  } catch (e) {
+    return handleError(e);
+  }
+}

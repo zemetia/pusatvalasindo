@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
     }
     assertCompanyAccess(caller, companyId);
 
-    const pockets = await stockistPocketRepository.findAllByCompany(companyId);
+    const allPockets = await stockistPocketRepository.findAllByCompany(companyId);
+    // Pocket "Total" dihitung otomatis (lihat stockist.service.ts) — tidak muncul di sini karena
+    // endpoint ini dipakai untuk kelola pocket manual & filter riwayat mutasi.
+    const pockets = allPockets.filter((p) => !p.isDefault);
     const balances = pockets.length
       ? await stockistBalanceRepository.findByPocketIds(pockets.map((p) => p.id))
       : [];

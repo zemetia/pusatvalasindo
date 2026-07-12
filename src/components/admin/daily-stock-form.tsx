@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { NumberInput } from "@/components/ui/number-input"
 import { Badge } from "@/components/ui/badge"
 import {
   Select,
@@ -31,12 +30,6 @@ type StockItem = {
   type: "CURRENCY" | "GOLD" | "CASH"
   sortOrder: number
 }
-type BankAccount = {
-  id: string
-  bankName: string
-  accountName: string
-  sortOrder: number
-}
 
 type StockRow = {
   stockItemId: string
@@ -45,14 +38,6 @@ type StockRow = {
   type: string
   qty1: string
   qty2: string
-}
-
-type BankRow = {
-  bankAccountId: string
-  accountName: string
-  bankName: string
-  balance: string
-  tarikCek: string
 }
 
 function fmt(n: number) {
@@ -78,7 +63,6 @@ export function DailyStockForm({ companies, branches }: Props) {
   const [branchId, setBranchId] = useState("")
   const [date, setDate] = useState(toDate(new Date()))
   const [stockRows, setStockRows] = useState<StockRow[]>([])
-  const [bankRows, setBankRows] = useState<BankRow[]>([])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(false)
 
@@ -86,17 +70,14 @@ export function DailyStockForm({ companies, branches }: Props) {
   const loadData = useCallback(async (bid: string, d: string) => {
     setFetching(true)
     try {
-      const cid = branches.find((b) => b.id === bid)?.companyId ?? ""
-      const [itemsRes, entriesRes, accountsRes] = await Promise.all([
+      const [itemsRes, entriesRes] = await Promise.all([
         fetch(`/api/stock-items?branchId=${bid}`),
         fetch(`/api/stok-harian?branchId=${bid}&date=${d}`),
-        fetch(`/api/bank-accounts?companyId=${cid}&active=true`),
       ])
 
-      const [itemsData, entriesData, accountsData] = await Promise.all([
+      const [itemsData, entriesData] = await Promise.all([
         itemsRes.json(),
         entriesRes.json(),
-        accountsRes.json(),
       ])
 
       const items: StockItem[] = itemsData.data ?? []
@@ -118,30 +99,12 @@ export function DailyStockForm({ companies, branches }: Props) {
       }))
 
       setStockRows(builtRows)
-
-      const accounts: BankAccount[] = accountsData.data ?? []
-      const existingBank: Record<string, { balance: string; tarikCek: string }> = {}
-      for (const e of entriesData.data?.bankEntries ?? []) {
-        existingBank[e.bankAccountId] = {
-          balance: String(e.balance ?? 0),
-          tarikCek: String(e.tarikCek ?? 0),
-        }
-      }
-      setBankRows(
-        accounts.map((acc) => ({
-          bankAccountId: acc.id,
-          accountName: acc.accountName,
-          bankName: acc.bankName,
-          balance: existingBank[acc.id]?.balance ?? "0",
-          tarikCek: existingBank[acc.id]?.tarikCek ?? "0",
-        }))
-      )
     } catch {
       toast.error("Gagal memuat data")
     } finally {
       setFetching(false)
     }
-  }, [branches])
+  }, [])
 
   useEffect(() => {
     if (branchId && date) loadData(branchId, date)
@@ -152,14 +115,8 @@ export function DailyStockForm({ companies, branches }: Props) {
     setStockRows((prev) => prev.map((r) => (r.stockItemId === id ? { ...r, [field]: val } : r)))
   }
 
-  const updateBank = (id: string, field: keyof BankRow, val: string) => {
-    setBankRows((prev) => prev.map((r) => (r.bankAccountId === id ? { ...r, [field]: val } : r)))
-  }
-
   const totals = useMemo(() => {
     let kasTunai = 0
-    let totalBank = 0
-    let totalTarikCek = 0
 
     for (const r of stockRows) {
       const qty = parseNum(r.qty1) + parseNum(r.qty2)
@@ -167,15 +124,9 @@ export function DailyStockForm({ companies, branches }: Props) {
         kasTunai += qty
       }
     }
-    for (const r of bankRows) {
-      totalBank += parseNum(r.balance)
-      totalTarikCek += parseNum(r.tarikCek)
-    }
 
-    const total = kasTunai + totalBank
-    const totalAset = total - totalTarikCek
-    return { kasTunai, totalBank, totalTarikCek, total, totalAset }
-  }, [stockRows, bankRows])
+    return { kasTunai }
+  }, [stockRows])
 
   const handleSave = async () => {
     if (!branchId || !date) {
@@ -203,11 +154,6 @@ export function DailyStockForm({ companies, branches }: Props) {
               totalIdr: null,
             }
           }),
-          bankEntries: bankRows.map((r) => ({
-            bankAccountId: r.bankAccountId,
-            balance: parseNum(r.balance),
-            tarikCek: parseNum(r.tarikCek),
-          })),
         }),
       })
       if (!res.ok) {
@@ -374,75 +320,15 @@ export function DailyStockForm({ companies, branches }: Props) {
             </Table>
           </div>
 
-          {/* Bank Table */}
-          {bankRows.length > 0 && (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Rekening PT</TableHead>
-                    <TableHead>Bank</TableHead>
-                    <TableHead className="w-52 text-right">Saldo (IDR)</TableHead>
-                    <TableHead className="w-44 text-right">Tarik Cek</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bankRows.map((r, i) => (
-                    <TableRow key={r.bankAccountId}>
-                      <TableCell className="font-medium text-sm">{r.accountName}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{r.bankName}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <NumberInput
-                          value={r.balance}
-                          onValueChange={(val) => updateBank(r.bankAccountId, "balance", val === undefined ? "" : String(val))}
-                          className="text-right font-mono w-full"
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <NumberInput
-                          value={r.tarikCek}
-                          onValueChange={(val) => updateBank(r.bankAccountId, "tarikCek", val === undefined ? "" : String(val))}
-                          className="text-right font-mono w-full"
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow className="font-medium bg-muted/50">
-                    <TableCell colSpan={2} className="text-right">Total Rekening PT</TableCell>
-                    <TableCell className="text-right font-mono">Rp {fmt(totals.totalBank)}</TableCell>
-                    <TableCell className="text-right font-mono text-destructive">
-                      (Rp {fmt(totals.totalTarikCek)})
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
           {/* Summary */}
           <div className="rounded-md border p-4 bg-muted/20 flex flex-col gap-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Kas Tunai</span>
+            <div className="flex justify-between font-semibold text-base">
+              <span>Kas Tunai</span>
               <span className="font-mono">Rp {fmt(totals.kasTunai)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Total Rekening PT</span>
-              <span className="font-mono">Rp {fmt(totals.totalBank)}</span>
-            </div>
-            <div className="border-t pt-2 flex justify-between font-semibold text-base">
-              <span>TOTAL</span>
-              <span className="font-mono">Rp {fmt(totals.total)}</span>
-            </div>
-            <div className="flex justify-between text-destructive">
-              <span>Tarik Cek</span>
-              <span className="font-mono">(Rp {fmt(totals.totalTarikCek)})</span>
-            </div>
-            <div className="border-t pt-2 flex justify-between font-bold text-base">
-              <span>TOTAL ASET PT</span>
-              <span className="font-mono">Rp {fmt(totals.totalAset)}</span>
-            </div>
+            <p className="text-xs text-muted-foreground pt-1">
+              Saldo rekening bank sekarang diisi per PT lewat halaman Stockist → tab Bank.
+            </p>
           </div>
         </>
       )}

@@ -4,6 +4,7 @@ import { BankAccountsPageClient } from "@/components/admin/bank-accounts-page-cl
 export default async function BankAccountsPage() {
   const [accounts, companies] = await Promise.all([
     prisma.bankAccount.findMany({
+      where: { isActive: true },
       include: { company: true, currency: true },
       orderBy: [{ company: { name: "asc" } }, { bankName: "asc" }],
     }),

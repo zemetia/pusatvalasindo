@@ -623,15 +623,16 @@ enum StockMutationType {
 // Bagian 1 — Stockist (Mata Uang): stock mata uang per pocket, dimiliki 1 PT (Company) dan
 // dipakai bersama oleh semua cabang di bawahnya — bukan per cabang.
 model StockistPocket {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   companyId String
   name      String // "Kas Kecil", "Finance Blue", "Kurir A", dst
   code      String?
-  isDefault Boolean  @default(false) // pocket bawaan yang ikut ke-seed tiap PT baru
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isDefault Boolean   @default(false) // pocket bawaan yang ikut ke-seed tiap PT baru
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  deletedAt DateTime? // soft delete — pocket Total (isDefault) tidak boleh pernah diisi ini
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   company   Company              @relation(fields: [companyId], references: [id])
   balances  StockistBalance[]

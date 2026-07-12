@@ -14,7 +14,7 @@ import {
   SheetFooter,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { IconLoader2, IconPlus, IconSettings } from "@tabler/icons-react"
+import { IconLoader2, IconPlus, IconSettings, IconTrash } from "@tabler/icons-react"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean }
 
@@ -78,6 +78,24 @@ export function StockistPocketSheet({ kind, companyId, pockets, onChanged }: Pro
       onChanged()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const remove = async (id: string, name: string) => {
+    if (!window.confirm(`Hapus pocket "${name}"? Tindakan ini tidak bisa dibatalkan dari sini.`)) {
+      return
+    }
+    setBusyId(id)
+    try {
+      const res = await fetch(updateUrl(id), { method: "DELETE" })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menghapus pocket")
+      toast.success("Pocket berhasil dihapus")
+      onChanged()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal menghapus pocket")
     } finally {
       setBusyId(null)
     }
@@ -179,6 +197,15 @@ export function StockistPocketSheet({ kind, companyId, pockets, onChanged }: Pro
                   ) : (
                     "Aktifkan"
                   )}
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="shrink-0 text-destructive hover:text-destructive"
+                  disabled={busyId === p.id}
+                  onClick={() => remove(p.id, p.name)}
+                >
+                  <IconTrash className="size-4" />
                 </Button>
               </div>
             ))}

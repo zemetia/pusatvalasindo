@@ -494,6 +494,7 @@ exports.Prisma.StockistPocketScalarFieldEnum = {
   isDefault: 'isDefault',
   sortOrder: 'sortOrder',
   isActive: 'isActive',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
