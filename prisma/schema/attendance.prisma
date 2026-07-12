@@ -8,26 +8,26 @@ enum AttendanceStatus {
 }
 
 model Attendance {
-  id                 String           @id @default(cuid())
-  userId             String
-  branchId           String?
-  date               DateTime         @db.Date
-  checkIn            DateTime?
-  checkOut           DateTime?
-  checkInPhotoUrl    String?
-  checkOutPhotoUrl   String?
+  id                String           @id @default(cuid())
+  userId            String
+  branchId          String?
+  date              DateTime         @db.Date
+  checkIn           DateTime?
+  checkOut          DateTime?
+  checkInPhotoUrl   String?
+  checkOutPhotoUrl  String?
   // GPS from browser navigator.geolocation (auto-captured)
-  checkInGpsLat      Float?
-  checkInGpsLng      Float?
+  checkInGpsLat     Float?
+  checkInGpsLng     Float?
   // Second location from manual input on the form (to detect GPS spoofing)
-  checkInManualLat   Float?
-  checkInManualLng   Float?
-  isLocationSuspect  Boolean          @default(false)
-  isWithDoctorNote   Boolean          @default(false)
-  status             AttendanceStatus @default(PRESENT)
-  notes              String?
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  checkInManualLat  Float?
+  checkInManualLng  Float?
+  isLocationSuspect Boolean          @default(false)
+  isWithDoctorNote  Boolean          @default(false)
+  status            AttendanceStatus @default(PRESENT)
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
   branch Branch? @relation(fields: [branchId], references: [id])

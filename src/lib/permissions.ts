@@ -21,6 +21,13 @@ export const PERMISSIONS = {
 
   BANK_VIEW: "bank.view",
   BANK_MANAGE: "bank.manage",
+  BANK_DAILY_INPUT: "bank.daily_input",
+
+  STOCKIST_VIEW: "stockist.view",
+  STOCKIST_MANAGE: "stockist.manage",
+
+  COMPANY_STOCK_VIEW: "company_stock.view",
+  COMPANY_STOCK_MANAGE: "company_stock.manage",
 
   CURRENCY_VIEW: "currency.view",
   CURRENCY_MANAGE: "currency.manage",
@@ -59,6 +66,11 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.BANK_VIEW,
   PERMISSIONS.BANK_MANAGE,
+  PERMISSIONS.BANK_DAILY_INPUT,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.STOCKIST_MANAGE,
+  PERMISSIONS.COMPANY_STOCK_VIEW,
+  PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.CURRENCY_MANAGE,
   PERMISSIONS.USERS_VIEW,
@@ -84,6 +96,9 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.BANK_VIEW,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.COMPANY_STOCK_VIEW,
+  PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.USERS_VIEW,
   PERMISSIONS.BRANCHES_VIEW,
@@ -115,11 +130,17 @@ const AKUNTAN_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.BANK_VIEW,
   PERMISSIONS.BANK_MANAGE,
+  PERMISSIONS.BANK_DAILY_INPUT,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.COMPANY_STOCK_VIEW,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.CURRENCY_MANAGE,
 ];
 
-const KASIR_PERMISSIONS: Permission[] = [
+// Base perms shared by Kasir and the 3 roles that used to alias KASIR_PERMISSIONS
+// (Teller Dalam, Teller Luar, Sales & Compliance) — kept identical to the old
+// combined set so splitting them doesn't change anyone's existing access.
+const KASIR_BASE_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
   PERMISSIONS.KPI_FILL_OWN,
@@ -128,6 +149,28 @@ const KASIR_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.BANK_VIEW,
+];
+
+const KASIR_PERMISSIONS: Permission[] = [
+  ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.STOCKIST_VIEW,
+];
+
+const TELLER_DALAM_PERMISSIONS: Permission[] = [
+  ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.STOCKIST_MANAGE,
+];
+
+const TELLER_LUAR_PERMISSIONS: Permission[] = [
+  ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.STOCKIST_VIEW,
+];
+
+const SALES_COMPLIANCE_PERMISSIONS: Permission[] = [
+  ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.BANK_DAILY_INPUT,
 ];
 
 const KURIR_PERMISSIONS: Permission[] = [
@@ -157,10 +200,11 @@ const ROLE_PERMISSION_MAP: Record<string, Permission[]> = {
   HR: HR_PERMISSIONS,
   Akuntan: AKUNTAN_PERMISSIONS,
   Kasir: KASIR_PERMISSIONS,
-  // Teller (dalam/luar) setara Kasir — akses transaksi & stock, self-fill KPI
-  "Teller Dalam": KASIR_PERMISSIONS,
-  "Teller Luar": KASIR_PERMISSIONS,
-  "Sales & Compliance": KASIR_PERMISSIONS,
+  // Teller Dalam bisa manage Stockist (reconciliation harian); Teller Luar cuma view.
+  "Teller Dalam": TELLER_DALAM_PERMISSIONS,
+  "Teller Luar": TELLER_LUAR_PERMISSIONS,
+  // Sales & Compliance ("marketing") input saldo bank harian, tapi tidak manage Stockist.
+  "Sales & Compliance": SALES_COMPLIANCE_PERMISSIONS,
   Kurir: KURIR_PERMISSIONS,
 };
 

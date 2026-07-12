@@ -31,29 +31,29 @@ const PKD_ACCOUNTS: BankAccountDef[] = [
   { bankName: 'PENDING', accountNumber: null, accountName: 'PENDING PENARIKAN', sortOrder: 4 },
 ]
 
-const BRANCH_ACCOUNTS: Record<string, BankAccountDef[]> = {
-  Cengkareng: PVI_PTU_ACCOUNTS,
-  Tangerang: PVI_PTU_ACCOUNTS,
-  'Pusat Kirim Duit': PKD_ACCOUNTS,
-  Pluit: PVI_PTU_ACCOUNTS,
+// Rekening milik 1 PT, dipakai bersama semua cabang di bawahnya — bukan per cabang.
+const COMPANY_ACCOUNTS: Record<string, BankAccountDef[]> = {
+  PVI: PVI_PTU_ACCOUNTS,
+  PTU: PVI_PTU_ACCOUNTS,
+  PKD: PKD_ACCOUNTS,
 }
 
 export async function seedBankAccounts(
   prisma: PrismaClient,
-  branchIds: Record<string, string>,
+  companyIds: Record<string, string>,
   idrId: string
 ): Promise<void> {
-  for (const [branchName, branchId] of Object.entries(branchIds)) {
-    const accounts = BRANCH_ACCOUNTS[branchName]
+  for (const [companyCode, companyId] of Object.entries(companyIds)) {
+    const accounts = COMPANY_ACCOUNTS[companyCode]
     if (!accounts) continue
     for (const acc of accounts) {
       const existing = await prisma.bankAccount.findFirst({
-        where: { branchId, accountName: acc.accountName },
+        where: { companyId, accountName: acc.accountName },
       })
       if (!existing) {
         await prisma.bankAccount.create({
           data: {
-            branchId,
+            companyId,
             bankName: acc.bankName,
             accountNumber: acc.accountNumber,
             accountName: acc.accountName,
@@ -65,6 +65,6 @@ export async function seedBankAccounts(
         })
       }
     }
-    console.log(`  ✓ ${accounts.length} bank accounts seeded for ${branchName}`)
+    console.log(`  ✓ ${accounts.length} bank accounts seeded for ${companyCode}`)
   }
 }

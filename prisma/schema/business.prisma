@@ -11,27 +11,30 @@ model Branch {
   attendanceRadiusM Int?            @default(20)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  bankAccounts   BankAccount[]
-  company        Company?        @relation(fields: [companyId], references: [id])
-  currencyStocks CurrencyStock[]
-  stockItems     StockItem[]
-  stockMutations StockMutation[]
-  users          user[]
-  attendances    Attendance[]
+  company           Company?        @relation(fields: [companyId], references: [id])
+  currencyStocks    CurrencyStock[]
+  stockItems        StockItem[]
+  stockMutations    StockMutation[]
+  users             user[]
+  attendances       Attendance[]
 }
 
 model Company {
-  id            String        @id @default(cuid())
-  name          String        @unique
-  code          String        @unique
-  isActive      Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  bonusMatrices BonusMatrix[]
-  branches      Branch[]
-  roleKpis      RoleKpi[]
-  custom_roles  custom_role[]
-  users         user[]
+  id                String             @id @default(cuid())
+  name              String             @unique
+  code              String             @unique
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  bonusMatrices     BonusMatrix[]
+  branches          Branch[]
+  roleKpis          RoleKpi[]
+  custom_roles      custom_role[]
+  users             user[]
+  stockistPockets   StockistPocket[]
+  kasPockets        KasPocket[]
+  companyStockItems CompanyStockItem[]
+  bankAccounts      BankAccount[]
 }
 
 model Currency {

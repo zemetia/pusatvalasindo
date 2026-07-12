@@ -1,0 +1,35 @@
+enum SampleStatus {
+  RECEIVED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum AssayMethod {
+  FIRE_ASSAY
+  XRF
+  ICP
+}
+
+model Sample {
+  id           String       @id @default(cuid())
+  sampleNumber String       @unique
+  materialType String
+  source       String?
+  dateReceived DateTime     @default(now())
+  initialNotes String?
+  status       SampleStatus @default(RECEIVED)
+  technicianId String?
+  method       AssayMethod?
+  assayResults String?
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  technician      user?           @relation(fields: [technicianId], references: [id])
+  refiningBatches RefiningBatch[]
+
+  @@index([status])
+  @@index([dateReceived])
+  @@index([sampleNumber])
+}

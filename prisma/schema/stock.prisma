@@ -26,6 +26,8 @@ model StockMutation {
   createdBy  String?
   branch     Branch            @relation(fields: [branchId], references: [id])
   currency   Currency          @relation(fields: [currencyId], references: [id])
+
+  @@index([branchId, currencyId, createdAt])
 }
 
 model StockItem {

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 
 export type CreateBankAccountInput = {
-  branchId: string;
+  companyId: string;
   bankName: string;
   accountNumber?: string | null;
   accountName: string;
@@ -10,37 +10,37 @@ export type CreateBankAccountInput = {
 };
 
 export type UpdateBankAccountInput = Partial<
-  Omit<CreateBankAccountInput, "branchId" | "currencyId"> & { isActive: boolean }
+  Omit<CreateBankAccountInput, "companyId" | "currencyId"> & { isActive: boolean }
 >;
 
 export const bankAccountRepository = {
-  findAll: (branchId?: string, onlyActive = false) =>
+  findAll: (companyId?: string, onlyActive = false) =>
     prisma.bankAccount.findMany({
       where: {
-        ...(branchId ? { branchId } : {}),
+        ...(companyId ? { companyId } : {}),
         ...(onlyActive ? { isActive: true } : {}),
       },
-      include: { branch: true, currency: true },
-      orderBy: [{ branch: { name: "asc" } }, { bankName: "asc" }],
+      include: { company: true, currency: true },
+      orderBy: [{ company: { name: "asc" } }, { bankName: "asc" }],
     }),
 
   findById: (id: string) =>
     prisma.bankAccount.findUnique({
       where: { id },
-      include: { branch: true, currency: true },
+      include: { company: true, currency: true },
     }),
 
   create: (data: CreateBankAccountInput) =>
     prisma.bankAccount.create({
       data,
-      include: { branch: true, currency: true },
+      include: { company: true, currency: true },
     }),
 
   update: (id: string, data: UpdateBankAccountInput) =>
     prisma.bankAccount.update({
       where: { id },
       data,
-      include: { branch: true, currency: true },
+      include: { company: true, currency: true },
     }),
 
   softDelete: (id: string) =>

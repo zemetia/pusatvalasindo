@@ -54,13 +54,13 @@ model Revenue {
 }
 
 model BonusMatrix {
-  id           String        @id @default(cuid())
+  id           String       @id @default(cuid())
   companyId    String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   customRoleId String?
-  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customRole   custom_role?  @relation(fields: [customRoleId], references: [id])
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole   custom_role? @relation(fields: [customRoleId], references: [id])
   tiers        BonusTier[]
 
   @@unique([companyId, customRoleId])

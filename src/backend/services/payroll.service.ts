@@ -15,27 +15,29 @@ export const payrollService = {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 1);
 
-    const employee = await prisma.user.findUnique({
-      where: { id: employeeId },
-      select: {
-        id: true,
-        name: true,
-        baseSalary: true,
-        mealAllowance: true,
-        transportAllowance: true,
-        positionAllowance: true,
-        bpjsKesehatan: true,
-      },
-    });
+    // employee, KPI result, and attendances only depend on employeeId/date range,
+    // not on each other — fetch them concurrently instead of round-tripping serially
+    const [employee, kpiResult, attendances] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: employeeId },
+        select: {
+          id: true,
+          name: true,
+          baseSalary: true,
+          mealAllowance: true,
+          transportAllowance: true,
+          positionAllowance: true,
+          bpjsKesehatan: true,
+        },
+      }),
+      // KPI calculation also saves/updates the KpiMonthlyResult record
+      kpiService.calculateMonthlyResult(employeeId, month, year),
+      prisma.attendance.findMany({
+        where: { userId: employeeId, date: { gte: startDate, lt: endDate } },
+      }),
+    ]);
 
     if (!employee) throw new NotFoundError("Karyawan tidak ditemukan");
-
-    // KPI calculation also saves/updates the KpiMonthlyResult record
-    const kpiResult = await kpiService.calculateMonthlyResult(employeeId, month, year);
-
-    const attendances = await prisma.attendance.findMany({
-      where: { userId: employeeId, date: { gte: startDate, lt: endDate } },
-    });
 
     const base = Number(employee.baseSalary ?? 0);
     const meal = Number(employee.mealAllowance ?? 0);

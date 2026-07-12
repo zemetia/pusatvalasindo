@@ -1,0 +1,125 @@
+// Bagian 1 — Stockist (Mata Uang): stock mata uang per pocket, dimiliki 1 PT (Company) dan
+// dipakai bersama oleh semua cabang di bawahnya — bukan per cabang.
+model StockistPocket {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String // "Kas Kecil", "Finance Blue", "Kurir A", dst
+  code      String?
+  isDefault Boolean  @default(false) // pocket bawaan yang ikut ke-seed tiap PT baru
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company              @relation(fields: [companyId], references: [id])
+  balances  StockistBalance[]
+  mutations StockistMutation[]
+  checks    StockistDailyCheck[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model StockistBalance {
+  id                 String   @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  quantity           Decimal  @default(0) // saldo berjalan (running balance) — 1 sel di matrix
+  updatedAt          DateTime @updatedAt
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@unique([pocketId, companyStockItemId])
+  @@index([pocketId])
+}
+
+model StockistMutation {
+  id                 String               @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  type               StockistMutationType
+  quantity           Decimal // + atau - tergantung type
+  balanceAfter       Decimal
+  note               String?
+  createdAt          DateTime             @default(now())
+  createdBy          String?
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@index([pocketId, companyStockItemId, createdAt])
+}
+
+model StockistDailyCheck {
+  id                 String              @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  date               DateTime            @db.Date
+  status             StockistCheckStatus @default(BELUM_REVIEW)
+  enteredQuantity    Decimal? // hasil opname yang diisi user untuk tanggal ini — null = belum diisi
+  filledAt           DateTime? // kapan opname diisi
+  filledBy           String? // siapa yang mengisi opname
+  note               String?
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@unique([pocketId, companyStockItemId, date])
+  @@index([pocketId, date])
+  @@index([date, status])
+}
+
+enum StockistMutationType {
+  OPENING
+  TOP_UP
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+}
+
+enum StockistCheckStatus {
+  BELUM_REVIEW
+  BEDA
+  BENAR
+}
+
+// Bagian 3 — Tunai (Kas): pocket kas rupiah, entitas sendiri (bukan reuse StockistPocket),
+// dimiliki 1 PT (Company) sama seperti StockistPocket — bukan per cabang.
+model KasPocket {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String // "Kas Besar", "Kas Operasional", dst — daftar sendiri, beda dari StockistPocket
+  code      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company      Company         @relation(fields: [companyId], references: [id])
+  dailyEntries KasDailyEntry[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model KasDailyEntry {
+  id          String   @id @default(cuid())
+  kasPocketId String
+  date        DateTime @db.Date
+  balance     Decimal  @default(0) // saldo tunai hari itu — user cuma isi ini, tanpa dimensi currency
+  note        String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kasPocket KasPocket @relation(fields: [kasPocketId], references: [id])
+
+  @@unique([kasPocketId, date])
+  @@index([kasPocketId, date])
+}

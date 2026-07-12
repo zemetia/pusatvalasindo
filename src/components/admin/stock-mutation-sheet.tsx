@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AdminFormSidebar } from "./admin-form-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -147,13 +148,10 @@ export function StockMutationSheet({ branches, currencies, trigger }: Props) {
 
       <div className="grid gap-1.5">
         <Label>Rate (IDR per 1 unit)</Label>
-        <Input
-          type="number"
-          min="0"
-          step="any"
+        <NumberInput
           placeholder="Opsional"
           value={form.rate}
-          onChange={(e) => set("rate")(e.target.value)}
+          onValueChange={(val) => set("rate")(val === undefined ? "" : String(val))}
         />
         {form.rate && form.quantity && (
           <p className="text-xs text-muted-foreground">

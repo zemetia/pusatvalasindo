@@ -14,13 +14,12 @@ import {
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
 import { Landmark, CreditCard, User, FileText, Building2, CircleDollarSign } from "lucide-react";
 
-type Branch = { id: string; name: string; companyId: string | null };
 type Company = { id: string; name: string };
 type Currency = { id: string; code: string; name: string };
 
 export type BankAccountData = {
   id: string;
-  branchId: string;
+  companyId: string;
   bankName: string;
   accountNumber: string | null;
   accountName: string;
@@ -29,25 +28,20 @@ export type BankAccountData = {
 };
 
 interface Props {
-  branches: Branch[];
   currencies: Currency[];
   companies: Company[];
   account?: BankAccountData;
   trigger?: React.ReactNode;
 }
 
-export function BankAccountSheet({ branches, currencies, companies, account, trigger }: Props) {
+export function BankAccountSheet({ currencies, companies, account, trigger }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const isEdit = !!account;
 
-  const initialBranchId = account?.branchId || "";
-  const initialCompanyId = branches.find(b => b.id === initialBranchId)?.companyId || "";
-
   const empty = {
-    companyId: initialCompanyId,
-    branchId: initialBranchId,
+    companyId: account?.companyId || "",
     bankName: "",
     accountNumber: "",
     accountName: "",
@@ -59,11 +53,8 @@ export function BankAccountSheet({ branches, currencies, companies, account, tri
 
   useEffect(() => {
     if (open) {
-      const bId = account?.branchId || "";
-      const cId = branches.find(b => b.id === bId)?.companyId || "";
       setForm({
-        companyId: cId,
-        branchId: bId,
+        companyId: account?.companyId || "",
         bankName: account?.bankName || "",
         accountNumber: account?.accountNumber || "",
         accountName: account?.accountName || "",
@@ -71,22 +62,14 @@ export function BankAccountSheet({ branches, currencies, companies, account, tri
         note: account?.note || "",
       });
     }
-  }, [open, account, branches]);
+  }, [open, account]);
 
   const set = (key: keyof typeof empty) => (val: string) =>
-    setForm((f) => {
-      const updated = { ...f, [key]: val };
-      if (key === "companyId") {
-        updated.branchId = "";
-      }
-      return updated;
-    });
-
-  const filteredBranches = branches.filter((b) => b.companyId === form.companyId);
+    setForm((f) => ({ ...f, [key]: val }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.branchId || !form.bankName || !form.accountName || !form.currencyId) {
+    if (!form.companyId || !form.bankName || !form.accountName || !form.currencyId) {
       toast.error("Semua field wajib diisi kecuali nomor rekening dan catatan");
       return;
     }
@@ -97,7 +80,7 @@ export function BankAccountSheet({ branches, currencies, companies, account, tri
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          branchId: form.branchId,
+          companyId: form.companyId,
           bankName: form.bankName,
           accountNumber: form.accountNumber,
           accountName: form.accountName,
@@ -126,7 +109,7 @@ export function BankAccountSheet({ branches, currencies, companies, account, tri
       description={
         isEdit
           ? "Perbarui informasi detail rekening bank operasional."
-          : "Tambahkan rekening bank baru untuk operasional cabang."
+          : "Tambahkan rekening bank baru untuk operasional PT."
       }
       icon={<Landmark className="w-5 h-5" />}
       onSubmit={handleSubmit}
@@ -158,21 +141,6 @@ export function BankAccountSheet({ branches, currencies, companies, account, tri
           {companies.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
-
-        <PremiumNativeSelect
-          label="Cabang *"
-          icon={<Building2 className="w-4 h-4" />}
-          value={form.branchId}
-          onChange={(e) => set("branchId")(e.target.value)}
-          disabled={isEdit || !form.companyId}
-        >
-          <option value="">Pilih cabang</option>
-          {filteredBranches.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
             </option>
           ))}
         </PremiumNativeSelect>

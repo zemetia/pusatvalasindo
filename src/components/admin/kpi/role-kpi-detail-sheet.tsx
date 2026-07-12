@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -311,13 +312,11 @@ export function RoleKpiDetailSheet({
               <FieldLabel tooltip="Target omzet yang harus dicapai karyawan per bulan. Pencapaian di atas 120% tidak dihitung lebih.">
                 Target Omzet per Bulan (Rp)
               </FieldLabel>
-              <Input
-                type="number"
-                min="1"
+              <NumberInput
                 placeholder="Contoh: 50000000"
                 value={form.targetValue}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, targetValue: e.target.value }))
+                onValueChange={(val) =>
+                  setForm((f) => ({ ...f, targetValue: val === undefined ? "" : String(val) }))
                 }
               />
               <p className="text-xs text-muted-foreground">

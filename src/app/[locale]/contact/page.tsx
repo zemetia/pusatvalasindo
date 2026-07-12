@@ -1,9 +1,6 @@
-"use client"
-
 import React from "react"
 import { Header } from "@/components/premium/Header"
 import { Footer } from "@/components/premium/Footer"
-import { motion } from "framer-motion"
 import { Phone, Mail, MapPin, MessageCircle, ArrowRight, Clock, Send } from "lucide-react"
 
 const hubs = [

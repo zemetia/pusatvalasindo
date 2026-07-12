@@ -27,7 +27,7 @@ export const stockItemRepository = {
     return prisma.stockItem.update({ where: { id }, data })
   },
 
-  delete(id: string) {
-    return prisma.stockItem.delete({ where: { id } })
+  softDelete(id: string) {
+    return prisma.stockItem.update({ where: { id }, data: { isActive: false } })
   },
 }

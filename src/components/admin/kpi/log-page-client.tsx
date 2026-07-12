@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -498,12 +499,10 @@ export function LogPageClient({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border rounded-lg bg-muted/30">
               <div className="grid gap-1.5">
                 <Label>Jumlah (IDR)</Label>
-                <Input
-                  type="number"
-                  min="1"
+                <NumberInput
                   placeholder="Contoh: 5000000"
                   value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
+                  onValueChange={(val) => setNewAmount(val === undefined ? "" : String(val))}
                 />
               </div>
               <div className="grid gap-1.5">

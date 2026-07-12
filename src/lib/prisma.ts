@@ -9,7 +9,9 @@ declare global {
 function createPrismaClient() {
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 1, // keep connection count low for serverless
+    max: 10, // this app runs as a long-lived `next start` process, not serverless —
+    // a single-connection pool serialized every query (including auth session
+    // lookups) behind one round trip, which was the main cause of admin page slowness
   });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });

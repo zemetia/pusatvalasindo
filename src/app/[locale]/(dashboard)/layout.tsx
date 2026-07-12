@@ -1,12 +1,10 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import prisma from "@/lib/prisma";
 
 import { SiteHeader } from "@/components/site-header";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { getCallerRecord } from "@/backend/helpers/get-admin-caller";
 
 import { redirect } from "next/navigation";
 
@@ -18,22 +16,13 @@ export default async function layout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
 
-  if (!session?.user) {
-    redirect(`/${locale}/login`);
-  }
-
-  let fullUser;
+  let caller;
   try {
-    fullUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: {
-        customRole: { select: { name: true, permissions: true } },
-      },
-    });
+    // Shared, request-cached lookup — pages rendered under this layout that also
+    // call getCaller()/getAdminCaller() reuse this same session + user query
+    // instead of hitting the database again.
+    caller = await getCallerRecord();
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (
@@ -45,12 +34,12 @@ export default async function layout({
     );
   }
 
-  if (!fullUser) {
+  if (!caller) {
     redirect(`/${locale}/login`);
   }
 
-  const permissions = fullUser.customRole?.permissions ?? [];
-  const sidebarUser = { name: fullUser.name, email: fullUser.email };
+  const permissions = caller.permissions;
+  const sidebarUser = { name: caller.name, email: caller.email };
 
   return (
     <SidebarProvider

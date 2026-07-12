@@ -5,7 +5,6 @@ import {
   IconBuilding,
   IconBuildingBank,
   IconCoin,
-  IconCurrencyDollar,
   IconDashboard,
   IconDatabase,
   IconListDetails,
@@ -18,6 +17,8 @@ import {
   IconBrandTabler,
   IconFingerprint,
   IconPencil,
+  IconReportMoney,
+  IconWallet,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -117,19 +118,6 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
   // ── Stock ──────────────────────────────────────────────────────────────────
   const navStock: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.STOCK_VIEW)) {
-    navStock.push({
-      title: "Stock Management",
-      url: "/dashboard/stock-management",
-      icon: IconDatabase,
-    });
-    navStock.push({
-      title: "Stok Harian",
-      url: "/dashboard/stok-harian",
-      icon: IconListDetails,
-    });
-  }
-
   if (can(permissions, PERMISSIONS.BANK_VIEW)) {
     navStock.push({
       title: "Rekening Bank",
@@ -138,11 +126,30 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
     });
   }
 
-  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
+  if (
+    can(permissions, PERMISSIONS.BANK_DAILY_INPUT) ||
+    can(permissions, PERMISSIONS.BANK_VIEW)
+  ) {
     navStock.push({
-      title: "Mata Uang",
-      url: "/dashboard/currencies",
-      icon: IconCurrencyDollar,
+      title: "Bank Harian",
+      url: "/dashboard/bank-harian",
+      icon: IconReportMoney,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
+    navStock.push({
+      title: "Stockist",
+      url: "/dashboard/stockist",
+      icon: IconWallet,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
+    navStock.push({
+      title: "Stock Management (PT)",
+      url: "/dashboard/stock-management-pt",
+      icon: IconDatabase,
     });
   }
 

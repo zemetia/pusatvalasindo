@@ -99,8 +99,8 @@ export default async function DashboardPage({
 
       prisma.bankAccount.findMany({
         where: { isActive: true },
-        include: { branch: true, currency: true },
-        orderBy: [{ branch: { name: "asc" } }, { bankName: "asc" }],
+        include: { company: true, currency: true },
+        orderBy: [{ company: { name: "asc" } }, { bankName: "asc" }],
       }),
 
       prisma.currencyStock.findMany({
@@ -111,7 +111,7 @@ export default async function DashboardPage({
       prisma.bankMutation.findMany({
         orderBy: { createdAt: "desc" },
         take: 8,
-        include: { bankAccount: { include: { branch: true, currency: true } } },
+        include: { bankAccount: { include: { company: true, currency: true } } },
       }),
 
       prisma.kpiMonthlyResult.findMany({
@@ -729,7 +729,7 @@ export default async function DashboardPage({
                           {mut.bankAccount.bankName}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {mut.bankAccount.branch.name}
+                          {mut.bankAccount.company.name}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -772,7 +772,7 @@ export default async function DashboardPage({
               <div>
                 <CardTitle className="text-base">Rekening Bank Aktif</CardTitle>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {activeBankAccountsCount} rekening di semua cabang
+                  {activeBankAccountsCount} rekening di semua PT
                 </p>
               </div>
               <Button variant="ghost" size="sm" asChild>
@@ -789,7 +789,7 @@ export default async function DashboardPage({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Cabang</TableHead>
+                    <TableHead>PT</TableHead>
                     <TableHead>Bank</TableHead>
                     <TableHead>Mata Uang</TableHead>
                     <TableHead className="text-right">Saldo</TableHead>
@@ -799,7 +799,7 @@ export default async function DashboardPage({
                   {bankAccounts.map((acc) => (
                     <TableRow key={acc.id}>
                       <TableCell className="text-sm">
-                        {acc.branch.name}
+                        {acc.company.name}
                       </TableCell>
                       <TableCell className="font-medium text-sm">
                         {acc.bankName}

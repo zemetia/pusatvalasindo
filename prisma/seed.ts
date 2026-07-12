@@ -9,6 +9,7 @@ import { seedCurrencies } from './seeds/currencies'
 import { seedCompanies } from './seeds/companies'
 import { seedBranches } from './seeds/branches'
 import { seedStockItems } from './seeds/stock-items'
+import { seedCompanyStockItems } from './seeds/company-stock-items'
 import { seedBankAccounts } from './seeds/bank-accounts'
 import { seedKpi } from './seeds/kpi'
 import { seedRoleKpis } from './seeds/role-kpi'
@@ -42,8 +43,11 @@ async function main() {
   console.log('🌱 Seeding stock items...')
   await seedStockItems(prisma, branchIds)
 
+  console.log('🌱 Seeding company stock items (mata uang & logam mulia per PT)...')
+  await seedCompanyStockItems(prisma, companyIds)
+
   console.log('🌱 Seeding bank accounts...')
-  await seedBankAccounts(prisma, branchIds, idrId)
+  await seedBankAccounts(prisma, companyIds, idrId)
 
   console.log('🌱 Seeding KPI definitions...')
   await seedKpi(prisma, companyIds)

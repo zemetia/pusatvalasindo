@@ -25,6 +25,8 @@ model session {
   userAgent String?
   userId    String
   user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model custom_role {
@@ -44,33 +46,34 @@ model custom_role {
 }
 
 model user {
-  id                String             @id
-  name              String
-  email             String             @unique
-  emailVerified     Boolean
-  image             String?
-  createdAt         DateTime
-  updatedAt         DateTime
-  phone             String?
-  branchId          String?
-  baseSalary        Decimal?
-  mealAllowance     Decimal?
+  id                 String             @id
+  name               String
+  email              String             @unique
+  emailVerified      Boolean
+  image              String?
+  createdAt          DateTime
+  updatedAt          DateTime
+  phone              String?
+  branchId           String?
+  baseSalary         Decimal?
+  mealAllowance      Decimal?
   transportAllowance Decimal?
   positionAllowance  Decimal?
-  bpjsKesehatan     Decimal?
-  joinDate          DateTime?
-  isActive          Boolean            @default(true)
-  companyId         String?
-  customRoleId      String?
-  kpiLogs           KpiLog[]
-  kpiMonthlyResults KpiMonthlyResult[]
-  revenues          Revenue[]
-  attendances       Attendance[]
-  account           account[]
-  session           session[]
-  branch            Branch?            @relation(fields: [branchId], references: [id])
-  company           Company?           @relation(fields: [companyId], references: [id])
-  customRole        custom_role?       @relation(fields: [customRoleId], references: [id])
+  bpjsKesehatan      Decimal?
+  joinDate           DateTime?
+  isActive           Boolean            @default(true)
+  companyId          String?
+  customRoleId       String?
+  kpiLogs            KpiLog[]
+  kpiMonthlyResults  KpiMonthlyResult[]
+  revenues           Revenue[]
+  attendances        Attendance[]
+  samples            Sample[]
+  account            account[]
+  session            session[]
+  branch             Branch?            @relation(fields: [branchId], references: [id])
+  company            Company?           @relation(fields: [companyId], references: [id])
+  customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
 
   @@index([branchId])
   @@index([companyId])

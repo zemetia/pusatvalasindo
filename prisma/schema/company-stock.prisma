@@ -1,0 +1,28 @@
+// Stock Management (PT): mata uang & logam mulia yang dimiliki 1 PT (Company) secara
+// langsung — bukan per cabang. Item ditulis manual (nama + kode bebas), terpisah dari
+// module stock lama (StockItem, per-branch) dan dari Stockist (pocket-based).
+model CompanyStockItem {
+  id        String               @id @default(cuid())
+  companyId String
+  name      String
+  code      String?
+  type      CompanyStockItemType @default(CURRENCY)
+  sortOrder Int                  @default(0)
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  stockistBalances    StockistBalance[]
+  stockistMutations   StockistMutation[]
+  stockistDailyChecks StockistDailyCheck[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+enum CompanyStockItemType {
+  CURRENCY
+  LOGAM_MULIA
+}

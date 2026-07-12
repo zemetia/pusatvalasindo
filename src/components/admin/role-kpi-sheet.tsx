@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
+import { NumericFormat } from "react-number-format";
 import { KpiDefinitionRow, KPI_TYPE_LABELS } from "./kpi-definition-sheet";
 import { Sliders, Percent, Target, AlertTriangle, ShieldCheck, BarChart2 } from "lucide-react";
 
@@ -194,13 +195,15 @@ export function RoleKpiSheet({ roleKpi, definitions, trigger }: Props) {
             />
           )}
           {selectedDef.type === "TARGET" && (
-            <PremiumField
+            <NumericFormat
+              customInput={PremiumField}
               label="Target Value (IDR)"
-              type="number"
-              min="1"
+              thousandSeparator="."
+              decimalSeparator=","
+              allowNegative={false}
               placeholder="Contoh: 100000000"
               value={form.targetValue}
-              onChange={(e) => setForm((f) => ({ ...f, targetValue: e.target.value }))}
+              onValueChange={(v) => setForm((f) => ({ ...f, targetValue: v.value }))}
               icon={<Target className="w-4 h-4" />}
             />
           )}

@@ -26,7 +26,7 @@ export const dailyStockEntryRepository = {
       createdBy?: string | null
     }[]
   ) {
-    return Promise.all(
+    return prisma.$transaction(
       entries.map((e) =>
         prisma.dailyStockEntry.upsert({
           where: { stockItemId_date: { stockItemId: e.stockItemId, date: e.date } },
@@ -50,20 +50,35 @@ export const dailyStockEntryRepository = {
             createdBy: e.createdBy,
           },
         })
-      )
+      ),
+      { timeout: 15000 }
     )
   },
 }
 
 export const dailyBankEntryRepository = {
-  findByBranchAndDate(branchId: string, date: Date) {
+  findByCompanyAndDate(companyId: string, date: Date) {
     return prisma.dailyBankEntry.findMany({
       where: {
-        bankAccount: { branchId },
+        bankAccount: { companyId },
         date,
       },
       include: { bankAccount: true },
       orderBy: [{ bankAccount: { sortOrder: 'asc' } }],
+    })
+  },
+
+  // Most recent entry strictly before `date`, per bank account — used as the
+  // "saldo kemarin" reference for the live delta in Bank Harian. One query via
+  // Postgres DISTINCT ON instead of N+1 per account.
+  findLatestBeforeDate(companyId: string, date: Date) {
+    return prisma.dailyBankEntry.findMany({
+      where: {
+        bankAccount: { companyId },
+        date: { lt: date },
+      },
+      orderBy: [{ bankAccountId: 'asc' }, { date: 'desc' }],
+      distinct: ['bankAccountId'],
     })
   },
 
@@ -77,7 +92,7 @@ export const dailyBankEntryRepository = {
       createdBy?: string | null
     }[]
   ) {
-    return Promise.all(
+    return prisma.$transaction(
       entries.map((e) =>
         prisma.dailyBankEntry.upsert({
           where: { bankAccountId_date: { bankAccountId: e.bankAccountId, date: e.date } },
@@ -95,7 +110,8 @@ export const dailyBankEntryRepository = {
             createdBy: e.createdBy,
           },
         })
-      )
+      ),
+      { timeout: 15000 }
     )
   },
 }

@@ -18,16 +18,14 @@ import {
 import { BankAccountSheet, BankAccountData } from "@/components/admin/bank-account-sheet";
 import { BankMutationSheet } from "@/components/admin/bank-mutation-sheet";
 import { PageHeader } from "@/components/admin/page-header";
-import { IconBuildingBank, IconSearch, IconTrash } from "@tabler/icons-react";
-import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
+import { IconBuildingBank, IconSearch, IconPower } from "@tabler/icons-react";
 
-type SerializedBranch = { id: string; name: string; companyId: string | null };
 type SerializedCurrency = { id: string; code: string; name: string };
 type Company = { id: string; name: string };
 
 type BankAccount = {
   id: string;
-  branchId: string;
+  companyId: string;
   bankName: string;
   accountNumber: string | null;
   accountName: string;
@@ -35,7 +33,7 @@ type BankAccount = {
   note: string | null;
   balance: string;
   isActive: boolean;
-  branch: { name: string };
+  company: { name: string };
   currency: { code: string };
 };
 
@@ -48,42 +46,44 @@ function fmtBalance(val: string, code: string): string {
 
 interface BankAccountsPageClientProps {
   accounts: BankAccount[];
-  branches: SerializedBranch[];
   currencies: SerializedCurrency[];
   companies: Company[];
 }
 
 export function BankAccountsPageClient({
   accounts,
-  branches,
   currencies,
   companies,
 }: BankAccountsPageClientProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     if (!q) return accounts;
     return accounts.filter((a) =>
-      [a.bankName, a.accountNumber, a.accountName, a.branch.name, a.currency.code]
+      [a.bankName, a.accountNumber, a.accountName, a.company.name, a.currency.code]
         .some((v) => v?.toLowerCase().includes(q))
     );
   }, [accounts, search]);
 
-  const handleDelete = async (a: BankAccount) => {
-    setDeletingId(a.id);
+  const handleToggleActive = async (a: BankAccount) => {
+    setTogglingId(a.id);
     try {
-      const res = await fetch(`/api/bank-accounts/${a.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/bank-accounts/${a.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !a.isActive }),
+      });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Gagal menghapus");
-      toast.success("Rekening berhasil dihapus");
+      if (!res.ok) throw new Error(data.message || "Gagal mengubah status");
+      toast.success(a.isActive ? "Rekening dinonaktifkan" : "Rekening diaktifkan");
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Gagal menghapus");
+      toast.error(err instanceof Error ? err.message : "Gagal mengubah status");
     } finally {
-      setDeletingId(null);
+      setTogglingId(null);
     }
   };
 
@@ -91,9 +91,9 @@ export function BankAccountsPageClient({
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       <PageHeader
         title="Rekening Bank"
-        description="Daftar rekening bank per cabang"
+        description="Daftar rekening bank per PT"
         icon={<IconBuildingBank className="size-5" />}
-        action={<BankAccountSheet branches={branches} currencies={currencies} companies={companies} />}
+        action={<BankAccountSheet currencies={currencies} companies={companies} />}
       />
 
       {accounts.length === 0 ? (
@@ -107,7 +107,7 @@ export function BankAccountsPageClient({
             <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
             <Input
               type="search"
-              placeholder="Cari bank, rekening, cabang..."
+              placeholder="Cari bank, rekening, PT..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-8"
@@ -118,7 +118,7 @@ export function BankAccountsPageClient({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Cabang</TableHead>
+                  <TableHead>PT</TableHead>
                   <TableHead>Bank</TableHead>
                   <TableHead>No. Rekening</TableHead>
                   <TableHead>Nama Pemilik</TableHead>
@@ -139,7 +139,7 @@ export function BankAccountsPageClient({
                   filtered.map((a) => {
                     const accountData: BankAccountData = {
                       id: a.id,
-                      branchId: a.branchId,
+                      companyId: a.companyId,
                       bankName: a.bankName,
                       accountNumber: a.accountNumber ?? null,
                       accountName: a.accountName,
@@ -148,7 +148,7 @@ export function BankAccountsPageClient({
                     };
                     return (
                       <TableRow key={a.id} className={!a.isActive ? "opacity-50" : ""}>
-                        <TableCell>{a.branch.name}</TableCell>
+                        <TableCell>{a.company.name}</TableCell>
                         <TableCell className="font-medium">{a.bankName}</TableCell>
                         <TableCell className="font-mono text-sm">{a.accountNumber}</TableCell>
                         <TableCell>{a.accountName}</TableCell>
@@ -180,7 +180,6 @@ export function BankAccountsPageClient({
                                   }
                                 />
                                 <BankAccountSheet
-                                  branches={branches}
                                   currencies={currencies}
                                   companies={companies}
                                   account={accountData}
@@ -190,22 +189,15 @@ export function BankAccountsPageClient({
                                 />
                               </>
                             )}
-                            <DeleteConfirmDialog
-                              trigger={
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-destructive hover:text-destructive"
-                                  disabled={deletingId === a.id}
-                                >
-                                  <IconTrash className="size-4" />
-                                </Button>
-                              }
-                              title={`Hapus rekening "${a.bankName} - ${a.accountName}"?`}
-                              description="Tindakan ini tidak dapat dibatalkan."
-                              onConfirm={() => handleDelete(a)}
-                              loading={deletingId === a.id}
-                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title={a.isActive ? "Nonaktifkan" : "Aktifkan"}
+                              disabled={togglingId === a.id}
+                              onClick={() => handleToggleActive(a)}
+                            >
+                              <IconPower className={`size-4 ${a.isActive ? "text-emerald-500" : "text-muted-foreground"}`} />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

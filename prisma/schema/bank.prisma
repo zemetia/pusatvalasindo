@@ -1,6 +1,6 @@
 model BankAccount {
   id            String           @id @default(cuid())
-  branchId      String
+  companyId     String
   bankName      String
   accountNumber String?
   accountName   String
@@ -11,10 +11,12 @@ model BankAccount {
   note          String?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-  branch        Branch           @relation(fields: [branchId], references: [id])
+  company       Company          @relation(fields: [companyId], references: [id])
   currency      Currency         @relation(fields: [currencyId], references: [id])
   mutations     BankMutation[]
   dailyEntries  DailyBankEntry[]
+
+  @@index([companyId])
 }
 
 model BankMutation {
@@ -27,6 +29,8 @@ model BankMutation {
   createdAt     DateTime         @default(now())
   createdBy     String?
   bankAccount   BankAccount      @relation(fields: [bankAccountId], references: [id])
+
+  @@index([bankAccountId, createdAt])
 }
 
 model DailyBankEntry {

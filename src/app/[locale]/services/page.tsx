@@ -1,9 +1,6 @@
-"use client"
-
 import React from "react"
 import { Header } from "@/components/premium/Header"
 import { Footer } from "@/components/premium/Footer"
-import { motion } from "framer-motion"
 import { Globe, Smartphone, Landmark, Send, Zap, ShieldCheck, ArrowRight } from "lucide-react"
 
 export default function ServicesPage() {

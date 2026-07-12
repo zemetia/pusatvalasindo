@@ -55,13 +55,13 @@ type BranchWithItems = {
   name: string;
   companyId: string | null;
   stockItems: StockItem[];
-  bankAccounts: BankAccount[];
 };
 
 type CompanyWithBranches = {
   id: string;
   name: string;
   branches: { id: string; name: string }[];
+  bankAccounts: BankAccount[];
 };
 
 interface Props {
@@ -91,7 +91,7 @@ export function StockManagementClient({ companies, branches, currencies }: Props
 
   const filteredItems = currentBranch ? [
     ...currentBranch.stockItems.map(i => ({ ...i, category: 'ITEM', currency: undefined, balance: undefined })),
-    ...currentBranch.bankAccounts.map(a => ({
+    ...(activeCompany?.bankAccounts ?? []).map(a => ({
       id: a.id,
       name: `${a.bankName} - ${a.accountName}`,
       code: a.accountNumber,
@@ -201,8 +201,9 @@ export function StockManagementClient({ companies, branches, currencies }: Props
                     </div>
                   </div>
                   
-                  <UnifiedStockSheet 
-                    branchId={activeBranchId} 
+                  <UnifiedStockSheet
+                    branchId={activeBranchId}
+                    companyId={activeCompanyId}
                     currencies={currencies}
                     trigger={
                       <Button className="rounded-xl bg-[#820302] hover:bg-[#820302]/90 shadow-lg shadow-[#820302]/20 flex gap-2">
@@ -277,10 +278,11 @@ export function StockManagementClient({ companies, branches, currencies }: Props
                             </TableCell>
                             <TableCell>
                               <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
-                                <UnifiedStockActions 
-                                  item={item} 
-                                  branchId={activeBranchId} 
-                                  currencies={currencies} 
+                                <UnifiedStockActions
+                                  item={item}
+                                  branchId={activeBranchId}
+                                  companyId={activeCompanyId}
+                                  currencies={currencies}
                                 />
                               </div>
                             </TableCell>

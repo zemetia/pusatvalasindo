@@ -5,6 +5,7 @@ export const bankMutationRepository = {
     prisma.bankMutation.findMany({
       where: { bankAccountId },
       orderBy: { createdAt: "desc" },
+      take: 200,
     }),
 
   findById: (id: string) =>

@@ -1,0 +1,78 @@
+enum ShipmentStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RETURNED
+  CANCELLED
+}
+
+enum ShipmentProviderCode {
+  JNE
+  TIKI
+  POS_INDONESIA
+  DHL
+  FEDEX
+  CUSTOM
+}
+
+model ShipmentProvider {
+  id            String               @id @default(cuid())
+  name          String
+  code          ShipmentProviderCode
+  apiBaseUrl    String?
+  apiKey        String?
+  webhookSecret String?
+  isActive      Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  shipments Shipment[]
+
+  @@unique([code])
+  @@index([isActive])
+}
+
+model Shipment {
+  id               String              @id @default(cuid())
+  trackingNumber   String
+  providerId       String
+  status           ShipmentStatus      @default(PENDING)
+  origin           String?
+  destination      String?
+  recipientName    String?
+  recipientPhone   String?
+  // Polymorphic reference: e.g. { referenceType: "ORDER", referenceId: "abc123" }
+  referenceType    String?
+  referenceId      String?
+  notes            String?
+  estimatedDelivery DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  provider       ShipmentProvider      @relation(fields: [providerId], references: [id])
+  statusEvents   ShipmentStatusEvent[]
+
+  @@unique([trackingNumber, providerId])
+  @@index([providerId])
+  @@index([status])
+  @@index([referenceType, referenceId])
+  @@index([createdAt])
+}
+
+model ShipmentStatusEvent {
+  id          String          @id @default(cuid())
+  shipmentId  String
+  status      ShipmentStatus
+  description String?
+  location    String?
+  eventTime   DateTime        @default(now())
+  rawPayload  Json?
+  createdAt   DateTime        @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, eventTime])
+}

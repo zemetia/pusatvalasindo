@@ -210,7 +210,7 @@ exports.Prisma.VerificationScalarFieldEnum = {
 
 exports.Prisma.BankAccountScalarFieldEnum = {
   id: 'id',
-  branchId: 'branchId',
+  companyId: 'companyId',
   bankName: 'bankName',
   accountNumber: 'accountNumber',
   accountName: 'accountName',
@@ -274,6 +274,18 @@ exports.Prisma.CurrencyScalarFieldEnum = {
   code: 'code',
   name: 'name',
   symbol: 'symbol',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CompanyStockItemScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  name: 'name',
+  code: 'code',
+  type: 'type',
+  sortOrder: 'sortOrder',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -348,6 +360,81 @@ exports.Prisma.KpiMonthlyResultScalarFieldEnum = {
   calculatedAt: 'calculatedAt'
 };
 
+exports.Prisma.RefiningBatchScalarFieldEnum = {
+  id: 'id',
+  batchNumber: 'batchNumber',
+  sampleId: 'sampleId',
+  refiningMethod: 'refiningMethod',
+  startTimestamp: 'startTimestamp',
+  estimatedDuration: 'estimatedDuration',
+  inputWeight: 'inputWeight',
+  initialPurity: 'initialPurity',
+  outputWeight: 'outputWeight',
+  finalPurity: 'finalPurity',
+  recordedYield: 'recordedYield',
+  recordedLoss: 'recordedLoss',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SampleScalarFieldEnum = {
+  id: 'id',
+  sampleNumber: 'sampleNumber',
+  materialType: 'materialType',
+  source: 'source',
+  dateReceived: 'dateReceived',
+  initialNotes: 'initialNotes',
+  status: 'status',
+  technicianId: 'technicianId',
+  method: 'method',
+  assayResults: 'assayResults',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ShipmentProviderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  apiBaseUrl: 'apiBaseUrl',
+  apiKey: 'apiKey',
+  webhookSecret: 'webhookSecret',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ShipmentScalarFieldEnum = {
+  id: 'id',
+  trackingNumber: 'trackingNumber',
+  providerId: 'providerId',
+  status: 'status',
+  origin: 'origin',
+  destination: 'destination',
+  recipientName: 'recipientName',
+  recipientPhone: 'recipientPhone',
+  referenceType: 'referenceType',
+  referenceId: 'referenceId',
+  notes: 'notes',
+  estimatedDelivery: 'estimatedDelivery',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ShipmentStatusEventScalarFieldEnum = {
+  id: 'id',
+  shipmentId: 'shipmentId',
+  status: 'status',
+  description: 'description',
+  location: 'location',
+  eventTime: 'eventTime',
+  rawPayload: 'rawPayload',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.CurrencyStockScalarFieldEnum = {
   id: 'id',
   branchId: 'branchId',
@@ -399,12 +486,87 @@ exports.Prisma.DailyStockEntryScalarFieldEnum = {
   qty2: 'qty2'
 };
 
+exports.Prisma.StockistPocketScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  name: 'name',
+  code: 'code',
+  isDefault: 'isDefault',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockistBalanceScalarFieldEnum = {
+  id: 'id',
+  pocketId: 'pocketId',
+  companyStockItemId: 'companyStockItemId',
+  quantity: 'quantity',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockistMutationScalarFieldEnum = {
+  id: 'id',
+  pocketId: 'pocketId',
+  companyStockItemId: 'companyStockItemId',
+  type: 'type',
+  quantity: 'quantity',
+  balanceAfter: 'balanceAfter',
+  note: 'note',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.StockistDailyCheckScalarFieldEnum = {
+  id: 'id',
+  pocketId: 'pocketId',
+  companyStockItemId: 'companyStockItemId',
+  date: 'date',
+  status: 'status',
+  enteredQuantity: 'enteredQuantity',
+  filledAt: 'filledAt',
+  filledBy: 'filledBy',
+  note: 'note',
+  reviewedBy: 'reviewedBy',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.KasPocketScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  name: 'name',
+  code: 'code',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.KasDailyEntryScalarFieldEnum = {
+  id: 'id',
+  kasPocketId: 'kasPocketId',
+  date: 'date',
+  balance: 'balance',
+  note: 'note',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -437,6 +599,11 @@ exports.BankMutationType = exports.$Enums.BankMutationType = {
   DEBIT: 'DEBIT'
 };
 
+exports.CompanyStockItemType = exports.$Enums.CompanyStockItemType = {
+  CURRENCY: 'CURRENCY',
+  LOGAM_MULIA: 'LOGAM_MULIA'
+};
+
 exports.KpiType = exports.$Enums.KpiType = {
   EVENT: 'EVENT',
   TARGET: 'TARGET'
@@ -448,6 +615,51 @@ exports.BonusResultType = exports.$Enums.BonusResultType = {
   PENALTY_SATURDAY: 'PENALTY_SATURDAY',
   PENALTY_DEDUCTION: 'PENALTY_DEDUCTION',
   TOP_PERFORMER: 'TOP_PERFORMER'
+};
+
+exports.RefiningMethod = exports.$Enums.RefiningMethod = {
+  MILLER: 'MILLER',
+  WOHLWILL: 'WOHLWILL',
+  AQUA_REGIA: 'AQUA_REGIA'
+};
+
+exports.RefiningBatchStatus = exports.$Enums.RefiningBatchStatus = {
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  FLAGGED: 'FLAGGED'
+};
+
+exports.SampleStatus = exports.$Enums.SampleStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED'
+};
+
+exports.AssayMethod = exports.$Enums.AssayMethod = {
+  FIRE_ASSAY: 'FIRE_ASSAY',
+  XRF: 'XRF',
+  ICP: 'ICP'
+};
+
+exports.ShipmentProviderCode = exports.$Enums.ShipmentProviderCode = {
+  JNE: 'JNE',
+  TIKI: 'TIKI',
+  POS_INDONESIA: 'POS_INDONESIA',
+  DHL: 'DHL',
+  FEDEX: 'FEDEX',
+  CUSTOM: 'CUSTOM'
+};
+
+exports.ShipmentStatus = exports.$Enums.ShipmentStatus = {
+  PENDING: 'PENDING',
+  PICKED_UP: 'PICKED_UP',
+  IN_TRANSIT: 'IN_TRANSIT',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
 };
 
 exports.StockMutationType = exports.$Enums.StockMutationType = {
@@ -466,6 +678,21 @@ exports.StockItemType = exports.$Enums.StockItemType = {
   SILVER: 'SILVER'
 };
 
+exports.StockistMutationType = exports.$Enums.StockistMutationType = {
+  OPENING: 'OPENING',
+  TOP_UP: 'TOP_UP',
+  WITHDRAWAL: 'WITHDRAWAL',
+  TRANSFER_IN: 'TRANSFER_IN',
+  TRANSFER_OUT: 'TRANSFER_OUT',
+  ADJUSTMENT: 'ADJUSTMENT'
+};
+
+exports.StockistCheckStatus = exports.$Enums.StockistCheckStatus = {
+  BELUM_REVIEW: 'BELUM_REVIEW',
+  BEDA: 'BEDA',
+  BENAR: 'BENAR'
+};
+
 exports.Prisma.ModelName = {
   Attendance: 'Attendance',
   account: 'account',
@@ -479,6 +706,7 @@ exports.Prisma.ModelName = {
   Branch: 'Branch',
   Company: 'Company',
   Currency: 'Currency',
+  CompanyStockItem: 'CompanyStockItem',
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
   KpiLog: 'KpiLog',
@@ -486,10 +714,21 @@ exports.Prisma.ModelName = {
   BonusMatrix: 'BonusMatrix',
   BonusTier: 'BonusTier',
   KpiMonthlyResult: 'KpiMonthlyResult',
+  RefiningBatch: 'RefiningBatch',
+  Sample: 'Sample',
+  ShipmentProvider: 'ShipmentProvider',
+  Shipment: 'Shipment',
+  ShipmentStatusEvent: 'ShipmentStatusEvent',
   CurrencyStock: 'CurrencyStock',
   StockMutation: 'StockMutation',
   StockItem: 'StockItem',
-  DailyStockEntry: 'DailyStockEntry'
+  DailyStockEntry: 'DailyStockEntry',
+  StockistPocket: 'StockistPocket',
+  StockistBalance: 'StockistBalance',
+  StockistMutation: 'StockistMutation',
+  StockistDailyCheck: 'StockistDailyCheck',
+  KasPocket: 'KasPocket',
+  KasDailyEntry: 'KasDailyEntry'
 };
 
 /**

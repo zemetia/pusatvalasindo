@@ -26,12 +26,13 @@ const TYPES = [
 
 interface Props {
   branchId: string;
+  companyId: string;
   currencies: { id: string; code: string; name: string }[];
   item?: any; // For edit mode
   trigger?: React.ReactNode;
 }
 
-export function UnifiedStockSheet({ branchId, currencies, item, trigger }: Props) {
+export function UnifiedStockSheet({ branchId, companyId, currencies, item, trigger }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ export function UnifiedStockSheet({ branchId, currencies, item, trigger }: Props
     try {
       if (type === 'BANK_ACCOUNT') {
         const body = {
-          branchId,
+          companyId,
           bankName: bankForm.bankName,
           accountName: bankForm.accountName,
           accountNumber: bankForm.accountNumber,

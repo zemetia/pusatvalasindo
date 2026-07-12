@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AdminFormSidebar } from "./admin-form-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -101,13 +102,10 @@ export function BankMutationSheet({
 
       <div className="grid gap-1.5">
         <Label>Nominal ({currencyCode}) *</Label>
-        <Input
-          type="number"
-          min="0.01"
-          step="any"
+        <NumberInput
           placeholder="0"
           value={form.amount}
-          onChange={(e) => set("amount")(e.target.value)}
+          onValueChange={(val) => set("amount")(val === undefined ? "" : String(val))}
         />
       </div>
 

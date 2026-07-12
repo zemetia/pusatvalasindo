@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { NumberInput } from "@/components/ui/number-input"
 import { Badge } from "@/components/ui/badge"
 import {
   Select,
@@ -85,10 +86,11 @@ export function DailyStockForm({ companies, branches }: Props) {
   const loadData = useCallback(async (bid: string, d: string) => {
     setFetching(true)
     try {
+      const cid = branches.find((b) => b.id === bid)?.companyId ?? ""
       const [itemsRes, entriesRes, accountsRes] = await Promise.all([
         fetch(`/api/stock-items?branchId=${bid}`),
         fetch(`/api/stok-harian?branchId=${bid}&date=${d}`),
-        fetch(`/api/bank-accounts?branchId=${bid}&active=true`),
+        fetch(`/api/bank-accounts?companyId=${cid}&active=true`),
       ])
 
       const [itemsData, entriesData, accountsData] = await Promise.all([
@@ -139,7 +141,7 @@ export function DailyStockForm({ companies, branches }: Props) {
     } finally {
       setFetching(false)
     }
-  }, [])
+  }, [branches])
 
   useEffect(() => {
     if (branchId && date) loadData(branchId, date)
@@ -392,21 +394,17 @@ export function DailyStockForm({ companies, branches }: Props) {
                         <Badge variant="outline">{r.bankName}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Input
-                          type="number"
+                        <NumberInput
                           value={r.balance}
-                          onChange={(e) => updateBank(r.bankAccountId, "balance", e.target.value)}
+                          onValueChange={(val) => updateBank(r.bankAccountId, "balance", val === undefined ? "" : String(val))}
                           className="text-right font-mono w-full"
-                          min={0}
                         />
                       </TableCell>
                       <TableCell className="text-right">
-                        <Input
-                          type="number"
+                        <NumberInput
                           value={r.tarikCek}
-                          onChange={(e) => updateBank(r.bankAccountId, "tarikCek", e.target.value)}
+                          onValueChange={(val) => updateBank(r.bankAccountId, "tarikCek", val === undefined ? "" : String(val))}
                           className="text-right font-mono w-full"
-                          min={0}
                         />
                       </TableCell>
                     </TableRow>

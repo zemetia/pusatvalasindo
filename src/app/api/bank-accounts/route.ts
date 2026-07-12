@@ -6,7 +6,7 @@ import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 
 const createAccountSchema = z.object({
-  branchId: z.string().min(1),
+  companyId: z.string().min(1),
   bankName: z.string().min(1).max(100),
   accountNumber: z.string().max(50).optional(),
   accountName: z.string().min(1).max(100),
@@ -18,9 +18,9 @@ type CreateBody = z.infer<typeof createAccountSchema>;
 
 export async function GET(req: NextRequest) {
   try {
-    const branchId = req.nextUrl.searchParams.get("branchId") ?? undefined;
+    const companyId = req.nextUrl.searchParams.get("companyId") ?? undefined;
     const onlyActive = req.nextUrl.searchParams.get("active") === "true";
-    const accounts = await bankAccountService.getAll(branchId, onlyActive);
+    const accounts = await bankAccountService.getAll(companyId, onlyActive);
     return NextResponse.json(ok(accounts));
   } catch (e) {
     return handleError(e);

@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
+import { NumericFormat } from "react-number-format";
 import {
   UserPlus,
   User,
@@ -238,50 +239,60 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           onChange={(e) => set("phone")(e.target.value)}
           icon={<Phone className="w-4 h-4" />}
         />
-        <PremiumField
+        <NumericFormat
+          customInput={PremiumField}
           label="Gaji Pokok (IDR)"
-          type="number"
-          min="0"
+          thousandSeparator="."
+          decimalSeparator=","
+          allowNegative={false}
           placeholder="0"
           value={form.baseSalary}
-          onChange={(e) => set("baseSalary")(e.target.value)}
+          onValueChange={(v) => set("baseSalary")(v.value)}
           icon={<Banknote className="w-4 h-4" />}
         />
         <div className="grid grid-cols-2 gap-4">
-          <PremiumField
+          <NumericFormat
+            customInput={PremiumField}
             label="Uang Makan (IDR)"
-            type="number"
-            min="0"
+            thousandSeparator="."
+            decimalSeparator=","
+            allowNegative={false}
             placeholder="0"
             value={form.mealAllowance}
-            onChange={(e) => set("mealAllowance")(e.target.value)}
+            onValueChange={(v) => set("mealAllowance")(v.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
-          <PremiumField
+          <NumericFormat
+            customInput={PremiumField}
             label="Uang Transport (IDR)"
-            type="number"
-            min="0"
+            thousandSeparator="."
+            decimalSeparator=","
+            allowNegative={false}
             placeholder="0"
             value={form.transportAllowance}
-            onChange={(e) => set("transportAllowance")(e.target.value)}
+            onValueChange={(v) => set("transportAllowance")(v.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
-          <PremiumField
+          <NumericFormat
+            customInput={PremiumField}
             label="Uang Jabatan (IDR)"
-            type="number"
-            min="0"
+            thousandSeparator="."
+            decimalSeparator=","
+            allowNegative={false}
             placeholder="0"
             value={form.positionAllowance}
-            onChange={(e) => set("positionAllowance")(e.target.value)}
+            onValueChange={(v) => set("positionAllowance")(v.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
-          <PremiumField
+          <NumericFormat
+            customInput={PremiumField}
             label="BPJS Kesehatan (IDR)"
-            type="number"
-            min="0"
+            thousandSeparator="."
+            decimalSeparator=","
+            allowNegative={false}
             placeholder="0"
             value={form.bpjsKesehatan}
-            onChange={(e) => set("bpjsKesehatan")(e.target.value)}
+            onValueChange={(v) => set("bpjsKesehatan")(v.value)}
             icon={<Banknote className="w-4 h-4" />}
           />
         </div>

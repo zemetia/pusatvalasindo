@@ -65,6 +65,8 @@ model session {
   userAgent String?
   userId    String
   user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model custom_role {
@@ -106,6 +108,7 @@ model user {
   kpiMonthlyResults  KpiMonthlyResult[]
   revenues           Revenue[]
   attendances        Attendance[]
+  samples            Sample[]
   account            account[]
   session            session[]
   branch             Branch?            @relation(fields: [branchId], references: [id])
@@ -128,7 +131,7 @@ model verification {
 
 model BankAccount {
   id            String           @id @default(cuid())
-  branchId      String
+  companyId     String
   bankName      String
   accountNumber String?
   accountName   String
@@ -139,10 +142,12 @@ model BankAccount {
   note          String?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-  branch        Branch           @relation(fields: [branchId], references: [id])
+  company       Company          @relation(fields: [companyId], references: [id])
   currency      Currency         @relation(fields: [currencyId], references: [id])
   mutations     BankMutation[]
   dailyEntries  DailyBankEntry[]
+
+  @@index([companyId])
 }
 
 model BankMutation {
@@ -155,6 +160,8 @@ model BankMutation {
   createdAt     DateTime         @default(now())
   createdBy     String?
   bankAccount   BankAccount      @relation(fields: [bankAccountId], references: [id])
+
+  @@index([bankAccountId, createdAt])
 }
 
 model DailyBankEntry {
@@ -191,7 +198,6 @@ model Branch {
   attendanceRadiusM Int?            @default(20)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  bankAccounts      BankAccount[]
   company           Company?        @relation(fields: [companyId], references: [id])
   currencyStocks    CurrencyStock[]
   stockItems        StockItem[]
@@ -201,17 +207,21 @@ model Branch {
 }
 
 model Company {
-  id            String        @id @default(cuid())
-  name          String        @unique
-  code          String        @unique
-  isActive      Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  bonusMatrices BonusMatrix[]
-  branches      Branch[]
-  roleKpis      RoleKpi[]
-  custom_roles  custom_role[]
-  users         user[]
+  id                String             @id @default(cuid())
+  name              String             @unique
+  code              String             @unique
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  bonusMatrices     BonusMatrix[]
+  branches          Branch[]
+  roleKpis          RoleKpi[]
+  custom_roles      custom_role[]
+  users             user[]
+  stockistPockets   StockistPocket[]
+  kasPockets        KasPocket[]
+  companyStockItems CompanyStockItem[]
+  bankAccounts      BankAccount[]
 }
 
 model Currency {
@@ -225,6 +235,35 @@ model Currency {
   bankAccounts   BankAccount[]
   stocks         CurrencyStock[]
   stockMutations StockMutation[]
+}
+
+// Stock Management (PT): mata uang & logam mulia yang dimiliki 1 PT (Company) secara
+// langsung — bukan per cabang. Item ditulis manual (nama + kode bebas), terpisah dari
+// module stock lama (StockItem, per-branch) dan dari Stockist (pocket-based).
+model CompanyStockItem {
+  id        String               @id @default(cuid())
+  companyId String
+  name      String
+  code      String?
+  type      CompanyStockItemType @default(CURRENCY)
+  sortOrder Int                  @default(0)
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  stockistBalances    StockistBalance[]
+  stockistMutations   StockistMutation[]
+  stockistDailyChecks StockistDailyCheck[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+enum CompanyStockItemType {
+  CURRENCY
+  LOGAM_MULIA
 }
 
 enum StockItemType {
@@ -351,6 +390,159 @@ datasource db {
   provider = "postgresql"
 }
 
+enum RefiningMethod {
+  MILLER
+  WOHLWILL
+  AQUA_REGIA
+}
+
+enum RefiningBatchStatus {
+  RUNNING
+  COMPLETED
+  FLAGGED
+}
+
+model RefiningBatch {
+  id                String              @id @default(cuid())
+  batchNumber       String              @unique
+  sampleId          String?
+  refiningMethod    RefiningMethod
+  startTimestamp    DateTime            @default(now())
+  estimatedDuration Int?
+  inputWeight       Decimal             @db.Decimal(12, 4)
+  initialPurity     Decimal             @db.Decimal(5, 2)
+  outputWeight      Decimal?            @db.Decimal(12, 4)
+  finalPurity       Decimal?            @db.Decimal(5, 2)
+  recordedYield     Decimal?            @db.Decimal(6, 2)
+  recordedLoss      Decimal?            @db.Decimal(6, 2)
+  status            RefiningBatchStatus @default(RUNNING)
+  notes             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  sample Sample? @relation(fields: [sampleId], references: [id])
+
+  @@index([status])
+  @@index([startTimestamp])
+  @@index([batchNumber])
+  @@index([sampleId])
+}
+
+enum SampleStatus {
+  RECEIVED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum AssayMethod {
+  FIRE_ASSAY
+  XRF
+  ICP
+}
+
+model Sample {
+  id           String       @id @default(cuid())
+  sampleNumber String       @unique
+  materialType String
+  source       String?
+  dateReceived DateTime     @default(now())
+  initialNotes String?
+  status       SampleStatus @default(RECEIVED)
+  technicianId String?
+  method       AssayMethod?
+  assayResults String?
+  completedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  technician      user?           @relation(fields: [technicianId], references: [id])
+  refiningBatches RefiningBatch[]
+
+  @@index([status])
+  @@index([dateReceived])
+  @@index([sampleNumber])
+}
+
+enum ShipmentStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RETURNED
+  CANCELLED
+}
+
+enum ShipmentProviderCode {
+  JNE
+  TIKI
+  POS_INDONESIA
+  DHL
+  FEDEX
+  CUSTOM
+}
+
+model ShipmentProvider {
+  id            String               @id @default(cuid())
+  name          String
+  code          ShipmentProviderCode
+  apiBaseUrl    String?
+  apiKey        String?
+  webhookSecret String?
+  isActive      Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  shipments Shipment[]
+
+  @@unique([code])
+  @@index([isActive])
+}
+
+model Shipment {
+  id                String         @id @default(cuid())
+  trackingNumber    String
+  providerId        String
+  status            ShipmentStatus @default(PENDING)
+  origin            String?
+  destination       String?
+  recipientName     String?
+  recipientPhone    String?
+  // Polymorphic reference: e.g. { referenceType: "ORDER", referenceId: "abc123" }
+  referenceType     String?
+  referenceId       String?
+  notes             String?
+  estimatedDelivery DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  provider     ShipmentProvider      @relation(fields: [providerId], references: [id])
+  statusEvents ShipmentStatusEvent[]
+
+  @@unique([trackingNumber, providerId])
+  @@index([providerId])
+  @@index([status])
+  @@index([referenceType, referenceId])
+  @@index([createdAt])
+}
+
+model ShipmentStatusEvent {
+  id          String         @id @default(cuid())
+  shipmentId  String
+  status      ShipmentStatus
+  description String?
+  location    String?
+  eventTime   DateTime       @default(now())
+  rawPayload  Json?
+  createdAt   DateTime       @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, eventTime])
+}
+
 model CurrencyStock {
   id         String   @id @default(cuid())
   branchId   String
@@ -379,6 +571,8 @@ model StockMutation {
   createdBy  String?
   branch     Branch            @relation(fields: [branchId], references: [id])
   currency   Currency          @relation(fields: [currencyId], references: [id])
+
+  @@index([branchId, currencyId, createdAt])
 }
 
 model StockItem {
@@ -424,4 +618,130 @@ enum StockMutationType {
   TRANSFER_IN
   TRANSFER_OUT
   ADJUSTMENT
+}
+
+// Bagian 1 — Stockist (Mata Uang): stock mata uang per pocket, dimiliki 1 PT (Company) dan
+// dipakai bersama oleh semua cabang di bawahnya — bukan per cabang.
+model StockistPocket {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String // "Kas Kecil", "Finance Blue", "Kurir A", dst
+  code      String?
+  isDefault Boolean  @default(false) // pocket bawaan yang ikut ke-seed tiap PT baru
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company              @relation(fields: [companyId], references: [id])
+  balances  StockistBalance[]
+  mutations StockistMutation[]
+  checks    StockistDailyCheck[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model StockistBalance {
+  id                 String   @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  quantity           Decimal  @default(0) // saldo berjalan (running balance) — 1 sel di matrix
+  updatedAt          DateTime @updatedAt
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@unique([pocketId, companyStockItemId])
+  @@index([pocketId])
+}
+
+model StockistMutation {
+  id                 String               @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  type               StockistMutationType
+  quantity           Decimal // + atau - tergantung type
+  balanceAfter       Decimal
+  note               String?
+  createdAt          DateTime             @default(now())
+  createdBy          String?
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@index([pocketId, companyStockItemId, createdAt])
+}
+
+model StockistDailyCheck {
+  id                 String              @id @default(cuid())
+  pocketId           String
+  companyStockItemId String
+  date               DateTime            @db.Date
+  status             StockistCheckStatus @default(BELUM_REVIEW)
+  enteredQuantity    Decimal? // hasil opname yang diisi user untuk tanggal ini — null = belum diisi
+  filledAt           DateTime? // kapan opname diisi
+  filledBy           String? // siapa yang mengisi opname
+  note               String?
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  pocket           StockistPocket   @relation(fields: [pocketId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@unique([pocketId, companyStockItemId, date])
+  @@index([pocketId, date])
+  @@index([date, status])
+}
+
+enum StockistMutationType {
+  OPENING
+  TOP_UP
+  WITHDRAWAL
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+}
+
+enum StockistCheckStatus {
+  BELUM_REVIEW
+  BEDA
+  BENAR
+}
+
+// Bagian 3 — Tunai (Kas): pocket kas rupiah, entitas sendiri (bukan reuse StockistPocket),
+// dimiliki 1 PT (Company) sama seperti StockistPocket — bukan per cabang.
+model KasPocket {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String // "Kas Besar", "Kas Operasional", dst — daftar sendiri, beda dari StockistPocket
+  code      String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company      Company         @relation(fields: [companyId], references: [id])
+  dailyEntries KasDailyEntry[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model KasDailyEntry {
+  id          String   @id @default(cuid())
+  kasPocketId String
+  date        DateTime @db.Date
+  balance     Decimal  @default(0) // saldo tunai hari itu — user cuma isi ini, tanpa dimensi currency
+  note        String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  kasPocket KasPocket @relation(fields: [kasPocketId], references: [id])
+
+  @@unique([kasPocketId, date])
+  @@index([kasPocketId, date])
 }

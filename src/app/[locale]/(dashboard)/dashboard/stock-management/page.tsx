@@ -14,6 +14,10 @@ export default async function StockManagementPage() {
             where: { isActive: true },
             orderBy: { name: "asc" },
           },
+          bankAccounts: {
+            include: { currency: true },
+            orderBy: { bankName: "asc" },
+          },
         },
       }),
       prisma.branch.findMany({
@@ -21,10 +25,6 @@ export default async function StockManagementPage() {
         include: {
           stockItems: {
             orderBy: [{ type: "asc" }, { sortOrder: "asc" }],
-          },
-          bankAccounts: {
-            include: { currency: true },
-            orderBy: { bankName: "asc" },
           },
         },
       }),
@@ -45,9 +45,9 @@ export default async function StockManagementPage() {
   }
   const [companies, branches, currencies] = result;
 
-  const serializedBranches = branches.map((b) => ({
-    ...b,
-    bankAccounts: b.bankAccounts.map((a) => ({
+  const serializedCompanies = companies.map((c) => ({
+    ...c,
+    bankAccounts: c.bankAccounts.map((a) => ({
       ...a,
       balance: a.balance.toString(),
     })),
@@ -62,8 +62,8 @@ export default async function StockManagementPage() {
       />
 
       <StockManagementClient
-        companies={companies}
-        branches={serializedBranches}
+        companies={serializedCompanies}
+        branches={branches}
         currencies={currencies}
       />
     </div>

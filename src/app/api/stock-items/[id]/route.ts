@@ -43,8 +43,8 @@ export const PUT = withValidation(updateSchema)(
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const { id } = await params
-    await stockItemRepository.delete(id)
-    return NextResponse.json(ok(null, 'Stock item deleted'))
+    await stockItemRepository.softDelete(id)
+    return NextResponse.json(ok(null, 'Stock item deactivated'))
   } catch (e) {
     return handleError(e)
   }

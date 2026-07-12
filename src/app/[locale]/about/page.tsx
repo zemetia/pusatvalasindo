@@ -1,7 +1,4 @@
-"use client"
-
 import React from "react"
-import { motion } from "framer-motion"
 import { Header } from "@/components/premium/Header"
 import { Footer } from "@/components/premium/Footer"
 import { Landmark, ShieldCheck, Star, ArrowUpRight, ArrowRight } from "lucide-react"

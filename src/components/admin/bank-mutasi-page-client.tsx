@@ -32,7 +32,7 @@ type Account = {
   accountName: string;
   balance: string;
   isActive: boolean;
-  branch: { name: string };
+  company: { name: string };
   currency: { code: string };
   mutations: Mutation[];
 };
@@ -83,10 +83,10 @@ export function BankMutasiPageClient({ account }: BankMutasiPageClientProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Cabang</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">PT</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{account.branch.name}</p>
+            <p className="text-lg font-semibold">{account.company.name}</p>
           </CardContent>
         </Card>
         <Card>

@@ -6,8 +6,8 @@ import {
 import { ConflictError, NotFoundError } from "@/backend/errors/app-error";
 
 export const bankAccountService = {
-  getAll: (branchId?: string, onlyActive = false) =>
-    bankAccountRepository.findAll(branchId, onlyActive),
+  getAll: (companyId?: string, onlyActive = false) =>
+    bankAccountRepository.findAll(companyId, onlyActive),
 
   getById: async (id: string) => {
     const account = await bankAccountRepository.findById(id);

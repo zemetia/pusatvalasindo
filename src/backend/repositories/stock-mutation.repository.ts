@@ -26,6 +26,7 @@ export const stockMutationRepository = {
       },
       include: { branch: true, currency: true },
       orderBy: { createdAt: "desc" },
+      take: 200,
     }),
 
   findById: (id: string) =>

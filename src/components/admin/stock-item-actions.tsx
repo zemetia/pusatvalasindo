@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StockItemSheet, StockItemRow } from "./stock-item-sheet";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
+import { IconPencil } from "@tabler/icons-react";
 
 type Branch = { id: string; name: string; companyId: string | null };
 type Company = { id: string; name: string };
@@ -27,7 +25,6 @@ interface Props {
 
 export function StockItemActions({ item, branches, companies }: Props) {
   const router = useRouter();
-  const [deleting, setDeleting] = useState(false);
 
   const handleToggleActive = async () => {
     const res = await fetch(`/api/stock-items/${item.id}`, {
@@ -42,22 +39,6 @@ export function StockItemActions({ item, branches, companies }: Props) {
     }
     toast.success(item.isActive ? "Item dinonaktifkan" : "Item diaktifkan");
     router.refresh();
-  };
-
-  const handleDelete = async () => {
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/stock-items/${item.id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) {
-        toast.error(data.message || "Gagal menghapus item");
-        return;
-      }
-      toast.success("Item dihapus");
-      router.refresh();
-    } finally {
-      setDeleting(false);
-    }
   };
 
   return (
@@ -75,23 +56,6 @@ export function StockItemActions({ item, branches, companies }: Props) {
             <IconPencil className="size-4" />
           </Button>
         }
-      />
-
-      <DeleteConfirmDialog
-        trigger={
-          <Button
-            size="icon"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            disabled={deleting}
-          >
-            <IconTrash className="size-4" />
-          </Button>
-        }
-        title={`Hapus item "${item.name}"?`}
-        description="Tindakan ini tidak bisa dibatalkan."
-        onConfirm={handleDelete}
-        loading={deleting}
       />
     </div>
   );

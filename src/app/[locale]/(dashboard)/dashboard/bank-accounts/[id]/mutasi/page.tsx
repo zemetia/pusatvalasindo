@@ -11,7 +11,7 @@ export default async function BankMutasiPage({ params }: Params) {
   try {
     account = await prisma.bankAccount.findUnique({
       where: { id },
-      include: { branch: true, currency: true, mutations: { orderBy: { createdAt: "desc" } } },
+      include: { company: true, currency: true, mutations: { orderBy: { createdAt: "desc" } } },
     });
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
@@ -33,7 +33,7 @@ export default async function BankMutasiPage({ params }: Params) {
     accountName: account.accountName,
     balance: account.balance.toString(),
     isActive: account.isActive,
-    branch: { name: account.branch.name },
+    company: { name: account.company.name },
     currency: { code: account.currency.code },
     mutations: account.mutations.map((m) => ({
       id: m.id,
