@@ -2,7 +2,7 @@
 **Pusat Kirim Duit Management System**
 
 You have **read-only** access to a PostgreSQL database via the user `oc_pvi_reader`.  
-You can only run `SELECT` queries. All accessible data is exposed through views prefixed with `hv_`.  
+You can only run `SELECT` queries. All accessible data is exposed through 28 views prefixed with `hv_`.  
 Auth-sensitive data (passwords, session tokens, verification codes) is **never** exposed through any view.
 
 ---
@@ -28,8 +28,17 @@ Auth-sensitive data (passwords, session tokens, verification codes) is **never**
 | `hv_bank_mutations` | All bank CREDIT/DEBIT transactions |
 | `hv_currency_stock` | Current foreign-currency stock per branch with IDR value estimates |
 | `hv_currency_stock_by_company` | Currency stock totals with potential gross profit per company |
-| `hv_stock_daily` | Daily stock entry records (all asset types: valas, emas, perak, kas) |
+| `hv_stock_daily` | Daily stock entry records — legacy per-branch module (all asset types: valas, emas, perak, kas) |
 | `hv_bonus_tiers` | Bonus matrix tier rules per company and role |
+| `hv_company_stock_items` | Stockist stock item catalog (mata uang / logam mulia) per PT |
+| `hv_stockist_pockets` | Stockist pocket list per PT (Kas Kecil, Finance Blue, Kurir A, dst), incl. auto "Total" pocket |
+| `hv_stockist_balances` | Current stockist balance matrix (pocket × stock item); Total pocket never appears here |
+| `hv_stockist_stock_by_company` | Stockist stock totals per PT per item — SQL equivalent of the app's on-the-fly "Total" pocket |
+| `hv_stockist_mutations` | Stockist pocket mutation history (top up, withdrawal, transfer, adjustment) |
+| `hv_stockist_daily_checks` | Daily opname (physical stock check) status per pocket per item |
+| `hv_kas_pockets` | Cash (rupiah) pocket list per PT |
+| `hv_kas_daily` | Daily cash balance entries per kas pocket |
+| `hv_kas_balance_by_company` | Latest cash balance per pocket, summed per PT |
 
 ---
 
@@ -150,10 +159,12 @@ estimated_take_home_pay, context_summary
 > `kpi_bonus_type` values: `BONUS_CASH`, `SAFE_ZONE`, `PENALTY_SATURDAY`, `PENALTY_DEDUCTION`, `TOP_PERFORMER`
 
 ### `hv_bank_accounts`
+> Bank accounts are scoped per PT (Company), not per branch — a bank account is shared
+> across all branches under the same company.
 ```
 id, bank_name, account_number, account_name, current_balance,
 is_active, status_label, note, sort_order,
-branch_id, branch_name, company_id, company_name, company_code,
+company_id, company_name, company_code,
 currency_code, currency_name, currency_symbol, created_at, updated_at
 ```
 
@@ -168,7 +179,7 @@ total_active_balance, total_balance
 ### `hv_bank_daily`
 ```
 id, bank_account_id, bank_name, account_name,
-branch_id, branch_name, company_id, company_name, company_code,
+company_id, company_name, company_code,
 currency_code, currency_symbol,
 date, year, month, period_label,
 balance, tarik_cek, note, created_by, created_at
@@ -177,7 +188,7 @@ balance, tarik_cek, note, created_by, created_at
 ### `hv_bank_mutations`
 ```
 id, bank_account_id, bank_name, account_name,
-branch_id, branch_name, company_id, company_name, company_code,
+company_id, company_name, company_code,
 currency_code, currency_symbol,
 mutation_type (CREDIT|DEBIT), mutation_type_label,
 amount, balance_after, description, created_by, created_at,
@@ -219,6 +230,76 @@ matrix_id, company_id, company_name, company_code,
 role_id, role_name, tier_id,
 min_score, max_score, result_type, result_type_label,
 amount, is_top_performer, tier_description
+```
+
+### `hv_company_stock_items`
+```
+id, company_id, company_name, company_code,
+item_name, item_code, item_type (CURRENCY|LOGAM_MULIA), item_type_label,
+sort_order, is_active, status_label, created_at
+```
+
+### `hv_stockist_pockets`
+> Pockets are scoped per PT, shared across all branches. `is_total_pocket = true` marks
+> the auto-computed "Total" pocket, which is never manually mutated (see
+> `hv_stockist_stock_by_company` for its SQL equivalent).
+```
+id, company_id, company_name, company_code,
+pocket_name, pocket_code, is_total_pocket, is_active, status_label,
+sort_order, created_at
+```
+
+### `hv_stockist_balances`
+> Current balance matrix — one row per (pocket, stock item). The "Total" pocket is
+> computed on the fly by the app and never persisted, so it never appears here.
+```
+id, pocket_id, pocket_name, company_id, company_name, company_code,
+stock_item_id, stock_item_name, stock_item_type, stock_item_type_label,
+quantity, updated_at
+```
+
+### `hv_stockist_stock_by_company`
+```
+company_id, company_name, company_code,
+stock_item_id, stock_item_name, stock_item_type, stock_item_type_label,
+pocket_count, total_quantity
+```
+
+### `hv_stockist_mutations`
+```
+id, pocket_id, pocket_name, company_id, company_name, company_code,
+stock_item_id, stock_item_name, stock_item_type,
+mutation_type (OPENING|TOP_UP|WITHDRAWAL|TRANSFER_IN|TRANSFER_OUT|ADJUSTMENT), mutation_type_label,
+quantity, balance_after, note, created_by, created_at,
+year, month, period_label
+```
+
+### `hv_stockist_daily_checks`
+```
+id, pocket_id, pocket_name, company_id, company_name, company_code,
+stock_item_id, stock_item_name,
+date, year, month, period_label,
+status (BELUM_REVIEW|BEDA|BENAR), status_label,
+entered_quantity, filled_at, filled_by, note, reviewed_by, reviewed_at, created_at
+```
+
+### `hv_kas_pockets`
+```
+id, company_id, company_name, company_code,
+pocket_name, pocket_code, is_active, status_label, sort_order, created_at
+```
+
+### `hv_kas_daily`
+```
+id, kas_pocket_id, pocket_name, company_id, company_name, company_code,
+date, year, month, period_label,
+balance, note, created_by, created_at
+```
+
+### `hv_kas_balance_by_company`
+```
+company_id, company_name, company_code,
+active_pocket_count, total_pocket_count, total_balance, as_of_date
 ```
 
 ---
@@ -280,14 +361,35 @@ WHERE is_active = true
 ORDER BY company_name, total_fixed_salary DESC;
 ```
 
-### Transaksi bank cabang tertentu minggu ini?
+### Transaksi bank PT tertentu minggu ini?
 ```sql
 SELECT bank_name, account_name, mutation_type_label,
        amount, balance_after, description, created_at
 FROM hv_bank_mutations
-WHERE branch_name = 'Nama Cabang'
+WHERE company_name = 'Nama PT'
   AND created_at >= CURRENT_DATE - INTERVAL '7 days'
 ORDER BY created_at DESC;
+```
+
+### Berapa kas & stockist tiap PT saat ini?
+```sql
+SELECT company_name, total_pocket_count, active_pocket_count, total_balance, as_of_date
+FROM hv_kas_balance_by_company
+ORDER BY company_name;
+
+SELECT company_name, stock_item_name, stock_item_type_label,
+       pocket_count, total_quantity
+FROM hv_stockist_stock_by_company
+ORDER BY company_name, stock_item_name;
+```
+
+### Opname stockist yang belum direview hari ini?
+```sql
+SELECT company_name, pocket_name, stock_item_name,
+       entered_quantity, filled_by, filled_at
+FROM hv_stockist_daily_checks
+WHERE status = 'BELUM_REVIEW' AND date = CURRENT_DATE
+ORDER BY company_name, pocket_name;
 ```
 
 ### Context summary untuk AI — karyawan dengan payroll bulan ini?
@@ -312,3 +414,8 @@ ORDER BY company_name, employee_name;
 - **KPI bonus types:** `BONUS_CASH`, `SAFE_ZONE`, `PENALTY_SATURDAY`, `PENALTY_DEDUCTION`, `TOP_PERFORMER`
 - **`spread_per_unit`** in `hv_currency_stock` = sell_rate − buy_rate (profitability per unit)
 - **`potential_gross_profit_idr`** in `hv_currency_stock_by_company` = total at sell − total at buy
+- **Bank accounts and Stockist/Kas pockets are scoped per PT (`company_id`), not per branch** — a bank account or pocket is shared across all branches under the same company. None of `hv_bank_*`, `hv_stockist_*`, or `hv_kas_*` have a `branch_id`/`branch_name` column.
+- **`hv_stock_daily`** is the legacy per-branch stock module (predates Stockist/Kas); for current PT-level stock and cash, prefer `hv_stockist_*` and `hv_kas_*` views.
+- **`is_total_pocket = true`** in `hv_stockist_pockets` marks the app's auto-computed "Total" row — it never has balances or mutations of its own; use `hv_stockist_stock_by_company` for the aggregate instead.
+- **Stockist mutation types:** `OPENING`, `TOP_UP`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `ADJUSTMENT`
+- **Stockist daily-check status:** `BELUM_REVIEW` (belum direview), `BEDA` (selisih), `BENAR` (cocok)

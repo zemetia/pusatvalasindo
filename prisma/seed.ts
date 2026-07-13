@@ -11,6 +11,8 @@ import { seedBranches } from './seeds/branches'
 import { seedStockItems } from './seeds/stock-items'
 import { seedCompanyStockItems } from './seeds/company-stock-items'
 import { seedBankAccounts } from './seeds/bank-accounts'
+import { seedStockistPockets } from './seeds/stockist-pockets'
+import { seedKasPockets } from './seeds/kas-pockets'
 import { seedKpi } from './seeds/kpi'
 import { seedRoleKpis } from './seeds/role-kpi'
 import { seedUsers } from './seeds/users'
@@ -48,6 +50,12 @@ async function main() {
 
   console.log('🌱 Seeding bank accounts...')
   await seedBankAccounts(prisma, companyIds, idrId)
+
+  console.log('🌱 Seeding stockist pockets...')
+  await seedStockistPockets(prisma, companyIds)
+
+  console.log('🌱 Seeding kas pockets...')
+  await seedKasPockets(prisma, companyIds)
 
   console.log('🌱 Seeding KPI definitions...')
   await seedKpi(prisma, companyIds)
