@@ -25,46 +25,46 @@ export interface ShipmentProviderRow {
   id: string
   name: string
   code: ShipmentProviderCode
-  api_base_url: string | null
-  api_key: string | null
-  webhook_secret: string | null
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  apiBaseUrl: string | null
+  apiKey: string | null
+  webhookSecret: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ShipmentRow {
   id: string
-  tracking_number: string
-  provider_id: string
+  trackingNumber: string
+  providerId: string
   status: ShipmentStatus
   origin: string | null
   destination: string | null
-  recipient_name: string | null
-  recipient_phone: string | null
-  reference_type: string | null
-  reference_id: string | null
+  recipientName: string | null
+  recipientPhone: string | null
+  referenceType: string | null
+  referenceId: string | null
   notes: string | null
-  estimated_delivery: string | null
-  created_at: string
-  updated_at: string
+  estimatedDelivery: string | null
+  createdAt: string
+  updatedAt: string
   // Joined fields
-  provider_name?: string
-  provider_code?: string
-  latest_event_status?: string
-  latest_event_location?: string
-  latest_event_time?: string
+  providerName?: string
+  providerCode?: string
+  latestEventStatus?: string
+  latestEventLocation?: string
+  latestEventTime?: string
 }
 
 export interface ShipmentStatusEventRow {
   id: string
-  shipment_id: string
+  shipmentId: string
   status: ShipmentStatus
   description: string | null
   location: string | null
-  event_time: string
-  raw_payload: unknown
-  created_at: string
+  eventTime: string
+  rawPayload: unknown
+  createdAt: string
 }
 
 export interface CreateShipmentInput {
