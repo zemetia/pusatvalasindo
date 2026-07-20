@@ -45,6 +45,13 @@ export const userRepository = {
       orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
     }),
 
+  findByCompany: (companyId: string, onlyActive = false) =>
+    prisma.user.findMany({
+      where: onlyActive ? { companyId, isActive: true } : { companyId },
+      select,
+      orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
+    }),
+
   findById: (id: string) =>
     prisma.user.findUnique({ where: { id }, select }),
 

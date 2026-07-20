@@ -14,12 +14,16 @@ export type RoleRow = {
   description: string | null;
   companyId: string | null;
   permissions: string[];
+  payrollCompanyIds?: string[];
 };
+
+type CompanyOption = { id: string; name: string; code: string };
 
 interface Props {
   role?: RoleRow;
   trigger?: React.ReactNode;
   currentCompanyId?: string;
+  companies?: CompanyOption[];
 }
 
 type PermissionGroup = {
@@ -55,6 +59,7 @@ const AVAILABLE_PERMISSIONS: PermissionGroup[] = [
     group: "Payroll",
     items: [
       { id: "payroll.view_own", label: "Lihat Slip Gaji Sendiri", description: "Akses slip gaji milik sendiri" },
+      { id: "payroll.view_company", label: "Lihat Gaji PT Tertentu", description: "Lihat gaji karyawan untuk PT yang dipilih di bawah (bukan seluruh perusahaan)" },
       { id: "payroll.view_all", label: "Lihat Semua Payroll", description: "Lihat data gaji seluruh karyawan" },
       { id: "payroll.manage", label: "Kelola Payroll", description: "Hitung dan proses pembayaran gaji" },
     ],
@@ -71,6 +76,14 @@ const AVAILABLE_PERMISSIONS: PermissionGroup[] = [
     items: [
       { id: "bank.view", label: "Lihat Rekening", description: "Lihat data rekening bank" },
       { id: "bank.manage", label: "Kelola Rekening", description: "Tambah dan edit rekening bank" },
+      { id: "bank.daily_input", label: "Isi Saldo Bank Harian", description: "Isi saldo bank harian di tab Bank halaman Stockist" },
+    ],
+  },
+  {
+    group: "Stockist",
+    items: [
+      { id: "stockist.view", label: "Lihat Stockist (Mata Uang & Kas)", description: "Lihat tab Mata Uang dan Tunai (Kas) di halaman Stockist" },
+      { id: "stockist.manage", label: "Kelola Stockist (Mata Uang & Kas)", description: "Isi dan koreksi saldo Mata Uang dan Kas harian" },
     ],
   },
   {
@@ -93,9 +106,9 @@ const AVAILABLE_PERMISSIONS: PermissionGroup[] = [
   },
 ];
 
-const emptyForm = { name: "", description: "", permissions: [] as string[] };
+const emptyForm = { name: "", description: "", permissions: [] as string[], payrollCompanyIds: [] as string[] };
 
-export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
+export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -109,6 +122,7 @@ export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
         name: role.name,
         description: role.description ?? "",
         permissions: role.permissions,
+        payrollCompanyIds: role.payrollCompanyIds ?? [],
       });
     } else if (open && !role) {
       setForm(emptyForm);
@@ -123,6 +137,15 @@ export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
       permissions: f.permissions.includes(id)
         ? f.permissions.filter((p) => p !== id)
         : [...f.permissions, id],
+    }));
+  };
+
+  const togglePayrollCompany = (id: string) => {
+    setForm((f) => ({
+      ...f,
+      payrollCompanyIds: f.payrollCompanyIds.includes(id)
+        ? f.payrollCompanyIds.filter((c) => c !== id)
+        : [...f.payrollCompanyIds, id],
     }));
   };
 
@@ -143,6 +166,7 @@ export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
           description: form.description || undefined,
           companyId: currentCompanyId || null,
           permissions: form.permissions,
+          payrollCompanyIds: form.payrollCompanyIds,
         }),
       });
       const data = await res.json();
@@ -248,6 +272,36 @@ export function RoleSheet({ role, trigger, currentCompanyId }: Props) {
           ))}
         </div>
       </FormSection>
+
+      {form.permissions.includes("payroll.view_company") && (
+        <FormSection title="Akses Gaji Lintas PT" icon={<CheckCircle2 className="w-3.5 h-3.5" />}>
+          <p className="text-[11px] text-slate-500 leading-relaxed mb-2 pl-1">
+            Pilih PT yang gajinya boleh dilihat oleh role ini. Jika tidak ada yang dipilih, defaultnya hanya PT role ini sendiri.
+          </p>
+          <div className="grid gap-2">
+            {companies.map((c) => {
+              const isSelected = form.payrollCompanyIds.includes(c.id);
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => togglePayrollCompany(c.id)}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer group",
+                    isSelected
+                      ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
+                      : "bg-white/50 border-slate-200/60 hover:border-primary/20 hover:bg-slate-50"
+                  )}
+                >
+                  {isSelected ? <CheckCircle2 className="w-4 h-4 text-primary" /> : <Circle className="w-4 h-4 text-slate-300 group-hover:text-slate-400" />}
+                  <span className={cn("text-[13px] font-bold", isSelected ? "text-slate-900" : "text-slate-600")}>
+                    {c.name} ({c.code})
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </FormSection>
+      )}
     </AdminFormSidebar>
   );
 }

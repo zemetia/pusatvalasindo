@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { payrollService } from "@/backend/services/payroll.service";
+import { payrollService, assertPayrollAccess } from "@/backend/services/payroll.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { getAdminCaller } from "@/backend/helpers/get-admin-caller";
+import prisma from "@/lib/prisma";
 
 const calculateSchema = z.object({
   employeeId: z.string().min(1),
@@ -21,6 +22,13 @@ export const POST = withValidation(calculateSchema)(
       if (caller instanceof NextResponse) return caller;
 
       const { employeeId, month, year } = ctx.body;
+
+      const target = await prisma.user.findUnique({
+        where: { id: employeeId },
+        select: { companyId: true },
+      });
+      assertPayrollAccess(caller, employeeId, target?.companyId ?? null);
+
       const result = await payrollService.calculateMonthlyPayroll(
         employeeId,
         month,

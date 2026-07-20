@@ -8,12 +8,15 @@ import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { RoleSheet, RoleRow } from "./role-sheet";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 
+type CompanyOption = { id: string; name: string; code: string };
+
 interface Props {
   role: RoleRow;
   currentCompanyId?: string;
+  companies?: CompanyOption[];
 }
 
-export function RoleActions({ role, currentCompanyId }: Props) {
+export function RoleActions({ role, currentCompanyId, companies }: Props) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
@@ -38,6 +41,7 @@ export function RoleActions({ role, currentCompanyId }: Props) {
       <RoleSheet
         role={role}
         currentCompanyId={currentCompanyId}
+        companies={companies}
         trigger={
           <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/5 hover:text-primary transition-colors">
             <IconPencil className="size-4" />

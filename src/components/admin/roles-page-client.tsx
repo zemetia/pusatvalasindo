@@ -76,7 +76,7 @@ export function RolesPageClient({ companies, roles }: Props) {
             )}
           </TabsList>
 
-          <RoleSheet currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined} />
+          <RoleSheet currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined} companies={companies} />
         </div>
 
         {companies.map((c) => {
@@ -84,14 +84,14 @@ export function RolesPageClient({ companies, roles }: Props) {
 
           return (
             <TabsContent key={c.id} value={c.id} className="mt-0 focus-visible:outline-none">
-              <RoleTable roles={companyRoles} currentCompanyId={c.id} emptyText={`Belum ada custom role untuk ${c.name}`} />
+              <RoleTable roles={companyRoles} currentCompanyId={c.id} companies={companies} emptyText={`Belum ada custom role untuk ${c.name}`} />
             </TabsContent>
           );
         })}
 
         {unassignedRoles.length > 0 && (
           <TabsContent value="unassigned" className="mt-0 focus-visible:outline-none">
-            <RoleTable roles={unassignedRoles} currentCompanyId={undefined} emptyText="Belum ada role sistem/global" />
+            <RoleTable roles={unassignedRoles} currentCompanyId={undefined} companies={companies} emptyText="Belum ada role sistem/global" />
           </TabsContent>
         )}
       </Tabs>
@@ -99,7 +99,7 @@ export function RolesPageClient({ companies, roles }: Props) {
   );
 }
 
-function RoleTable({ roles, currentCompanyId, emptyText }: { roles: RoleWithCount[], currentCompanyId?: string, emptyText: string }) {
+function RoleTable({ roles, currentCompanyId, companies, emptyText }: { roles: RoleWithCount[], currentCompanyId?: string, companies: Company[], emptyText: string }) {
   const [search, setSearch] = useState("");
 
   const filtered = search
@@ -200,6 +200,7 @@ function RoleTable({ roles, currentCompanyId, emptyText }: { roles: RoleWithCoun
                         <RoleActions
                           role={role}
                           currentCompanyId={currentCompanyId}
+                          companies={companies}
                         />
                       </div>
                     </TableCell>

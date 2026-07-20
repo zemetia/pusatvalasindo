@@ -7,6 +7,9 @@ export const userService = {
   getByBranch: (branchId: string, onlyActive = false) =>
     userRepository.findByBranch(branchId, onlyActive),
 
+  getByCompany: (companyId: string, onlyActive = false) =>
+    userRepository.findByCompany(companyId, onlyActive),
+
   getById: async (id: string) => {
     const user = await userRepository.findById(id);
     if (!user) throw new NotFoundError("User not found");

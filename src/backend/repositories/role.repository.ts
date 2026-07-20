@@ -5,6 +5,7 @@ export type CreateRoleInput = {
   description?: string;
   companyId?: string | null;
   permissions: string[];
+  payrollCompanyIds?: string[];
 };
 
 export type UpdateRoleInput = Partial<CreateRoleInput>;

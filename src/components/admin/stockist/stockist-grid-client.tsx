@@ -84,8 +84,8 @@ function stateLabel(state: CellState) {
   if (state === "BENAR") return "Benar"
   if (state === "BEDA") return "Beda"
   if (state === "BELUM_REVIEW") return "Klik untuk review"
-  if (state === "filled_today") return "Klik untuk ubah"
-  if (state === "empty_fillable") return "Klik untuk isi"
+  if (state === "filled_today") return "Tersimpan"
+  if (state === "empty_fillable") return "Belum diisi"
   return "Tidak diisi"
 }
 
@@ -289,10 +289,6 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     ? currencies.find((c) => c.id === activeCell.companyStockItemId)
     : undefined
   const activeKey = activeCell ? `${activeCell.pocketId}:${activeCell.companyStockItemId}` : null
-  const activeState = activeCell ? cellState(checks[activeKey!], isToday) : undefined
-  const activeIsFillable = activeState === "empty_fillable" || activeState === "filled_today"
-  const activeIsReviewable =
-    activeState === "BELUM_REVIEW" || activeState === "BENAR" || activeState === "BEDA"
 
   if (loading && currencies.length === 0) {
     return <p className="text-sm text-muted-foreground">Memuat data...</p>
@@ -368,7 +364,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
       </div>
 
       <div className="rounded-md border max-h-[65vh] overflow-auto">
-        <Table>
+        <Table containerClassName="overflow-visible">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead className="sticky left-0 top-0 z-30 bg-background border-r">
@@ -438,9 +434,23 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                   const check = checks[key]
                   const state = cellState(check, isToday)
                   const qty = check?.enteredQuantity ?? null
-                  const clickable = canManage && state !== "not_filled"
+                  const isFillable = state === "empty_fillable" || state === "filled_today"
+                  const clickable = canManage && !isFillable && state !== "not_filled"
                   const isActive =
                     activeCell?.pocketId === p.id && activeCell?.companyStockItemId === cur.id
+
+                  if (canManage && isFillable) {
+                    return (
+                      <TableCell key={p.id} className="p-0 min-w-[104px]">
+                        <InlineFillCell
+                          quantity={qty}
+                          silver={isLogam}
+                          state={state}
+                          onSave={(quantity) => fillCell(p.id, cur.id, quantity)}
+                        />
+                      </TableCell>
+                    )
+                  }
 
                   const cellInner = (
                     <button
@@ -476,26 +486,17 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                         >
                           <PopoverTrigger asChild>{cellInner}</PopoverTrigger>
                           <PopoverContent align="center" className="w-72">
-                            {state === "empty_fillable" || state === "filled_today" ? (
-                              <FillCellForm
-                                pocketName={p.name}
-                                currencyCode={cur.code ?? cur.name}
-                                initialQuantity={qty ?? undefined}
-                                onSubmit={(quantity) => fillCell(p.id, cur.id, quantity)}
-                              />
-                            ) : (
-                              <CellActionForm
-                                pocketName={p.name}
-                                currencyCode={cur.code ?? cur.name}
-                                qty={qty ?? 0}
-                                status={check?.status ?? "BELUM_REVIEW"}
-                                note={check?.note ?? null}
-                                onBenar={() => markCheck(p.id, cur.id, "BENAR")}
-                                onBeda={(note, corrected) =>
-                                  markCheck(p.id, cur.id, "BEDA", note, corrected)
-                                }
-                              />
-                            )}
+                            <CellActionForm
+                              pocketName={p.name}
+                              currencyCode={cur.code ?? cur.name}
+                              qty={qty ?? 0}
+                              status={check?.status ?? "BELUM_REVIEW"}
+                              note={check?.note ?? null}
+                              onBenar={() => markCheck(p.id, cur.id, "BENAR")}
+                              onBeda={(note, corrected) =>
+                                markCheck(p.id, cur.id, "BEDA", note, corrected)
+                              }
+                            />
                           </PopoverContent>
                         </Popover>
                       )}
@@ -518,35 +519,23 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                   <DrawerTitle>
                     {activeCurrency.code ?? activeCurrency.name} — {activePocket.name}
                   </DrawerTitle>
-                  {activeIsReviewable && (
-                    <DrawerDescription>
-                      Diisi: {fmt(checks[activeKey]?.enteredQuantity ?? 0)}
-                    </DrawerDescription>
-                  )}
+                  <DrawerDescription>
+                    Diisi: {fmt(checks[activeKey]?.enteredQuantity ?? 0)}
+                  </DrawerDescription>
                 </DrawerHeader>
                 <div className="px-4 pb-6">
-                  {activeIsFillable ? (
-                    <FillCellForm
-                      pocketName={activePocket.name}
-                      currencyCode={activeCurrency.code ?? activeCurrency.name}
-                      initialQuantity={checks[activeKey]?.enteredQuantity ?? undefined}
-                      onSubmit={(quantity) => fillCell(activeCell.pocketId, activeCell.companyStockItemId, quantity)}
-                      hideHeader
-                    />
-                  ) : (
-                    <CellActionForm
-                      pocketName={activePocket.name}
-                      currencyCode={activeCurrency.code ?? activeCurrency.name}
-                      qty={checks[activeKey]?.enteredQuantity ?? 0}
-                      status={checks[activeKey]?.status ?? "BELUM_REVIEW"}
-                      note={checks[activeKey]?.note ?? null}
-                      onBenar={() => markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BENAR")}
-                      onBeda={(note, corrected) =>
-                        markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BEDA", note, corrected)
-                      }
-                      hideHeader
-                    />
-                  )}
+                  <CellActionForm
+                    pocketName={activePocket.name}
+                    currencyCode={activeCurrency.code ?? activeCurrency.name}
+                    qty={checks[activeKey]?.enteredQuantity ?? 0}
+                    status={checks[activeKey]?.status ?? "BELUM_REVIEW"}
+                    note={checks[activeKey]?.note ?? null}
+                    onBenar={() => markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BENAR")}
+                    onBeda={(note, corrected) =>
+                      markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BEDA", note, corrected)
+                    }
+                    hideHeader
+                  />
                 </div>
               </>
             )}
@@ -557,61 +546,76 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
   )
 }
 
-function FillCellForm({
-  pocketName,
-  currencyCode,
-  initialQuantity,
-  onSubmit,
-  hideHeader,
+// Sel opname yang bisa diisi langsung diedit di tempat (bukan lewat popover/tombol Simpan) —
+// autosave saat blur atau Enter. `skipBlurRef` mencegah Escape ikut memicu commit karena blur()
+// terpanggil sinkron sebelum React sempat merender ulang `draft` yang sudah direvert.
+function InlineFillCell({
+  quantity,
+  silver,
+  state,
+  onSave,
 }: {
-  pocketName: string
-  currencyCode: string
-  initialQuantity?: number
-  onSubmit: (quantity: number) => Promise<unknown> | void
-  hideHeader?: boolean
+  quantity: number | null
+  silver?: boolean
+  state: CellState
+  onSave: (quantity: number) => Promise<unknown>
 }) {
-  const isEdit = initialQuantity !== undefined
-  const [draft, setDraft] = useState<number | undefined>(initialQuantity)
-  const [submitting, setSubmitting] = useState(false)
+  const [draft, setDraft] = useState<number | undefined>(quantity ?? undefined)
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
+  const skipBlurRef = useRef(false)
+  const committedRef = useRef(quantity)
 
-  const submit = async () => {
-    if (draft === undefined) {
-      toast.error("Jumlah opname wajib diisi")
+  useEffect(() => {
+    committedRef.current = quantity
+    setDraft(quantity ?? undefined)
+  }, [quantity])
+
+  const commit = useCallback(async () => {
+    if (skipBlurRef.current) {
+      skipBlurRef.current = false
       return
     }
-    setSubmitting(true)
-    await onSubmit(draft)
-    setSubmitting(false)
-  }
+    if (savingRef.current) return
+    if (draft === undefined || draft === committedRef.current) {
+      setDraft(committedRef.current ?? undefined)
+      return
+    }
+    savingRef.current = true
+    setSaving(true)
+    const ok = await onSave(draft)
+    savingRef.current = false
+    setSaving(false)
+    if (!ok) setDraft(committedRef.current ?? undefined)
+  }, [draft, onSave])
 
   return (
-    <div className="flex flex-col gap-3">
-      {!hideHeader && (
-        <div>
-          <p className="text-sm font-medium">
-            {currencyCode} — {pocketName}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {isEdit ? "Sudah diisi hari ini — masih bisa diubah" : "Belum diisi hari ini"}
-          </p>
-        </div>
-      )}
-      <div className="grid gap-1">
-        <label className="text-[10px] uppercase text-muted-foreground font-medium">
-          Jumlah opname
-        </label>
-        <NumberInput
-          autoFocus
-          value={draft}
-          onValueChange={setDraft}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          className="font-mono text-right"
-        />
+    <div className={cn("w-full h-full", stateBg(state, silver))}>
+      <NumberInput
+        value={draft}
+        onValueChange={setDraft}
+        onBlur={commit}
+        disabled={saving}
+        placeholder="—"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.currentTarget.blur()
+          } else if (e.key === "Escape") {
+            skipBlurRef.current = true
+            setDraft(committedRef.current ?? undefined)
+            e.currentTarget.blur()
+          }
+        }}
+        className="h-auto border-0 rounded-none bg-transparent shadow-none px-2 py-2 text-right font-mono text-sm focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
+      />
+      <div
+        className={cn(
+          "px-2 pb-1.5 text-[10px] font-sans",
+          saving ? "text-muted-foreground" : stateText(state)
+        )}
+      >
+        {saving ? "Menyimpan…" : stateLabel(state)}
       </div>
-      <Button size="sm" disabled={submitting} onClick={submit}>
-        {submitting ? <IconLoader2 className="size-4 animate-spin" /> : <IconCheck className="size-4" />}
-        Simpan
-      </Button>
     </div>
   )
 }

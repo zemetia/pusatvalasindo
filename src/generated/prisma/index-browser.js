@@ -174,6 +174,7 @@ exports.Prisma.Custom_roleScalarFieldEnum = {
   description: 'description',
   companyId: 'companyId',
   permissions: 'permissions',
+  payrollCompanyIds: 'payrollCompanyIds',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -239,7 +240,6 @@ exports.Prisma.DailyBankEntryScalarFieldEnum = {
   bankAccountId: 'bankAccountId',
   date: 'date',
   balance: 'balance',
-  tarikCek: 'tarikCek',
   note: 'note',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
@@ -557,6 +557,40 @@ exports.Prisma.KasDailyEntryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StockistHeadConfirmationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  companyStockItemId: 'companyStockItemId',
+  date: 'date',
+  confirmedQuantity: 'confirmedQuantity',
+  confirmedIdrValue: 'confirmedIdrValue',
+  note: 'note',
+  confirmedBy: 'confirmedBy',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.KasHeadConfirmationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  date: 'date',
+  confirmedIdrValue: 'confirmedIdrValue',
+  note: 'note',
+  confirmedBy: 'confirmedBy',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CompanyHeadConfirmationTotalScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  date: 'date',
+  totalIdr: 'totalIdr',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -729,7 +763,10 @@ exports.Prisma.ModelName = {
   StockistMutation: 'StockistMutation',
   StockistDailyCheck: 'StockistDailyCheck',
   KasPocket: 'KasPocket',
-  KasDailyEntry: 'KasDailyEntry'
+  KasDailyEntry: 'KasDailyEntry',
+  StockistHeadConfirmation: 'StockistHeadConfirmation',
+  KasHeadConfirmation: 'KasHeadConfirmation',
+  CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal'
 };
 
 /**

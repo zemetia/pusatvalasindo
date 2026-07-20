@@ -2,18 +2,33 @@ import prisma from "@/lib/prisma";
 import { RolesPageClient } from "@/components/admin/roles-page-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconShieldLock } from "@tabler/icons-react";
+import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { can, PERMISSIONS } from "@/lib/permissions";
+import { redirect } from "next/navigation";
 
 export default async function RolesPage() {
+  const caller = await getCaller();
+  if (!caller || !can(caller.permissions, PERMISSIONS.ROLES_VIEW)) {
+    redirect("/dashboard");
+  }
+
+  const SYSTEM_ROLES = ["SUPER_ADMIN", "OWNER"];
+  const scopedCompanyId = SYSTEM_ROLES.includes(caller.roleName.toUpperCase())
+    ? undefined
+    : caller.companyId;
+
   let result;
   try {
     result = await Promise.all([
       prisma.custom_role.findMany({
+        where: scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : undefined,
         orderBy: { name: "asc" },
         include: {
           _count: { select: { users: true } },
         },
       }),
       prisma.company.findMany({
+        where: scopedCompanyId ? { id: scopedCompanyId } : undefined,
         orderBy: { name: "asc" },
       }),
     ]);

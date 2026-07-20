@@ -20,21 +20,24 @@ model Branch {
 }
 
 model Company {
-  id                String             @id @default(cuid())
-  name              String             @unique
-  code              String             @unique
-  isActive          Boolean            @default(true)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  bonusMatrices     BonusMatrix[]
-  branches          Branch[]
-  roleKpis          RoleKpi[]
-  custom_roles      custom_role[]
-  users             user[]
-  stockistPockets   StockistPocket[]
-  kasPockets        KasPocket[]
-  companyStockItems CompanyStockItem[]
-  bankAccounts      BankAccount[]
+  id                        String                         @id @default(cuid())
+  name                      String                         @unique
+  code                      String                         @unique
+  isActive                  Boolean                        @default(true)
+  createdAt                 DateTime                       @default(now())
+  updatedAt                 DateTime                       @updatedAt
+  bonusMatrices             BonusMatrix[]
+  branches                  Branch[]
+  roleKpis                  RoleKpi[]
+  custom_roles              custom_role[]
+  users                     user[]
+  stockistPockets           StockistPocket[]
+  kasPockets                KasPocket[]
+  companyStockItems         CompanyStockItem[]
+  bankAccounts              BankAccount[]
+  stockistHeadConfirmations StockistHeadConfirmation[]
+  kasHeadConfirmations      KasHeadConfirmation[]
+  headConfirmationTotals    CompanyHeadConfirmationTotal[]
 }
 
 model Currency {

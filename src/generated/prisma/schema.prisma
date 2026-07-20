@@ -70,17 +70,18 @@ model session {
 }
 
 model custom_role {
-  id            String        @id @default(cuid())
-  name          String
-  description   String?
-  companyId     String?
-  permissions   String[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  bonusMatrices BonusMatrix[]
-  roleKpis      RoleKpi[]
-  company       Company?      @relation(fields: [companyId], references: [id])
-  users         user[]
+  id                String        @id @default(cuid())
+  name              String
+  description       String?
+  companyId         String?
+  permissions       String[]
+  payrollCompanyIds String[]      @default([])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  bonusMatrices     BonusMatrix[]
+  roleKpis          RoleKpi[]
+  company           Company?      @relation(fields: [companyId], references: [id])
+  users             user[]
 
   @@unique([name, companyId])
 }
@@ -169,7 +170,6 @@ model DailyBankEntry {
   bankAccountId String
   date          DateTime    @db.Date
   balance       Decimal     @default(0)
-  tarikCek      Decimal     @default(0)
   note          String?
   createdBy     String?
   createdAt     DateTime    @default(now())
@@ -207,21 +207,24 @@ model Branch {
 }
 
 model Company {
-  id                String             @id @default(cuid())
-  name              String             @unique
-  code              String             @unique
-  isActive          Boolean            @default(true)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  bonusMatrices     BonusMatrix[]
-  branches          Branch[]
-  roleKpis          RoleKpi[]
-  custom_roles      custom_role[]
-  users             user[]
-  stockistPockets   StockistPocket[]
-  kasPockets        KasPocket[]
-  companyStockItems CompanyStockItem[]
-  bankAccounts      BankAccount[]
+  id                        String                         @id @default(cuid())
+  name                      String                         @unique
+  code                      String                         @unique
+  isActive                  Boolean                        @default(true)
+  createdAt                 DateTime                       @default(now())
+  updatedAt                 DateTime                       @updatedAt
+  bonusMatrices             BonusMatrix[]
+  branches                  Branch[]
+  roleKpis                  RoleKpi[]
+  custom_roles              custom_role[]
+  users                     user[]
+  stockistPockets           StockistPocket[]
+  kasPockets                KasPocket[]
+  companyStockItems         CompanyStockItem[]
+  bankAccounts              BankAccount[]
+  stockistHeadConfirmations StockistHeadConfirmation[]
+  kasHeadConfirmations      KasHeadConfirmation[]
+  headConfirmationTotals    CompanyHeadConfirmationTotal[]
 }
 
 model Currency {
@@ -253,9 +256,10 @@ model CompanyStockItem {
 
   company Company @relation(fields: [companyId], references: [id])
 
-  stockistBalances    StockistBalance[]
-  stockistMutations   StockistMutation[]
-  stockistDailyChecks StockistDailyCheck[]
+  stockistBalances          StockistBalance[]
+  stockistMutations         StockistMutation[]
+  stockistDailyChecks       StockistDailyCheck[]
+  stockistHeadConfirmations StockistHeadConfirmation[]
 
   @@unique([companyId, name])
   @@index([companyId])
@@ -745,4 +749,56 @@ model KasDailyEntry {
 
   @@unique([kasPocketId, date])
   @@index([kasPocketId, date])
+}
+
+// Bagian 4 — Konfirmasi Kepala Cabang: hitung ulang manual kepala cabang atas total
+// stock (per item) dan total kas (gabungan), dibandingkan dengan total sistem hasil
+// input teller dalam. Hanya kepala cabang yang bisa mengisi/melihat nilai IDR di sini.
+model StockistHeadConfirmation {
+  id                 String    @id @default(cuid())
+  companyId          String
+  companyStockItemId String
+  date               DateTime  @db.Date
+  confirmedQuantity  Decimal // total stock asli hasil hitung ulang kepala cabang
+  confirmedIdrValue  Decimal // total dalam IDR hasil hitung ulang kepala cabang
+  note               String?
+  confirmedBy        String?
+  confirmedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  company          Company          @relation(fields: [companyId], references: [id])
+  companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
+
+  @@unique([companyId, companyStockItemId, date])
+  @@index([companyId, date])
+}
+
+model KasHeadConfirmation {
+  id                String    @id @default(cuid())
+  companyId         String
+  date              DateTime  @db.Date
+  confirmedIdrValue Decimal
+  note              String?
+  confirmedBy       String?
+  confirmedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, date])
+  @@index([companyId, date])
+}
+
+model CompanyHeadConfirmationTotal {
+  id        String   @id @default(cuid())
+  companyId String
+  date      DateTime @db.Date
+  totalIdr  Decimal // sum(StockistHeadConfirmation.confirmedIdrValue) + KasHeadConfirmation.confirmedIdrValue, hari itu
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, date])
 }

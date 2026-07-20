@@ -46,9 +46,9 @@ export function AdminFormSidebar({
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent
         className={cn(
-          "w-[480px] max-w-[100vw] p-0 flex flex-col overflow-hidden",
+          "w-full max-w-[100vw] sm:w-[640px] sm:max-w-[85vw] lg:w-[760px] xl:w-[860px] p-0 flex flex-col overflow-hidden",
           "bg-white dark:bg-[#0f0f17]",
-          "border-l border-zinc-200 dark:border-zinc-800",
+          "border-l-0 sm:border-l border-zinc-200 dark:border-zinc-800",
           "[&>button]:hidden",
           className
         )}

@@ -2,12 +2,31 @@ import prisma from "@/lib/prisma";
 import { PayrollPageClient } from "@/components/admin/payroll/payroll-page-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconCoin } from "@tabler/icons-react";
+import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { can, PERMISSIONS } from "@/lib/permissions";
+import { redirect } from "next/navigation";
+import type { Prisma } from "@src/generated/prisma/client";
 
 export default async function PayrollPage() {
+  const caller = await getCaller();
+  if (!caller) redirect("/login");
+
+  let where: Prisma.userWhereInput;
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL)) {
+    where = { customRoleId: { not: null } };
+  } else if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
+    const allowedCompanyIds = caller.payrollCompanyIds.length > 0 ? caller.payrollCompanyIds : [caller.companyId ?? ""];
+    where = { customRoleId: { not: null }, companyId: { in: allowedCompanyIds } };
+  } else if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN)) {
+    where = { id: caller.id };
+  } else {
+    redirect("/dashboard");
+  }
+
   let users;
   try {
     users = await prisma.user.findMany({
-      where: { customRoleId: { not: null } },
+      where,
       include: {
         branch: { select: { name: true } },
         customRole: { select: { name: true } },

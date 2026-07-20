@@ -24,8 +24,8 @@ const HEADER_FONT = "FFFFFFFF";
 const THIN_BORDER = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
 
 // GET /api/stockist/export?companyId=&date=YYYY-MM-DD
-// Satu file Excel, 3 sheet: Stock (Mata Uang), Kas (Tunai), Bank — snapshot untuk tanggal terpilih.
-// Stock, Kas, dan Bank semuanya milik 1 PT (dipakai bersama semua cabang di PT itu).
+// Satu file Excel, 2 sheet: Stock (Mata Uang) & Kas (Tunai) — snapshot untuk tanggal terpilih.
+// Bank di-export terpisah lewat /api/bank-harian/export (halaman Bank berdiri sendiri).
 export async function GET(req: NextRequest) {
   try {
     const caller = await requirePermission(PERMISSIONS.STOCKIST_VIEW);
@@ -50,25 +50,6 @@ export async function GET(req: NextRequest) {
       kasDailyEntryRepository.findByCompanyAndDate(companyId, date),
       kasDailyEntryRepository.findLatestBeforeDate(companyId, date),
     ]);
-
-    const canViewBank = caller.permissions.includes(PERMISSIONS.BANK_VIEW);
-    const [bankAccounts, bankEntries, bankPrevious] = canViewBank
-      ? await Promise.all([
-          prisma.bankAccount.findMany({
-            where: { companyId, isActive: true },
-            include: { currency: true },
-            orderBy: [{ bankName: "asc" }],
-          }),
-          prisma.dailyBankEntry.findMany({
-            where: { bankAccount: { companyId }, date },
-          }),
-          prisma.dailyBankEntry.findMany({
-            where: { bankAccount: { companyId }, date: { lt: date } },
-            orderBy: [{ bankAccountId: "asc" }, { date: "desc" }],
-            distinct: ["bankAccountId"],
-          }),
-        ])
-      : [[], [], []];
 
     const wb = new ExcelJS.Workbook();
     wb.creator = "Pusat Kirim Duit";
@@ -186,45 +167,9 @@ export async function GET(req: NextRequest) {
       styleDataRow(row, ["kemarin", "hariIni", "delta"]);
     }
 
-    // --- Sheet 3: Bank (rekening PT ini) ---
-    if (canViewBank) {
-      const bankEntryMap = new Map(bankEntries.map((e) => [e.bankAccountId, e]));
-      const bankPrevMap = new Map(bankPrevious.map((e) => [e.bankAccountId, e]));
-      const bankSheet = wb.addWorksheet("Bank", { views: [{ state: "frozen", ySplit: 1 }] });
-      bankSheet.columns = [
-        { header: "Bank", key: "bank", width: 16 },
-        { header: "No Rekening", key: "noRek", width: 20 },
-        { header: "Nama Rekening", key: "namaRek", width: 22 },
-        { header: "Mata Uang", key: "mataUang", width: 12 },
-        { header: "Saldo Kemarin", key: "kemarin", width: 18 },
-        { header: "Saldo Hari Ini", key: "hariIni", width: 18 },
-        { header: "Tarik Cek", key: "tarikCek", width: 14 },
-        { header: "Catatan", key: "catatan", width: 30 },
-      ];
-      styleHeaderRow(bankSheet.getRow(1));
-
-      for (const a of bankAccounts) {
-        const entry = bankEntryMap.get(a.id);
-        const prev = bankPrevMap.get(a.id);
-        const saldoHariIni = entry ? Number(entry.balance) : Number(a.balance);
-        const saldoKemarin = prev ? Number(prev.balance) : 0;
-        const row = bankSheet.addRow({
-          bank: a.bankName,
-          noRek: a.accountNumber ?? "",
-          namaRek: a.accountName,
-          mataUang: a.currency.code,
-          kemarin: saldoKemarin,
-          hariIni: saldoHariIni,
-          tarikCek: entry ? Number(entry.tarikCek) : 0,
-          catatan: entry?.note ?? "",
-        });
-        styleDataRow(row, ["kemarin", "hariIni", "tarikCek"]);
-      }
-    }
-
     const buffer = await wb.xlsx.writeBuffer();
     const companyName = (company?.name ?? "pt").replace(/[^a-zA-Z0-9]+/g, "-");
-    const filename = `export-stock-kas-bank-${companyName}-${dateStr}.xlsx`;
+    const filename = `export-stock-kas-${companyName}-${dateStr}.xlsx`;
 
     return new NextResponse(new Uint8Array(buffer), {
       headers: {

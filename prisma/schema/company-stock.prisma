@@ -14,9 +14,10 @@ model CompanyStockItem {
 
   company Company @relation(fields: [companyId], references: [id])
 
-  stockistBalances    StockistBalance[]
-  stockistMutations   StockistMutation[]
-  stockistDailyChecks StockistDailyCheck[]
+  stockistBalances          StockistBalance[]
+  stockistMutations         StockistMutation[]
+  stockistDailyChecks       StockistDailyCheck[]
+  stockistHeadConfirmations StockistHeadConfirmation[]
 
   @@unique([companyId, name])
   @@index([companyId])

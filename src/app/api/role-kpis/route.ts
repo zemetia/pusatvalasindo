@@ -4,6 +4,9 @@ import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
+import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { assertCompanyAccess } from "@/backend/services/stockist.service";
+import { PERMISSIONS } from "@/lib/permissions";
 
 const createSchema = z.object({
   companyId: z.string().min(1),
@@ -18,9 +21,17 @@ const createSchema = z.object({
 type CreateBody = z.infer<typeof createSchema>;
 
 export async function GET(req: NextRequest) {
+  const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+  if (caller instanceof NextResponse) return caller;
+
   try {
-    const companyId = req.nextUrl.searchParams.get("companyId");
+    const requestedCompanyId = req.nextUrl.searchParams.get("companyId");
     const customRoleId = req.nextUrl.searchParams.get("customRoleId");
+    // Company-scoped callers can't request another PT's KPI config, and
+    // can't omit companyId to see every PT's config either.
+    const companyId = requestedCompanyId ?? caller.companyId;
+
+    if (companyId) assertCompanyAccess(caller, companyId);
 
     if (companyId && customRoleId) {
       return NextResponse.json(
@@ -28,7 +39,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(ok(await kpiService.getAllRoleKpis()));
+    const all = await kpiService.getAllRoleKpis();
+    const scoped = companyId ? all.filter((rk) => rk.companyId === companyId) : all;
+    return NextResponse.json(ok(scoped));
   } catch (e) {
     return handleError(e);
   }
@@ -36,7 +49,11 @@ export async function GET(req: NextRequest) {
 
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
+    const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+    if (caller instanceof NextResponse) return caller;
+
     try {
+      assertCompanyAccess(caller, ctx.body.companyId);
       const roleKpi = await kpiService.createRoleKpi(ctx.body);
       return NextResponse.json(
         ok(roleKpi, "Konfigurasi KPI jabatan berhasil ditambahkan"),

@@ -53,6 +53,7 @@ Every view is designed to be LLM-friendly:
 - **`COALESCE`** applied to all nullable text/numeric — no unexpected NULLs in output
 - All monetary values are in **IDR** unless a `currency_code` column is present
 - **`year`** and **`month`** as integers on all time-series views for easy filtering
+- **Employee company resolution has a branch fallback** — every employee-based view (`hv_employees`, `hv_attendance`, `hv_attendance_monthly`, `hv_kpi_logs`, `hv_kpi_monthly`, `hv_revenue`, `hv_revenue_monthly`, `hv_payroll_monthly`) resolves `company_id`/`company_name`/`company_code` via `COALESCE(employee.companyId, branch.companyId)`, so an employee with no `companyId` of their own still shows up under their branch's company instead of appearing blank or being silently dropped from aggregates
 
 ---
 
@@ -182,7 +183,7 @@ id, bank_account_id, bank_name, account_name,
 company_id, company_name, company_code,
 currency_code, currency_symbol,
 date, year, month, period_label,
-balance, tarik_cek, note, created_by, created_at
+balance, note, created_by, created_at
 ```
 
 ### `hv_bank_mutations`
@@ -419,3 +420,4 @@ ORDER BY company_name, employee_name;
 - **`is_total_pocket = true`** in `hv_stockist_pockets` marks the app's auto-computed "Total" row — it never has balances or mutations of its own; use `hv_stockist_stock_by_company` for the aggregate instead.
 - **Stockist mutation types:** `OPENING`, `TOP_UP`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `ADJUSTMENT`
 - **Stockist daily-check status:** `BELUM_REVIEW` (belum direview), `BEDA` (selisih), `BENAR` (cocok)
+- **Employee `company_id` fallback:** if an employee row has no `companyId` set directly, the employee-based views fall back to their branch's `companyId`. This means `company_id` can differ from the raw `"user"."companyId"` column in the source table — always trust the view's `company_id`/`company_name`, not the raw table.

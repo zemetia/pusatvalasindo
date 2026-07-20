@@ -30,17 +30,18 @@ model session {
 }
 
 model custom_role {
-  id            String        @id @default(cuid())
-  name          String
-  description   String?
-  companyId     String?
-  permissions   String[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  bonusMatrices BonusMatrix[]
-  roleKpis      RoleKpi[]
-  company       Company?      @relation(fields: [companyId], references: [id])
-  users         user[]
+  id                String        @id @default(cuid())
+  name              String
+  description       String?
+  companyId         String?
+  permissions       String[]
+  payrollCompanyIds String[]      @default([])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  bonusMatrices     BonusMatrix[]
+  roleKpis          RoleKpi[]
+  company           Company?      @relation(fields: [companyId], references: [id])
+  users             user[]
 
   @@unique([name, companyId])
 }

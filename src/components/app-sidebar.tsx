@@ -18,6 +18,7 @@ import {
   IconFingerprint,
   IconPencil,
   IconWallet,
+  IconClipboardCheck,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -127,9 +128,25 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
 
   if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
     navStock.push({
-      title: "Stockist",
+      title: "Stock & Kas",
       url: "/dashboard/stockist",
       icon: IconWallet,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+    navStock.push({
+      title: "Saldo Bank Harian",
+      url: "/dashboard/stockist/bank",
+      icon: IconBuildingBank,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.STOCKIST_VERIFY)) {
+    navStock.push({
+      title: "Cross-Check Stock",
+      url: "/dashboard/stockist/konfirmasi",
+      icon: IconClipboardCheck,
     });
   }
 

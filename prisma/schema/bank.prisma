@@ -38,7 +38,6 @@ model DailyBankEntry {
   bankAccountId String
   date          DateTime    @db.Date
   balance       Decimal     @default(0)
-  tarikCek      Decimal     @default(0)
   note          String?
   createdBy     String?
   createdAt     DateTime    @default(now())

@@ -1,7 +1,7 @@
 import type { PrismaClient } from '../../src/generated/prisma/client'
 import * as XLSX from 'xlsx'
 import * as path from 'path'
-import { getPermissionsForRole } from '../../src/lib/permissions'
+import { getPermissionsForRole, PERMISSIONS } from '../../src/lib/permissions'
 
 // Setiap perusahaan wajib memiliki seluruh role standar ini,
 // terlepas dari apa yang ada di sheet Excel.
@@ -76,11 +76,21 @@ export async function seedRoles(prisma: PrismaClient, companyIds: Record<string,
     console.log(`  🌱 Roles for ${companyCode} (${roleList.length}): ${roleList.join(', ')}`)
 
     for (const roleName of roleList) {
-      const permissions = getPermissionsForRole(roleName)
+      let permissions = getPermissionsForRole(roleName)
+      let payrollCompanyIds: string[] = []
+
+      // Kepala Cabang PKD is the one exception ko Hoker specified: it can view
+      // payroll for PKD + PVI employees (but never PTU, and never anyone's P&L).
+      // Kepala Cabang PVI/PTU stay at PAYROLL_VIEW_OWN only (from the base map).
+      if (roleName === 'Kepala Cabang' && companyCode === 'PKD' && companyIds.PVI) {
+        permissions = [...permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY]
+        payrollCompanyIds = [companyId, companyIds.PVI]
+      }
+
       await prisma.custom_role.upsert({
         where: { name_companyId: { name: roleName, companyId } },
-        update: { permissions },
-        create: { name: roleName, companyId, permissions },
+        update: { permissions, payrollCompanyIds },
+        create: { name: roleName, companyId, permissions, payrollCompanyIds },
       })
     }
   }

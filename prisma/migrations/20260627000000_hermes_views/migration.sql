@@ -93,7 +93,7 @@ SELECT
   -- Organization
   u."branchId"                                                            AS branch_id,
   COALESCE(b.name, '')                                                    AS branch_name,
-  u."companyId"                                                           AS company_id,
+  COALESCE(u."companyId", b."companyId")                                  AS company_id,
   COALESCE(co.name, '')                                                   AS company_name,
   COALESCE(co.code, '')                                                   AS company_code,
   u."customRoleId"                                                        AS role_id,
@@ -116,7 +116,7 @@ SELECT
   u."createdAt"                                                           AS created_at
 FROM "user" u
 LEFT JOIN "Branch"      b  ON b.id = u."branchId"
-LEFT JOIN "Company"     co ON co.id = u."companyId"
+LEFT JOIN "Company"     co ON co.id = COALESCE(u."companyId", b."companyId")
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
 
 

@@ -14,6 +14,7 @@ export type AdminCaller = {
   branchId: string | null;
   roleName: string;
   permissions: string[];
+  payrollCompanyIds: string[];
 };
 
 type CallerRecord = {
@@ -24,6 +25,7 @@ type CallerRecord = {
   branchId: string | null;
   roleName: string;
   permissions: string[];
+  payrollCompanyIds: string[];
 } | null;
 
 /**
@@ -44,7 +46,7 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
       email: true,
       companyId: true,
       branchId: true,
-      customRole: { select: { name: true, permissions: true } },
+      customRole: { select: { name: true, permissions: true, payrollCompanyIds: true } },
     },
   });
   if (!user) return null;
@@ -57,6 +59,7 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
     branchId: user.branchId,
     roleName: user.customRole?.name ?? "",
     permissions: user.customRole?.permissions ?? [],
+    payrollCompanyIds: user.customRole?.payrollCompanyIds ?? [],
   };
 });
 
@@ -71,7 +74,9 @@ export async function getAdminCaller(): Promise<AdminCaller | NextResponse> {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
-  const roleName = caller.roleName.toUpperCase();
+  // Role names like "Kepala Cabang" uppercase to "KEPALA CABANG" (space), so
+  // normalize spaces to underscores before comparing against ADMIN_ROLES.
+  const roleName = caller.roleName.toUpperCase().replace(/\s+/g, "_");
   if (!roleName || !ADMIN_ROLES.includes(roleName)) {
     return NextResponse.json({ error: "Tidak memiliki izin" }, { status: 403 });
   }
@@ -82,6 +87,7 @@ export async function getAdminCaller(): Promise<AdminCaller | NextResponse> {
     branchId: caller.branchId,
     roleName,
     permissions: caller.permissions,
+    payrollCompanyIds: caller.payrollCompanyIds,
   };
 }
 
@@ -100,6 +106,7 @@ export async function getCaller(): Promise<AdminCaller | null> {
     branchId: caller.branchId,
     roleName: caller.roleName,
     permissions: caller.permissions,
+    payrollCompanyIds: caller.payrollCompanyIds,
   };
 }
 
@@ -125,5 +132,6 @@ export async function requirePermission(
     branchId: caller.branchId,
     roleName: caller.roleName,
     permissions: caller.permissions,
+    payrollCompanyIds: caller.payrollCompanyIds,
   };
 }

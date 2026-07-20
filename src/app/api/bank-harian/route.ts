@@ -16,7 +16,6 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const entrySchema = z.object({
   bankAccountId: z.string().min(1),
   balance: z.number(),
-  tarikCek: z.number().default(0),
   note: z.string().max(500).optional().nullable(),
 });
 
@@ -27,6 +26,21 @@ const saveSchema = z.object({
 });
 
 type SaveBody = z.infer<typeof saveSchema>;
+
+// Dates flow through this route as UTC-midnight (parsed from "YYYY-MM-DD"), matching the
+// convention used in stockist-head-confirmation.service.ts.
+function todayDateOnly(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+/** Anyone with BANK_DAILY_INPUT can edit today's entry; editing a past date requires Super Admin/Owner. */
+function assertEditableDate(roleName: string, date: Date) {
+  const isPast = date.getTime() < todayDateOnly().getTime();
+  if (isPast && roleName !== "SUPER_ADMIN" && roleName !== "OWNER") {
+    throw new ForbiddenError("Tanggal sudah lewat — edit perlu otorisasi Super Admin");
+  }
+}
 
 // GET /api/bank-harian?companyId=&date=YYYY-MM-DD
 // List rekening bank aktif PT + entry hari itu (kalau ada) + entry sebelumnya (referensi delta).
@@ -70,7 +84,7 @@ export async function GET(req: NextRequest) {
         entries: Object.fromEntries(
           todayEntries.map((e) => [
             e.bankAccountId,
-            { balance: e.balance.toString(), tarikCek: e.tarikCek.toString(), note: e.note },
+            { balance: e.balance.toString(), note: e.note },
           ])
         ),
         previous: Object.fromEntries(
@@ -87,7 +101,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/bank-harian — body { companyId, date, entries: [{ bankAccountId, balance, tarikCek?, note? }] }
+// POST /api/bank-harian — body { companyId, date, entries: [{ bankAccountId, balance, note? }] }
 // Upsert DailyBankEntry per rekening. Tidak menyentuh BankMutation sama sekali.
 export const POST = withValidation(saveSchema)(
   async (_req: NextRequest, ctx: { body: SaveBody }) => {
@@ -107,6 +121,8 @@ export const POST = withValidation(saveSchema)(
       }
 
       const date = new Date(ctx.body.date);
+      assertEditableDate(caller.roleName, date);
+
       const saved = await dailyBankEntryRepository.upsertMany(
         ctx.body.entries.map((e) => ({ ...e, date, createdBy: caller.id }))
       );

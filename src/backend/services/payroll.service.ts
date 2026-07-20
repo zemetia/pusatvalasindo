@@ -1,10 +1,33 @@
 import prisma from "@/lib/prisma";
 import { kpiService } from "./kpi.service";
-import { NotFoundError } from "@/backend/errors/app-error";
+import { NotFoundError, ForbiddenError } from "@/backend/errors/app-error";
 import type { BreakdownItem } from "@/lib/kpi-utils";
+import { can, PERMISSIONS } from "@/lib/permissions";
+import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
 
 const WORK_START_HOUR = 17;
 const WORK_START_MINUTE = 40;
+
+/**
+ * Guards payroll visibility per caller's permission tier:
+ * - PAYROLL_VIEW_ALL: any employee.
+ * - PAYROLL_VIEW_COMPANY: only employees in payrollCompanyIds (falls back to
+ *   the caller's own company if that list is empty).
+ * - PAYROLL_VIEW_OWN: only the caller's own record.
+ */
+export function assertPayrollAccess(caller: AdminCaller, targetUserId: string, targetCompanyId: string | null) {
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL)) return;
+
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
+    const allowedCompanyIds = caller.payrollCompanyIds.length > 0 ? caller.payrollCompanyIds : [caller.companyId];
+    if (targetCompanyId && allowedCompanyIds.includes(targetCompanyId)) return;
+    throw new ForbiddenError("Tidak punya akses ke gaji PT ini");
+  }
+
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN) && caller.id === targetUserId) return;
+
+  throw new ForbiddenError("Tidak punya akses ke data gaji ini");
+}
 
 export const payrollService = {
   calculateMonthlyPayroll: async (

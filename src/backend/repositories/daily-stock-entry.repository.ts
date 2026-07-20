@@ -87,7 +87,6 @@ export const dailyBankEntryRepository = {
       bankAccountId: string
       date: Date
       balance: number
-      tarikCek?: number
       note?: string | null
       createdBy?: string | null
     }[]
@@ -98,14 +97,12 @@ export const dailyBankEntryRepository = {
           where: { bankAccountId_date: { bankAccountId: e.bankAccountId, date: e.date } },
           update: {
             balance: new Prisma.Decimal(e.balance),
-            tarikCek: new Prisma.Decimal(e.tarikCek ?? 0),
             note: e.note,
           },
           create: {
             bankAccountId: e.bankAccountId,
             date: e.date,
             balance: new Prisma.Decimal(e.balance),
-            tarikCek: new Prisma.Decimal(e.tarikCek ?? 0),
             note: e.note,
             createdBy: e.createdBy,
           },

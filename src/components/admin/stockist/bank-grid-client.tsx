@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  type KeyboardEvent,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { type KeyboardEvent, type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { NumberInput } from "@/components/ui/number-input"
@@ -45,10 +37,8 @@ type Row = {
   previousDate: string | null
   fallbackBalance: number
   balance: string
-  tarikCek: string
   note: string
   savedBalance: string
-  savedTarikCek: string
   savedNote: string
   saveState: SaveState
   hasEntry: boolean
@@ -90,15 +80,13 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
       }
 
       const accounts: Account[] = data.data.accounts ?? []
-      const entries: Record<string, { balance: string; tarikCek: string; note: string | null }> =
-        data.data.entries ?? {}
+      const entries: Record<string, { balance: string; note: string | null }> = data.data.entries ?? {}
       const previous: Record<string, { balance: string; date: string }> = data.data.previous ?? {}
 
       const builtRows: Row[] = accounts.map((acc) => {
         const entry = entries[acc.id]
         const prev = previous[acc.id]
         const balance = entry?.balance ?? "0"
-        const tarikCek = entry?.tarikCek ?? "0"
         const note = entry?.note ?? ""
         return {
           bankAccountId: acc.id,
@@ -109,10 +97,8 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
           previousDate: prev?.date ?? null,
           fallbackBalance: Number(acc.referenceBalance ?? 0),
           balance,
-          tarikCek,
           note,
           savedBalance: balance,
-          savedTarikCek: tarikCek,
           savedNote: note,
           saveState: "idle",
           hasEntry: Boolean(entry),
@@ -131,20 +117,14 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
     loadData()
   }, [loadData])
 
-  const updateRow = (id: string, field: "balance" | "tarikCek" | "note", val: string) => {
+  const updateRow = (id: string, field: "balance" | "note", val: string) => {
     setRows((prev) => prev.map((r) => (r.bankAccountId === id ? { ...r, [field]: val } : r)))
   }
 
   const saveRow = async (id: string) => {
     const row = rowsRef.current.find((r) => r.bankAccountId === id)
     if (!row || !canManage) return
-    if (
-      row.balance === row.savedBalance &&
-      row.tarikCek === row.savedTarikCek &&
-      row.note === row.savedNote
-    ) {
-      return
-    }
+    if (row.balance === row.savedBalance && row.note === row.savedNote) return
 
     setRows((prev) =>
       prev.map((r) => (r.bankAccountId === id ? { ...r, saveState: "saving" } : r))
@@ -161,7 +141,6 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
             {
               bankAccountId: id,
               balance: parseNum(row.balance),
-              tarikCek: parseNum(row.tarikCek),
               note: row.note || null,
             },
           ],
@@ -174,14 +153,7 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
       setRows((prev) =>
         prev.map((r) =>
           r.bankAccountId === id
-            ? {
-                ...r,
-                savedBalance: r.balance,
-                savedTarikCek: r.tarikCek,
-                savedNote: r.note,
-                saveState: "saved",
-                hasEntry: true,
-              }
+            ? { ...r, savedBalance: r.balance, savedNote: r.note, saveState: "saved", hasEntry: true }
             : r
         )
       )
@@ -195,18 +167,16 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
 
   const totals = useMemo(() => {
     let totalBalance = 0
-    let totalTarikCek = 0
     let totalDelta = 0
     let unfilled = 0
     for (const r of rows) {
       const balance = parseNum(r.balance)
       const ref = r.previousBalance ?? r.fallbackBalance
       totalBalance += balance
-      totalTarikCek += parseNum(r.tarikCek)
       totalDelta += balance - ref
       if (!r.hasEntry) unfilled += 1
     }
-    return { totalBalance, totalTarikCek, totalDelta, unfilled }
+    return { totalBalance, totalDelta, unfilled }
   }, [rows])
 
   const onUnfilledChangeRef = useRef(onUnfilledChange)
@@ -245,7 +215,6 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
               <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Saldo Kemarin</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Saldo Hari Ini</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Tarik Cek</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-10" />
             </TableRow>
@@ -278,9 +247,6 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
                 {totals.totalDelta > 0 ? "+" : ""}
                 {fmt(totals.totalDelta)}
               </TableCell>
-              <TableCell className="text-right font-mono text-destructive">
-                ({fmt(totals.totalTarikCek)})
-              </TableCell>
               <TableCell colSpan={2} />
             </TableRow>
           </TableBody>
@@ -308,7 +274,7 @@ function BankRowEdit({
 }: {
   row: Row
   canManage: boolean
-  onChange: (id: string, field: "balance" | "tarikCek" | "note", val: string) => void
+  onChange: (id: string, field: "balance" | "note", val: string) => void
   onBlurSave: (id: string) => void
   inputRefs: RefObject<Map<string, HTMLInputElement>>
   rowIndex: number
@@ -319,18 +285,18 @@ function BankRowEdit({
   const delta = balance - reference
   const isUnfilled = !row.hasEntry
 
-  const registerRef = (field: "balance" | "tarikCek" | "note") => (el: HTMLInputElement | null) => {
+  const registerRef = (field: "balance" | "note") => (el: HTMLInputElement | null) => {
     const key = `${rowIndex}:${field}`
     if (el) inputRefs.current.set(key, el)
     else inputRefs.current.delete(key)
   }
 
-  const focusNextRow = (field: "balance" | "tarikCek" | "note") => {
+  const focusNextRow = (field: "balance" | "note") => {
     if (rowIndex >= rowCount - 1) return
     inputRefs.current.get(`${rowIndex + 1}:${field}`)?.focus()
   }
 
-  const handleEnter = (field: "balance" | "tarikCek" | "note") => (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleEnter = (field: "balance" | "note") => (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return
     e.preventDefault()
     focusNextRow(field)
@@ -376,17 +342,6 @@ function BankRowEdit({
       >
         {delta > 0 ? "+" : ""}
         {fmt(delta)}
-      </TableCell>
-      <TableCell className="text-right">
-        <NumberInput
-          ref={registerRef("tarikCek")}
-          value={row.tarikCek}
-          disabled={!canManage}
-          onValueChange={(val) => onChange(row.bankAccountId, "tarikCek", val === undefined ? "" : String(val))}
-          onBlur={() => onBlurSave(row.bankAccountId)}
-          onKeyDown={handleEnter("tarikCek")}
-          className="text-right font-mono w-full"
-        />
       </TableCell>
       <TableCell>
         <Input

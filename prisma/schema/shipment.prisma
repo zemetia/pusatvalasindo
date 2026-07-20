@@ -36,24 +36,24 @@ model ShipmentProvider {
 }
 
 model Shipment {
-  id               String              @id @default(cuid())
-  trackingNumber   String
-  providerId       String
-  status           ShipmentStatus      @default(PENDING)
-  origin           String?
-  destination      String?
-  recipientName    String?
-  recipientPhone   String?
+  id                String         @id @default(cuid())
+  trackingNumber    String
+  providerId        String
+  status            ShipmentStatus @default(PENDING)
+  origin            String?
+  destination       String?
+  recipientName     String?
+  recipientPhone    String?
   // Polymorphic reference: e.g. { referenceType: "ORDER", referenceId: "abc123" }
-  referenceType    String?
-  referenceId      String?
-  notes            String?
+  referenceType     String?
+  referenceId       String?
+  notes             String?
   estimatedDelivery DateTime?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
-  provider       ShipmentProvider      @relation(fields: [providerId], references: [id])
-  statusEvents   ShipmentStatusEvent[]
+  provider     ShipmentProvider      @relation(fields: [providerId], references: [id])
+  statusEvents ShipmentStatusEvent[]
 
   @@unique([trackingNumber, providerId])
   @@index([providerId])
@@ -63,14 +63,14 @@ model Shipment {
 }
 
 model ShipmentStatusEvent {
-  id          String          @id @default(cuid())
+  id          String         @id @default(cuid())
   shipmentId  String
   status      ShipmentStatus
   description String?
   location    String?
-  eventTime   DateTime        @default(now())
+  eventTime   DateTime       @default(now())
   rawPayload  Json?
-  createdAt   DateTime        @default(now())
+  createdAt   DateTime       @default(now())
 
   shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 

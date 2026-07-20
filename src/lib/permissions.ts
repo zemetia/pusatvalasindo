@@ -13,6 +13,9 @@ export const PERMISSIONS = {
   KPI_MANAGE: "kpi.manage",
 
   PAYROLL_VIEW_OWN: "payroll.view_own",
+  // View payroll for a specific set of companies (custom_role.payrollCompanyIds),
+  // falling back to the role's own company when that list is empty.
+  PAYROLL_VIEW_COMPANY: "payroll.view_company",
   PAYROLL_VIEW_ALL: "payroll.view_all",
   PAYROLL_MANAGE: "payroll.manage",
 
@@ -25,6 +28,7 @@ export const PERMISSIONS = {
 
   STOCKIST_VIEW: "stockist.view",
   STOCKIST_MANAGE: "stockist.manage",
+  STOCKIST_VERIFY: "stockist.verify",
 
   COMPANY_STOCK_VIEW: "company_stock.view",
   COMPANY_STOCK_MANAGE: "company_stock.manage",
@@ -44,6 +48,9 @@ export const PERMISSIONS = {
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
+/** All permission string values, typed as a non-empty tuple for z.enum(). */
+export const PermissionValues = Object.values(PERMISSIONS) as [Permission, ...Permission[]];
+
 // ─── Role → permission mapping ───────────────────────────────────────────────
 // Keys must match the `name` field stored in `custom_role` (case-sensitive).
 // Add a normalized uppercase alias for SUPER_ADMIN / OWNER system roles.
@@ -60,6 +67,7 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.KPI_VIEW_ALL,
   PERMISSIONS.KPI_MANAGE,
   PERMISSIONS.PAYROLL_VIEW_OWN,
+  PERMISSIONS.PAYROLL_VIEW_COMPANY,
   PERMISSIONS.PAYROLL_VIEW_ALL,
   PERMISSIONS.PAYROLL_MANAGE,
   PERMISSIONS.STOCK_VIEW,
@@ -69,6 +77,7 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.BANK_DAILY_INPUT,
   PERMISSIONS.STOCKIST_VIEW,
   PERMISSIONS.STOCKIST_MANAGE,
+  PERMISSIONS.STOCKIST_VERIFY,
   PERMISSIONS.COMPANY_STOCK_VIEW,
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
@@ -81,6 +90,12 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.ROLES_MANAGE,
 ];
 
+// Base set for "Kepala Cabang" — payroll visibility beyond one's own salary
+// is granted per-company in prisma/seeds/roles.ts (PAYROLL_VIEW_COMPANY +
+// custom_role.payrollCompanyIds), NOT here, since this list is shared by the
+// same role name across every company and can't tell PKD apart from PVI/PTU.
+// No profit_loss.* permission exists yet (no P&L module built) — when one is
+// added, it must NOT be included here for any Kepala Cabang role.
 const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
@@ -91,12 +106,12 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.KPI_VIEW_ALL,
   PERMISSIONS.KPI_MANAGE,
   PERMISSIONS.PAYROLL_VIEW_OWN,
-  PERMISSIONS.PAYROLL_VIEW_ALL,
   PERMISSIONS.PAYROLL_MANAGE,
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.BANK_VIEW,
   PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.STOCKIST_VERIFY,
   PERMISSIONS.COMPANY_STOCK_VIEW,
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
@@ -137,9 +152,9 @@ const AKUNTAN_PERMISSIONS: Permission[] = [
   PERMISSIONS.CURRENCY_MANAGE,
 ];
 
-// Base perms shared by Kasir and the 3 roles that used to alias KASIR_PERMISSIONS
-// (Teller Dalam, Teller Luar, Sales & Compliance) — kept identical to the old
-// combined set so splitting them doesn't change anyone's existing access.
+// Base perms shared by Kasir and Teller Dalam/Luar (currency stock handlers).
+// Sales & Compliance (marketing) is defined separately below, NOT from this
+// base — it must not see foreign currency stock at all (bank/rekening only).
 const KASIR_BASE_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
@@ -148,16 +163,17 @@ const KASIR_BASE_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
-  PERMISSIONS.BANK_VIEW,
 ];
 
 const KASIR_PERMISSIONS: Permission[] = [
   ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.BANK_VIEW,
   PERMISSIONS.STOCKIST_VIEW,
 ];
 
 const TELLER_DALAM_PERMISSIONS: Permission[] = [
   ...KASIR_BASE_PERMISSIONS,
+  PERMISSIONS.PAYROLL_VIEW_OWN,
   PERMISSIONS.STOCKIST_VIEW,
   PERMISSIONS.STOCKIST_MANAGE,
 ];
@@ -167,10 +183,16 @@ const TELLER_LUAR_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCKIST_VIEW,
 ];
 
+// Marketing: focused on rekening (bank) only — no stock/currency visibility.
 const SALES_COMPLIANCE_PERMISSIONS: Permission[] = [
-  ...KASIR_BASE_PERMISSIONS,
-  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.DASHBOARD_VIEW,
+  PERMISSIONS.ATTENDANCE_VIEW_OWN,
+  PERMISSIONS.KPI_FILL_OWN,
+  PERMISSIONS.KPI_VIEW_OWN,
+  PERMISSIONS.PAYROLL_VIEW_OWN,
+  PERMISSIONS.BANK_VIEW,
   PERMISSIONS.BANK_DAILY_INPUT,
+  PERMISSIONS.STOCKIST_VIEW,
 ];
 
 const KURIR_PERMISSIONS: Permission[] = [
