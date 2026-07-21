@@ -101,7 +101,7 @@ export default async function StockMataUangPage() {
                 const qty = Number(s.quantity.toString());
                 return (
                   <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.branch.name}</TableCell>
+                    <TableCell className="font-medium">{s.branch?.name ?? "Tanpa Cabang"}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{s.currency.code}</Badge>
                     </TableCell>

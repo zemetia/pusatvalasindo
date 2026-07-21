@@ -113,7 +113,7 @@ export default async function BranchItemsPage({ params }: PageProps) {
                     <StockItemActions
                       item={{
                         id: item.id,
-                        branchId: item.branchId,
+                        branchId: item.branchId ?? "",
                         name: item.name,
                         code: item.code,
                         type: item.type,

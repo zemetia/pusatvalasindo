@@ -35311,7 +35311,7 @@ export namespace Prisma {
 
   export type CurrencyStockGroupByOutputType = {
     id: string
-    branchId: string
+    branchId: string | null
     currencyId: string
     quantity: Decimal
     buyRate: Decimal | null
@@ -35348,7 +35348,7 @@ export namespace Prisma {
     sellRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["currencyStock"]>
 
@@ -35361,7 +35361,7 @@ export namespace Prisma {
     sellRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["currencyStock"]>
 
@@ -35374,7 +35374,7 @@ export namespace Prisma {
     sellRate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["currencyStock"]>
 
@@ -35391,27 +35391,27 @@ export namespace Prisma {
 
   export type CurrencyStockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "currencyId" | "quantity" | "buyRate" | "sellRate" | "createdAt" | "updatedAt", ExtArgs["result"]["currencyStock"]>
   export type CurrencyStockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
   export type CurrencyStockIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
   export type CurrencyStockIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | CurrencyStock$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
 
   export type $CurrencyStockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CurrencyStock"
     objects: {
-      branch: Prisma.$BranchPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs> | null
       currency: Prisma.$CurrencyPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      branchId: string
+      branchId: string | null
       currencyId: string
       quantity: Prisma.Decimal
       buyRate: Prisma.Decimal | null
@@ -35812,7 +35812,7 @@ export namespace Prisma {
    */
   export interface Prisma__CurrencyStockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends CurrencyStock$branchArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyStock$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     currency<T extends CurrencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyDefaultArgs<ExtArgs>>): Prisma__CurrencyClient<$Result.GetResult<Prisma.$CurrencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -36252,6 +36252,25 @@ export namespace Prisma {
   }
 
   /**
+   * CurrencyStock.branch
+   */
+  export type CurrencyStock$branchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
+  }
+
+  /**
    * CurrencyStock without action
    */
   export type CurrencyStockDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -36475,7 +36494,7 @@ export namespace Prisma {
 
   export type StockMutationGroupByOutputType = {
     id: string
-    branchId: string
+    branchId: string | null
     currencyId: string
     type: $Enums.StockMutationType
     quantity: Decimal
@@ -36516,7 +36535,7 @@ export namespace Prisma {
     note?: boolean
     createdAt?: boolean
     createdBy?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["stockMutation"]>
 
@@ -36531,7 +36550,7 @@ export namespace Prisma {
     note?: boolean
     createdAt?: boolean
     createdBy?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["stockMutation"]>
 
@@ -36546,7 +36565,7 @@ export namespace Prisma {
     note?: boolean
     createdAt?: boolean
     createdBy?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["stockMutation"]>
 
@@ -36565,27 +36584,27 @@ export namespace Prisma {
 
   export type StockMutationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "currencyId" | "type" | "quantity" | "rate" | "idrValue" | "note" | "createdAt" | "createdBy", ExtArgs["result"]["stockMutation"]>
   export type StockMutationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
   export type StockMutationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
   export type StockMutationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockMutation$branchArgs<ExtArgs>
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
   }
 
   export type $StockMutationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StockMutation"
     objects: {
-      branch: Prisma.$BranchPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs> | null
       currency: Prisma.$CurrencyPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      branchId: string
+      branchId: string | null
       currencyId: string
       type: $Enums.StockMutationType
       quantity: Prisma.Decimal
@@ -36988,7 +37007,7 @@ export namespace Prisma {
    */
   export interface Prisma__StockMutationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends StockMutation$branchArgs<ExtArgs> = {}>(args?: Subset<T, StockMutation$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     currency<T extends CurrencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyDefaultArgs<ExtArgs>>): Prisma__CurrencyClient<$Result.GetResult<Prisma.$CurrencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -37430,6 +37449,25 @@ export namespace Prisma {
   }
 
   /**
+   * StockMutation.branch
+   */
+  export type StockMutation$branchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
+  }
+
+  /**
    * StockMutation without action
    */
   export type StockMutationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -37639,7 +37677,7 @@ export namespace Prisma {
 
   export type StockItemGroupByOutputType = {
     id: string
-    branchId: string
+    branchId: string | null
     name: string
     code: string | null
     type: $Enums.StockItemType
@@ -37679,7 +37717,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     dailyEntries?: boolean | StockItem$dailyEntriesArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
     _count?: boolean | StockItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["stockItem"]>
 
@@ -37693,7 +37731,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
   }, ExtArgs["result"]["stockItem"]>
 
   export type StockItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -37706,7 +37744,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
   }, ExtArgs["result"]["stockItem"]>
 
   export type StockItemSelectScalar = {
@@ -37724,25 +37762,25 @@ export namespace Prisma {
   export type StockItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "name" | "code" | "type" | "sortOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["stockItem"]>
   export type StockItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dailyEntries?: boolean | StockItem$dailyEntriesArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
     _count?: boolean | StockItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StockItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
   }
   export type StockItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    branch?: boolean | StockItem$branchArgs<ExtArgs>
   }
 
   export type $StockItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StockItem"
     objects: {
       dailyEntries: Prisma.$DailyStockEntryPayload<ExtArgs>[]
-      branch: Prisma.$BranchPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      branchId: string
+      branchId: string | null
       name: string
       code: string | null
       type: $Enums.StockItemType
@@ -38145,7 +38183,7 @@ export namespace Prisma {
   export interface Prisma__StockItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     dailyEntries<T extends StockItem$dailyEntriesArgs<ExtArgs> = {}>(args?: Subset<T, StockItem$dailyEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyStockEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends StockItem$branchArgs<ExtArgs> = {}>(args?: Subset<T, StockItem$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -38606,6 +38644,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DailyStockEntryScalarFieldEnum | DailyStockEntryScalarFieldEnum[]
+  }
+
+  /**
+   * StockItem.branch
+   */
+  export type StockItem$branchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
   }
 
   /**
@@ -53369,20 +53426,20 @@ export namespace Prisma {
     OR?: CurrencyStockWhereInput[]
     NOT?: CurrencyStockWhereInput | CurrencyStockWhereInput[]
     id?: StringFilter<"CurrencyStock"> | string
-    branchId?: StringFilter<"CurrencyStock"> | string
+    branchId?: StringNullableFilter<"CurrencyStock"> | string | null
     currencyId?: StringFilter<"CurrencyStock"> | string
     quantity?: DecimalFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string
     buyRate?: DecimalNullableFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
     sellRate?: DecimalNullableFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"CurrencyStock"> | Date | string
     updatedAt?: DateTimeFilter<"CurrencyStock"> | Date | string
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
   }
 
   export type CurrencyStockOrderByWithRelationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     currencyId?: SortOrder
     quantity?: SortOrder
     buyRate?: SortOrderInput | SortOrder
@@ -53399,20 +53456,20 @@ export namespace Prisma {
     AND?: CurrencyStockWhereInput | CurrencyStockWhereInput[]
     OR?: CurrencyStockWhereInput[]
     NOT?: CurrencyStockWhereInput | CurrencyStockWhereInput[]
-    branchId?: StringFilter<"CurrencyStock"> | string
+    branchId?: StringNullableFilter<"CurrencyStock"> | string | null
     currencyId?: StringFilter<"CurrencyStock"> | string
     quantity?: DecimalFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string
     buyRate?: DecimalNullableFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
     sellRate?: DecimalNullableFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"CurrencyStock"> | Date | string
     updatedAt?: DateTimeFilter<"CurrencyStock"> | Date | string
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
   }, "id" | "branchId_currencyId">
 
   export type CurrencyStockOrderByWithAggregationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     currencyId?: SortOrder
     quantity?: SortOrder
     buyRate?: SortOrderInput | SortOrder
@@ -53431,7 +53488,7 @@ export namespace Prisma {
     OR?: CurrencyStockScalarWhereWithAggregatesInput[]
     NOT?: CurrencyStockScalarWhereWithAggregatesInput | CurrencyStockScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"CurrencyStock"> | string
-    branchId?: StringWithAggregatesFilter<"CurrencyStock"> | string
+    branchId?: StringNullableWithAggregatesFilter<"CurrencyStock"> | string | null
     currencyId?: StringWithAggregatesFilter<"CurrencyStock"> | string
     quantity?: DecimalWithAggregatesFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string
     buyRate?: DecimalNullableWithAggregatesFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
@@ -53445,7 +53502,7 @@ export namespace Prisma {
     OR?: StockMutationWhereInput[]
     NOT?: StockMutationWhereInput | StockMutationWhereInput[]
     id?: StringFilter<"StockMutation"> | string
-    branchId?: StringFilter<"StockMutation"> | string
+    branchId?: StringNullableFilter<"StockMutation"> | string | null
     currencyId?: StringFilter<"StockMutation"> | string
     type?: EnumStockMutationTypeFilter<"StockMutation"> | $Enums.StockMutationType
     quantity?: DecimalFilter<"StockMutation"> | Decimal | DecimalJsLike | number | string
@@ -53454,13 +53511,13 @@ export namespace Prisma {
     note?: StringNullableFilter<"StockMutation"> | string | null
     createdAt?: DateTimeFilter<"StockMutation"> | Date | string
     createdBy?: StringNullableFilter<"StockMutation"> | string | null
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
   }
 
   export type StockMutationOrderByWithRelationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     currencyId?: SortOrder
     type?: SortOrder
     quantity?: SortOrder
@@ -53478,7 +53535,7 @@ export namespace Prisma {
     AND?: StockMutationWhereInput | StockMutationWhereInput[]
     OR?: StockMutationWhereInput[]
     NOT?: StockMutationWhereInput | StockMutationWhereInput[]
-    branchId?: StringFilter<"StockMutation"> | string
+    branchId?: StringNullableFilter<"StockMutation"> | string | null
     currencyId?: StringFilter<"StockMutation"> | string
     type?: EnumStockMutationTypeFilter<"StockMutation"> | $Enums.StockMutationType
     quantity?: DecimalFilter<"StockMutation"> | Decimal | DecimalJsLike | number | string
@@ -53487,13 +53544,13 @@ export namespace Prisma {
     note?: StringNullableFilter<"StockMutation"> | string | null
     createdAt?: DateTimeFilter<"StockMutation"> | Date | string
     createdBy?: StringNullableFilter<"StockMutation"> | string | null
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
   }, "id">
 
   export type StockMutationOrderByWithAggregationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     currencyId?: SortOrder
     type?: SortOrder
     quantity?: SortOrder
@@ -53514,7 +53571,7 @@ export namespace Prisma {
     OR?: StockMutationScalarWhereWithAggregatesInput[]
     NOT?: StockMutationScalarWhereWithAggregatesInput | StockMutationScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StockMutation"> | string
-    branchId?: StringWithAggregatesFilter<"StockMutation"> | string
+    branchId?: StringNullableWithAggregatesFilter<"StockMutation"> | string | null
     currencyId?: StringWithAggregatesFilter<"StockMutation"> | string
     type?: EnumStockMutationTypeWithAggregatesFilter<"StockMutation"> | $Enums.StockMutationType
     quantity?: DecimalWithAggregatesFilter<"StockMutation"> | Decimal | DecimalJsLike | number | string
@@ -53530,7 +53587,7 @@ export namespace Prisma {
     OR?: StockItemWhereInput[]
     NOT?: StockItemWhereInput | StockItemWhereInput[]
     id?: StringFilter<"StockItem"> | string
-    branchId?: StringFilter<"StockItem"> | string
+    branchId?: StringNullableFilter<"StockItem"> | string | null
     name?: StringFilter<"StockItem"> | string
     code?: StringNullableFilter<"StockItem"> | string | null
     type?: EnumStockItemTypeFilter<"StockItem"> | $Enums.StockItemType
@@ -53539,12 +53596,12 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"StockItem"> | Date | string
     updatedAt?: DateTimeFilter<"StockItem"> | Date | string
     dailyEntries?: DailyStockEntryListRelationFilter
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }
 
   export type StockItemOrderByWithRelationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     name?: SortOrder
     code?: SortOrderInput | SortOrder
     type?: SortOrder
@@ -53562,7 +53619,7 @@ export namespace Prisma {
     AND?: StockItemWhereInput | StockItemWhereInput[]
     OR?: StockItemWhereInput[]
     NOT?: StockItemWhereInput | StockItemWhereInput[]
-    branchId?: StringFilter<"StockItem"> | string
+    branchId?: StringNullableFilter<"StockItem"> | string | null
     name?: StringFilter<"StockItem"> | string
     code?: StringNullableFilter<"StockItem"> | string | null
     type?: EnumStockItemTypeFilter<"StockItem"> | $Enums.StockItemType
@@ -53571,12 +53628,12 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"StockItem"> | Date | string
     updatedAt?: DateTimeFilter<"StockItem"> | Date | string
     dailyEntries?: DailyStockEntryListRelationFilter
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }, "id" | "branchId_name">
 
   export type StockItemOrderByWithAggregationInput = {
     id?: SortOrder
-    branchId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
     name?: SortOrder
     code?: SortOrderInput | SortOrder
     type?: SortOrder
@@ -53596,7 +53653,7 @@ export namespace Prisma {
     OR?: StockItemScalarWhereWithAggregatesInput[]
     NOT?: StockItemScalarWhereWithAggregatesInput | StockItemScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StockItem"> | string
-    branchId?: StringWithAggregatesFilter<"StockItem"> | string
+    branchId?: StringNullableWithAggregatesFilter<"StockItem"> | string | null
     name?: StringWithAggregatesFilter<"StockItem"> | string
     code?: StringNullableWithAggregatesFilter<"StockItem"> | string | null
     type?: EnumStockItemTypeWithAggregatesFilter<"StockItem"> | $Enums.StockItemType
@@ -56761,13 +56818,13 @@ export namespace Prisma {
     sellRate?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    branch: BranchCreateNestedOneWithoutCurrencyStocksInput
+    branch?: BranchCreateNestedOneWithoutCurrencyStocksInput
     currency: CurrencyCreateNestedOneWithoutStocksInput
   }
 
   export type CurrencyStockUncheckedCreateInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     currencyId: string
     quantity?: Decimal | DecimalJsLike | number | string
     buyRate?: Decimal | DecimalJsLike | number | string | null
@@ -56783,13 +56840,13 @@ export namespace Prisma {
     sellRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    branch?: BranchUpdateOneRequiredWithoutCurrencyStocksNestedInput
+    branch?: BranchUpdateOneWithoutCurrencyStocksNestedInput
     currency?: CurrencyUpdateOneRequiredWithoutStocksNestedInput
   }
 
   export type CurrencyStockUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     currencyId?: StringFieldUpdateOperationsInput | string
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     buyRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -56800,7 +56857,7 @@ export namespace Prisma {
 
   export type CurrencyStockCreateManyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     currencyId: string
     quantity?: Decimal | DecimalJsLike | number | string
     buyRate?: Decimal | DecimalJsLike | number | string | null
@@ -56820,7 +56877,7 @@ export namespace Prisma {
 
   export type CurrencyStockUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     currencyId?: StringFieldUpdateOperationsInput | string
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     buyRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -56838,13 +56895,13 @@ export namespace Prisma {
     note?: string | null
     createdAt?: Date | string
     createdBy?: string | null
-    branch: BranchCreateNestedOneWithoutStockMutationsInput
+    branch?: BranchCreateNestedOneWithoutStockMutationsInput
     currency: CurrencyCreateNestedOneWithoutStockMutationsInput
   }
 
   export type StockMutationUncheckedCreateInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     currencyId: string
     type: $Enums.StockMutationType
     quantity: Decimal | DecimalJsLike | number | string
@@ -56864,13 +56921,13 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
-    branch?: BranchUpdateOneRequiredWithoutStockMutationsNestedInput
+    branch?: BranchUpdateOneWithoutStockMutationsNestedInput
     currency?: CurrencyUpdateOneRequiredWithoutStockMutationsNestedInput
   }
 
   export type StockMutationUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     currencyId?: StringFieldUpdateOperationsInput | string
     type?: EnumStockMutationTypeFieldUpdateOperationsInput | $Enums.StockMutationType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56883,7 +56940,7 @@ export namespace Prisma {
 
   export type StockMutationCreateManyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     currencyId: string
     type: $Enums.StockMutationType
     quantity: Decimal | DecimalJsLike | number | string
@@ -56907,7 +56964,7 @@ export namespace Prisma {
 
   export type StockMutationUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     currencyId?: StringFieldUpdateOperationsInput | string
     type?: EnumStockMutationTypeFieldUpdateOperationsInput | $Enums.StockMutationType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56928,12 +56985,12 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     dailyEntries?: DailyStockEntryCreateNestedManyWithoutStockItemInput
-    branch: BranchCreateNestedOneWithoutStockItemsInput
+    branch?: BranchCreateNestedOneWithoutStockItemsInput
   }
 
   export type StockItemUncheckedCreateInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     name: string
     code?: string | null
     type?: $Enums.StockItemType
@@ -56954,12 +57011,12 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyEntries?: DailyStockEntryUpdateManyWithoutStockItemNestedInput
-    branch?: BranchUpdateOneRequiredWithoutStockItemsNestedInput
+    branch?: BranchUpdateOneWithoutStockItemsNestedInput
   }
 
   export type StockItemUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumStockItemTypeFieldUpdateOperationsInput | $Enums.StockItemType
@@ -56972,7 +57029,7 @@ export namespace Prisma {
 
   export type StockItemCreateManyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     name: string
     code?: string | null
     type?: $Enums.StockItemType
@@ -56995,7 +57052,7 @@ export namespace Prisma {
 
   export type StockItemUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumStockItemTypeFieldUpdateOperationsInput | $Enums.StockItemType
@@ -59932,11 +59989,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
-
-  export type BranchScalarRelationFilter = {
-    is?: BranchWhereInput
-    isNot?: BranchWhereInput
   }
 
   export type CurrencyStockBranchIdCurrencyIdCompoundUniqueInput = {
@@ -63010,10 +63062,12 @@ export namespace Prisma {
     connect?: CurrencyWhereUniqueInput
   }
 
-  export type BranchUpdateOneRequiredWithoutCurrencyStocksNestedInput = {
+  export type BranchUpdateOneWithoutCurrencyStocksNestedInput = {
     create?: XOR<BranchCreateWithoutCurrencyStocksInput, BranchUncheckedCreateWithoutCurrencyStocksInput>
     connectOrCreate?: BranchCreateOrConnectWithoutCurrencyStocksInput
     upsert?: BranchUpsertWithoutCurrencyStocksInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutCurrencyStocksInput, BranchUpdateWithoutCurrencyStocksInput>, BranchUncheckedUpdateWithoutCurrencyStocksInput>
   }
@@ -63042,10 +63096,12 @@ export namespace Prisma {
     set?: $Enums.StockMutationType
   }
 
-  export type BranchUpdateOneRequiredWithoutStockMutationsNestedInput = {
+  export type BranchUpdateOneWithoutStockMutationsNestedInput = {
     create?: XOR<BranchCreateWithoutStockMutationsInput, BranchUncheckedCreateWithoutStockMutationsInput>
     connectOrCreate?: BranchCreateOrConnectWithoutStockMutationsInput
     upsert?: BranchUpsertWithoutStockMutationsInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutStockMutationsInput, BranchUpdateWithoutStockMutationsInput>, BranchUncheckedUpdateWithoutStockMutationsInput>
   }
@@ -63096,10 +63152,12 @@ export namespace Prisma {
     deleteMany?: DailyStockEntryScalarWhereInput | DailyStockEntryScalarWhereInput[]
   }
 
-  export type BranchUpdateOneRequiredWithoutStockItemsNestedInput = {
+  export type BranchUpdateOneWithoutStockItemsNestedInput = {
     create?: XOR<BranchCreateWithoutStockItemsInput, BranchUncheckedCreateWithoutStockItemsInput>
     connectOrCreate?: BranchCreateOrConnectWithoutStockItemsInput
     upsert?: BranchUpsertWithoutStockItemsInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutStockItemsInput, BranchUpdateWithoutStockItemsInput>, BranchUncheckedUpdateWithoutStockItemsInput>
   }
@@ -66352,7 +66410,7 @@ export namespace Prisma {
     OR?: CurrencyStockScalarWhereInput[]
     NOT?: CurrencyStockScalarWhereInput | CurrencyStockScalarWhereInput[]
     id?: StringFilter<"CurrencyStock"> | string
-    branchId?: StringFilter<"CurrencyStock"> | string
+    branchId?: StringNullableFilter<"CurrencyStock"> | string | null
     currencyId?: StringFilter<"CurrencyStock"> | string
     quantity?: DecimalFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string
     buyRate?: DecimalNullableFilter<"CurrencyStock"> | Decimal | DecimalJsLike | number | string | null
@@ -66382,7 +66440,7 @@ export namespace Prisma {
     OR?: StockItemScalarWhereInput[]
     NOT?: StockItemScalarWhereInput | StockItemScalarWhereInput[]
     id?: StringFilter<"StockItem"> | string
-    branchId?: StringFilter<"StockItem"> | string
+    branchId?: StringNullableFilter<"StockItem"> | string | null
     name?: StringFilter<"StockItem"> | string
     code?: StringNullableFilter<"StockItem"> | string | null
     type?: EnumStockItemTypeFilter<"StockItem"> | $Enums.StockItemType
@@ -66413,7 +66471,7 @@ export namespace Prisma {
     OR?: StockMutationScalarWhereInput[]
     NOT?: StockMutationScalarWhereInput | StockMutationScalarWhereInput[]
     id?: StringFilter<"StockMutation"> | string
-    branchId?: StringFilter<"StockMutation"> | string
+    branchId?: StringNullableFilter<"StockMutation"> | string | null
     currencyId?: StringFilter<"StockMutation"> | string
     type?: EnumStockMutationTypeFilter<"StockMutation"> | $Enums.StockMutationType
     quantity?: DecimalFilter<"StockMutation"> | Decimal | DecimalJsLike | number | string
@@ -67286,12 +67344,12 @@ export namespace Prisma {
     sellRate?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    branch: BranchCreateNestedOneWithoutCurrencyStocksInput
+    branch?: BranchCreateNestedOneWithoutCurrencyStocksInput
   }
 
   export type CurrencyStockUncheckedCreateWithoutCurrencyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     quantity?: Decimal | DecimalJsLike | number | string
     buyRate?: Decimal | DecimalJsLike | number | string | null
     sellRate?: Decimal | DecimalJsLike | number | string | null
@@ -67318,12 +67376,12 @@ export namespace Prisma {
     note?: string | null
     createdAt?: Date | string
     createdBy?: string | null
-    branch: BranchCreateNestedOneWithoutStockMutationsInput
+    branch?: BranchCreateNestedOneWithoutStockMutationsInput
   }
 
   export type StockMutationUncheckedCreateWithoutCurrencyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     type: $Enums.StockMutationType
     quantity: Decimal | DecimalJsLike | number | string
     rate?: Decimal | DecimalJsLike | number | string | null
@@ -69778,12 +69836,12 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    branch: BranchCreateNestedOneWithoutStockItemsInput
+    branch?: BranchCreateNestedOneWithoutStockItemsInput
   }
 
   export type StockItemUncheckedCreateWithoutDailyEntriesInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     name: string
     code?: string | null
     type?: $Enums.StockItemType
@@ -69818,12 +69876,12 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    branch?: BranchUpdateOneRequiredWithoutStockItemsNestedInput
+    branch?: BranchUpdateOneWithoutStockItemsNestedInput
   }
 
   export type StockItemUncheckedUpdateWithoutDailyEntriesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     code?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumStockItemTypeFieldUpdateOperationsInput | $Enums.StockItemType
@@ -72647,7 +72705,7 @@ export namespace Prisma {
 
   export type CurrencyStockCreateManyCurrencyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     quantity?: Decimal | DecimalJsLike | number | string
     buyRate?: Decimal | DecimalJsLike | number | string | null
     sellRate?: Decimal | DecimalJsLike | number | string | null
@@ -72657,7 +72715,7 @@ export namespace Prisma {
 
   export type StockMutationCreateManyCurrencyInput = {
     id?: string
-    branchId: string
+    branchId?: string | null
     type: $Enums.StockMutationType
     quantity: Decimal | DecimalJsLike | number | string
     rate?: Decimal | DecimalJsLike | number | string | null
@@ -72720,12 +72778,12 @@ export namespace Prisma {
     sellRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    branch?: BranchUpdateOneRequiredWithoutCurrencyStocksNestedInput
+    branch?: BranchUpdateOneWithoutCurrencyStocksNestedInput
   }
 
   export type CurrencyStockUncheckedUpdateWithoutCurrencyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     buyRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -72735,7 +72793,7 @@ export namespace Prisma {
 
   export type CurrencyStockUncheckedUpdateManyWithoutCurrencyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     buyRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     sellRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -72752,12 +72810,12 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
-    branch?: BranchUpdateOneRequiredWithoutStockMutationsNestedInput
+    branch?: BranchUpdateOneWithoutStockMutationsNestedInput
   }
 
   export type StockMutationUncheckedUpdateWithoutCurrencyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumStockMutationTypeFieldUpdateOperationsInput | $Enums.StockMutationType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -72769,7 +72827,7 @@ export namespace Prisma {
 
   export type StockMutationUncheckedUpdateManyWithoutCurrencyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumStockMutationTypeFieldUpdateOperationsInput | $Enums.StockMutationType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null

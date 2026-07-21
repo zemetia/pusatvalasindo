@@ -116,7 +116,7 @@ export default async function MutasiStokPage() {
                       year: "numeric",
                     })}
                   </TableCell>
-                  <TableCell>{m.branch.name}</TableCell>
+                  <TableCell>{m.branch?.name ?? "Tanpa Cabang"}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{m.currency.code}</Badge>
                   </TableCell>

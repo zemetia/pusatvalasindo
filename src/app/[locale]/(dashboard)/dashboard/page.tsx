@@ -218,8 +218,8 @@ export default async function DashboardPage({
   const stockByBranch = todayStockByBranch.reduce<
     Record<string, { branchName: string; totalIdr: number }>
   >((acc, entry) => {
-    const branchId = entry.stockItem.branchId;
-    const branchName = entry.stockItem.branch.name;
+    const branchId = entry.stockItem.branchId ?? "__none__";
+    const branchName = entry.stockItem.branch?.name ?? "Tanpa Cabang";
     if (!acc[branchId]) acc[branchId] = { branchName, totalIdr: 0 };
     acc[branchId].totalIdr += Number(entry.totalIdr ?? 0);
     return acc;
@@ -535,7 +535,7 @@ export default async function DashboardPage({
                     {currencyStocks.map((cs) => (
                       <TableRow key={cs.id}>
                         <TableCell className="text-sm">
-                          {cs.branch.name}
+                          {cs.branch?.name ?? "Tanpa Cabang"}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">{cs.currency.code}</Badge>

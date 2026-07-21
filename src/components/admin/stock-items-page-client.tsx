@@ -27,13 +27,13 @@ type Company = { id: string; name: string };
 
 type StockItem = {
   id: string;
-  branchId: string;
+  branchId: string | null;
   name: string;
   code: string | null;
   type: string;
   sortOrder: number;
   isActive: boolean;
-  branch: { id: string; name: string };
+  branch: { id: string; name: string } | null;
 };
 
 interface StockItemsPageClientProps {
@@ -49,7 +49,7 @@ export function StockItemsPageClient({ items, branches, companies }: StockItemsP
     const q = search.toLowerCase();
     if (!q) return items;
     return items.filter((item) =>
-      [item.name, item.code, item.branch.name, TYPE_LABELS[item.type] ?? item.type]
+      [item.name, item.code, item.branch?.name, TYPE_LABELS[item.type] ?? item.type]
         .some((v) => v?.toLowerCase().includes(q))
     );
   }, [items, search]);
@@ -108,7 +108,7 @@ export function StockItemsPageClient({ items, branches, companies }: StockItemsP
                       <TableCell className="font-mono text-sm text-muted-foreground">
                         {item.code ?? "—"}
                       </TableCell>
-                      <TableCell>{item.branch.name}</TableCell>
+                      <TableCell>{item.branch?.name ?? "Tanpa Cabang"}</TableCell>
                       <TableCell>
                         <Badge variant="secondary">
                           {TYPE_LABELS[item.type] ?? item.type}
@@ -124,7 +124,7 @@ export function StockItemsPageClient({ items, branches, companies }: StockItemsP
                         <StockItemActions
                           item={{
                             id: item.id,
-                            branchId: item.branchId,
+                            branchId: item.branchId ?? "",
                             name: item.name,
                             code: item.code,
                             type: item.type,

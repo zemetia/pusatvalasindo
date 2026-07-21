@@ -72,7 +72,7 @@ model user {
   samples            Sample[]
   account            account[]
   session            session[]
-  branch             Branch?            @relation(fields: [branchId], references: [id])
+  branch             Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
   company            Company?           @relation(fields: [companyId], references: [id])
   customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
 

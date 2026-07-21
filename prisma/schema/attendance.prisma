@@ -30,7 +30,7 @@ model Attendance {
   updatedAt         DateTime         @updatedAt
 
   user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  branch Branch? @relation(fields: [branchId], references: [id])
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])

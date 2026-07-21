@@ -1,13 +1,13 @@
 model CurrencyStock {
   id         String   @id @default(cuid())
-  branchId   String
+  branchId   String?
   currencyId String
   quantity   Decimal  @default(0)
   buyRate    Decimal?
   sellRate   Decimal?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  branch     Branch   @relation(fields: [branchId], references: [id])
+  branch     Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
   currency   Currency @relation(fields: [currencyId], references: [id])
 
   @@unique([branchId, currencyId])
@@ -15,7 +15,7 @@ model CurrencyStock {
 
 model StockMutation {
   id         String            @id @default(cuid())
-  branchId   String
+  branchId   String?
   currencyId String
   type       StockMutationType
   quantity   Decimal
@@ -24,7 +24,7 @@ model StockMutation {
   note       String?
   createdAt  DateTime          @default(now())
   createdBy  String?
-  branch     Branch            @relation(fields: [branchId], references: [id])
+  branch     Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
   currency   Currency          @relation(fields: [currencyId], references: [id])
 
   @@index([branchId, currencyId, createdAt])
@@ -32,7 +32,7 @@ model StockMutation {
 
 model StockItem {
   id           String            @id @default(cuid())
-  branchId     String
+  branchId     String?
   name         String
   code         String?
   type         StockItemType     @default(CURRENCY)
@@ -41,7 +41,7 @@ model StockItem {
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
   dailyEntries DailyStockEntry[]
-  branch       Branch            @relation(fields: [branchId], references: [id])
+  branch       Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
   @@unique([branchId, name])
   @@index([branchId])
