@@ -72,9 +72,15 @@ interface Props {
   companies: Company[]
   defaultCompanyId: string | null
   isSuperAdmin: boolean
+  canSelectCompany: boolean
 }
 
-export function StockistHeadConfirmationClient({ companies, defaultCompanyId, isSuperAdmin }: Props) {
+export function StockistHeadConfirmationClient({
+  companies,
+  defaultCompanyId,
+  isSuperAdmin,
+  canSelectCompany,
+}: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? companies[0]?.id ?? "")
   const [date, setDate] = useState(toDate(new Date()))
   const [fetching, setFetching] = useState(false)
@@ -285,7 +291,7 @@ export function StockistHeadConfirmationClient({ companies, defaultCompanyId, is
             className="w-44 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus-visible:ring-red-500/20 focus-visible:border-red-500"
           />
         </div>
-        {!defaultCompanyId && (
+        {canSelectCompany && (
           <div className="grid gap-1.5">
             <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
               Pilih PT

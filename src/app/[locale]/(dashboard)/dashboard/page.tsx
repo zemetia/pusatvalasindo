@@ -235,7 +235,7 @@ export default async function DashboardPage({
     { href: "/dashboard/kpi/log", label: "Log KPI", icon: IconReport },
     { href: "/dashboard/payroll", label: "Hitung Gaji", icon: IconCoin },
     { href: "/dashboard/bank-accounts", label: "Rekening Bank", icon: IconBuildingBank },
-    { href: "/dashboard/stock-management", label: "Stock Mata Uang", icon: IconDatabase },
+    { href: "/dashboard/stockist", label: "Stock Mata Uang", icon: IconDatabase },
     { href: "/dashboard/stok-harian", label: "Stok Harian", icon: IconListDetails },
     { href: "/dashboard/users", label: "Pengguna", icon: IconUsers },
     { href: "/dashboard/branches", label: "Cabang", icon: IconBuilding },
@@ -504,7 +504,7 @@ export default async function DashboardPage({
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Kurs Mata Uang</CardTitle>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/stock-management">Lihat Semua →</Link>
+                  <Link href="/dashboard/stockist">Lihat Semua →</Link>
                 </Button>
               </div>
             </CardHeader>
@@ -513,7 +513,7 @@ export default async function DashboardPage({
                 <div className="py-10 text-center text-muted-foreground text-sm px-6">
                   Belum ada data kurs mata uang. Tambahkan melalui menu{" "}
                   <Link
-                    href="/dashboard/stock-management"
+                    href="/dashboard/stockist"
                     className="underline"
                   >
                     Stock Mata Uang

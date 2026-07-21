@@ -32,17 +32,20 @@ export default async function StockistHeadConfirmationPage({
   }
 
   const isSuperAdmin = user.customRole?.name === "SUPER_ADMIN";
+  const isOwner = user.customRole?.name === "OWNER";
+  const canSelectCompany = isSuperAdmin || isOwner;
 
-  // Konfirmasi kepala cabang dimiliki 1 PT — scoped ke PT sendiri kalau user punya companyId;
-  // kalau tidak (Super Admin/Owner), bisa pilih semua PT aktif.
+  // Konfirmasi kepala cabang dimiliki 1 PT — hanya Super Admin/Owner yang boleh memilih PT
+  // lain; role lain selalu di-scope ke PT sendiri.
   const companies = await prisma.company.findMany({
     where: {
       isActive: true,
-      ...(user.companyId ? { id: user.companyId } : {}),
+      ...(canSelectCompany ? {} : { id: user.companyId ?? "" }),
     },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });
+  const defaultCompanyId = canSelectCompany ? null : user.companyId;
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
@@ -53,8 +56,9 @@ export default async function StockistHeadConfirmationPage({
       />
       <StockistHeadConfirmationClient
         companies={companies}
-        defaultCompanyId={user.companyId}
+        defaultCompanyId={defaultCompanyId}
         isSuperAdmin={isSuperAdmin}
+        canSelectCompany={canSelectCompany}
       />
     </div>
   );

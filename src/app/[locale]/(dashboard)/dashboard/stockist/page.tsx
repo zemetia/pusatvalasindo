@@ -23,7 +23,7 @@ export default async function StockistPage({
     select: {
       id: true,
       companyId: true,
-      customRole: { select: { permissions: true } },
+      customRole: { select: { name: true, permissions: true } },
     },
   });
   if (!user) redirect(`/${locale}/login`);
@@ -34,16 +34,19 @@ export default async function StockistPage({
   }
   const canManage = can(permissions, PERMISSIONS.STOCKIST_MANAGE);
 
-  // Stockist & Kas dimiliki 1 PT, dipakai bersama semua cabangnya. Scoped ke PT sendiri kalau
-  // user punya companyId; kalau tidak (Admin/Owner/Akuntan), bisa pilih semua PT aktif.
+  // Stockist & Kas dimiliki 1 PT, dipakai bersama semua cabangnya. Hanya Super Admin/Owner
+  // yang boleh memilih PT lain; role lain selalu di-scope ke PT sendiri.
+  const roleName = user.customRole?.name;
+  const canSelectCompany = roleName === "SUPER_ADMIN" || roleName === "OWNER";
   const companies = await prisma.company.findMany({
     where: {
       isActive: true,
-      ...(user.companyId ? { id: user.companyId } : {}),
+      ...(canSelectCompany ? {} : { id: user.companyId ?? "" }),
     },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });
+  const defaultCompanyId = canSelectCompany ? null : user.companyId;
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
@@ -62,8 +65,9 @@ export default async function StockistPage({
       />
       <StockistTabs
         companies={companies}
-        defaultCompanyId={user.companyId}
+        defaultCompanyId={defaultCompanyId}
         canManage={canManage}
+        canSelectCompany={canSelectCompany}
       />
     </div>
   );

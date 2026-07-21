@@ -36,18 +36,19 @@ interface Props {
   companies: Company[]
   defaultCompanyId: string | null
   canManage: boolean
+  canSelectCompany: boolean
 }
 
-export function BankPageClient({ companies, defaultCompanyId, canManage }: Props) {
+export function BankPageClient({ companies, defaultCompanyId, canManage, canSelectCompany }: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? "")
   const [date, setDate] = useState(toDate(new Date()))
   const [bankUnfilled, setBankUnfilled] = useState(0)
   const [exporting, setExporting] = useState(false)
 
-  // Remember the last PT an unscoped user (Admin/Owner/Akuntan) picked, so they
-  // don't have to reselect every time they open this page.
+  // Remember the last PT a Super Admin/Owner picked, so they don't have to
+  // reselect every time they open this page.
   useEffect(() => {
-    if (defaultCompanyId) return
+    if (!canSelectCompany) return
     const saved = readLastSelection()
     if (!saved) return
     if (companies.some((c) => c.id === saved)) setCompanyId(saved)
@@ -55,9 +56,9 @@ export function BankPageClient({ companies, defaultCompanyId, canManage }: Props
   }, [])
 
   useEffect(() => {
-    if (defaultCompanyId || !companyId) return
+    if (!canSelectCompany || !companyId) return
     window.localStorage.setItem(LAST_SELECTION_KEY, companyId)
-  }, [companyId, defaultCompanyId])
+  }, [companyId, canSelectCompany])
 
   const handleExport = async () => {
     if (!companyId || !date) return
@@ -99,7 +100,7 @@ export function BankPageClient({ companies, defaultCompanyId, canManage }: Props
             className="w-44 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus-visible:ring-red-500/20 focus-visible:border-red-500"
           />
         </div>
-        {!defaultCompanyId && (
+        {canSelectCompany && (
           <div className="grid gap-1.5">
             <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
               Pilih PT
@@ -118,7 +119,7 @@ export function BankPageClient({ companies, defaultCompanyId, canManage }: Props
             </Select>
           </div>
         )}
-        {defaultCompanyId && companies.length > 0 && (
+        {!canSelectCompany && companies.length > 0 && (
           <div className="grid gap-1.5">
             <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
               PT
