@@ -5,7 +5,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS, PermissionValues } from "@/lib/permissions";
+import { isGlobalRole, PERMISSIONS, PermissionValues } from "@/lib/permissions";
 import { ForbiddenError } from "@/backend/errors/app-error";
 
 const updateRoleSchema = z.object({
@@ -18,10 +18,8 @@ const updateRoleSchema = z.object({
 
 type UpdateBody = z.infer<typeof updateRoleSchema>;
 
-const SYSTEM_ROLES = ["SUPER_ADMIN", "OWNER"];
-
 async function assertOwnCompanyRole(callerRoleName: string, callerCompanyId: string | null, id: string) {
-  if (SYSTEM_ROLES.includes(callerRoleName.toUpperCase())) return;
+  if (isGlobalRole(callerRoleName)) return;
   const role = await roleService.getById(id);
   if (role.companyId !== callerCompanyId) {
     throw new ForbiddenError("Tidak punya akses ke role PT ini");
@@ -53,7 +51,7 @@ export const PATCH = withValidation(updateRoleSchema)(
     try {
       const { id } = await ctx.params;
       await assertOwnCompanyRole(caller.roleName, caller.companyId, id);
-      const isSystem = SYSTEM_ROLES.includes(caller.roleName.toUpperCase());
+      const isSystem = isGlobalRole(caller.roleName);
       const body = isSystem ? ctx.body : { ...ctx.body, companyId: caller.companyId };
       const role = await roleService.update(id, body);
       return NextResponse.json(ok(role, "Role updated"));

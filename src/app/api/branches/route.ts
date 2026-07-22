@@ -4,6 +4,8 @@ import { branchService } from "@/backend/services/branch.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
+import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { PERMISSIONS } from "@/lib/permissions";
 
 const createBranchSchema = z.object({
   name: z.string().min(1).max(100),
@@ -19,6 +21,9 @@ type CreateBody = z.infer<typeof createBranchSchema>;
 
 export async function GET(req: NextRequest) {
   try {
+    const caller = await requirePermission(PERMISSIONS.BRANCHES_VIEW);
+    if (caller instanceof NextResponse) return caller;
+
     const onlyActive = req.nextUrl.searchParams.get("active") === "true";
     const branches = await branchService.getAll(onlyActive);
     return NextResponse.json(ok(branches));
@@ -30,6 +35,9 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createBranchSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
+      const caller = await requirePermission(PERMISSIONS.BRANCHES_MANAGE);
+      if (caller instanceof NextResponse) return caller;
+
       const branch = await branchService.create(ctx.body);
       return NextResponse.json(ok(branch, "Branch created"), { status: 201 });
     } catch (e) {

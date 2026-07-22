@@ -2,8 +2,18 @@ import prisma from "@/lib/prisma";
 import { BranchesPageClient } from "@/components/admin/branches-page-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconBuilding } from "@tabler/icons-react";
+import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { can, PERMISSIONS } from "@/lib/permissions";
+import { redirect } from "next/navigation";
 
 export default async function BranchesPage() {
+  // Hanya Owner & Super Admin (pemegang BRANCHES_VIEW) yang boleh melihat halaman
+  // Cabang — Kepala Cabang dan role lain diarahkan kembali ke dashboard.
+  const caller = await getCaller();
+  if (!caller || !can(caller.permissions, PERMISSIONS.BRANCHES_VIEW)) {
+    redirect("/dashboard");
+  }
+
   let result;
   try {
     result = await Promise.all([

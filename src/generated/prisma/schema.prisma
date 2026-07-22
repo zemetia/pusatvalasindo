@@ -103,7 +103,6 @@ model user {
   bpjsKesehatan      Decimal?
   joinDate           DateTime?
   isActive           Boolean            @default(true)
-  companyId          String?
   customRoleId       String?
   kpiLogs            KpiLog[]
   kpiMonthlyResults  KpiMonthlyResult[]
@@ -113,11 +112,9 @@ model user {
   account            account[]
   session            session[]
   branch             Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  company            Company?           @relation(fields: [companyId], references: [id])
   customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
 
   @@index([branchId])
-  @@index([companyId])
   @@index([customRoleId])
 }
 
@@ -217,7 +214,6 @@ model Company {
   branches                  Branch[]
   roleKpis                  RoleKpi[]
   custom_roles              custom_role[]
-  users                     user[]
   stockistPockets           StockistPocket[]
   kasPockets                KasPocket[]
   companyStockItems         CompanyStockItem[]

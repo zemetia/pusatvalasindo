@@ -51,7 +51,7 @@ SELECT
     c."createdAt"
 FROM "Company" c
 LEFT JOIN "Branch"  b ON b."companyId" = c.id AND b."isActive" = true
-LEFT JOIN "user"    u ON u."companyId" = c.id AND u."isActive" = true
+LEFT JOIN "user"    u ON u."branchId" = b.id AND u."isActive" = true
 GROUP BY c.id, c.name, c.code, c."isActive", c."createdAt";
 
 
@@ -98,7 +98,7 @@ SELECT
     -- Location
     u."branchId",
     b.name  AS branch_name,
-    u."companyId",
+    b."companyId",
     c.name  AS company_name,
     c.code  AS company_code,
     -- Role
@@ -107,7 +107,7 @@ SELECT
     u."createdAt"
 FROM "user"         u
 LEFT JOIN "Branch"      b  ON b.id  = u."branchId"
-LEFT JOIN "Company"     c  ON c.id  = u."companyId"
+LEFT JOIN "Company"     c  ON c.id  = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
 
 
@@ -119,7 +119,7 @@ SELECT
     a.id,
     a."userId",
     u.name         AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name         AS company_name,
     a."branchId",
     b.name         AS branch_name,
@@ -139,7 +139,7 @@ SELECT
 FROM "Attendance" a
 JOIN "user"     u ON u.id = a."userId"
 LEFT JOIN "Branch"   b ON b.id = a."branchId"
-LEFT JOIN "Company"  c ON c.id = u."companyId";
+LEFT JOIN "Company"  c ON c.id = b."companyId";
 
 
 -- -----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ CREATE OR REPLACE VIEW oc_attendance_monthly AS
 SELECT
     a."userId",
     u.name                          AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name                          AS company_name,
     a."branchId",
     b.name                          AS branch_name,
@@ -166,9 +166,9 @@ SELECT
 FROM "Attendance" a
 JOIN "user"    u ON u.id = a."userId"
 LEFT JOIN "Branch"  b ON b.id = a."branchId"
-LEFT JOIN "Company" c ON c.id = u."companyId"
+LEFT JOIN "Company" c ON c.id = b."companyId"
 GROUP BY
-    a."userId", u.name, u."companyId", c.name,
+    a."userId", u.name, b."companyId", c.name,
     a."branchId", b.name,
     EXTRACT(YEAR FROM a.date), EXTRACT(MONTH FROM a.date);
 
@@ -224,7 +224,7 @@ WITH attendance_deductions AS (
 SELECT
     u.id                      AS employee_id,
     u.name                    AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name                    AS company_name,
     u."branchId",
     b.name                    AS branch_name,
@@ -278,7 +278,7 @@ SELECT
 FROM "KpiMonthlyResult" km
 JOIN "user"         u  ON u.id  = km."employeeId"
 LEFT JOIN "Branch"      b  ON b.id  = u."branchId"
-LEFT JOIN "Company"     c  ON c.id  = u."companyId"
+LEFT JOIN "Company"     c  ON c.id  = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId"
 LEFT JOIN attendance_deductions ad
     ON ad."userId" = km."employeeId"
@@ -294,7 +294,7 @@ SELECT
     km.id,
     km."employeeId",
     u.name          AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name          AS company_name,
     u."branchId",
     b.name          AS branch_name,
@@ -309,7 +309,7 @@ SELECT
 FROM "KpiMonthlyResult" km
 JOIN "user"         u  ON u.id  = km."employeeId"
 LEFT JOIN "Branch"      b  ON b.id  = u."branchId"
-LEFT JOIN "Company"     c  ON c.id  = u."companyId"
+LEFT JOIN "Company"     c  ON c.id  = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
 
 
@@ -321,7 +321,7 @@ SELECT
     kl.id,
     kl."employeeId",
     u.name      AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name      AS company_name,
     kd.name     AS kpi_name,
     kd.type     AS kpi_type,
@@ -331,7 +331,8 @@ SELECT
 FROM "KpiLog"        kl
 JOIN "user"          u  ON u.id  = kl."employeeId"
 JOIN "KpiDefinition" kd ON kd.id = kl."kpiId"
-LEFT JOIN "Company"  c  ON c.id  = u."companyId";
+LEFT JOIN "Branch"   b  ON b.id  = u."branchId"
+LEFT JOIN "Company"  c  ON c.id  = b."companyId";
 
 
 -- -----------------------------------------------------------------------------
@@ -363,7 +364,7 @@ SELECT
     r.id,
     r."employeeId",
     u.name          AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name          AS company_name,
     u."branchId",
     b.name          AS branch_name,
@@ -374,7 +375,7 @@ SELECT
 FROM "Revenue"   r
 JOIN "user"      u ON u.id = r."employeeId"
 LEFT JOIN "Branch"   b ON b.id = u."branchId"
-LEFT JOIN "Company"  c ON c.id = u."companyId";
+LEFT JOIN "Company"  c ON c.id = b."companyId";
 
 
 -- -----------------------------------------------------------------------------
@@ -384,7 +385,7 @@ CREATE OR REPLACE VIEW oc_revenue_monthly AS
 SELECT
     r."employeeId",
     u.name                          AS employee_name,
-    u."companyId",
+    b."companyId",
     c.name                          AS company_name,
     u."branchId",
     b.name                          AS branch_name,
@@ -396,9 +397,9 @@ SELECT
 FROM "Revenue"   r
 JOIN "user"      u ON u.id = r."employeeId"
 LEFT JOIN "Branch"   b ON b.id = u."branchId"
-LEFT JOIN "Company"  c ON c.id = u."companyId"
+LEFT JOIN "Company"  c ON c.id = b."companyId"
 GROUP BY
-    r."employeeId", u.name, u."companyId", c.name,
+    r."employeeId", u.name, b."companyId", c.name,
     u."branchId", b.name,
     EXTRACT(YEAR FROM r.date), EXTRACT(MONTH FROM r.date);
 
@@ -416,9 +417,7 @@ SELECT
     ba."isActive",
     ba.note,
     ba."sortOrder",
-    ba."branchId",
-    b.name          AS branch_name,
-    b."companyId",
+    ba."companyId",
     c.name          AS company_name,
     c.code          AS company_code,
     cur.code        AS currency_code,
@@ -427,8 +426,7 @@ SELECT
     ba."createdAt",
     ba."updatedAt"
 FROM "BankAccount" ba
-JOIN "Branch"   b   ON b.id   = ba."branchId"
-LEFT JOIN "Company"  c   ON c.id   = b."companyId"
+LEFT JOIN "Company"  c   ON c.id   = ba."companyId"
 JOIN "Currency"  cur ON cur.id = ba."currencyId";
 
 
@@ -445,8 +443,7 @@ SELECT
     COUNT(ba.id)    AS account_count,
     SUM(ba.balance) AS total_balance
 FROM "BankAccount" ba
-JOIN "Branch"   b   ON b.id   = ba."branchId"
-JOIN "Company"  c   ON c.id   = b."companyId"
+JOIN "Company"  c   ON c.id   = ba."companyId"
 JOIN "Currency" cur ON cur.id = ba."currencyId"
 WHERE ba."isActive" = true
 GROUP BY c.id, c.name, c.code, cur.code, cur.symbol;
@@ -461,21 +458,17 @@ SELECT
     dbe."bankAccountId",
     ba."bankName",
     ba."accountName",
-    ba."branchId",
-    b.name          AS branch_name,
-    b."companyId",
+    ba."companyId",
     c.name          AS company_name,
     cur.code        AS currency_code,
     dbe.date,
     dbe.balance,
-    dbe."tarikCek",
     dbe.note,
     dbe."createdBy",
     dbe."createdAt"
 FROM "DailyBankEntry" dbe
 JOIN "BankAccount"  ba  ON ba.id  = dbe."bankAccountId"
-JOIN "Branch"       b   ON b.id   = ba."branchId"
-LEFT JOIN "Company" c   ON c.id   = b."companyId"
+LEFT JOIN "Company" c   ON c.id   = ba."companyId"
 JOIN "Currency"     cur ON cur.id = ba."currencyId";
 
 
@@ -488,9 +481,7 @@ SELECT
     bm."bankAccountId",
     ba."bankName",
     ba."accountName",
-    ba."branchId",
-    b.name          AS branch_name,
-    b."companyId",
+    ba."companyId",
     c.name          AS company_name,
     cur.code        AS currency_code,
     bm.type,
@@ -501,8 +492,7 @@ SELECT
     bm."createdAt"
 FROM "BankMutation"  bm
 JOIN "BankAccount"   ba  ON ba.id  = bm."bankAccountId"
-JOIN "Branch"        b   ON b.id   = ba."branchId"
-LEFT JOIN "Company"  c   ON c.id   = b."companyId"
+LEFT JOIN "Company"  c   ON c.id   = ba."companyId"
 JOIN "Currency"      cur ON cur.id = ba."currencyId";
 
 

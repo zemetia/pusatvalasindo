@@ -34,7 +34,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { PERMISSIONS, can } from "@/lib/permissions";
+import { PERMISSIONS, can, isAdminRole } from "@/lib/permissions";
 
 interface NavItem {
   title: string;
@@ -48,9 +48,10 @@ type SidebarUser = { name: string; email: string };
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: SidebarUser;
   permissions: string[];
+  roleName: string;
 }
 
-export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebarProps) {
   if (!user) {
     throw new Error("AppSidebar requires a user but received undefined.");
   }
@@ -161,7 +162,9 @@ export function AppSidebar({ user, permissions, ...props }: AppSidebarProps) {
   // ── Management ─────────────────────────────────────────────────────────────
   const navManagement: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.USERS_VIEW)) {
+  // Pengguna hanya untuk Super Admin, Owner, dan Kepala Cabang (role-gated,
+  // sejalan dengan guard di halaman /dashboard/users).
+  if (isAdminRole(roleName)) {
     navManagement.push({
       title: "Pengguna",
       url: "/dashboard/users",

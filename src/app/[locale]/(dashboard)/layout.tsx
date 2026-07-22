@@ -50,7 +50,7 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={sidebarUser} permissions={permissions} />
+      <AppSidebar user={sidebarUser} permissions={permissions} roleName={caller.roleName} />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

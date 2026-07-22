@@ -23,7 +23,7 @@ export default async function KpiSelfPage({
       select: {
         id: true,
         name: true,
-        companyId: true,
+        branch: { select: { companyId: true } },
         customRole: { select: { id: true, name: true, permissions: true } },
       },
     });
@@ -88,7 +88,7 @@ export default async function KpiSelfPage({
         userName={user.name}
         roleName={user.customRole?.name ?? "—"}
         roleKpis={roleKpis}
-        companyId={user.companyId ?? ""}
+        companyId={user.branch?.companyId ?? ""}
         customRoleId={user.customRole?.id ?? ""}
       />
     </div>

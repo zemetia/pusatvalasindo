@@ -6,7 +6,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { PERMISSIONS } from "@/lib/permissions";
+import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { ForbiddenError } from "@/backend/errors/app-error";
 import { bankAccountRepository } from "@/backend/repositories/bank-account.repository";
 import { dailyBankEntryRepository } from "@/backend/repositories/daily-bank-entry.repository";
@@ -37,7 +37,7 @@ function todayDateOnly(): Date {
 /** Anyone with BANK_DAILY_INPUT can edit today's entry; editing a past date requires Super Admin/Owner. */
 function assertEditableDate(roleName: string, date: Date) {
   const isPast = date.getTime() < todayDateOnly().getTime();
-  if (isPast && roleName !== "SUPER_ADMIN" && roleName !== "OWNER") {
+  if (isPast && !isGlobalRole(roleName)) {
     throw new ForbiddenError("Tanggal sudah lewat — edit perlu otorisasi Super Admin");
   }
 }

@@ -47,7 +47,8 @@ export const userRepository = {
 
   findByCompany: (companyId: string, onlyActive = false) =>
     prisma.user.findMany({
-      where: onlyActive ? { companyId, isActive: true } : { companyId },
+      // A user's PT is derived from their branch, so scope by the branch's company.
+      where: { branch: { companyId }, ...(onlyActive ? { isActive: true } : {}) },
       select,
       orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
     }),

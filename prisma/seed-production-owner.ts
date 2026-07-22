@@ -41,7 +41,6 @@ async function main() {
     where: { email: 'owner@pvi.com' },
     update: {
       name: 'Owner',
-      companyId: null,
       branchId: null,
       customRoleId: ownerRole.id,
       isActive: true,
@@ -52,7 +51,6 @@ async function main() {
       name: 'Owner',
       email: 'owner@pvi.com',
       emailVerified: true,
-      companyId: null,
       branchId: null,
       customRoleId: ownerRole.id,
       isActive: true,

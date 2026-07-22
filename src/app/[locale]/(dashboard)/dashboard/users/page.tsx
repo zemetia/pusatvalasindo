@@ -1,11 +1,32 @@
 import prisma from "@/lib/prisma";
 import { UsersPageClient } from "@/components/admin/users-page-client";
+import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { isAdminRole, isGlobalRole } from "@/lib/permissions";
+import { redirect } from "next/navigation";
 
 export default async function UsersPage() {
+  // Hanya Super Admin, Owner, dan Kepala Cabang yang boleh membuka halaman ini —
+  // role lain (HR, Akuntan, Kasir, dst.) diarahkan kembali ke dashboard.
+  const caller = await getCaller();
+  if (!caller || !isAdminRole(caller.roleName)) {
+    redirect("/dashboard");
+  }
+
+  // Super Admin / Owner melihat semua PT; Kepala Cabang dikunci ke PT-nya
+  // sendiri (companyId diturunkan dari cabang, lihat getCallerRecord).
+  const global = isGlobalRole(caller.roleName);
+  // Kepala Cabang tanpa PT (tidak punya cabang) tidak bisa di-scope dengan aman.
+  if (!global && !caller.companyId) {
+    redirect("/dashboard");
+  }
+  // companyId is guaranteed non-null here for scoped callers (redirected above).
+  const scopedCompanyId: string | undefined = global ? undefined : caller.companyId ?? undefined;
+
   let result;
   try {
     result = await Promise.all([
       prisma.user.findMany({
+        where: scopedCompanyId !== undefined ? { branch: { companyId: scopedCompanyId } } : undefined,
         include: {
           branch: { select: { id: true, name: true } },
           customRole: { select: { id: true, name: true } },
@@ -13,16 +34,19 @@ export default async function UsersPage() {
         orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
       }),
       prisma.branch.findMany({
-        where: { isActive: true },
+        where: { isActive: true, ...(scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : {}) },
         orderBy: { name: "asc" },
         select: { id: true, name: true, companyId: true },
       }),
       prisma.company.findMany({
-        where: { isActive: true },
+        where: { isActive: true, ...(scopedCompanyId !== undefined ? { id: scopedCompanyId } : {}) },
         orderBy: { name: "asc" },
         select: { id: true, name: true },
       }),
       prisma.custom_role.findMany({
+        // Kepala Cabang hanya boleh menetapkan role milik PT-nya (tidak ada
+        // role global seperti Super Admin/Owner yang companyId-nya null).
+        where: scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : undefined,
         orderBy: { name: "asc" },
         select: { id: true, name: true, companyId: true },
       }),

@@ -25,9 +25,9 @@ export const POST = withValidation(calculateSchema)(
 
       const target = await prisma.user.findUnique({
         where: { id: employeeId },
-        select: { companyId: true },
+        select: { branch: { select: { companyId: true } } },
       });
-      assertPayrollAccess(caller, employeeId, target?.companyId ?? null);
+      assertPayrollAccess(caller, employeeId, target?.branch?.companyId ?? null);
 
       const result = await payrollService.calculateMonthlyPayroll(
         employeeId,

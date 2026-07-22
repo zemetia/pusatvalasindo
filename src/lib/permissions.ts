@@ -84,8 +84,6 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.CURRENCY_MANAGE,
   PERMISSIONS.USERS_VIEW,
   PERMISSIONS.USERS_MANAGE,
-  PERMISSIONS.BRANCHES_VIEW,
-  PERMISSIONS.BRANCHES_MANAGE,
   PERMISSIONS.ROLES_VIEW,
   PERMISSIONS.ROLES_MANAGE,
 ];
@@ -116,7 +114,6 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.USERS_VIEW,
-  PERMISSIONS.BRANCHES_VIEW,
   PERMISSIONS.ROLES_VIEW,
 ];
 
@@ -133,7 +130,6 @@ const HR_PERMISSIONS: Permission[] = [
   PERMISSIONS.PAYROLL_VIEW_ALL,
   PERMISSIONS.USERS_VIEW,
   PERMISSIONS.USERS_MANAGE,
-  PERMISSIONS.BRANCHES_VIEW,
 ];
 
 const AKUNTAN_PERMISSIONS: Permission[] = [
@@ -254,4 +250,36 @@ export function can(permissions: string[], permission: Permission): boolean {
 /** Returns true when the user has ANY of the given permissions. */
 export function canAny(permissions: string[], required: Permission[]): boolean {
   return required.some((p) => permissions.includes(p));
+}
+
+// ─── Role classification (single source of truth) ────────────────────────────
+// These predicates are the ONLY place role names are matched against literals.
+// Everything else (pages, API routes, services, sidebar) must call these helpers
+// instead of re-checking `roleName === "SUPER_ADMIN"` inline, so the policy can't
+// drift across files. Both role gating and the DB-stored permission arrays are
+// resolved in `backend/helpers/get-admin-caller.ts`.
+
+/** Roles not scoped to a single PT — Super Admin & Owner see/act across every PT. */
+const GLOBAL_ROLES = ["SUPER_ADMIN", "OWNER"];
+/** Admin-capable roles: the global roles plus Kepala Cabang (scoped to their PT). */
+const ADMIN_ROLES = ["SUPER_ADMIN", "OWNER", "KEPALA_CABANG"];
+
+/** Normalizes a role name to the uppercase/underscore form used for comparisons. */
+export function normalizeRoleName(roleName: string): string {
+  return roleName.toUpperCase().replace(/\s+/g, "_");
+}
+
+/** True for unscoped roles (Super Admin, Owner) — they see every PT. */
+export function isGlobalRole(roleName: string): boolean {
+  return GLOBAL_ROLES.includes(normalizeRoleName(roleName));
+}
+
+/**
+ * True for admin-capable roles (Super Admin, Owner, Kepala Cabang). Gates the
+ * admin API surface (getAdminCaller), the Users (Pengguna) page, and its sidebar
+ * entry. This is role-gated (not permission-gated) on purpose so access can't
+ * drift with the DB-stored permission arrays.
+ */
+export function isAdminRole(roleName: string): boolean {
+  return ADMIN_ROLES.includes(normalizeRoleName(roleName));
 }

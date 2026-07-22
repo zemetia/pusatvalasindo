@@ -1,8 +1,6 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
+import { requirePageCaller } from "@/backend/helpers/page-access";
 import { CompanyStockClient } from "@/components/admin/company-stock/company-stock-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconDatabase } from "@tabler/icons-react";
@@ -13,29 +11,17 @@ export default async function CompanyStockManagementPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect(`/${locale}/login`);
+  const caller = await requirePageCaller(PERMISSIONS.COMPANY_STOCK_VIEW, locale);
+  const canManage = can(caller.permissions, PERMISSIONS.COMPANY_STOCK_MANAGE);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      companyId: true,
-      customRole: { select: { permissions: true } },
-    },
-  });
-  if (!user) redirect(`/${locale}/login`);
-
-  const permissions = user.customRole?.permissions ?? [];
-  if (!can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
-    redirect(`/${locale}/dashboard`);
-  }
-  const canManage = can(permissions, PERMISSIONS.COMPANY_STOCK_MANAGE);
-
+  // Global role (Super Admin/Owner) melihat semua PT; role lain di-scope ke PT
+  // sendiri. Non-global tanpa cabang tidak melihat PT mana pun. Query pakai
+  // `include` (butuh companyStockItems), jadi tidak lewat getScopedCompanies.
+  const canSelectCompany = isGlobalRole(caller.roleName);
   const companies = await prisma.company.findMany({
     where: {
       isActive: true,
-      ...(user.companyId ? { id: user.companyId } : {}),
+      ...(canSelectCompany ? {} : { id: caller.companyId ?? "" }),
     },
     orderBy: { name: "asc" },
     include: {

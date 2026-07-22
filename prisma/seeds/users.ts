@@ -279,14 +279,13 @@ export async function seedUsers(
 
   for (const u of USERS) {
     const customRoleId = resolveRoleId(u.roleName, u.companyCode)
-    const companyId    = u.companyCode ? companyIds[u.companyCode] ?? null : null
+    // A user's PT is derived from their branch — no companyId is stored on the user.
     const branchId     = u.branchName  ? branchIds[u.branchName]  ?? null : null
 
     const user = await prisma.user.upsert({
       where: { email: u.email },
       update: {
         name: u.name,
-        companyId,
         branchId,
         customRoleId,
         baseSalary: u.baseSalary ?? null,
@@ -298,7 +297,6 @@ export async function seedUsers(
         name: u.name,
         email: u.email,
         emailVerified: true,
-        companyId,
         branchId,
         customRoleId,
         baseSalary: u.baseSalary ?? null,

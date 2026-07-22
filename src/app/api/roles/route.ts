@@ -5,7 +5,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS, PermissionValues } from "@/lib/permissions";
+import { isGlobalRole, PERMISSIONS, PermissionValues } from "@/lib/permissions";
 
 const createRoleSchema = z.object({
   name: z.string().min(1).max(100),
@@ -17,16 +17,15 @@ const createRoleSchema = z.object({
 
 type CreateBody = z.infer<typeof createRoleSchema>;
 
-const SYSTEM_ROLES = ["SUPER_ADMIN", "OWNER"];
-
 export async function GET(req: NextRequest) {
   const caller = await requirePermission(PERMISSIONS.ROLES_VIEW);
   if (caller instanceof NextResponse) return caller;
 
   try {
     let companyId = req.nextUrl.searchParams.get("companyId");
-    // Non-system callers can only ever see roles for their own company.
-    if (!SYSTEM_ROLES.includes(caller.roleName.toUpperCase())) {
+    // Only global roles (Super Admin/Owner) manage cross-PT roles; everyone else
+    // can only ever see roles for their own company.
+    if (!isGlobalRole(caller.roleName)) {
       companyId = caller.companyId;
     }
     const roles = companyId
@@ -44,7 +43,7 @@ export const POST = withValidation(createRoleSchema)(
     if (caller instanceof NextResponse) return caller;
 
     try {
-      const isSystem = SYSTEM_ROLES.includes(caller.roleName.toUpperCase());
+      const isSystem = isGlobalRole(caller.roleName);
       const companyId = isSystem ? (ctx.body.companyId ?? null) : caller.companyId;
       const role = await roleService.create({ ...ctx.body, companyId });
       return NextResponse.json(ok(role, "Role created"), { status: 201 });

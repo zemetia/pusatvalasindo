@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { PERMISSIONS } from "@/lib/permissions";
+import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
 import { StockistHistoryClient } from "@/components/admin/stockist/stockist-history-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconHistory } from "@tabler/icons-react";
@@ -13,32 +10,11 @@ export default async function StockistHistoryPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect(`/${locale}/login`);
+  const caller = await requirePageCaller(PERMISSIONS.STOCKIST_VIEW, locale);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      companyId: true,
-      customRole: { select: { permissions: true } },
-    },
-  });
-  if (!user) redirect(`/${locale}/login`);
-
-  const permissions = user.customRole?.permissions ?? [];
-  if (!can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
-    redirect(`/${locale}/dashboard`);
-  }
-
-  const companies = await prisma.company.findMany({
-    where: {
-      isActive: true,
-      ...(user.companyId ? { id: user.companyId } : {}),
-    },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
-  });
+  // Global role (Super Admin/Owner) melihat semua PT & memilih bebas; role lain
+  // di-scope ke PT sendiri. Non-global tanpa cabang tidak melihat PT mana pun.
+  const { companies, effectiveCompanyId } = await getScopedCompanies(caller);
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
@@ -47,7 +23,7 @@ export default async function StockistHistoryPage({
         description="Riwayat mutasi & koreksi saldo mata uang per pocket."
         icon={<IconHistory className="size-5" />}
       />
-      <StockistHistoryClient companies={companies} defaultCompanyId={user.companyId} />
+      <StockistHistoryClient companies={companies} defaultCompanyId={effectiveCompanyId} />
     </div>
   );
 }

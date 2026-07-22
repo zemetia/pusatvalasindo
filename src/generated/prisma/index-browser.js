@@ -196,7 +196,6 @@ exports.Prisma.UserScalarFieldEnum = {
   bpjsKesehatan: 'bpjsKesehatan',
   joinDate: 'joinDate',
   isActive: 'isActive',
-  companyId: 'companyId',
   customRoleId: 'customRoleId'
 };
 

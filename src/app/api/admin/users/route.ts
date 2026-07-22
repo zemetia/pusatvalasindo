@@ -6,6 +6,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { getAdminCaller } from "@/backend/helpers/get-admin-caller";
+import { isGlobalRole } from "@/lib/permissions";
 
 const createUserSchema = z.object({
   name: z.string().min(1).max(100),
@@ -31,6 +32,18 @@ export const POST = withValidation(createUserSchema)(
       if (caller instanceof NextResponse) return caller;
 
       let { name, email, password, customRoleId, branchId, phone, baseSalary, mealAllowance, transportAllowance, positionAllowance, bpjsKesehatan, joinDate } = ctx.body;
+
+      // Kepala Cabang hanya boleh membuat user pada cabang yang PT-nya sama
+      // dengan miliknya. Super Admin / Owner tidak dibatasi.
+      if (!isGlobalRole(caller.roleName)) {
+        const branch = await prisma.branch.findUnique({
+          where: { id: branchId },
+          select: { companyId: true },
+        });
+        if (!branch || branch.companyId !== caller.companyId) {
+          return NextResponse.json({ error: "Cabang berada di luar PT Anda" }, { status: 403 });
+        }
+      }
 
       if (!password) {
         const emailPrefix = email.split("@")[0];

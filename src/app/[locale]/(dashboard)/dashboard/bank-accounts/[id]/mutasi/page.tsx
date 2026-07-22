@@ -1,11 +1,16 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
+import { requirePageCaller } from "@/backend/helpers/page-access";
 import { BankMutasiPageClient } from "@/components/admin/bank-mutasi-page-client";
 
-type Params = { params: Promise<{ id: string }> };
+type Params = { params: Promise<{ id: string; locale: string }> };
 
 export default async function BankMutasiPage({ params }: Params) {
-  const { id } = await params;
+  const { id, locale } = await params;
+
+  const caller = await requirePageCaller(PERMISSIONS.BANK_VIEW, locale);
+  const canSelectCompany = isGlobalRole(caller.roleName);
 
   let account;
   try {
@@ -25,6 +30,10 @@ export default async function BankMutasiPage({ params }: Params) {
   }
 
   if (!account) notFound();
+
+  // Kepala Cabang & role non-global hanya boleh melihat mutasi rekening PT-nya sendiri.
+  // PT caller diturunkan dari cabangnya (single source of truth).
+  if (!canSelectCompany && account.companyId !== caller.companyId) notFound();
 
   const serialized = {
     id: account.id,

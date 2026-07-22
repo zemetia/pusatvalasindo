@@ -71,14 +71,14 @@ function toDate(d: Date) {
 interface Props {
   companies: Company[]
   defaultCompanyId: string | null
-  isSuperAdmin: boolean
+  canEditPastDate: boolean
   canSelectCompany: boolean
 }
 
 export function StockistHeadConfirmationClient({
   companies,
   defaultCompanyId,
-  isSuperAdmin,
+  canEditPastDate,
   canSelectCompany,
 }: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? companies[0]?.id ?? "")
@@ -90,7 +90,7 @@ export function StockistHeadConfirmationClient({
   const [exporting, setExporting] = useState(false)
 
   const isPastDate = date < toDate(new Date())
-  const locked = isPastDate && !isSuperAdmin
+  const locked = isPastDate && !canEditPastDate
 
   const loadData = useCallback(async () => {
     if (!companyId || !date) return

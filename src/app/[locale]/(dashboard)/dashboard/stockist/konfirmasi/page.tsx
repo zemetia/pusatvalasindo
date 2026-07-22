@@ -1,11 +1,9 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { PERMISSIONS } from "@/lib/permissions";
+import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
 import { StockistHeadConfirmationClient } from "@/components/admin/stockist/stockist-head-confirmation-client";
 import { PageHeader } from "@/components/admin/page-header";
-import { IconClipboardCheck } from "@tabler/icons-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { IconClipboardCheck, IconBuildingOff } from "@tabler/icons-react";
 
 export default async function StockistHeadConfirmationPage({
   params,
@@ -13,39 +11,18 @@ export default async function StockistHeadConfirmationPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect(`/${locale}/login`);
+  const caller = await requirePageCaller(PERMISSIONS.STOCKIST_VERIFY, locale);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      id: true,
-      companyId: true,
-      customRole: { select: { name: true, permissions: true } },
-    },
-  });
-  if (!user) redirect(`/${locale}/login`);
+  // Cross-check dimiliki 1 PT, dipakai bersama semua cabangnya. Global role
+  // (Super Admin/Owner) memilih PT bebas & boleh edit tanggal lampau; role lain
+  // di-scope ke PT sendiri (diturunkan dari cabangnya).
+  const { companies, defaultCompanyId, canSelectCompany, effectiveCompanyId } =
+    await getScopedCompanies(caller);
+  const canEditPastDate = canSelectCompany;
 
-  const permissions = user.customRole?.permissions ?? [];
-  if (!can(permissions, PERMISSIONS.STOCKIST_VERIFY)) {
-    redirect(`/${locale}/dashboard`);
-  }
-
-  const isSuperAdmin = user.customRole?.name === "SUPER_ADMIN";
-  const isOwner = user.customRole?.name === "OWNER";
-  const canSelectCompany = isSuperAdmin || isOwner;
-
-  // Konfirmasi kepala cabang dimiliki 1 PT — hanya Super Admin/Owner yang boleh memilih PT
-  // lain; role lain selalu di-scope ke PT sendiri.
-  const companies = await prisma.company.findMany({
-    where: {
-      isActive: true,
-      ...(canSelectCompany ? {} : { id: user.companyId ?? "" }),
-    },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
-  });
-  const defaultCompanyId = canSelectCompany ? null : user.companyId;
+  // Role non-global wajib terikat ke sebuah PT (lewat cabang). Kalau tidak, akunnya
+  // belum dikonfigurasi — tampilkan pesan jelas, bukan pemilih semua PT.
+  const isUnassigned = !canSelectCompany && !effectiveCompanyId;
 
   return (
     <div className="flex flex-col gap-6 px-4 lg:px-6">
@@ -54,12 +31,23 @@ export default async function StockistHeadConfirmationPage({
         description="Hitung ulang total stock & kas oleh kepala cabang, dibandingkan otomatis dengan total sistem."
         icon={<IconClipboardCheck className="size-5" />}
       />
-      <StockistHeadConfirmationClient
-        companies={companies}
-        defaultCompanyId={defaultCompanyId}
-        isSuperAdmin={isSuperAdmin}
-        canSelectCompany={canSelectCompany}
-      />
+      {isUnassigned ? (
+        <Alert variant="destructive">
+          <IconBuildingOff className="size-4" />
+          <AlertTitle>Akun belum terhubung ke PT</AlertTitle>
+          <AlertDescription>
+            Akun Anda belum terhubung ke perusahaan (PT) atau cabang mana pun, sehingga
+            cross-check tidak dapat ditampilkan. Hubungi admin untuk menetapkan cabang/PT Anda.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <StockistHeadConfirmationClient
+          companies={companies}
+          defaultCompanyId={defaultCompanyId}
+          canEditPastDate={canEditPastDate}
+          canSelectCompany={canSelectCompany}
+        />
+      )}
     </div>
   );
 }

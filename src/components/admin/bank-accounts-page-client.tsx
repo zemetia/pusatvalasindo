@@ -47,12 +47,15 @@ interface BankAccountsPageClientProps {
   accounts: BankAccount[];
   currencies: SerializedCurrency[];
   companies: Company[];
+  // Non-privileged roles are locked to their own PT, so the PT filter bar is hidden for them.
+  canSelectCompany?: boolean;
 }
 
 export function BankAccountsPageClient({
   accounts,
   currencies,
   companies,
+  canSelectCompany = true,
 }: BankAccountsPageClientProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -97,7 +100,7 @@ export function BankAccountsPageClient({
         action={<BankAccountSheet currencies={currencies} companies={companies} />}
       />
 
-      {companies.length > 0 && (
+      {canSelectCompany && companies.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <IconBuilding className="size-4" />

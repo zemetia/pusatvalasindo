@@ -4,9 +4,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import type { Permission } from "@/lib/permissions";
-import { can } from "@/lib/permissions";
-
-const ADMIN_ROLES = ["SUPER_ADMIN", "OWNER", "KEPALA_CABANG"];
+import { can, isAdminRole } from "@/lib/permissions";
 
 export type AdminCaller = {
   id: string;
@@ -44,18 +42,23 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
     select: {
       name: true,
       email: true,
-      companyId: true,
       branchId: true,
+      branch: { select: { companyId: true } },
       customRole: { select: { name: true, permissions: true, payrollCompanyIds: true } },
     },
   });
   if (!user) return null;
 
+  // A user's PT is derived solely from their branch — the single source of truth.
+  // Branch-scoped roles (e.g. Kepala Cabang) are thereby locked to their PT, while
+  // global roles (Super Admin/Owner) have no branch and stay unscoped.
+  const companyId = user.branch?.companyId ?? null;
+
   return {
     id: session.user.id,
     name: user.name,
     email: user.email,
-    companyId: user.companyId,
+    companyId,
     branchId: user.branchId,
     roleName: user.customRole?.name ?? "",
     permissions: user.customRole?.permissions ?? [],
@@ -74,10 +77,9 @@ export async function getAdminCaller(): Promise<AdminCaller | NextResponse> {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
-  // Role names like "Kepala Cabang" uppercase to "KEPALA CABANG" (space), so
-  // normalize spaces to underscores before comparing against ADMIN_ROLES.
-  const roleName = caller.roleName.toUpperCase().replace(/\s+/g, "_");
-  if (!roleName || !ADMIN_ROLES.includes(roleName)) {
+  // Role matching (incl. name normalization) lives in isAdminRole — the single
+  // source of truth in lib/permissions.ts.
+  if (!isAdminRole(caller.roleName)) {
     return NextResponse.json({ error: "Tidak memiliki izin" }, { status: 403 });
   }
 
@@ -85,7 +87,9 @@ export async function getAdminCaller(): Promise<AdminCaller | NextResponse> {
     id: caller.id,
     companyId: caller.companyId,
     branchId: caller.branchId,
-    roleName,
+    // Raw role name (as stored) — consistent with getCaller/requirePermission.
+    // Callers must classify it via isGlobalRole/isAdminRole, never string-compare.
+    roleName: caller.roleName,
     permissions: caller.permissions,
     payrollCompanyIds: caller.payrollCompanyIds,
   };

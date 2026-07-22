@@ -1,5 +1,6 @@
 import { ForbiddenError, NotFoundError } from "@/backend/errors/app-error";
 import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
+import { isGlobalRole } from "@/lib/permissions";
 import { companyStockItemRepository } from "@/backend/repositories/company-stock-item.repository";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
 import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
@@ -16,12 +17,13 @@ function todayDateOnly(): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 }
 
-/** Kepala Cabang can only edit today's confirmation; editing a past date requires Super Admin. */
+/** Kepala Cabang can only edit today's confirmation; editing a past date requires a global role (Super Admin/Owner). */
 function assertEditableDate(caller: AdminCaller, date: Date) {
   const isPast = date.getTime() < todayDateOnly().getTime();
-  if (isPast && caller.roleName !== "SUPER_ADMIN") {
+  const canEditPastDate = isGlobalRole(caller.roleName);
+  if (isPast && !canEditPastDate) {
     throw new ForbiddenError(
-      "Tanggal sudah lewat — edit perlu otorisasi Super Admin"
+      "Tanggal sudah lewat — edit perlu otorisasi Super Admin/Owner"
     );
   }
 }

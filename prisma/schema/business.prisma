@@ -30,7 +30,6 @@ model Company {
   branches                  Branch[]
   roleKpis                  RoleKpi[]
   custom_roles              custom_role[]
-  users                     user[]
   stockistPockets           StockistPocket[]
   kasPockets                KasPocket[]
   companyStockItems         CompanyStockItem[]

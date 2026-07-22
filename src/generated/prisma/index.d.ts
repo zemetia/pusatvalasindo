@@ -4696,7 +4696,6 @@ export namespace Prisma {
     branches: number
     roleKpis: number
     custom_roles: number
-    users: number
     stockistPockets: number
     kasPockets: number
     companyStockItems: number
@@ -4711,7 +4710,6 @@ export namespace Prisma {
     branches?: boolean | CompanyCountOutputTypeCountBranchesArgs
     roleKpis?: boolean | CompanyCountOutputTypeCountRoleKpisArgs
     custom_roles?: boolean | CompanyCountOutputTypeCountCustom_rolesArgs
-    users?: boolean | CompanyCountOutputTypeCountUsersArgs
     stockistPockets?: boolean | CompanyCountOutputTypeCountStockistPocketsArgs
     kasPockets?: boolean | CompanyCountOutputTypeCountKasPocketsArgs
     companyStockItems?: boolean | CompanyCountOutputTypeCountCompanyStockItemsArgs
@@ -4758,13 +4756,6 @@ export namespace Prisma {
    */
   export type CompanyCountOutputTypeCountCustom_rolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: custom_roleWhereInput
-  }
-
-  /**
-   * CompanyCountOutputType without action
-   */
-  export type CompanyCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: userWhereInput
   }
 
   /**
@@ -10021,7 +10012,6 @@ export namespace Prisma {
     bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean | null
-    companyId: string | null
     customRoleId: string | null
   }
 
@@ -10042,7 +10032,6 @@ export namespace Prisma {
     bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean | null
-    companyId: string | null
     customRoleId: string | null
   }
 
@@ -10063,7 +10052,6 @@ export namespace Prisma {
     bpjsKesehatan: number
     joinDate: number
     isActive: number
-    companyId: number
     customRoleId: number
     _all: number
   }
@@ -10102,7 +10090,6 @@ export namespace Prisma {
     bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
-    companyId?: true
     customRoleId?: true
   }
 
@@ -10123,7 +10110,6 @@ export namespace Prisma {
     bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
-    companyId?: true
     customRoleId?: true
   }
 
@@ -10144,7 +10130,6 @@ export namespace Prisma {
     bpjsKesehatan?: true
     joinDate?: true
     isActive?: true
-    companyId?: true
     customRoleId?: true
     _all?: true
   }
@@ -10252,7 +10237,6 @@ export namespace Prisma {
     bpjsKesehatan: Decimal | null
     joinDate: Date | null
     isActive: boolean
-    companyId: string | null
     customRoleId: string | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
@@ -10292,7 +10276,6 @@ export namespace Prisma {
     bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
-    companyId?: boolean
     customRoleId?: boolean
     kpiLogs?: boolean | user$kpiLogsArgs<ExtArgs>
     kpiMonthlyResults?: boolean | user$kpiMonthlyResultsArgs<ExtArgs>
@@ -10302,7 +10285,6 @@ export namespace Prisma {
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -10324,10 +10306,8 @@ export namespace Prisma {
     bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
-    companyId?: boolean
     customRoleId?: boolean
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -10348,10 +10328,8 @@ export namespace Prisma {
     bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
-    companyId?: boolean
     customRoleId?: boolean
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -10372,11 +10350,10 @@ export namespace Prisma {
     bpjsKesehatan?: boolean
     joinDate?: boolean
     isActive?: boolean
-    companyId?: boolean
     customRoleId?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "joinDate" | "isActive" | "companyId" | "customRoleId", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "joinDate" | "isActive" | "customRoleId", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kpiLogs?: boolean | user$kpiLogsArgs<ExtArgs>
     kpiMonthlyResults?: boolean | user$kpiMonthlyResultsArgs<ExtArgs>
@@ -10386,18 +10363,15 @@ export namespace Prisma {
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type userIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
   }
   export type userIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | user$branchArgs<ExtArgs>
-    company?: boolean | user$companyArgs<ExtArgs>
     customRole?: boolean | user$customRoleArgs<ExtArgs>
   }
 
@@ -10412,7 +10386,6 @@ export namespace Prisma {
       account: Prisma.$accountPayload<ExtArgs>[]
       session: Prisma.$sessionPayload<ExtArgs>[]
       branch: Prisma.$BranchPayload<ExtArgs> | null
-      company: Prisma.$CompanyPayload<ExtArgs> | null
       customRole: Prisma.$custom_rolePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -10432,7 +10405,6 @@ export namespace Prisma {
       bpjsKesehatan: Prisma.Decimal | null
       joinDate: Date | null
       isActive: boolean
-      companyId: string | null
       customRoleId: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -10836,7 +10808,6 @@ export namespace Prisma {
     account<T extends user$accountArgs<ExtArgs> = {}>(args?: Subset<T, user$accountArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$accountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     session<T extends user$sessionArgs<ExtArgs> = {}>(args?: Subset<T, user$sessionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$sessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     branch<T extends user$branchArgs<ExtArgs> = {}>(args?: Subset<T, user$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    company<T extends user$companyArgs<ExtArgs> = {}>(args?: Subset<T, user$companyArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     customRole<T extends user$customRoleArgs<ExtArgs> = {}>(args?: Subset<T, user$customRoleArgs<ExtArgs>>): Prisma__custom_roleClient<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -10883,7 +10854,6 @@ export namespace Prisma {
     readonly bpjsKesehatan: FieldRef<"user", 'Decimal'>
     readonly joinDate: FieldRef<"user", 'DateTime'>
     readonly isActive: FieldRef<"user", 'Boolean'>
-    readonly companyId: FieldRef<"user", 'String'>
     readonly customRoleId: FieldRef<"user", 'String'>
   }
     
@@ -11470,25 +11440,6 @@ export namespace Prisma {
      */
     include?: BranchInclude<ExtArgs> | null
     where?: BranchWhereInput
-  }
-
-  /**
-   * user.company
-   */
-  export type user$companyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Company
-     */
-    select?: CompanySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Company
-     */
-    omit?: CompanyOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: CompanyInclude<ExtArgs> | null
-    where?: CompanyWhereInput
   }
 
   /**
@@ -17596,7 +17547,6 @@ export namespace Prisma {
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
-    users?: boolean | Company$usersArgs<ExtArgs>
     stockistPockets?: boolean | Company$stockistPocketsArgs<ExtArgs>
     kasPockets?: boolean | Company$kasPocketsArgs<ExtArgs>
     companyStockItems?: boolean | Company$companyStockItemsArgs<ExtArgs>
@@ -17640,7 +17590,6 @@ export namespace Prisma {
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
-    users?: boolean | Company$usersArgs<ExtArgs>
     stockistPockets?: boolean | Company$stockistPocketsArgs<ExtArgs>
     kasPockets?: boolean | Company$kasPocketsArgs<ExtArgs>
     companyStockItems?: boolean | Company$companyStockItemsArgs<ExtArgs>
@@ -17660,7 +17609,6 @@ export namespace Prisma {
       branches: Prisma.$BranchPayload<ExtArgs>[]
       roleKpis: Prisma.$RoleKpiPayload<ExtArgs>[]
       custom_roles: Prisma.$custom_rolePayload<ExtArgs>[]
-      users: Prisma.$userPayload<ExtArgs>[]
       stockistPockets: Prisma.$StockistPocketPayload<ExtArgs>[]
       kasPockets: Prisma.$KasPocketPayload<ExtArgs>[]
       companyStockItems: Prisma.$CompanyStockItemPayload<ExtArgs>[]
@@ -18074,7 +18022,6 @@ export namespace Prisma {
     branches<T extends Company$branchesArgs<ExtArgs> = {}>(args?: Subset<T, Company$branchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     roleKpis<T extends Company$roleKpisArgs<ExtArgs> = {}>(args?: Subset<T, Company$roleKpisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     custom_roles<T extends Company$custom_rolesArgs<ExtArgs> = {}>(args?: Subset<T, Company$custom_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    users<T extends Company$usersArgs<ExtArgs> = {}>(args?: Subset<T, Company$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockistPockets<T extends Company$stockistPocketsArgs<ExtArgs> = {}>(args?: Subset<T, Company$stockistPocketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistPocketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kasPockets<T extends Company$kasPocketsArgs<ExtArgs> = {}>(args?: Subset<T, Company$kasPocketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KasPocketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     companyStockItems<T extends Company$companyStockItemsArgs<ExtArgs> = {}>(args?: Subset<T, Company$companyStockItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompanyStockItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -18603,30 +18550,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: Custom_roleScalarFieldEnum | Custom_roleScalarFieldEnum[]
-  }
-
-  /**
-   * Company.users
-   */
-  export type Company$usersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the user
-     */
-    select?: userSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the user
-     */
-    omit?: userOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: userInclude<ExtArgs> | null
-    where?: userWhereInput
-    orderBy?: userOrderByWithRelationInput | userOrderByWithRelationInput[]
-    cursor?: userWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -50448,7 +50371,6 @@ export namespace Prisma {
     bpjsKesehatan: 'bpjsKesehatan',
     joinDate: 'joinDate',
     isActive: 'isActive',
-    companyId: 'companyId',
     customRoleId: 'customRoleId'
   };
 
@@ -51693,7 +51615,6 @@ export namespace Prisma {
     bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
-    companyId?: StringNullableFilter<"user"> | string | null
     customRoleId?: StringNullableFilter<"user"> | string | null
     kpiLogs?: KpiLogListRelationFilter
     kpiMonthlyResults?: KpiMonthlyResultListRelationFilter
@@ -51703,7 +51624,6 @@ export namespace Prisma {
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
-    company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     customRole?: XOR<Custom_roleNullableScalarRelationFilter, custom_roleWhereInput> | null
   }
 
@@ -51724,7 +51644,6 @@ export namespace Prisma {
     bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     isActive?: SortOrder
-    companyId?: SortOrderInput | SortOrder
     customRoleId?: SortOrderInput | SortOrder
     kpiLogs?: KpiLogOrderByRelationAggregateInput
     kpiMonthlyResults?: KpiMonthlyResultOrderByRelationAggregateInput
@@ -51734,7 +51653,6 @@ export namespace Prisma {
     account?: accountOrderByRelationAggregateInput
     session?: sessionOrderByRelationAggregateInput
     branch?: BranchOrderByWithRelationInput
-    company?: CompanyOrderByWithRelationInput
     customRole?: custom_roleOrderByWithRelationInput
   }
 
@@ -51758,7 +51676,6 @@ export namespace Prisma {
     bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
-    companyId?: StringNullableFilter<"user"> | string | null
     customRoleId?: StringNullableFilter<"user"> | string | null
     kpiLogs?: KpiLogListRelationFilter
     kpiMonthlyResults?: KpiMonthlyResultListRelationFilter
@@ -51768,7 +51685,6 @@ export namespace Prisma {
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
-    company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     customRole?: XOR<Custom_roleNullableScalarRelationFilter, custom_roleWhereInput> | null
   }, "id" | "email">
 
@@ -51789,7 +51705,6 @@ export namespace Prisma {
     bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     isActive?: SortOrder
-    companyId?: SortOrderInput | SortOrder
     customRoleId?: SortOrderInput | SortOrder
     _count?: userCountOrderByAggregateInput
     _avg?: userAvgOrderByAggregateInput
@@ -51818,7 +51733,6 @@ export namespace Prisma {
     bpjsKesehatan?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableWithAggregatesFilter<"user"> | Date | string | null
     isActive?: BoolWithAggregatesFilter<"user"> | boolean
-    companyId?: StringNullableWithAggregatesFilter<"user"> | string | null
     customRoleId?: StringNullableWithAggregatesFilter<"user"> | string | null
   }
 
@@ -52241,7 +52155,6 @@ export namespace Prisma {
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
-    users?: UserListRelationFilter
     stockistPockets?: StockistPocketListRelationFilter
     kasPockets?: KasPocketListRelationFilter
     companyStockItems?: CompanyStockItemListRelationFilter
@@ -52262,7 +52175,6 @@ export namespace Prisma {
     branches?: BranchOrderByRelationAggregateInput
     roleKpis?: RoleKpiOrderByRelationAggregateInput
     custom_roles?: custom_roleOrderByRelationAggregateInput
-    users?: userOrderByRelationAggregateInput
     stockistPockets?: StockistPocketOrderByRelationAggregateInput
     kasPockets?: KasPocketOrderByRelationAggregateInput
     companyStockItems?: CompanyStockItemOrderByRelationAggregateInput
@@ -52286,7 +52198,6 @@ export namespace Prisma {
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
-    users?: UserListRelationFilter
     stockistPockets?: StockistPocketListRelationFilter
     kasPockets?: KasPocketListRelationFilter
     companyStockItems?: CompanyStockItemListRelationFilter
@@ -54910,7 +54821,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -54931,7 +54841,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -54966,7 +54875,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -54987,7 +54895,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -55015,7 +54922,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
   }
 
@@ -55054,7 +54960,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -55512,7 +55417,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -55533,7 +55437,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -55554,7 +55457,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -55575,7 +55477,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -58435,7 +58336,6 @@ export namespace Prisma {
     bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
-    companyId?: SortOrder
     customRoleId?: SortOrder
   }
 
@@ -58464,7 +58364,6 @@ export namespace Prisma {
     bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
-    companyId?: SortOrder
     customRoleId?: SortOrder
   }
 
@@ -58485,7 +58384,6 @@ export namespace Prisma {
     bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     isActive?: SortOrder
-    companyId?: SortOrder
     customRoleId?: SortOrder
   }
 
@@ -61053,12 +60951,6 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
-  export type CompanyCreateNestedOneWithoutUsersInput = {
-    create?: XOR<CompanyCreateWithoutUsersInput, CompanyUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: CompanyCreateOrConnectWithoutUsersInput
-    connect?: CompanyWhereUniqueInput
-  }
-
   export type custom_roleCreateNestedOneWithoutUsersInput = {
     create?: XOR<custom_roleCreateWithoutUsersInput, custom_roleUncheckedCreateWithoutUsersInput>
     connectOrCreate?: custom_roleCreateOrConnectWithoutUsersInput
@@ -61228,16 +61120,6 @@ export namespace Prisma {
     delete?: BranchWhereInput | boolean
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutUsersInput, BranchUpdateWithoutUsersInput>, BranchUncheckedUpdateWithoutUsersInput>
-  }
-
-  export type CompanyUpdateOneWithoutUsersNestedInput = {
-    create?: XOR<CompanyCreateWithoutUsersInput, CompanyUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: CompanyCreateOrConnectWithoutUsersInput
-    upsert?: CompanyUpsertWithoutUsersInput
-    disconnect?: CompanyWhereInput | boolean
-    delete?: CompanyWhereInput | boolean
-    connect?: CompanyWhereUniqueInput
-    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutUsersInput, CompanyUpdateWithoutUsersInput>, CompanyUncheckedUpdateWithoutUsersInput>
   }
 
   export type custom_roleUpdateOneWithoutUsersNestedInput = {
@@ -61770,13 +61652,6 @@ export namespace Prisma {
     connect?: custom_roleWhereUniqueInput | custom_roleWhereUniqueInput[]
   }
 
-  export type userCreateNestedManyWithoutCompanyInput = {
-    create?: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput> | userCreateWithoutCompanyInput[] | userUncheckedCreateWithoutCompanyInput[]
-    connectOrCreate?: userCreateOrConnectWithoutCompanyInput | userCreateOrConnectWithoutCompanyInput[]
-    createMany?: userCreateManyCompanyInputEnvelope
-    connect?: userWhereUniqueInput | userWhereUniqueInput[]
-  }
-
   export type StockistPocketCreateNestedManyWithoutCompanyInput = {
     create?: XOR<StockistPocketCreateWithoutCompanyInput, StockistPocketUncheckedCreateWithoutCompanyInput> | StockistPocketCreateWithoutCompanyInput[] | StockistPocketUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: StockistPocketCreateOrConnectWithoutCompanyInput | StockistPocketCreateOrConnectWithoutCompanyInput[]
@@ -61852,13 +61727,6 @@ export namespace Prisma {
     connectOrCreate?: custom_roleCreateOrConnectWithoutCompanyInput | custom_roleCreateOrConnectWithoutCompanyInput[]
     createMany?: custom_roleCreateManyCompanyInputEnvelope
     connect?: custom_roleWhereUniqueInput | custom_roleWhereUniqueInput[]
-  }
-
-  export type userUncheckedCreateNestedManyWithoutCompanyInput = {
-    create?: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput> | userCreateWithoutCompanyInput[] | userUncheckedCreateWithoutCompanyInput[]
-    connectOrCreate?: userCreateOrConnectWithoutCompanyInput | userCreateOrConnectWithoutCompanyInput[]
-    createMany?: userCreateManyCompanyInputEnvelope
-    connect?: userWhereUniqueInput | userWhereUniqueInput[]
   }
 
   export type StockistPocketUncheckedCreateNestedManyWithoutCompanyInput = {
@@ -61964,20 +61832,6 @@ export namespace Prisma {
     update?: custom_roleUpdateWithWhereUniqueWithoutCompanyInput | custom_roleUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: custom_roleUpdateManyWithWhereWithoutCompanyInput | custom_roleUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: custom_roleScalarWhereInput | custom_roleScalarWhereInput[]
-  }
-
-  export type userUpdateManyWithoutCompanyNestedInput = {
-    create?: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput> | userCreateWithoutCompanyInput[] | userUncheckedCreateWithoutCompanyInput[]
-    connectOrCreate?: userCreateOrConnectWithoutCompanyInput | userCreateOrConnectWithoutCompanyInput[]
-    upsert?: userUpsertWithWhereUniqueWithoutCompanyInput | userUpsertWithWhereUniqueWithoutCompanyInput[]
-    createMany?: userCreateManyCompanyInputEnvelope
-    set?: userWhereUniqueInput | userWhereUniqueInput[]
-    disconnect?: userWhereUniqueInput | userWhereUniqueInput[]
-    delete?: userWhereUniqueInput | userWhereUniqueInput[]
-    connect?: userWhereUniqueInput | userWhereUniqueInput[]
-    update?: userUpdateWithWhereUniqueWithoutCompanyInput | userUpdateWithWhereUniqueWithoutCompanyInput[]
-    updateMany?: userUpdateManyWithWhereWithoutCompanyInput | userUpdateManyWithWhereWithoutCompanyInput[]
-    deleteMany?: userScalarWhereInput | userScalarWhereInput[]
   }
 
   export type StockistPocketUpdateManyWithoutCompanyNestedInput = {
@@ -62132,20 +61986,6 @@ export namespace Prisma {
     update?: custom_roleUpdateWithWhereUniqueWithoutCompanyInput | custom_roleUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: custom_roleUpdateManyWithWhereWithoutCompanyInput | custom_roleUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: custom_roleScalarWhereInput | custom_roleScalarWhereInput[]
-  }
-
-  export type userUncheckedUpdateManyWithoutCompanyNestedInput = {
-    create?: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput> | userCreateWithoutCompanyInput[] | userUncheckedCreateWithoutCompanyInput[]
-    connectOrCreate?: userCreateOrConnectWithoutCompanyInput | userCreateOrConnectWithoutCompanyInput[]
-    upsert?: userUpsertWithWhereUniqueWithoutCompanyInput | userUpsertWithWhereUniqueWithoutCompanyInput[]
-    createMany?: userCreateManyCompanyInputEnvelope
-    set?: userWhereUniqueInput | userWhereUniqueInput[]
-    disconnect?: userWhereUniqueInput | userWhereUniqueInput[]
-    delete?: userWhereUniqueInput | userWhereUniqueInput[]
-    connect?: userWhereUniqueInput | userWhereUniqueInput[]
-    update?: userUpdateWithWhereUniqueWithoutCompanyInput | userUpdateWithWhereUniqueWithoutCompanyInput[]
-    updateMany?: userUpdateManyWithWhereWithoutCompanyInput | userUpdateManyWithWhereWithoutCompanyInput[]
-    deleteMany?: userScalarWhereInput | userScalarWhereInput[]
   }
 
   export type StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput = {
@@ -64160,7 +64000,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -64181,7 +64020,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -64271,7 +64109,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -64292,7 +64129,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -64372,7 +64208,6 @@ export namespace Prisma {
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -64393,7 +64228,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -64442,7 +64276,6 @@ export namespace Prisma {
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -64463,7 +64296,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -64496,7 +64328,6 @@ export namespace Prisma {
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -64517,7 +64348,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -64566,7 +64396,6 @@ export namespace Prisma {
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -64587,7 +64416,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -64667,7 +64495,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -64687,7 +64514,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -64726,7 +64552,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
   }
 
   export type userUncheckedCreateWithoutCustomRoleInput = {
@@ -64746,7 +64571,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
     revenues?: RevenueUncheckedCreateNestedManyWithoutEmployeeInput
@@ -64846,7 +64670,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -64866,7 +64689,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -64912,7 +64734,6 @@ export namespace Prisma {
     bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
-    companyId?: StringNullableFilter<"user"> | string | null
     customRoleId?: StringNullableFilter<"user"> | string | null
   }
 
@@ -65201,51 +65022,6 @@ export namespace Prisma {
   export type BranchCreateOrConnectWithoutUsersInput = {
     where: BranchWhereUniqueInput
     create: XOR<BranchCreateWithoutUsersInput, BranchUncheckedCreateWithoutUsersInput>
-  }
-
-  export type CompanyCreateWithoutUsersInput = {
-    id?: string
-    name: string
-    code: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
-    branches?: BranchCreateNestedManyWithoutCompanyInput
-    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
-    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
-    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
-    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
-    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
-    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
-    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
-    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
-  }
-
-  export type CompanyUncheckedCreateWithoutUsersInput = {
-    id?: string
-    name: string
-    code: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
-    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
-    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
-    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
-    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
-    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
-    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
-    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
-    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
-    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
-  }
-
-  export type CompanyCreateOrConnectWithoutUsersInput = {
-    where: CompanyWhereUniqueInput
-    create: XOR<CompanyCreateWithoutUsersInput, CompanyUncheckedCreateWithoutUsersInput>
   }
 
   export type custom_roleCreateWithoutUsersInput = {
@@ -65553,57 +65329,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
   }
 
-  export type CompanyUpsertWithoutUsersInput = {
-    update: XOR<CompanyUpdateWithoutUsersInput, CompanyUncheckedUpdateWithoutUsersInput>
-    create: XOR<CompanyCreateWithoutUsersInput, CompanyUncheckedCreateWithoutUsersInput>
-    where?: CompanyWhereInput
-  }
-
-  export type CompanyUpdateToOneWithWhereWithoutUsersInput = {
-    where?: CompanyWhereInput
-    data: XOR<CompanyUpdateWithoutUsersInput, CompanyUncheckedUpdateWithoutUsersInput>
-  }
-
-  export type CompanyUpdateWithoutUsersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
-    branches?: BranchUpdateManyWithoutCompanyNestedInput
-    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
-    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
-    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
-    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
-    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
-    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
-    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
-    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
-  }
-
-  export type CompanyUncheckedUpdateWithoutUsersInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    code?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
-    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
-    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
-    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
-    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
-    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
-    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
-    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
-    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
-    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
-  }
-
   export type custom_roleUpsertWithoutUsersInput = {
     update: XOR<custom_roleUpdateWithoutUsersInput, custom_roleUncheckedUpdateWithoutUsersInput>
     create: XOR<custom_roleCreateWithoutUsersInput, custom_roleUncheckedCreateWithoutUsersInput>
@@ -65652,7 +65377,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -65672,7 +65396,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -65797,7 +65520,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -65817,7 +65539,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -66091,7 +65812,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -66111,7 +65831,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -66247,7 +65966,6 @@ export namespace Prisma {
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -66267,7 +65985,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -66359,7 +66076,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -66379,7 +66095,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -66653,70 +66368,6 @@ export namespace Prisma {
 
   export type custom_roleCreateManyCompanyInputEnvelope = {
     data: custom_roleCreateManyCompanyInput | custom_roleCreateManyCompanyInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type userCreateWithoutCompanyInput = {
-    id: string
-    name: string
-    email: string
-    emailVerified: boolean
-    image?: string | null
-    createdAt: Date | string
-    updatedAt: Date | string
-    phone?: string | null
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
-    joinDate?: Date | string | null
-    isActive?: boolean
-    kpiLogs?: KpiLogCreateNestedManyWithoutEmployeeInput
-    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
-    revenues?: RevenueCreateNestedManyWithoutEmployeeInput
-    attendances?: AttendanceCreateNestedManyWithoutUserInput
-    samples?: SampleCreateNestedManyWithoutTechnicianInput
-    account?: accountCreateNestedManyWithoutUserInput
-    session?: sessionCreateNestedManyWithoutUserInput
-    branch?: BranchCreateNestedOneWithoutUsersInput
-    customRole?: custom_roleCreateNestedOneWithoutUsersInput
-  }
-
-  export type userUncheckedCreateWithoutCompanyInput = {
-    id: string
-    name: string
-    email: string
-    emailVerified: boolean
-    image?: string | null
-    createdAt: Date | string
-    updatedAt: Date | string
-    phone?: string | null
-    branchId?: string | null
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
-    joinDate?: Date | string | null
-    isActive?: boolean
-    customRoleId?: string | null
-    kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
-    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
-    revenues?: RevenueUncheckedCreateNestedManyWithoutEmployeeInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
-    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
-    account?: accountUncheckedCreateNestedManyWithoutUserInput
-    session?: sessionUncheckedCreateNestedManyWithoutUserInput
-  }
-
-  export type userCreateOrConnectWithoutCompanyInput = {
-    where: userWhereUniqueInput
-    create: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput>
-  }
-
-  export type userCreateManyCompanyInputEnvelope = {
-    data: userCreateManyCompanyInput | userCreateManyCompanyInput[]
     skipDuplicates?: boolean
   }
 
@@ -67059,22 +66710,6 @@ export namespace Prisma {
     payrollCompanyIds?: StringNullableListFilter<"custom_role">
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
-  }
-
-  export type userUpsertWithWhereUniqueWithoutCompanyInput = {
-    where: userWhereUniqueInput
-    update: XOR<userUpdateWithoutCompanyInput, userUncheckedUpdateWithoutCompanyInput>
-    create: XOR<userCreateWithoutCompanyInput, userUncheckedCreateWithoutCompanyInput>
-  }
-
-  export type userUpdateWithWhereUniqueWithoutCompanyInput = {
-    where: userWhereUniqueInput
-    data: XOR<userUpdateWithoutCompanyInput, userUncheckedUpdateWithoutCompanyInput>
-  }
-
-  export type userUpdateManyWithWhereWithoutCompanyInput = {
-    where: userScalarWhereInput
-    data: XOR<userUpdateManyMutationInput, userUncheckedUpdateManyWithoutCompanyInput>
   }
 
   export type StockistPocketUpsertWithWhereUniqueWithoutCompanyInput = {
@@ -67460,7 +67095,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
@@ -67480,7 +67114,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
@@ -67648,7 +67281,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
@@ -67668,7 +67300,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
@@ -67888,7 +67519,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -67908,7 +67538,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -67998,7 +67627,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -68018,7 +67646,6 @@ export namespace Prisma {
     bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -68117,7 +67744,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -68138,7 +67764,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
     revenues?: RevenueUncheckedCreateNestedManyWithoutEmployeeInput
@@ -68210,7 +67835,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -68231,7 +67855,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
     revenues?: RevenueUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -68293,7 +67916,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -68314,7 +67936,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -68363,7 +67984,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -68384,7 +68004,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -68404,7 +68023,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -68424,7 +68042,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -68519,7 +68136,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -68539,7 +68155,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -68686,7 +68301,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -68707,7 +68321,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     revenues?: RevenueUncheckedCreateNestedManyWithoutEmployeeInput
@@ -68756,7 +68369,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -68777,7 +68389,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     revenues?: RevenueUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -68890,7 +68501,6 @@ export namespace Prisma {
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
-    company?: CompanyCreateNestedOneWithoutUsersInput
     customRole?: custom_roleCreateNestedOneWithoutUsersInput
   }
 
@@ -68911,7 +68521,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
     kpiLogs?: KpiLogUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
@@ -69006,7 +68615,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -69027,7 +68635,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -69902,7 +69509,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
@@ -69922,7 +69528,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
@@ -70054,7 +69659,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
@@ -70074,7 +69678,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
@@ -70598,7 +70201,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
@@ -70618,7 +70220,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
@@ -70684,7 +70285,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
@@ -70704,7 +70304,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
@@ -70814,7 +70413,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -70834,7 +70432,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -70905,7 +70502,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -70925,7 +70521,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -70986,7 +70581,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -71006,7 +70600,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -71042,7 +70635,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -71062,7 +70654,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -71082,7 +70673,6 @@ export namespace Prisma {
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
-    users?: userCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -71102,7 +70692,6 @@ export namespace Prisma {
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
-    users?: userUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -71138,7 +70727,6 @@ export namespace Prisma {
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
-    users?: userUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -71158,7 +70746,6 @@ export namespace Prisma {
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
-    users?: userUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -71203,7 +70790,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
   }
 
   export type BonusMatrixUpdateWithoutCustomRoleInput = {
@@ -71289,7 +70875,6 @@ export namespace Prisma {
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
   }
 
   export type userUncheckedUpdateWithoutCustomRoleInput = {
@@ -71309,7 +70894,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
     revenues?: RevenueUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -71336,7 +70920,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type KpiLogCreateManyEmployeeInput = {
@@ -71818,7 +71401,6 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
-    companyId?: string | null
     customRoleId?: string | null
   }
 
@@ -71966,7 +71548,6 @@ export namespace Prisma {
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
-    company?: CompanyUpdateOneWithoutUsersNestedInput
     customRole?: custom_roleUpdateOneWithoutUsersNestedInput
   }
 
@@ -71986,7 +71567,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -72013,7 +71593,6 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    companyId?: NullableStringFieldUpdateOperationsInput | string | null
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -72117,26 +71696,6 @@ export namespace Prisma {
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
-  }
-
-  export type userCreateManyCompanyInput = {
-    id: string
-    name: string
-    email: string
-    emailVerified: boolean
-    image?: string | null
-    createdAt: Date | string
-    updatedAt: Date | string
-    phone?: string | null
-    branchId?: string | null
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
-    joinDate?: Date | string | null
-    isActive?: boolean
-    customRoleId?: string | null
   }
 
   export type StockistPocketCreateManyCompanyInput = {
@@ -72359,80 +71918,6 @@ export namespace Prisma {
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type userUpdateWithoutCompanyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: BoolFieldUpdateOperationsInput | boolean
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    kpiLogs?: KpiLogUpdateManyWithoutEmployeeNestedInput
-    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
-    revenues?: RevenueUpdateManyWithoutEmployeeNestedInput
-    attendances?: AttendanceUpdateManyWithoutUserNestedInput
-    samples?: SampleUpdateManyWithoutTechnicianNestedInput
-    account?: accountUpdateManyWithoutUserNestedInput
-    session?: sessionUpdateManyWithoutUserNestedInput
-    branch?: BranchUpdateOneWithoutUsersNestedInput
-    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
-  }
-
-  export type userUncheckedUpdateWithoutCompanyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: BoolFieldUpdateOperationsInput | boolean
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    branchId?: NullableStringFieldUpdateOperationsInput | string | null
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
-    kpiLogs?: KpiLogUncheckedUpdateManyWithoutEmployeeNestedInput
-    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
-    revenues?: RevenueUncheckedUpdateManyWithoutEmployeeNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
-    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
-    account?: accountUncheckedUpdateManyWithoutUserNestedInput
-    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type userUncheckedUpdateManyWithoutCompanyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    emailVerified?: BoolFieldUpdateOperationsInput | boolean
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    branchId?: NullableStringFieldUpdateOperationsInput | string | null
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StockistPocketUpdateWithoutCompanyInput = {

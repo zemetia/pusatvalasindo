@@ -3,7 +3,7 @@ import { RolesPageClient } from "@/components/admin/roles-page-client";
 import { PageHeader } from "@/components/admin/page-header";
 import { IconShieldLock } from "@tabler/icons-react";
 import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 
 export default async function RolesPage() {
@@ -12,10 +12,8 @@ export default async function RolesPage() {
     redirect("/dashboard");
   }
 
-  const SYSTEM_ROLES = ["SUPER_ADMIN", "OWNER"];
-  const scopedCompanyId = SYSTEM_ROLES.includes(caller.roleName.toUpperCase())
-    ? undefined
-    : caller.companyId;
+  // Global role (Super Admin/Owner) melihat role semua PT; role lain di-scope ke PT-nya.
+  const scopedCompanyId = isGlobalRole(caller.roleName) ? undefined : caller.companyId;
 
   let result;
   try {

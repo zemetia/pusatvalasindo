@@ -16,7 +16,8 @@ export default async function PayrollPage() {
     where = { customRoleId: { not: null } };
   } else if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
     const allowedCompanyIds = caller.payrollCompanyIds.length > 0 ? caller.payrollCompanyIds : [caller.companyId ?? ""];
-    where = { customRoleId: { not: null }, companyId: { in: allowedCompanyIds } };
+    // PT user diturunkan dari cabangnya (single source of truth).
+    where = { customRoleId: { not: null }, branch: { companyId: { in: allowedCompanyIds } } };
   } else if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN)) {
     where = { id: caller.id };
   } else {

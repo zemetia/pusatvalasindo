@@ -109,7 +109,7 @@ export const kpiService = {
     const [employee, logs, revenues] = await Promise.all([
       prisma.user.findUnique({
         where: { id: employeeId },
-        select: { customRoleId: true, companyId: true },
+        select: { customRoleId: true, branch: { select: { companyId: true } } },
       }),
       prisma.kpiLog.findMany({
         where: { employeeId, createdAt: { gte: startDate, lt: endDate } },
@@ -119,19 +119,21 @@ export const kpiService = {
       }),
     ]);
 
-    if (!employee?.customRoleId || !employee.companyId)
+    // PT karyawan diturunkan dari cabangnya (single source of truth).
+    const employeeCompanyId = employee?.branch?.companyId;
+    if (!employee?.customRoleId || !employeeCompanyId)
       throw new NotFoundError("Karyawan tidak memiliki jabatan atau perusahaan (PT)");
 
     // Batch 2: roleKpis + bonusMatrix both need companyId + customRoleId from batch 1
     const [roleKpis, matrix] = await Promise.all([
       prisma.roleKpi.findMany({
-        where: { companyId: employee.companyId, customRoleId: employee.customRoleId },
+        where: { companyId: employeeCompanyId, customRoleId: employee.customRoleId },
         include: { definition: true },
       }),
       prisma.bonusMatrix.findUnique({
         where: {
           companyId_customRoleId: {
-            companyId: employee.companyId,
+            companyId: employeeCompanyId,
             customRoleId: employee.customRoleId,
           },
         },
