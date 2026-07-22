@@ -157,18 +157,6 @@ export default async function DashboardPage({
         orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
       }),
 
-      // #2 — total nilai stok hari ini (semua cabang)
-      prisma.dailyStockEntry.aggregate({
-        where: { date: todayDate },
-        _sum: { totalIdr: true },
-      }),
-
-      // #2 — nilai stok per cabang
-      prisma.dailyStockEntry.findMany({
-        where: { date: todayDate },
-        include: { stockItem: { include: { branch: true } } },
-      }),
-
       // #3 — presensi mencurigakan hari ini
       prisma.attendance.findMany({
         where: { date: todayDate, isLocationSuspect: true },
@@ -205,27 +193,12 @@ export default async function DashboardPage({
     totalKpiLogsThisMonth,
     // #1 - belum absen hari ini
     notYetAbsent,
-    // #2 - nilai stok harian
-    todayStockAggregate,
-    todayStockByBranch,
     // #3 - location suspect
     suspectAttendance,
     // #5 - status payroll
     kpiCalculatedCount,
   ] = dashboardData;
 
-  // Aggregate stok per cabang dari data mentah
-  const stockByBranch = todayStockByBranch.reduce<
-    Record<string, { branchName: string; totalIdr: number }>
-  >((acc, entry) => {
-    const branchId = entry.stockItem.branchId ?? "__none__";
-    const branchName = entry.stockItem.branch?.name ?? "Tanpa Cabang";
-    if (!acc[branchId]) acc[branchId] = { branchName, totalIdr: 0 };
-    acc[branchId].totalIdr += Number(entry.totalIdr ?? 0);
-    return acc;
-  }, {});
-
-  const totalStockIDR = Number(todayStockAggregate._sum.totalIdr ?? 0);
   const activeBankAccountsCount = bankAccounts.length;
 
   const quickLinks = [
@@ -236,7 +209,6 @@ export default async function DashboardPage({
     { href: "/dashboard/payroll", label: "Hitung Gaji", icon: IconCoin },
     { href: "/dashboard/bank-accounts", label: "Rekening Bank", icon: IconBuildingBank },
     { href: "/dashboard/stockist", label: "Stock Mata Uang", icon: IconDatabase },
-    { href: "/dashboard/stok-harian", label: "Stok Harian", icon: IconListDetails },
     { href: "/dashboard/users", label: "Pengguna", icon: IconUsers },
     { href: "/dashboard/branches", label: "Cabang", icon: IconBuilding },
     { href: "/dashboard/roles", label: "Role & Akses", icon: IconId },
@@ -371,60 +343,8 @@ export default async function DashboardPage({
         </Card>
       </div>
 
-      {/* #2 + #5 — Nilai Stok & Status Payroll */}
+      {/* #5 — Status Payroll */}
       <div className="grid gap-4 @xl/main:grid-cols-3">
-        {/* #2 — Nilai Stok Hari Ini */}
-        <Card className="@xl/main:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base">Nilai Stok Harian</CardTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Total nilai stok hari ini berdasarkan rate IDR
-                </p>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard/stok-harian">Isi Stok →</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {Object.keys(stockByBranch).length === 0 ? (
-              <div className="py-6 text-center text-muted-foreground text-sm">
-                Belum ada entri stok hari ini.{" "}
-                <Link href="/dashboard/stok-harian" className="underline">
-                  Isi sekarang
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-end justify-between mb-4">
-                  <span className="text-sm text-muted-foreground">
-                    Total semua cabang
-                  </span>
-                  <span className="text-2xl font-bold font-mono">
-                    {fmtCurrency(totalStockIDR)}
-                  </span>
-                </div>
-                <div className="divide-y">
-                  {Object.values(stockByBranch).map((branch) => (
-                    <div
-                      key={branch.branchName}
-                      className="flex items-center justify-between py-2"
-                    >
-                      <span className="text-sm">{branch.branchName}</span>
-                      <span className="font-mono text-sm font-medium">
-                        {fmtCurrency(branch.totalIdr)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* #5 — Status Payroll */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">

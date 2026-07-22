@@ -9,7 +9,7 @@ import { withValidation } from "@/backend/middleware/with-validation";
 import { PERMISSIONS } from "@/lib/permissions";
 import { ForbiddenError } from "@/backend/errors/app-error";
 import { bankAccountRepository } from "@/backend/repositories/bank-account.repository";
-import { dailyBankEntryRepository } from "@/backend/repositories/daily-stock-entry.repository";
+import { dailyBankEntryRepository } from "@/backend/repositories/daily-bank-entry.repository";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
