@@ -4,11 +4,15 @@ import { generateSampleQRCodeSvg } from "@/services/qr.service"
 import { ok } from "@/backend/helpers/api-response"
 import { handleError } from "@/backend/helpers/handle-error"
 import { NotFoundError } from "@/backend/errors/app-error"
+import { requireAuth } from "@/backend/helpers/get-admin-caller"
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const caller = await requireAuth()
+    if (caller instanceof NextResponse) return caller
+
     const { id } = await params
     const sample = await sampleRepository.findById(id)
     if (!sample) throw new NotFoundError("Sample not found")

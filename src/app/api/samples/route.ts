@@ -5,6 +5,7 @@ import { generateSampleNumber } from "@/services/sample-number.service"
 import { ok } from "@/backend/helpers/api-response"
 import { handleError } from "@/backend/helpers/handle-error"
 import { withValidation } from "@/backend/middleware/with-validation"
+import { requireAuth } from "@/backend/helpers/get-admin-caller"
 
 const createSchema = z.object({
   materialType: z.string().min(1).max(200),
@@ -16,6 +17,11 @@ type CreateBody = z.infer<typeof createSchema>
 
 export async function GET(req: NextRequest) {
   try {
+    // Modul sample tidak punya permission sendiri di PERMISSIONS — pakai syarat yang sama
+    // dengan gate middleware lama (sesi valid) supaya tidak ada perubahan perilaku.
+    const caller = await requireAuth()
+    if (caller instanceof NextResponse) return caller
+
     const status = req.nextUrl.searchParams.get("status") || undefined
     const search = req.nextUrl.searchParams.get("search") || undefined
     const limit = parseInt(req.nextUrl.searchParams.get("limit") || "50")
@@ -31,6 +37,9 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
+      const caller = await requireAuth()
+      if (caller instanceof NextResponse) return caller
+
       const sampleNumber = await generateSampleNumber()
       const sample = await sampleRepository.create({
         materialType: ctx.body.materialType,

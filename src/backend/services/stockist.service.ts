@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import type { Prisma} from "@src/generated/prisma/client";
 import { StockistCheckStatus, StockistMutationType } from "@src/generated/prisma/client";
 import { ForbiddenError, NotFoundError, ValidationError } from "@/backend/errors/app-error";
+import { PERMISSIONS } from "@/lib/permissions";
 import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
 import { stockistBalanceRepository } from "@/backend/repositories/stockist-balance.repository";
@@ -355,3 +356,40 @@ export const stockistService = {
     return { beda, belumReview, belumIsi, totalCells, isToday };
   },
 };
+
+/**
+ * The complete payload the Stock & Kas grid renders from.
+ *
+ * Shared by `GET /api/stockist/grid` and the server-rendered stockist page so the
+ * page can ship its first grid inside the initial HTML instead of the client
+ * mounting, hydrating, and only then firing a fetch. On Vercel that saved a whole
+ * browser → function → database journey per page open. Both callers must go through
+ * this function so the two paths can never drift apart.
+ *
+ * Enforces the caller's PT scope itself — do not call it with an unvalidated companyId.
+ */
+export async function buildStockistGridPayload(
+  caller: AdminCaller,
+  companyId: string,
+  date: Date
+) {
+  assertCompanyAccess(caller, companyId);
+
+  const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
+  const [grid, pending] = await Promise.all([
+    stockistService.getOrCreateGridForDate(companyId, date),
+    correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["STOCKIST"]),
+  ]);
+  const alerts = stockistService.computeAlerts(grid.pockets, grid.currencies, grid.checks, date);
+
+  const pendingCorrections = Object.fromEntries(
+    pending
+      .filter((c) => c.pocketId && c.companyStockItemId)
+      .map((c) => [
+        `${c.pocketId}:${c.companyStockItemId}`,
+        { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
+      ])
+  );
+
+  return { ...grid, alerts, canManage, pendingCorrections };
+}

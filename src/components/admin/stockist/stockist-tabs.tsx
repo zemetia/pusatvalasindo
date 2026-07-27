@@ -40,6 +40,10 @@ interface Props {
   defaultCompanyId: string | null
   canManage: boolean
   canSelectCompany: boolean
+  /** Grid hari ini yang sudah dirender server, kalau PT-nya sudah pasti. */
+  initialGrid?: unknown
+  /** `${companyId}:${YYYY-MM-DD}` milik initialGrid — dipakai hanya kalau cocok. */
+  initialGridKey?: string | null
 }
 
 export function StockistTabs({
@@ -47,6 +51,8 @@ export function StockistTabs({
   defaultCompanyId,
   canManage,
   canSelectCompany,
+  initialGrid,
+  initialGridKey,
 }: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? "")
   const [date, setDate] = useState(toDate(new Date()))
@@ -199,6 +205,8 @@ export function StockistTabs({
               date={date}
               canManage={canManage}
               onAlertsChange={setMataUangAlert}
+              initialGrid={initialGrid}
+              initialGridKey={initialGridKey}
             />
           </TabsContent>
           <TabsContent value="kas">

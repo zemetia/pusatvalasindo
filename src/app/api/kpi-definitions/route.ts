@@ -5,6 +5,8 @@ import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
+import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { PERMISSIONS } from "@/lib/permissions";
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
@@ -15,6 +17,9 @@ type CreateBody = z.infer<typeof createSchema>;
 
 export async function GET() {
   try {
+    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+    if (caller instanceof NextResponse) return caller;
+
     return NextResponse.json(ok(await kpiService.getAllDefinitions()));
   } catch (e) {
     return handleError(e);
@@ -24,6 +29,9 @@ export async function GET() {
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
+      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      if (caller instanceof NextResponse) return caller;
+
       const definition = await kpiService.createDefinition(ctx.body);
       return NextResponse.json(
         ok(definition, "Definisi KPI berhasil ditambahkan"),

@@ -5,6 +5,8 @@ import { ok } from '@/backend/helpers/api-response'
 import { handleError } from '@/backend/helpers/handle-error'
 import { withValidation } from '@/backend/middleware/with-validation'
 import { NotFoundError } from '@/backend/errors/app-error'
+import { requirePermission } from '@/backend/helpers/get-admin-caller'
+import { PERMISSIONS } from '@/lib/permissions'
 
 const updateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -19,6 +21,9 @@ type UpdateBody = z.infer<typeof updateSchema>
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const caller = await requirePermission(PERMISSIONS.STOCK_VIEW)
+    if (caller instanceof NextResponse) return caller
+
     const { id } = await params
     const item = await stockItemRepository.findById(id)
     if (!item) throw new NotFoundError('Stock item not found')
@@ -31,6 +36,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export const PUT = withValidation(updateSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
     try {
+      const caller = await requirePermission(PERMISSIONS.STOCK_MANAGE)
+      if (caller instanceof NextResponse) return caller
+
       const { id } = await ctx.params
       const item = await stockItemRepository.update(id, ctx.body)
       return NextResponse.json(ok(item, 'Stock item updated'))
@@ -42,6 +50,9 @@ export const PUT = withValidation(updateSchema)(
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
+    const caller = await requirePermission(PERMISSIONS.STOCK_MANAGE)
+    if (caller instanceof NextResponse) return caller
+
     const { id } = await params
     await stockItemRepository.softDelete(id)
     return NextResponse.json(ok(null, 'Stock item deactivated'))
