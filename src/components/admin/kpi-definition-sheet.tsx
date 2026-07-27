@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
 import { PremiumField, PremiumNativeSelect } from "./premium-field";
+import { Button } from "@/components/ui/button";
 import { BarChart2, Tag, Layers } from "lucide-react";
 
 export const KPI_TYPE_LABELS: Record<string, string> = {
@@ -91,16 +92,10 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button
-            style={{
-              background: "linear-gradient(to right, #dc2626, #f43f5e)",
-              boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)",
-            }}
-            className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200"
-          >
+          <Button className="gap-2">
             <BarChart2 className="w-4 h-4" />
             Tambah Definisi KPI
-          </button>
+          </Button>
         )
       }
       footer={
@@ -124,18 +119,11 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
         icon={<Layers className="w-4 h-4" />}
         error={isEdit ? "Tipe tidak dapat diubah" : undefined}
         value={form.type}
-        onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+        onValueChange={(val) => setForm((f) => ({ ...f, type: val }))}
         disabled={isEdit}
-      >
-        <option value="" disabled>
-          Pilih tipe
-        </option>
-        {Object.entries(KPI_TYPE_LABELS).map(([val, label]) => (
-          <option key={val} value={val}>
-            {label}
-          </option>
-        ))}
-      </PremiumNativeSelect>
+        placeholder="Pilih tipe"
+        options={Object.entries(KPI_TYPE_LABELS).map(([val, label]) => ({ value: val, label }))}
+      />
 
       {form.type === "EVENT" && (
         <p className="text-[11.5px] text-zinc-500 dark:text-zinc-400 leading-relaxed pl-1 border-l-2 border-violet-400/40 dark:border-violet-400/25 ml-0.5">

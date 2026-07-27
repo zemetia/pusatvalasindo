@@ -7,6 +7,7 @@ import { AdminFormSidebar } from "../admin-form-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { IconCoins, IconDiamond } from "@tabler/icons-react";
 
 const TYPES = [
@@ -97,7 +98,7 @@ export function CompanyStockSheet({ companyId, item, trigger }: Props) {
       trigger={trigger}
       onSubmit={handleSubmit}
       footer={
-        <Button type="submit" disabled={loading} className="w-full bg-[#820302] hover:bg-[#820302]/90">
+        <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90">
           {loading ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan Stok"}
         </Button>
       }
@@ -105,24 +106,21 @@ export function CompanyStockSheet({ companyId, item, trigger }: Props) {
       <div className="space-y-6 py-4">
         <div className="grid gap-2">
           <Label className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Tipe Stok</Label>
-          <div className="grid grid-cols-2 gap-2">
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            value={type}
+            onValueChange={(val) => val && !isEdit && setType(val)}
+            disabled={isEdit}
+            className="w-full"
+          >
             {TYPES.map((t) => (
-              <button
-                key={t.value}
-                type="button"
-                disabled={isEdit}
-                onClick={() => setType(t.value)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all ${
-                  type === t.value
-                    ? "border-[#820302] bg-[#820302]/5 text-[#820302] font-bold"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted"
-                } ${isEdit && type !== t.value && "opacity-50 cursor-not-allowed"}`}
-              >
+              <ToggleGroupItem key={t.value} value={t.value} className="gap-2">
                 {t.icon}
                 {t.label}
-              </button>
+              </ToggleGroupItem>
             ))}
-          </div>
+          </ToggleGroup>
         </div>
 
         <div className="border-t pt-6 space-y-4">

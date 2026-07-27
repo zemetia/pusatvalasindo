@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
 import { PremiumField, PremiumNativeSelect } from "./premium-field";
+import { Button } from "@/components/ui/button";
 import { Building2, MapPin, Phone, Briefcase, Locate, Radius } from "lucide-react";
 
 export type BranchRow = {
@@ -122,10 +123,10 @@ export function BranchSheet({ branch, companies, trigger, currentCompanyId }: Pr
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <Button className="gap-2">
             <Building2 className="w-4 h-4" />
             Tambah Cabang
-          </button>
+          </Button>
         )
       }
       footer={
@@ -149,15 +150,10 @@ export function BranchSheet({ branch, companies, trigger, currentCompanyId }: Pr
           label="Perusahaan (PT) *"
           icon={<Briefcase className="w-4 h-4" />}
           value={form.companyId}
-          onChange={(e) => set("companyId")(e.target.value)}
-        >
-          <option value="" disabled>Pilih Perusahaan</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          onValueChange={(val) => set("companyId")(val)}
+          placeholder="Pilih Perusahaan"
+          options={companies.map((c) => ({ value: c.id, label: c.name }))}
+        />
       )}
 
       <PremiumField

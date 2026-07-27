@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect } from "./premium-field";
+import { Button } from "@/components/ui/button";
 import { Package, Tag, Hash, ListOrdered, Building2, Layers } from "lucide-react";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -137,10 +131,10 @@ export function StockItemSheet({ branches, companies, item, defaultBranchId, tri
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <Button className="gap-2">
             <Package className="w-4 h-4" />
             Tambah Item
-          </button>
+          </Button>
         )
       }
       footer={
@@ -155,31 +149,21 @@ export function StockItemSheet({ branches, companies, item, defaultBranchId, tri
         label="Perusahaan *"
         icon={<Building2 className="w-4 h-4" />}
         value={form.companyId}
-        onChange={(e) => set("companyId")(e.target.value)}
+        onValueChange={(val) => set("companyId")(val)}
         disabled={isEdit || !!defaultBranchId}
-      >
-        <option value="">Pilih perusahaan</option>
-        {companies.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </PremiumNativeSelect>
+        placeholder="Pilih perusahaan"
+        options={companies.map((c) => ({ value: c.id, label: c.name }))}
+      />
 
       <PremiumNativeSelect
         label="Cabang *"
         icon={<Building2 className="w-4 h-4" />}
         value={form.branchId}
-        onChange={(e) => set("branchId")(e.target.value)}
+        onValueChange={(val) => set("branchId")(val)}
         disabled={isEdit || !!defaultBranchId || !form.companyId}
-      >
-        <option value="">Pilih cabang</option>
-        {filteredBranches.map((b) => (
-          <option key={b.id} value={b.id}>
-            {b.name}
-          </option>
-        ))}
-      </PremiumNativeSelect>
+        placeholder="Pilih cabang"
+        options={filteredBranches.map((b) => ({ value: b.id, label: b.name }))}
+      />
 
       <PremiumField
         label="Nama Item *"
@@ -202,15 +186,10 @@ export function StockItemSheet({ branches, companies, item, defaultBranchId, tri
         label="Tipe *"
         icon={<Layers className="w-4 h-4" />}
         value={form.type}
-        onChange={(e) => set("type")(e.target.value)}
-      >
-        <option value="" disabled>Pilih tipe</option>
-        {Object.entries(TYPE_LABELS).map(([val, label]) => (
-          <option key={val} value={val}>
-            {label}
-          </option>
-        ))}
-      </PremiumNativeSelect>
+        onValueChange={(val) => set("type")(val)}
+        placeholder="Pilih tipe"
+        options={Object.entries(TYPE_LABELS).map(([val, label]) => ({ value: val, label }))}
+      />
 
       <PremiumField
         label="Urutan"

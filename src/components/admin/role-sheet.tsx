@@ -7,6 +7,7 @@ import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
 import { PremiumField, FormSection } from "./premium-field";
 import { ShieldCheck, FileText, CheckCircle2, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export type RoleRow = {
   id: string;
@@ -196,10 +197,10 @@ export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: P
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <Button className="gap-2">
             <ShieldCheck className="w-4 h-4" />
             Tambah Role
-          </button>
+          </Button>
         )
       }
       footer={

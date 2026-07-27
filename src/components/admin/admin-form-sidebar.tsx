@@ -47,8 +47,8 @@ export function AdminFormSidebar({
       <SheetContent
         className={cn(
           "w-full max-w-[100vw] sm:w-[640px] sm:max-w-[85vw] lg:w-[760px] xl:w-[860px] p-0 flex flex-col overflow-hidden",
-          "bg-white dark:bg-[#0f0f17]",
-          "border-l-0 sm:border-l border-zinc-200 dark:border-zinc-800",
+          "bg-background",
+          "border-l-0 sm:border-l border-border",
           "[&>button]:hidden",
           className
         )}
@@ -56,11 +56,11 @@ export function AdminFormSidebar({
         <form onSubmit={onSubmit} className="flex flex-col h-full overflow-hidden">
 
           {/* ── Header ─────────────────────────────────────────── */}
-          <div className="relative flex-shrink-0 bg-gradient-to-br from-violet-50 to-indigo-50/40 dark:from-violet-950/30 dark:to-indigo-950/20 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="relative flex-shrink-0 bg-gradient-to-br from-primary/5 to-primary/[0.02] border-b border-border">
             {/* Decorative blobs */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-violet-200/50 dark:bg-violet-500/10 blur-2xl" />
-              <div className="absolute -bottom-4 left-2 w-24 h-24 rounded-full bg-indigo-200/40 dark:bg-indigo-500/08 blur-xl" />
+              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
+              <div className="absolute -bottom-4 left-2 w-24 h-24 rounded-full bg-primary/[0.06] blur-xl" />
             </div>
 
             <div className="relative flex items-start gap-4 px-6 py-5">
@@ -70,7 +70,7 @@ export function AdminFormSidebar({
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.05 }}
-                  className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-violet-500/40 mt-0.5"
+                  className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md shadow-primary/30 mt-0.5"
                 >
                   {icon}
                 </motion.div>
@@ -82,7 +82,7 @@ export function AdminFormSidebar({
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.07, duration: 0.22, ease: "easeOut" }}
-                  className="text-[18px] font-bold text-zinc-900 dark:text-white leading-snug"
+                  className="text-[18px] font-bold text-foreground leading-snug"
                 >
                   {title}
                 </motion.h2>
@@ -91,7 +91,7 @@ export function AdminFormSidebar({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.13, duration: 0.2 }}
-                    className="mt-1 text-[12.5px] text-zinc-500 dark:text-zinc-400 leading-relaxed"
+                    className="mt-1 text-[12.5px] text-muted-foreground leading-relaxed"
                   >
                     {description}
                   </motion.p>
@@ -99,18 +99,20 @@ export function AdminFormSidebar({
               </div>
 
               {/* Close button */}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => onOpenChange(false)}
-                className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 transition-colors duration-150 mt-0.5"
+                className="flex-shrink-0 size-8 mt-0.5 text-muted-foreground hover:text-foreground"
               >
-                <X className="w-[15px] h-[15px]" />
-              </button>
+                <X className="size-[15px]" />
+              </Button>
             </div>
           </div>
 
           {/* ── Scrollable Body ─────────────────────────────────── */}
-          <div className="flex-1 overflow-y-auto overscroll-contain bg-white dark:bg-[#0f0f17]">
+          <div className="flex-1 overflow-y-auto overscroll-contain bg-background">
             <motion.div
               initial="hidden"
               animate="visible"
@@ -130,7 +132,7 @@ export function AdminFormSidebar({
 
           {/* ── Footer ──────────────────────────────────────────── */}
           {footer && (
-            <div className="flex-shrink-0 px-6 py-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+            <div className="flex-shrink-0 px-6 py-4 border-t border-border bg-muted/40">
               {footer}
             </div>
           )}

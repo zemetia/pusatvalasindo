@@ -4,16 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
 import { NumericFormat } from "react-number-format";
 import { KpiDefinitionRow, KPI_TYPE_LABELS } from "./kpi-definition-sheet";
+import { Button } from "@/components/ui/button";
 import { Sliders, Percent, Target, AlertTriangle, ShieldCheck, BarChart2 } from "lucide-react";
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -123,10 +117,10 @@ export function RoleKpiSheet({ roleKpi, definitions, trigger }: Props) {
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <Button className="gap-2">
             <Sliders className="w-4 h-4" />
             Tambah Konfigurasi
-          </button>
+          </Button>
         )
       }
       footer={
@@ -142,31 +136,24 @@ export function RoleKpiSheet({ roleKpi, definitions, trigger }: Props) {
           label="Jabatan *"
           icon={<ShieldCheck className="w-4 h-4" />}
           value={form.roleName}
-          onChange={(e) => setForm((f) => ({ ...f, roleName: e.target.value }))}
+          onValueChange={(val) => setForm((f) => ({ ...f, roleName: val }))}
           disabled={isEdit}
-        >
-          <option value="" disabled>Pilih jabatan</option>
-          {Object.entries(ROLE_LABELS).map(([val, label]) => (
-            <option key={val} value={val}>
-              {label}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih jabatan"
+          options={Object.entries(ROLE_LABELS).map(([val, label]) => ({ value: val, label }))}
+        />
 
         <PremiumNativeSelect
           label="Definisi KPI *"
           icon={<BarChart2 className="w-4 h-4" />}
           value={form.kpiId}
-          onChange={(e) => setForm((f) => ({ ...f, kpiId: e.target.value }))}
+          onValueChange={(val) => setForm((f) => ({ ...f, kpiId: val }))}
           disabled={isEdit}
-        >
-          <option value="" disabled>Pilih KPI</option>
-          {definitions.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name} — {KPI_TYPE_LABELS[d.type] ?? d.type}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih KPI"
+          options={definitions.map((d) => ({
+            value: d.id,
+            label: `${d.name} — ${KPI_TYPE_LABELS[d.type] ?? d.type}`,
+          }))}
+        />
 
         <PremiumField
           label="Max Score * (0–1)"

@@ -4,15 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
 import { NumericFormat } from "react-number-format";
+import { Button } from "@/components/ui/button";
 import {
   UserPlus,
   User,
@@ -133,10 +127,10 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
       icon={<UserPlus className="w-5 h-5" />}
       onSubmit={handleSubmit}
       trigger={
-        <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+        <Button className="gap-2">
           <UserPlus className="w-4 h-4" />
           Buat Pengguna
-        </button>
+        </Button>
       }
       footer={
         <AdminFormFooter
@@ -189,45 +183,30 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           label="Perusahaan *"
           icon={<Building2 className="w-4 h-4" />}
           value={form.companyId}
-          onChange={(e) => set("companyId")(e.target.value)}
-        >
-          <option value="">Pilih perusahaan</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          onValueChange={(val) => set("companyId")(val)}
+          placeholder="Pilih perusahaan"
+          options={companies.map((c) => ({ value: c.id, label: c.name }))}
+        />
 
         <PremiumNativeSelect
           label="Cabang *"
           icon={<Building2 className="w-4 h-4" />}
           value={form.branchId}
-          onChange={(e) => set("branchId")(e.target.value)}
+          onValueChange={(val) => set("branchId")(val)}
           disabled={!form.companyId}
-        >
-          <option value="">Pilih cabang</option>
-          {filteredBranches.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih cabang"
+          options={filteredBranches.map((b) => ({ value: b.id, label: b.name }))}
+        />
 
         <PremiumNativeSelect
           label="Jabatan / Role *"
           icon={<ShieldCheck className="w-4 h-4" />}
           value={form.customRoleId}
-          onChange={(e) => set("customRoleId")(e.target.value)}
+          onValueChange={(val) => set("customRoleId")(val)}
           disabled={!form.companyId}
-        >
-          <option value="" disabled>Pilih jabatan</option>
-          {filteredRoles.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih jabatan"
+          options={filteredRoles.map((r) => ({ value: r.id, label: r.name }))}
+        />
       </FormSection>
 
       <FormSection title="Detail Karyawan" icon={<Banknote className="w-3.5 h-3.5" />}>

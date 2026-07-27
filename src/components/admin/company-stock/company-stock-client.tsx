@@ -71,13 +71,13 @@ export function CompanyStockClient({ companies, canManage }: Props) {
               onClick={() => setActiveCompanyId(company.id)}
               className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
                 activeCompanyId === company.id
-                  ? "border-[#820302] bg-[#820302]/5 shadow-sm"
+                  ? "border-primary bg-primary/5 shadow-sm"
                   : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
               }`}
             >
               <span
                 className={`text-xs uppercase tracking-widest font-bold ${
-                  activeCompanyId === company.id ? "text-[#820302]" : "text-muted-foreground"
+                  activeCompanyId === company.id ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 Perusahaan
@@ -112,12 +112,12 @@ export function CompanyStockClient({ companies, canManage }: Props) {
               <div className="p-6 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20">
                 <div className="flex items-center gap-3">
                   <div className="relative w-full md:w-80 group">
-                    <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-[#820302] transition-colors" />
+                    <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       placeholder="Cari item, kode, atau tipe..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 rounded-xl border-border/50 focus-visible:ring-[#820302]/20 focus-visible:border-[#820302] transition-all"
+                      className="pl-10 rounded-xl border-border/50"
                     />
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export function CompanyStockClient({ companies, canManage }: Props) {
                   <CompanyStockSheet
                     companyId={activeCompanyId}
                     trigger={
-                      <Button className="rounded-xl bg-[#820302] hover:bg-[#820302]/90 shadow-lg shadow-[#820302]/20 flex gap-2">
+                      <Button className="rounded-xl gap-2">
                         <IconPlus className="size-4" />
                         <span>Tambah Stok</span>
                       </Button>

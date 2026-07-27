@@ -4,14 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
+import { Button } from "@/components/ui/button";
 import { Landmark, CreditCard, User, FileText, Building2, CircleDollarSign } from "lucide-react";
 
 type Company = { id: string; name: string };
@@ -115,10 +109,10 @@ export function BankAccountSheet({ currencies, companies, account, trigger }: Pr
       onSubmit={handleSubmit}
       trigger={
         trigger ?? (
-          <button style={{ background: "linear-gradient(to right, #dc2626, #f43f5e)", boxShadow: "0 4px 14px 0 rgba(220,38,38,0.35)" }} className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold uppercase tracking-widest text-white transition-all duration-200">
+          <Button className="gap-2">
             <Landmark className="w-4 h-4" />
             {isEdit ? "Edit" : "Tambah Rekening"}
-          </button>
+          </Button>
         )
       }
       footer={
@@ -134,16 +128,11 @@ export function BankAccountSheet({ currencies, companies, account, trigger }: Pr
           label="Perusahaan *"
           icon={<Building2 className="w-4 h-4" />}
           value={form.companyId}
-          onChange={(e) => set("companyId")(e.target.value)}
+          onValueChange={(val) => set("companyId")(val)}
           disabled={isEdit}
-        >
-          <option value="">Pilih perusahaan</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih perusahaan"
+          options={companies.map((c) => ({ value: c.id, label: c.name }))}
+        />
 
         <PremiumField
           label="Nama Bank *"
@@ -175,16 +164,11 @@ export function BankAccountSheet({ currencies, companies, account, trigger }: Pr
           label="Mata Uang *"
           icon={<CircleDollarSign className="w-4 h-4" />}
           value={form.currencyId}
-          onChange={(e) => set("currencyId")(e.target.value)}
+          onValueChange={(val) => set("currencyId")(val)}
           disabled={isEdit}
-        >
-          <option value="" disabled>Pilih mata uang</option>
-          {currencies.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.code} — {c.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          placeholder="Pilih mata uang"
+          options={currencies.map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` }))}
+        />
 
         <PremiumField
           label="Catatan"

@@ -111,13 +111,13 @@ export function BankAccountsPageClient({
               onClick={() => setActiveCompanyId("")}
               className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
                 activeCompanyId === ""
-                  ? "border-[#820302] bg-[#820302]/5 shadow-sm"
+                  ? "border-primary bg-primary/5 shadow-sm"
                   : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
               }`}
             >
               <span
                 className={`text-xs uppercase tracking-widest font-bold ${
-                  activeCompanyId === "" ? "text-[#820302]" : "text-muted-foreground"
+                  activeCompanyId === "" ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 Semua
@@ -136,13 +136,13 @@ export function BankAccountsPageClient({
                 onClick={() => setActiveCompanyId(company.id)}
                 className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
                   activeCompanyId === company.id
-                    ? "border-[#820302] bg-[#820302]/5 shadow-sm"
+                    ? "border-primary bg-primary/5 shadow-sm"
                     : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
                 }`}
               >
                 <span
                   className={`text-xs uppercase tracking-widest font-bold ${
-                    activeCompanyId === company.id ? "text-[#820302]" : "text-muted-foreground"
+                    activeCompanyId === company.id ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
                   Perusahaan

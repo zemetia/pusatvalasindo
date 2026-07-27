@@ -4,13 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
 import { NumericFormat } from "react-number-format";
 import {
@@ -191,46 +184,35 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
             label="Perusahaan"
             icon={<Building2 className="w-4 h-4" />}
             value={form.companyId}
-            onChange={(e) => set("companyId")(e.target.value)}
-          >
-            <option value="">Pilih perusahaan</option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </PremiumNativeSelect>
+            onValueChange={(val) => set("companyId")(val)}
+            placeholder="Pilih perusahaan"
+            options={companies.map((c) => ({ value: c.id, label: c.name }))}
+          />
 
           <PremiumNativeSelect
             label="Cabang Penugasan"
             icon={<Building2 className="w-4 h-4" />}
             value={form.branchId}
-            onChange={(e) => set("branchId")(e.target.value)}
+            onValueChange={(val) => set("branchId")(val)}
             disabled={!form.companyId}
-          >
-            <option value="none">— Tanpa cabang —</option>
-            {filteredBranches.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </PremiumNativeSelect>
+            options={[
+              { value: "none", label: "— Tanpa cabang —" },
+              ...filteredBranches.map((b) => ({ value: b.id, label: b.name })),
+            ]}
+          />
         </div>
 
         <PremiumNativeSelect
           label="Jabatan / Role"
           icon={<ShieldCheck className="w-4 h-4" />}
           value={form.customRoleId}
-          onChange={(e) => set("customRoleId")(e.target.value)}
+          onValueChange={(val) => set("customRoleId")(val)}
           disabled={!form.companyId}
-        >
-          <option value="none">— Tanpa jabatan —</option>
-          {filteredRoles.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </PremiumNativeSelect>
+          options={[
+            { value: "none", label: "— Tanpa jabatan —" },
+            ...filteredRoles.map((r) => ({ value: r.id, label: r.name })),
+          ]}
+        />
       </FormSection>
 
       <FormSection title="Detail Karyawan" icon={<Banknote className="w-3.5 h-3.5" />}>
