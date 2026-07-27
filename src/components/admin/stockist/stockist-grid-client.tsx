@@ -27,6 +27,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { IconAlertTriangle, IconCheck, IconChecks, IconLoader2, IconSearch, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
+import type { PendingCorrection } from "@/components/admin/stockist/daily-verify-cell"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean; isDefault: boolean }
 type StockItem = { id: string; code: string | null; name: string; type: "CURRENCY" | "LOGAM_MULIA" }
@@ -94,6 +95,8 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
   const [pockets, setPockets] = useState<Pocket[]>([])
   const [currencies, setCurrencies] = useState<StockItem[]>([])
   const [checks, setChecks] = useState<Record<string, Check>>({})
+  // key: `${pocketId}:${companyStockItemId}` — koreksi yang masih menunggu keputusan owner.
+  const [pendingCorrections, setPendingCorrections] = useState<Record<string, PendingCorrection>>({})
   const [serverDate, setServerDate] = useState<string | null>(null)
   const [alerts, setAlerts] = useState({ beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0 })
   const [loading, setLoading] = useState(false)
@@ -137,6 +140,7 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
         }
       }
       setChecks(checkMap)
+      setPendingCorrections(g.pendingCorrections ?? {})
       setAlerts(g.alerts ?? { beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0 })
     } catch {
       toast.error("Gagal memuat data")
@@ -209,7 +213,19 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
         })
         const data = await res.json()
         if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
-        if (!silent) toast.success(status === "BENAR" ? "Ditandai Benar" : "Ditandai Beda")
+        // Pesan datang dari server: kalau ada angka koreksi, dia menyebut pengajuannya
+        // menunggu persetujuan — bukan sekadar "Ditandai Beda".
+        if (!silent) toast.success(data.message ?? (status === "BENAR" ? "Ditandai Benar" : "Ditandai Beda"))
+        if (data.data?.correctionRequestId && correctedQuantity !== undefined) {
+          setPendingCorrections((prev) => ({
+            ...prev,
+            [key]: {
+              id: data.data.correctionRequestId,
+              proposedValue: String(correctedQuantity),
+              reason: note ?? "",
+            },
+          }))
+        }
         setActiveCell(null)
         setAlerts((prev) => {
           const wasBeda = prevCheck.status === "BEDA"
@@ -470,6 +486,11 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
                       <div className={cn("text-[10px] font-sans font-normal", stateText(state))}>
                         {stateLabel(state)}
                       </div>
+                      {pendingCorrections[key] && (
+                        <div className="text-[10px] font-sans font-normal text-amber-700 dark:text-amber-400">
+                          usul {fmt(Number(pendingCorrections[key].proposedValue))} · menunggu ACC
+                        </div>
+                      )}
                     </button>
                   )
 
@@ -708,13 +729,17 @@ function CellActionForm({
           />
           <div className="grid gap-1">
             <label className="text-[10px] uppercase text-muted-foreground font-medium">
-              Koreksi saldo (opsional)
+              Jumlah yang benar (opsional)
             </label>
             <NumberInput
               value={correctedDraft}
               onValueChange={setCorrectedDraft}
               className="font-mono text-right"
             />
+            <p className="text-[10px] text-muted-foreground">
+              Saldo tidak langsung berubah — angka ini diajukan dulu dan baru berlaku setelah
+              disetujui Owner / Super Admin di halaman Persetujuan Koreksi.
+            </p>
           </div>
           <div className="flex gap-2">
             <Button

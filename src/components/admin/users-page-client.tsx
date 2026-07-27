@@ -37,7 +37,7 @@ type User = {
   joinDate: string | null;
   isActive: boolean;
   createdAt: string;
-  branch: { id: string; name: string } | null;
+  branch: { id: string; name: string; company: { code: string } | null } | null;
 };
 
 function fmtSalary(val: unknown): string {
@@ -127,7 +127,20 @@ export function UsersPageClient({ users, branches, companies, roles }: UsersPage
                           <Badge variant="outline" className="ml-1.5 text-xs">belum verif</Badge>
                         )}
                       </TableCell>
-                      <TableCell>{u.branch?.name ?? "—"}</TableCell>
+                      <TableCell>
+                        {u.branch ? (
+                          <div className="flex items-center gap-1.5">
+                            <span>{u.branch.name}</span>
+                            {u.branch.company?.code && (
+                              <Badge variant="outline" className="text-xs">
+                                {u.branch.company.code}
+                              </Badge>
+                            )}
+                          </div>
+                        ) : (
+                          "—"
+                        )}
+                      </TableCell>
                       <TableCell>
                         {u.roleName ? (
                           <Badge variant="secondary">{u.roleName}</Badge>

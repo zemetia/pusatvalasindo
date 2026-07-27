@@ -38,9 +38,11 @@ export async function GET(req: NextRequest) {
     const date = new Date(dateStr);
     const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });
 
-    const [stockRows, kas, companyTotal, bankAccounts, bankEntries] = await Promise.all([
+    const [stockRows, stockTotal, kas, bankConfirmation, companyTotal, bankAccounts, bankEntries] = await Promise.all([
       stockistHeadConfirmationService.getStockConfirmationGrid(companyId, date),
+      stockistHeadConfirmationService.getStockTotalConfirmation(companyId, date),
       stockistHeadConfirmationService.getKasConfirmation(companyId, date),
+      stockistHeadConfirmationService.getBankConfirmation(companyId, date),
       stockistHeadConfirmationService.getCompanyTotal(companyId, date),
       prisma.bankAccount.findMany({
         where: { companyId, isActive: true },
@@ -58,9 +60,15 @@ export async function GET(req: NextRequest) {
       bankByCurrency.set(a.currency.code, (bankByCurrency.get(a.currency.code) ?? 0) + saldo);
     }
 
-    const stockTotalIdr = stockRows.reduce((sum, r) => sum + (r.confirmedIdrValue ?? 0), 0);
+    // Total IDR stock kini satu angka final dari kepala cabang, bukan penjumlahan per item.
+    const stockTotalIdr = stockTotal ? Number(stockTotal.confirmedIdrValue) : 0;
     const kasTotalIdr = kas.confirmedIdrValue ?? 0;
-    const grandTotal = companyTotal ? Number(companyTotal.totalIdr) : stockTotalIdr + kasTotalIdr;
+    const bankTotalIdr = bankConfirmation.confirmedIdrValue ?? 0;
+    const grandTotal = companyTotal
+      ? Number(companyTotal.totalIdr)
+      : stockTotalIdr + kasTotalIdr + bankTotalIdr;
+    const stockSystemSum = stockRows.reduce((sum, r) => sum + r.systemTotal, 0);
+    const stockKepcabSum = stockRows.reduce((sum, r) => sum + (r.confirmedQuantity ?? 0), 0);
 
     const wb = new ExcelJS.Workbook();
     wb.creator = "Pusat Kirim Duit";
@@ -80,12 +88,16 @@ export async function GET(req: NextRequest) {
     styleDataRow(r, ["value"]);
     r = ringkasan.addRow({ label: "Total Kas (Kepala Cabang, IDR)", value: kasTotalIdr });
     styleDataRow(r, ["value"]);
+    r = ringkasan.addRow({ label: "Total Bank (Kepala Cabang, IDR)", value: bankTotalIdr });
+    styleDataRow(r, ["value"]);
+    r = ringkasan.addRow({ label: "Total Bank (Sistem, IDR)", value: bankConfirmation.systemTotal });
+    styleDataRow(r, ["value"]);
     for (const [code, total] of bankByCurrency) {
-      r = ringkasan.addRow({ label: `Total Bank (${code})`, value: total });
+      r = ringkasan.addRow({ label: `Saldo Bank per Mata Uang (${code})`, value: total });
       styleDataRow(r, ["value"]);
     }
     ringkasan.addRow({});
-    r = ringkasan.addRow({ label: "Total Keseluruhan (Stock + Kas, IDR)", value: grandTotal });
+    r = ringkasan.addRow({ label: "Total Keseluruhan (Stock + Kas + Bank, IDR)", value: grandTotal });
     r.getCell("label").font = { bold: true };
     r.getCell("value").font = { bold: true };
     styleDataRow(r, ["value"]);
@@ -96,7 +108,6 @@ export async function GET(req: NextRequest) {
       { header: "Item", key: "item", width: 24 },
       { header: "Total Sistem", key: "sistem", width: 16 },
       { header: "Total Kepala Cabang", key: "kepcab", width: 20 },
-      { header: "Total IDR", key: "idr", width: 20 },
       { header: "Selisih", key: "selisih", width: 16 },
       { header: "Jam Konfirmasi", key: "jam", width: 16 },
     ];
@@ -107,11 +118,10 @@ export async function GET(req: NextRequest) {
         item: label,
         sistem: row.systemTotal,
         kepcab: row.confirmedQuantity ?? "",
-        idr: row.confirmedIdrValue ?? "",
         selisih: row.selisih ?? "",
         jam: row.confirmedAt ? new Date(row.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
       });
-      styleDataRow(dataRow, ["sistem", "kepcab", "idr", "selisih"]);
+      styleDataRow(dataRow, ["sistem", "kepcab", "selisih"]);
       if (row.confirmedQuantity !== null) {
         const cell = dataRow.getCell("selisih");
         const fill = row.isMatch ? MATCH_FILL : MISMATCH_FILL;
@@ -120,6 +130,38 @@ export async function GET(req: NextRequest) {
         cell.font = { color: { argb: font } };
       }
     }
+
+    // Baris total: kuantitas beda mata uang dijumlahkan mentah (permintaan client — cukup untuk
+    // melihat ada/tidaknya selisih keseluruhan), lalu satu total IDR final di bawahnya.
+    const stockTotalRow = stockSheet.addRow({
+      item: "TOTAL KESELURUHAN",
+      sistem: stockSystemSum,
+      kepcab: stockKepcabSum,
+      selisih: stockKepcabSum - stockSystemSum,
+      jam: "",
+    });
+    styleDataRow(stockTotalRow, ["sistem", "kepcab", "selisih"]);
+    stockTotalRow.font = { bold: true };
+    const totalSelisihCell = stockTotalRow.getCell("selisih");
+    const totalMatch = stockKepcabSum - stockSystemSum === 0;
+    totalSelisihCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: totalMatch ? MATCH_FILL : MISMATCH_FILL },
+    };
+    totalSelisihCell.font = { bold: true, color: { argb: totalMatch ? MATCH_FONT : MISMATCH_FONT } };
+
+    const stockIdrRow = stockSheet.addRow({
+      item: "TOTAL IDR (FINAL)",
+      sistem: "",
+      kepcab: stockTotalIdr,
+      selisih: "",
+      jam: stockTotal?.confirmedAt
+        ? new Date(stockTotal.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+        : "-",
+    });
+    styleDataRow(stockIdrRow, ["kepcab"]);
+    stockIdrRow.font = { bold: true };
 
     // --- Sheet 3: Kas ---
     const kasSheet = wb.addWorksheet("Kas");
@@ -166,6 +208,36 @@ export async function GET(req: NextRequest) {
         saldo,
       });
       styleDataRow(bankRow, ["saldo"]);
+    }
+
+    // Cross-check bank di bawah daftar rekening: total sistem vs total kepala cabang.
+    bankSheet.addRow({});
+    const bankCheckHeader = bankSheet.addRow({
+      bank: "CROSS-CHECK BANK",
+      noRek: "Total Sistem",
+      namaRek: "Total Kepala Cabang",
+      mataUang: "Selisih",
+      saldo: "Jam Konfirmasi",
+    });
+    styleHeaderRow(bankCheckHeader);
+    const bankCheckRow = bankSheet.addRow({
+      bank: "",
+      noRek: bankConfirmation.systemTotal,
+      namaRek: bankConfirmation.confirmedIdrValue ?? "",
+      mataUang: bankConfirmation.selisih ?? "",
+      saldo: bankConfirmation.confirmedAt
+        ? new Date(bankConfirmation.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+        : "-",
+    });
+    styleDataRow(bankCheckRow, ["noRek", "namaRek", "mataUang"]);
+    if (bankConfirmation.confirmedIdrValue !== null) {
+      const cell = bankCheckRow.getCell("mataUang");
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: bankConfirmation.isMatch ? MATCH_FILL : MISMATCH_FILL },
+      };
+      cell.font = { color: { argb: bankConfirmation.isMatch ? MATCH_FONT : MISMATCH_FONT } };
     }
 
     const buffer = await wb.xlsx.writeBuffer();

@@ -19,6 +19,9 @@ import {
   IconPencil,
   IconWallet,
   IconClipboardCheck,
+  IconGavel,
+  IconChartCandle,
+  IconAdjustmentsHorizontal,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -64,8 +67,11 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     },
   ];
 
+  // ── Aktivitas Saya ────────────────────────────────────────────────────────
+  const navSelf: NavItem[] = [];
+
   if (can(permissions, PERMISSIONS.ATTENDANCE_VIEW_OWN)) {
-    navMain.push({
+    navSelf.push({
       title: "Presensi",
       url: "/dashboard/attendance",
       icon: IconFingerprint,
@@ -73,7 +79,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   }
 
   if (can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
-    navMain.push({
+    navSelf.push({
       title: "Isi KPI Saya",
       url: "/dashboard/kpi/self",
       icon: IconPencil,
@@ -116,30 +122,33 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  // ── Stock ──────────────────────────────────────────────────────────────────
-  const navStock: NavItem[] = [];
+  // ── Bank & Treasury ──────────────────────────────────────────────────────
+  const navBank: NavItem[] = [];
 
   if (can(permissions, PERMISSIONS.BANK_VIEW)) {
-    navStock.push({
+    navBank.push({
       title: "Rekening Bank",
       url: "/dashboard/bank-accounts",
       icon: IconBuildingBank,
     });
   }
 
+  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+    navBank.push({
+      title: "Saldo Bank Harian",
+      url: "/dashboard/stockist/bank",
+      icon: IconBuildingBank,
+    });
+  }
+
+  // ── Stock & Valas ────────────────────────────────────────────────────────
+  const navStock: NavItem[] = [];
+
   if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
     navStock.push({
       title: "Stock & Kas",
       url: "/dashboard/stockist",
       icon: IconWallet,
-    });
-  }
-
-  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
-    navStock.push({
-      title: "Saldo Bank Harian",
-      url: "/dashboard/stockist/bank",
-      icon: IconBuildingBank,
     });
   }
 
@@ -151,11 +160,35 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
+  if (can(permissions, PERMISSIONS.CORRECTION_VIEW)) {
+    navStock.push({
+      title: "Persetujuan Koreksi",
+      url: "/dashboard/persetujuan-koreksi",
+      icon: IconGavel,
+    });
+  }
+
   if (can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
     navStock.push({
       title: "Stock Management (PT)",
       url: "/dashboard/stock-management-pt",
       icon: IconDatabase,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
+    navStock.push({
+      title: "Watcher Valas",
+      url: "/dashboard/watcher-valas",
+      icon: IconChartCandle,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
+    navStock.push({
+      title: "Patokan Harga",
+      url: "/dashboard/patokan-harga",
+      icon: IconAdjustmentsHorizontal,
     });
   }
 
@@ -222,9 +255,11 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />
+        {navSelf.length > 0 && <NavMain items={navSelf} label="Aktivitas Saya" />}
         {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
         {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
-        {navStock.length > 0 && <NavMain items={navStock} label="Inventory & Treasury" />}
+        {navBank.length > 0 && <NavMain items={navBank} label="Bank & Treasury" />}
+        {navStock.length > 0 && <NavMain items={navStock} label="Stock & Valas" />}
         <NavMain items={navManagement} label="Management" />
         <div className="mt-auto">
           <NavMain items={navSecondary} label="System" />

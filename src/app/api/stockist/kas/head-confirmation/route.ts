@@ -64,7 +64,13 @@ export const PATCH = withValidation(upsertSchema)(
         caller,
       });
 
-      return NextResponse.json(ok(result, "Konfirmasi kas berhasil disimpan"));
+      // companyTotal ikut di respons — client memakainya langsung tanpa GET ulang.
+      return NextResponse.json(
+        ok(
+          { confirmation: result.confirmation, companyTotal: result.companyTotal },
+          "Konfirmasi kas berhasil disimpan"
+        )
+      );
     } catch (e) {
       return handleError(e);
     }

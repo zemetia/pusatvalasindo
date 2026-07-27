@@ -15,6 +15,11 @@ import {
 } from "@/components/ui/table"
 import { IconAlertTriangle, IconCheck, IconLoader2, IconMinus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import {
+  DailyVerifyCell,
+  type DailyVerifyStatus,
+  type PendingCorrection,
+} from "@/components/admin/stockist/daily-verify-cell"
 
 type Account = {
   id: string
@@ -42,6 +47,9 @@ type Row = {
   savedNote: string
   saveState: SaveState
   hasEntry: boolean
+  verifyStatus: DailyVerifyStatus
+  verifyNote: string | null
+  pendingCorrection?: PendingCorrection
 }
 
 function fmt(n: number) {
@@ -62,6 +70,7 @@ interface Props {
 
 export function BankGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
   const [rows, setRows] = useState<Row[]>([])
+  const [serverDate, setServerDate] = useState<string | null>(null)
   const [fetching, setFetching] = useState(false)
   const rowsRef = useRef<Row[]>([])
   rowsRef.current = rows
@@ -80,8 +89,13 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
       }
 
       const accounts: Account[] = data.data.accounts ?? []
-      const entries: Record<string, { balance: string; note: string | null }> = data.data.entries ?? {}
+      const entries: Record<
+        string,
+        { balance: string; note: string | null; verifyStatus: DailyVerifyStatus; verifyNote: string | null }
+      > = data.data.entries ?? {}
       const previous: Record<string, { balance: string; date: string }> = data.data.previous ?? {}
+      const pendingCorrections: Record<string, PendingCorrection> = data.data.pendingCorrections ?? {}
+      setServerDate(data.data.serverDate ?? null)
 
       const builtRows: Row[] = accounts.map((acc) => {
         const entry = entries[acc.id]
@@ -102,6 +116,9 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
           savedNote: note,
           saveState: "idle",
           hasEntry: Boolean(entry),
+          verifyStatus: entry?.verifyStatus ?? "BELUM_REVIEW",
+          verifyNote: entry?.verifyNote ?? null,
+          pendingCorrection: pendingCorrections[acc.id],
         }
       })
       setRows(builtRows)
@@ -165,18 +182,66 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
     }
   }
 
+  // Tanggal lampau = mode verifikasi H+1: saldonya dikunci dan hanya bisa diubah lewat
+  // pengajuan koreksi yang disetujui Owner/Super Admin.
+  const isPast = serverDate !== null && date < serverDate
+
+  const verifyRow = async (
+    bankAccountId: string,
+    status: "BENAR" | "BEDA",
+    note?: string,
+    correctedBalance?: number
+  ) => {
+    try {
+      const res = await fetch("/api/bank-harian/verify", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bankAccountId, date, status, note, correctedBalance }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
+      toast.success(data.message ?? "Verifikasi tersimpan")
+      setRows((prev) =>
+        prev.map((r) =>
+          r.bankAccountId === bankAccountId
+            ? {
+                ...r,
+                verifyStatus: status,
+                verifyNote: note ?? null,
+                pendingCorrection: data.data?.correctionRequestId
+                  ? {
+                      id: data.data.correctionRequestId,
+                      proposedValue: String(correctedBalance ?? ""),
+                      reason: note ?? "",
+                    }
+                  : undefined,
+              }
+            : r
+        )
+      )
+      return true
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
+      return false
+    }
+  }
+
   const totals = useMemo(() => {
     let totalBalance = 0
     let totalDelta = 0
     let unfilled = 0
+    let belumVerifikasi = 0
     for (const r of rows) {
       const balance = parseNum(r.balance)
       const ref = r.previousBalance ?? r.fallbackBalance
       totalBalance += balance
       totalDelta += balance - ref
       if (!r.hasEntry) unfilled += 1
+      if (r.hasEntry && r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) {
+        belumVerifikasi += 1
+      }
     }
-    return { totalBalance, totalDelta, unfilled }
+    return { totalBalance, totalDelta, unfilled, belumVerifikasi }
   }, [rows])
 
   const onUnfilledChangeRef = useRef(onUnfilledChange)
@@ -196,7 +261,18 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        {totals.unfilled > 0 ? (
+        {isPast ? (
+          totals.belumVerifikasi > 0 ? (
+            <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+              <IconAlertTriangle className="size-4" />
+              {totals.belumVerifikasi} rekening belum dikonfirmasi untuk tanggal ini.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Semua saldo tanggal ini sudah dikonfirmasi.
+            </p>
+          )
+        ) : totals.unfilled > 0 ? (
           <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
             <IconAlertTriangle className="size-4" />
             {totals.unfilled} rekening belum diisi hari ini.
@@ -213,9 +289,14 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
               <TableHead className="sticky top-0 z-20 bg-background">Rekening PT</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background">Bank</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Saldo Kemarin</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Saldo Hari Ini</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">
+                {isPast ? "Saldo Tanggal Ini" : "Saldo Hari Ini"}
+              </TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
+              {isPast && (
+                <TableHead className="sticky top-0 z-20 bg-background w-56">Konfirmasi</TableHead>
+              )}
               <TableHead className="sticky top-0 z-20 bg-background w-10" />
             </TableRow>
           </TableHeader>
@@ -225,8 +306,10 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
                 key={r.bankAccountId}
                 row={r}
                 canManage={canManage}
+                isPast={isPast}
                 onChange={updateRow}
                 onBlurSave={saveRow}
+                onVerify={verifyRow}
                 inputRefs={inputRefs}
                 rowIndex={i}
                 rowCount={rows.length}
@@ -247,7 +330,7 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
                 {totals.totalDelta > 0 ? "+" : ""}
                 {fmt(totals.totalDelta)}
               </TableCell>
-              <TableCell colSpan={2} />
+              <TableCell colSpan={isPast ? 3 : 2} />
             </TableRow>
           </TableBody>
         </Table>
@@ -266,16 +349,25 @@ function SaveIndicator({ state }: { state: SaveState }) {
 function BankRowEdit({
   row,
   canManage,
+  isPast,
   onChange,
   onBlurSave,
+  onVerify,
   inputRefs,
   rowIndex,
   rowCount,
 }: {
   row: Row
   canManage: boolean
+  isPast: boolean
   onChange: (id: string, field: "balance" | "note", val: string) => void
   onBlurSave: (id: string) => void
+  onVerify: (
+    id: string,
+    status: "BENAR" | "BEDA",
+    note?: string,
+    correctedBalance?: number
+  ) => Promise<boolean>
   inputRefs: RefObject<Map<string, HTMLInputElement>>
   rowIndex: number
   rowCount: number
@@ -284,6 +376,8 @@ function BankRowEdit({
   const reference = row.previousBalance ?? row.fallbackBalance
   const delta = balance - reference
   const isUnfilled = !row.hasEntry
+  // Saldo tanggal lampau dikunci — perubahannya wajib lewat pengajuan koreksi.
+  const editable = canManage && !isPast
 
   const registerRef = (field: "balance" | "note") => (el: HTMLInputElement | null) => {
     const key = `${rowIndex}:${field}`
@@ -326,7 +420,7 @@ function BankRowEdit({
         <NumberInput
           ref={registerRef("balance")}
           value={row.balance}
-          disabled={!canManage}
+          disabled={!editable}
           onValueChange={(val) => onChange(row.bankAccountId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.bankAccountId)}
           onKeyDown={handleEnter("balance")}
@@ -348,7 +442,7 @@ function BankRowEdit({
           ref={registerRef("note")}
           type="text"
           value={row.note}
-          disabled={!canManage}
+          disabled={!editable}
           placeholder="Opsional"
           onChange={(e) => onChange(row.bankAccountId, "note", e.target.value)}
           onBlur={() => onBlurSave(row.bankAccountId)}
@@ -356,6 +450,24 @@ function BankRowEdit({
           className="w-full text-sm"
         />
       </TableCell>
+      {isPast && (
+        <TableCell>
+          {row.hasEntry ? (
+            <DailyVerifyCell
+              status={row.verifyStatus}
+              note={row.verifyNote}
+              balance={balance}
+              pending={row.pendingCorrection}
+              canVerify={canManage}
+              onVerify={(status, note, correctedBalance) =>
+                onVerify(row.bankAccountId, status, note, correctedBalance)
+              }
+            />
+          ) : (
+            <span className="text-xs text-muted-foreground">Tidak diisi</span>
+          )}
+        </TableCell>
+      )}
       <TableCell>
         <SaveIndicator state={row.saveState} />
       </TableCell>

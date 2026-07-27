@@ -20,12 +20,12 @@ model Branch {
 }
 
 model Company {
-  id                        String                         @id @default(cuid())
-  name                      String                         @unique
-  code                      String                         @unique
-  isActive                  Boolean                        @default(true)
-  createdAt                 DateTime                       @default(now())
-  updatedAt                 DateTime                       @updatedAt
+  id                        String                          @id @default(cuid())
+  name                      String                          @unique
+  code                      String                          @unique
+  isActive                  Boolean                         @default(true)
+  createdAt                 DateTime                        @default(now())
+  updatedAt                 DateTime                        @updatedAt
   bonusMatrices             BonusMatrix[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
@@ -35,8 +35,11 @@ model Company {
   companyStockItems         CompanyStockItem[]
   bankAccounts              BankAccount[]
   stockistHeadConfirmations StockistHeadConfirmation[]
+  stockistTotalHeadConfirms StockistTotalHeadConfirmation[]
   kasHeadConfirmations      KasHeadConfirmation[]
+  bankHeadConfirmations     BankHeadConfirmation[]
   headConfirmationTotals    CompanyHeadConfirmationTotal[]
+  correctionRequests        CorrectionRequest[]
 }
 
 model Currency {
@@ -50,4 +53,20 @@ model Currency {
   bankAccounts   BankAccount[]
   stocks         CurrencyStock[]
   stockMutations StockMutation[]
+}
+
+// Patokan Harga: manual sell/buy adjustment rules layered on top of the live
+// SmartDeal rate (see watcher-valas.service.ts) to derive Pusat Valas Indo's
+// own posted rate. Global — not branch/company-scoped. Adjustment strings are
+// stored as-is (e.g. "+5", "-10", "c5", "f0.05", "c0.1+5") and parsed by
+// src/lib/price-adjustment.ts; this table only persists them.
+model PriceBenchmark {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  name           String
+  sellAdjustment String   @default("")
+  buyAdjustment  String   @default("")
+  updatedBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

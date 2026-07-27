@@ -16,6 +16,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -40,14 +41,13 @@ type StockRow = {
   item: StockItem
   systemTotal: number
   confirmedQuantity: number | null
-  confirmedIdrValue: number | null
   confirmedAt: string | null
   qtyDraft: number | undefined
-  idrDraft: number | undefined
   saveState: SaveState
 }
 
-type KasState = {
+/** Satu angka IDR yang dikonfirmasi kepala cabang: dipakai untuk total stock, kas, dan bank. */
+type IdrState = {
   systemTotal: number
   confirmedIdrValue: number | null
   confirmedAt: string | null
@@ -85,7 +85,9 @@ export function StockistHeadConfirmationClient({
   const [date, setDate] = useState(toDate(new Date()))
   const [fetching, setFetching] = useState(false)
   const [stockRows, setStockRows] = useState<StockRow[]>([])
-  const [kas, setKas] = useState<KasState | null>(null)
+  const [stockIdr, setStockIdr] = useState<IdrState | null>(null)
+  const [kas, setKas] = useState<IdrState | null>(null)
+  const [bank, setBank] = useState<IdrState | null>(null)
   const [companyTotal, setCompanyTotal] = useState(0)
   const [exporting, setExporting] = useState(false)
 
@@ -96,55 +98,55 @@ export function StockistHeadConfirmationClient({
     if (!companyId || !date) return
     setFetching(true)
     try {
-      const [stockRes, kasRes] = await Promise.all([
-        fetch(`/api/stockist/head-confirmation?companyId=${companyId}&date=${date}`),
-        fetch(`/api/stockist/kas/head-confirmation?companyId=${companyId}&date=${date}`),
-      ])
-      const stockData = await stockRes.json()
-      const kasData = await kasRes.json()
+      // Satu request untuk stock + total stock + kas + bank + total PT (endpoint mengembalikan
+      // semuanya sekaligus).
+      const res = await fetch(`/api/stockist/head-confirmation?companyId=${companyId}&date=${date}`)
+      const data = await res.json()
 
-      if (!stockRes.ok || !stockData.success) {
-        toast.error(stockData.error || stockData.message || "Gagal memuat data stock")
+      if (!res.ok || !data.success) {
+        toast.error(data.error || data.message || "Gagal memuat data")
         setStockRows([])
-      } else {
-        type ApiRow = {
-          item: StockItem
-          systemTotal: number
-          confirmedQuantity: number | null
-          confirmedIdrValue: number | null
-          confirmedAt: string | null
-        }
-        setStockRows(
-          (stockData.data.rows as ApiRow[]).map((r) => ({
-            item: r.item,
-            systemTotal: r.systemTotal,
-            confirmedQuantity: r.confirmedQuantity,
-            confirmedIdrValue: r.confirmedIdrValue,
-            confirmedAt: r.confirmedAt,
-            qtyDraft: r.confirmedQuantity ?? undefined,
-            idrDraft: r.confirmedIdrValue ?? undefined,
-            saveState: "idle" as SaveState,
-          }))
-        )
-        setCompanyTotal(stockData.data.companyTotal ?? 0)
+        setStockIdr(null)
+        setKas(null)
+        setBank(null)
+        return
       }
 
-      if (!kasRes.ok || !kasData.success) {
-        toast.error(kasData.error || kasData.message || "Gagal memuat data kas")
-        setKas(null)
-      } else {
-        setKas({
-          systemTotal: kasData.data.systemTotal,
-          confirmedIdrValue: kasData.data.confirmedIdrValue,
-          confirmedAt: kasData.data.confirmedAt,
-          idrDraft: kasData.data.confirmedIdrValue ?? undefined,
-          saveState: "idle",
-        })
+      type ApiRow = {
+        item: StockItem
+        systemTotal: number
+        confirmedQuantity: number | null
+        confirmedAt: string | null
       }
+      setStockRows(
+        (data.data.rows as ApiRow[]).map((r) => ({
+          item: r.item,
+          systemTotal: r.systemTotal,
+          confirmedQuantity: r.confirmedQuantity,
+          confirmedAt: r.confirmedAt,
+          qtyDraft: r.confirmedQuantity ?? undefined,
+          saveState: "idle" as SaveState,
+        }))
+      )
+      setCompanyTotal(data.data.companyTotal ?? 0)
+
+      const totals = data.data.stockTotals
+      setStockIdr({
+        // Total IDR stock tidak punya pembanding sistem — hanya angka final kepala cabang.
+        systemTotal: 0,
+        confirmedIdrValue: totals.confirmedIdrValue,
+        confirmedAt: totals.idrConfirmedAt,
+        idrDraft: totals.confirmedIdrValue ?? undefined,
+        saveState: "idle",
+      })
+      setKas(toIdrState(data.data.kas))
+      setBank(toIdrState(data.data.bank))
     } catch {
       toast.error("Gagal memuat data")
       setStockRows([])
+      setStockIdr(null)
       setKas(null)
+      setBank(null)
     } finally {
       setFetching(false)
     }
@@ -154,15 +156,15 @@ export function StockistHeadConfirmationClient({
     loadData()
   }, [loadData])
 
-  const updateStockDraft = (itemId: string, field: "qtyDraft" | "idrDraft", value: number | undefined) => {
-    setStockRows((prev) => prev.map((r) => (r.item.id === itemId ? { ...r, [field]: value } : r)))
+  const updateStockDraft = (itemId: string, value: number | undefined) => {
+    setStockRows((prev) => prev.map((r) => (r.item.id === itemId ? { ...r, qtyDraft: value } : r)))
   }
 
   const saveStockRow = async (itemId: string) => {
     const row = stockRows.find((r) => r.item.id === itemId)
     if (!row || locked) return
-    if (row.qtyDraft === undefined || row.idrDraft === undefined) return
-    if (row.qtyDraft === row.confirmedQuantity && row.idrDraft === row.confirmedIdrValue) return
+    if (row.qtyDraft === undefined) return
+    if (row.qtyDraft === row.confirmedQuantity) return
 
     setStockRows((prev) => prev.map((r) => (r.item.id === itemId ? { ...r, saveState: "saving" } : r)))
     try {
@@ -174,7 +176,6 @@ export function StockistHeadConfirmationClient({
           companyStockItemId: itemId,
           date,
           confirmedQuantity: row.qtyDraft,
-          confirmedIdrValue: row.idrDraft,
         }),
       })
       const data = await res.json()
@@ -185,41 +186,38 @@ export function StockistHeadConfirmationClient({
             ? {
                 ...r,
                 confirmedQuantity: r.qtyDraft ?? null,
-                confirmedIdrValue: r.idrDraft ?? null,
                 confirmedAt: new Date().toISOString(),
                 saveState: "saved",
               }
             : r
         )
       )
-      // Total keseluruhan PT ikut berubah di server setiap baris disimpan — refetch ringan.
-      const totalRes = await fetch(`/api/stockist/head-confirmation?companyId=${companyId}&date=${date}`)
-      const totalData = await totalRes.json()
-      if (totalRes.ok && totalData.success) setCompanyTotal(totalData.data.companyTotal ?? 0)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
       setStockRows((prev) => prev.map((r) => (r.item.id === itemId ? { ...r, saveState: "error" } : r)))
     }
   }
 
-  const updateKasDraft = (value: number | undefined) => {
-    setKas((prev) => (prev ? { ...prev, idrDraft: value } : prev))
-  }
+  // Total stock IDR, kas, dan bank sama-sama satu angka per PT per tanggal, jadi satu
+  // handler saja yang dibedakan endpoint + setter-nya.
+  const saveIdr = async (
+    state: IdrState | null,
+    setState: React.Dispatch<React.SetStateAction<IdrState | null>>,
+    url: string
+  ) => {
+    if (!state || locked || state.idrDraft === undefined) return
+    if (state.idrDraft === state.confirmedIdrValue) return
 
-  const saveKas = async () => {
-    if (!kas || locked || kas.idrDraft === undefined) return
-    if (kas.idrDraft === kas.confirmedIdrValue) return
-
-    setKas((prev) => (prev ? { ...prev, saveState: "saving" } : prev))
+    setState((prev) => (prev ? { ...prev, saveState: "saving" } : prev))
     try {
-      const res = await fetch("/api/stockist/kas/head-confirmation", {
+      const res = await fetch(url, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyId, date, confirmedIdrValue: kas.idrDraft }),
+        body: JSON.stringify({ companyId, date, confirmedIdrValue: state.idrDraft }),
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
-      setKas((prev) =>
+      setState((prev) =>
         prev
           ? {
               ...prev,
@@ -229,12 +227,11 @@ export function StockistHeadConfirmationClient({
             }
           : prev
       )
-      const totalRes = await fetch(`/api/stockist/head-confirmation?companyId=${companyId}&date=${date}`)
-      const totalData = await totalRes.json()
-      if (totalRes.ok && totalData.success) setCompanyTotal(totalData.data.companyTotal ?? 0)
+      // Total PT dikembalikan langsung oleh PATCH — tanpa GET ulang seluruh halaman.
+      if (typeof data.data?.companyTotal === "number") setCompanyTotal(data.data.companyTotal)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
-      setKas((prev) => (prev ? { ...prev, saveState: "error" } : prev))
+      setState((prev) => (prev ? { ...prev, saveState: "error" } : prev))
     }
   }
 
@@ -271,11 +268,17 @@ export function StockistHeadConfirmationClient({
     [stockRows]
   )
 
-  const stockTotalKepcab = useMemo(
-    () => stockRows.reduce((sum, r) => sum + (r.confirmedIdrValue ?? 0), 0),
+  // Baris total di bawah tabel: beda mata uang memang dijumlahkan mentah — permintaan client,
+  // supaya selisih keseluruhan langsung kelihatan tanpa memeriksa baris satu per satu.
+  const stockSystemSum = useMemo(
+    () => stockRows.reduce((sum, r) => sum + r.systemTotal, 0),
     [stockRows]
   )
-  const kasTotalKepcab = kas?.confirmedIdrValue ?? 0
+  const stockKepcabSum = useMemo(
+    () => stockRows.reduce((sum, r) => sum + (r.qtyDraft ?? 0), 0),
+    [stockRows]
+  )
+  const stockSumSelisih = stockKepcabSum - stockSystemSum
 
   return (
     <div className="flex flex-col gap-6">
@@ -340,37 +343,11 @@ export function StockistHeadConfirmationClient({
 
       {companyId && (
         <>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground font-medium">
-                  Total Stock Kepala Cabang — {date}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold font-mono">Rp {fmt(stockTotalKepcab)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground font-medium">
-                  Total Kas Kepala Cabang — {date}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold font-mono">Rp {fmt(kasTotalKepcab)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground font-medium">
-                  Total Keseluruhan IDR PT — {date}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold font-mono">Rp {fmt(companyTotal)}</p>
-              </CardContent>
-            </Card>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryCard label={`Total Stock Kepala Cabang — ${date}`} value={stockIdr?.confirmedIdrValue ?? 0} />
+            <SummaryCard label={`Total Kas Kepala Cabang — ${date}`} value={kas?.confirmedIdrValue ?? 0} />
+            <SummaryCard label={`Total Bank Kepala Cabang — ${date}`} value={bank?.confirmedIdrValue ?? 0} />
+            <SummaryCard label={`Total Keseluruhan IDR PT — ${date}`} value={companyTotal} highlight />
           </div>
 
           {fetching && stockRows.length === 0 ? (
@@ -381,11 +358,10 @@ export function StockistHeadConfirmationClient({
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="sticky top-0 z-20 bg-background">Item</TableHead>
-                    <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Total Sistem</TableHead>
-                    <TableHead className="sticky top-0 z-20 bg-background w-44 text-right">
+                    <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Total Sistem</TableHead>
+                    <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">
                       Total Kepala Cabang
                     </TableHead>
-                    <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Total IDR</TableHead>
                     <TableHead className="sticky top-0 z-20 bg-background w-32 text-right">Selisih</TableHead>
                     <TableHead className="sticky top-0 z-20 bg-background w-24">Jam</TableHead>
                     <TableHead className="sticky top-0 z-20 bg-background w-10" />
@@ -394,7 +370,6 @@ export function StockistHeadConfirmationClient({
                 <TableBody>
                   {stockRowsSorted.map((r) => {
                     const selisih = r.qtyDraft === undefined ? null : r.qtyDraft - r.systemTotal
-                    const isMatch = selisih === 0
                     return (
                       <TableRow key={r.item.id}>
                         <TableCell className="font-medium text-sm">
@@ -410,28 +385,12 @@ export function StockistHeadConfirmationClient({
                           <NumberInput
                             value={r.qtyDraft ?? ""}
                             disabled={locked}
-                            onValueChange={(val) => updateStockDraft(r.item.id, "qtyDraft", val)}
+                            onValueChange={(val) => updateStockDraft(r.item.id, val)}
                             onBlur={() => saveStockRow(r.item.id)}
                             className="text-right font-mono w-full"
                           />
                         </TableCell>
-                        <TableCell className="text-right">
-                          <NumberInput
-                            value={r.idrDraft ?? ""}
-                            disabled={locked}
-                            onValueChange={(val) => updateStockDraft(r.item.id, "idrDraft", val)}
-                            onBlur={() => saveStockRow(r.item.id)}
-                            className="text-right font-mono w-full"
-                          />
-                        </TableCell>
-                        <TableCell
-                          className={cn(
-                            "text-right font-mono text-sm font-medium",
-                            selisih === null && "text-muted-foreground",
-                            selisih !== null && isMatch && "text-emerald-600 dark:text-emerald-500",
-                            selisih !== null && !isMatch && "text-destructive"
-                          )}
-                        >
+                        <TableCell className={selisihClass(selisih)}>
                           {selisih === null ? "-" : fmt(selisih)}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">{fmtTime(r.confirmedAt)}</TableCell>
@@ -442,66 +401,180 @@ export function StockistHeadConfirmationClient({
                     )
                   })}
                 </TableBody>
+                <TableFooter className="sticky bottom-0 z-20 bg-muted">
+                  {/* Total kuantitas lintas mata uang — sekadar penanda apakah masih ada selisih
+                      keseluruhan, bukan angka yang punya arti satuan. */}
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell className="text-sm font-semibold">Total Keseluruhan</TableCell>
+                    <TableCell className="text-right font-mono text-sm font-semibold">
+                      {fmt(stockSystemSum)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-sm font-semibold pr-4">
+                      {fmt(stockKepcabSum)}
+                    </TableCell>
+                    <TableCell className={cn(selisihClass(stockSumSelisih), "font-semibold")}>
+                      {fmt(stockSumSelisih)}
+                    </TableCell>
+                    <TableCell colSpan={2} />
+                  </TableRow>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell className="text-sm font-semibold" colSpan={2}>
+                      Total IDR (final)
+                      <span className="ml-2 text-[10px] font-normal text-muted-foreground uppercase">
+                        Valas + Logam
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <NumberInput
+                        value={stockIdr?.idrDraft ?? ""}
+                        disabled={locked || !stockIdr}
+                        onValueChange={(val) =>
+                          setStockIdr((prev) => (prev ? { ...prev, idrDraft: val } : prev))
+                        }
+                        onBlur={() =>
+                          saveIdr(stockIdr, setStockIdr, "/api/stockist/head-confirmation/total")
+                        }
+                        className="text-right font-mono w-full"
+                      />
+                    </TableCell>
+                    <TableCell />
+                    <TableCell className="text-sm text-muted-foreground">
+                      {fmtTime(stockIdr?.confirmedAt ?? null)}
+                    </TableCell>
+                    <TableCell>
+                      <SaveIndicator state={stockIdr?.saveState ?? "idle"} />
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
               </Table>
             </div>
           )}
 
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Cross-Check Kas</h3>
-            {kas && (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-36 text-right">Total Sistem</TableHead>
-                      <TableHead className="w-52 text-right">Total Kepala Cabang</TableHead>
-                      <TableHead className="w-32 text-right">Selisih</TableHead>
-                      <TableHead className="w-24">Jam</TableHead>
-                      <TableHead className="w-10" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(() => {
-                      const kasSelisih = kas.idrDraft === undefined ? null : kas.idrDraft - kas.systemTotal
-                      const kasMatch = kasSelisih === 0
-                      return (
-                        <TableRow>
-                          <TableCell className="text-right font-mono text-sm text-muted-foreground">
-                            Rp {fmt(kas.systemTotal)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <NumberInput
-                              value={kas.idrDraft ?? ""}
-                              disabled={locked}
-                              onValueChange={updateKasDraft}
-                              onBlur={saveKas}
-                              className="text-right font-mono w-full"
-                            />
-                          </TableCell>
-                          <TableCell
-                            className={cn(
-                              "text-right font-mono text-sm font-medium",
-                              kasSelisih === null && "text-muted-foreground",
-                              kasSelisih !== null && kasMatch && "text-emerald-600 dark:text-emerald-500",
-                              kasSelisih !== null && !kasMatch && "text-destructive"
-                            )}
-                          >
-                            {kasSelisih === null ? "-" : fmt(kasSelisih)}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">{fmtTime(kas.confirmedAt)}</TableCell>
-                          <TableCell>
-                            <SaveIndicator state={kas.saveState} />
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })()}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </div>
+          <IdrCrossCheckSection
+            title="Cross-Check Kas"
+            state={kas}
+            locked={locked}
+            onChange={(val) => setKas((prev) => (prev ? { ...prev, idrDraft: val } : prev))}
+            onBlur={() => saveIdr(kas, setKas, "/api/stockist/kas/head-confirmation")}
+          />
+
+          <IdrCrossCheckSection
+            title="Cross-Check Bank"
+            description="Total sistem = jumlah saldo Bank Harian seluruh rekening aktif PT pada tanggal ini."
+            state={bank}
+            locked={locked}
+            onChange={(val) => setBank((prev) => (prev ? { ...prev, idrDraft: val } : prev))}
+            onBlur={() => saveIdr(bank, setBank, "/api/stockist/bank/head-confirmation")}
+          />
         </>
       )}
+    </div>
+  )
+}
+
+function toIdrState(api: {
+  systemTotal: number
+  confirmedIdrValue: number | null
+  confirmedAt: string | null
+}): IdrState {
+  return {
+    systemTotal: api.systemTotal,
+    confirmedIdrValue: api.confirmedIdrValue,
+    confirmedAt: api.confirmedAt,
+    idrDraft: api.confirmedIdrValue ?? undefined,
+    saveState: "idle",
+  }
+}
+
+function selisihClass(selisih: number | null) {
+  return cn(
+    "text-right font-mono text-sm font-medium",
+    selisih === null && "text-muted-foreground",
+    selisih !== null && selisih === 0 && "text-emerald-600 dark:text-emerald-500",
+    selisih !== null && selisih !== 0 && "text-destructive"
+  )
+}
+
+function SummaryCard({
+  label,
+  value,
+  highlight,
+}: {
+  label: string
+  value: number
+  highlight?: boolean
+}) {
+  return (
+    <Card className={cn(highlight && "border-emerald-500/40")}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm text-muted-foreground font-medium">{label}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold font-mono">Rp {fmt(value)}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+/** Kas dan bank punya bentuk cross-check identik: satu total sistem vs satu total kepala cabang. */
+function IdrCrossCheckSection({
+  title,
+  description,
+  state,
+  locked,
+  onChange,
+  onBlur,
+}: {
+  title: string
+  description?: string
+  state: IdrState | null
+  locked: boolean
+  onChange: (value: number | undefined) => void
+  onBlur: () => void
+}) {
+  if (!state) return null
+  const selisih = state.idrDraft === undefined ? null : state.idrDraft - state.systemTotal
+
+  return (
+    <div>
+      <h3 className="text-sm font-semibold mb-2">{title}</h3>
+      {description && <p className="text-xs text-muted-foreground mb-2">{description}</p>}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-36 text-right">Total Sistem</TableHead>
+              <TableHead className="w-52 text-right">Total Kepala Cabang</TableHead>
+              <TableHead className="w-32 text-right">Selisih</TableHead>
+              <TableHead className="w-24">Jam</TableHead>
+              <TableHead className="w-10" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="text-right font-mono text-sm text-muted-foreground">
+                Rp {fmt(state.systemTotal)}
+              </TableCell>
+              <TableCell className="text-right">
+                <NumberInput
+                  value={state.idrDraft ?? ""}
+                  disabled={locked}
+                  onValueChange={onChange}
+                  onBlur={onBlur}
+                  className="text-right font-mono w-full"
+                />
+              </TableCell>
+              <TableCell className={selisihClass(selisih)}>
+                {selisih === null ? "-" : fmt(selisih)}
+              </TableCell>
+              <TableCell className="text-sm text-muted-foreground">{fmtTime(state.confirmedAt)}</TableCell>
+              <TableCell>
+                <SaveIndicator state={state.saveState} />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

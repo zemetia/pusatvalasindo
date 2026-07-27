@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import type { Permission } from "@/lib/permissions";
 import { can, isAdminRole } from "@/lib/permissions";
+import { fail } from "./api-response";
 
 export type AdminCaller = {
   id: string;
@@ -37,32 +38,53 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      name: true,
-      email: true,
-      branchId: true,
-      branch: { select: { companyId: true } },
-      customRole: { select: { name: true, permissions: true, payrollCompanyIds: true } },
-    },
-  });
-  if (!user) return null;
+  // Single round-trip: user + branch (→ companyId) + custom_role in ONE query via explicit
+  // LEFT JOINs. Prisma's default relation-load strategy runs each nested `select`/`include`
+  // relation as a SEPARATE query (this client has no `relationJoins`), so the previous
+  // findUnique with two relation selects cost 3 network round trips to the remote DB on every
+  // request. Auth runs on every page render AND every API call, so this was the single biggest
+  // per-request latency source.
+  const rows = await prisma.$queryRaw<
+    {
+      name: string;
+      email: string;
+      branchId: string | null;
+      companyId: string | null;
+      roleName: string | null;
+      permissions: string[] | null;
+      payrollCompanyIds: string[] | null;
+    }[]
+  >`
+    SELECT u."name",
+           u."email",
+           u."branchId",
+           b."companyId"          AS "companyId",
+           r."name"               AS "roleName",
+           r."permissions"        AS "permissions",
+           r."payrollCompanyIds"  AS "payrollCompanyIds"
+    FROM "user" u
+    LEFT JOIN "Branch"      b ON b."id" = u."branchId"
+    LEFT JOIN "custom_role" r ON r."id" = u."customRoleId"
+    WHERE u."id" = ${session.user.id}
+    LIMIT 1
+  `;
+  const row = rows[0];
+  if (!row) return null;
 
   // A user's PT is derived solely from their branch — the single source of truth.
   // Branch-scoped roles (e.g. Kepala Cabang) are thereby locked to their PT, while
   // global roles (Super Admin/Owner) have no branch and stay unscoped.
-  const companyId = user.branch?.companyId ?? null;
+  const companyId = row.companyId ?? null;
 
   return {
     id: session.user.id,
-    name: user.name,
-    email: user.email,
+    name: row.name,
+    email: row.email,
     companyId,
-    branchId: user.branchId,
-    roleName: user.customRole?.name ?? "",
-    permissions: user.customRole?.permissions ?? [],
-    payrollCompanyIds: user.customRole?.payrollCompanyIds ?? [],
+    branchId: row.branchId,
+    roleName: row.roleName ?? "",
+    permissions: row.permissions ?? [],
+    payrollCompanyIds: row.payrollCompanyIds ?? [],
   };
 });
 
@@ -74,13 +96,13 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
 export async function getAdminCaller(): Promise<AdminCaller | NextResponse> {
   const caller = await getCallerRecord();
   if (!caller) {
-    return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
+    return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
   }
 
   // Role matching (incl. name normalization) lives in isAdminRole — the single
   // source of truth in lib/permissions.ts.
   if (!isAdminRole(caller.roleName)) {
-    return NextResponse.json({ error: "Tidak memiliki izin" }, { status: 403 });
+    return NextResponse.json(fail("FORBIDDEN", "Anda tidak memiliki izin untuk melakukan aksi ini"), { status: 403 });
   }
 
   return {
@@ -123,11 +145,11 @@ export async function requirePermission(
 ): Promise<AdminCaller | NextResponse> {
   const caller = await getCallerRecord();
   if (!caller) {
-    return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
+    return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
   }
 
   if (!can(caller.permissions, permission)) {
-    return NextResponse.json({ error: "Tidak memiliki izin" }, { status: 403 });
+    return NextResponse.json(fail("FORBIDDEN", "Anda tidak memiliki izin untuk melakukan aksi ini"), { status: 403 });
   }
 
   return {

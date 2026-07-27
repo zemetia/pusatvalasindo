@@ -28,7 +28,7 @@ export default async function StockistHeadConfirmationPage({
     <div className="flex flex-col gap-6 px-4 lg:px-6">
       <PageHeader
         title="Cross-Check Stock"
-        description="Hitung ulang total stock & kas oleh kepala cabang, dibandingkan otomatis dengan total sistem."
+        description="Hitung ulang total stock, kas, & bank oleh kepala cabang, dibandingkan otomatis dengan total sistem."
         icon={<IconClipboardCheck className="size-5" />}
       />
       {isUnassigned ? (

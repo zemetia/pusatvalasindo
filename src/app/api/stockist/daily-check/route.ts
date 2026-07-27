@@ -33,7 +33,7 @@ export const PATCH = withValidation(markCheckSchema)(
       if (!pocket) throw new NotFoundError("Pocket tidak ditemukan");
       assertCompanyAccess(caller, pocket.companyId);
 
-      const check = await stockistService.markDailyCheck({
+      const result = await stockistService.markDailyCheck({
         pocketId: ctx.body.pocketId,
         companyStockItemId: ctx.body.companyStockItemId,
         date: new Date(ctx.body.date),
@@ -43,7 +43,17 @@ export const PATCH = withValidation(markCheckSchema)(
         reviewedBy: caller.id,
       });
 
-      return NextResponse.json(ok(check, "Status berhasil disimpan"));
+      return NextResponse.json(
+        ok(
+          {
+            ...result.check,
+            correctionRequestId: result.correctionRequest?.id ?? null,
+          },
+          result.correctionRequest
+            ? "Ditandai Beda — koreksi menunggu persetujuan Owner/Super Admin"
+            : "Status berhasil disimpan"
+        )
+      );
     } catch (e) {
       return handleError(e);
     }

@@ -1,16 +1,62 @@
 import prisma from '@/lib/prisma'
 import { Prisma } from '@src/generated/prisma/client'
+import type { DailyVerifyStatus } from '@src/generated/prisma/client'
 
 export const dailyBankEntryRepository = {
+  // Callers key the result by bankAccountId (a lookup map) and only read the scalar columns,
+  // so we select just those — no `include: { bankAccount: true }` (that relation is loaded as a
+  // separate query on this client) and no relation-based orderBy (a JOIN whose order is discarded
+  // by the map). Trims a full round trip + payload per Bank Harian load.
   findByCompanyAndDate(companyId: string, date: Date) {
     return prisma.dailyBankEntry.findMany({
       where: {
         bankAccount: { companyId },
         date,
       },
-      include: { bankAccount: true },
-      orderBy: [{ bankAccount: { sortOrder: 'asc' } }],
+      select: {
+        bankAccountId: true,
+        balance: true,
+        note: true,
+        verifyStatus: true,
+        verifyNote: true,
+        verifiedAt: true,
+      },
     })
+  },
+
+  findByAccountAndDate(bankAccountId: string, date: Date) {
+    return prisma.dailyBankEntry.findUnique({ where: { bankAccountId_date: { bankAccountId, date } } })
+  },
+
+  markVerified(
+    id: string,
+    data: { verifyStatus: DailyVerifyStatus; verifyNote?: string | null; verifiedBy?: string | null }
+  ) {
+    return prisma.dailyBankEntry.update({ where: { id }, data: { ...data, verifiedAt: new Date() } })
+  },
+
+  // Dipakai saat pengajuan koreksi disetujui — saldo tanggal itu diganti angka usulan.
+  applyApprovedCorrection(id: string, balance: number, verifyNote?: string | null) {
+    return prisma.dailyBankEntry.update({
+      where: { id },
+      data: {
+        balance: new Prisma.Decimal(balance),
+        verifyStatus: 'BENAR',
+        verifyNote,
+        verifiedAt: new Date(),
+      },
+    })
+  },
+
+  // Total saldo bank "menurut sistem" untuk cross-check kepala cabang: jumlah saldo harian
+  // seluruh rekening aktif PT pada tanggal itu. Diagregasi di DB supaya yang lewat kabel cuma
+  // satu angka, bukan seluruh baris entry.
+  async sumActiveByCompanyAndDate(companyId: string, date: Date) {
+    const result = await prisma.dailyBankEntry.aggregate({
+      where: { bankAccount: { companyId, isActive: true }, date },
+      _sum: { balance: true },
+    })
+    return Number(result._sum.balance ?? 0)
   },
 
   // Most recent entry strictly before `date`, per bank account — used as the

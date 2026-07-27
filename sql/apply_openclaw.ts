@@ -63,19 +63,25 @@ async function main() {
   await run(client, `GRANT CONNECT ON DATABASE ${dbName}`, `GRANT CONNECT ON DATABASE "${dbName}" TO oc_pvi_reader`);
   await run(client, 'GRANT USAGE ON SCHEMA public', 'GRANT USAGE ON SCHEMA public TO oc_pvi_reader');
 
-  // ── 3. Grant SELECT on all oc_ views ─────────────────────────────────────────
+  // ── 3. Grant SELECT on all hv_ views ─────────────────────────────────────────
   console.log('\n=== Granting SELECT on views ===');
-  const ocViews = [
-    'oc_companies', 'oc_branches', 'oc_employees',
-    'oc_attendance', 'oc_attendance_monthly',
-    'oc_payroll_monthly',
-    'oc_kpi_monthly', 'oc_kpi_logs', 'oc_kpi_definitions',
-    'oc_revenue', 'oc_revenue_monthly',
-    'oc_bank_accounts', 'oc_bank_balance_by_company', 'oc_bank_daily', 'oc_bank_mutations',
-    'oc_currency_stock', 'oc_currency_stock_by_company',
-    'oc_stock_daily', 'oc_bonus_tiers',
+  const hvViews = [
+    'hv_companies', 'hv_branches', 'hv_employees',
+    'hv_attendance', 'hv_attendance_monthly',
+    'hv_kpi_definitions', 'hv_kpi_logs', 'hv_kpi_monthly',
+    'hv_revenue', 'hv_revenue_monthly',
+    'hv_payroll_monthly',
+    'hv_bank_accounts', 'hv_bank_balance_by_company', 'hv_bank_daily', 'hv_bank_mutations',
+    'hv_currency_stock', 'hv_currency_stock_by_company',
+    'hv_stock_daily', 'hv_bonus_tiers',
+    'hv_company_stock_items',
+    'hv_stockist_pockets', 'hv_stockist_balances', 'hv_stockist_stock_by_company',
+    'hv_stockist_mutations', 'hv_stockist_daily_checks',
+    'hv_kas_pockets', 'hv_kas_daily', 'hv_kas_balance_by_company',
+    'hv_stockist_head_confirmations', 'hv_stockist_total_head_confirmations',
+    'hv_kas_head_confirmations', 'hv_bank_head_confirmations', 'hv_finance_confirmed_daily',
   ];
-  for (const v of ocViews) {
+  for (const v of hvViews) {
     await run(client, `GRANT SELECT ON ${v}`, `GRANT SELECT ON ${v} TO oc_pvi_reader`);
   }
 
@@ -92,7 +98,7 @@ async function main() {
   const ocDb   = dbUrl.pathname.replace('/', '');
   console.log('\n════════════════════════════════════════════');
   console.log('  Openclaw connection string (if user was created):');
-  console.log(`  postgresql://openclaw_reader:${OPENCLAW_PASSWORD}@${ocHost}/${ocDb}`);
+  console.log(`  postgresql://oc_pvi_reader:${OPENCLAW_PASSWORD}@${ocHost}/${ocDb}`);
   console.log('════════════════════════════════════════════');
   console.log('  Save the password — it will NOT be shown again.');
 }

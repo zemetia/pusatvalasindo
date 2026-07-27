@@ -5,6 +5,7 @@ import { handleError } from "@/backend/helpers/handle-error";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
 import { PERMISSIONS } from "@/lib/permissions";
 import { assertCompanyAccess, stockistService } from "@/backend/services/stockist.service";
+import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -27,12 +28,25 @@ export async function GET(req: NextRequest) {
 
     const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
     const date = new Date(dateStr);
-    const [grid, alerts] = await Promise.all([
+    // Satu kali ambil grid; alerts dihitung dari data yang sama (tanpa query duplikat).
+    const [grid, pending] = await Promise.all([
       stockistService.getOrCreateGridForDate(companyId, date),
-      stockistService.getCompanyAlerts(companyId, date),
+      correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["STOCKIST"]),
     ]);
+    const alerts = stockistService.computeAlerts(grid.pockets, grid.currencies, grid.checks, date);
 
-    return NextResponse.json(ok({ ...grid, alerts, canManage }));
+    // Sel yang koreksinya masih menunggu persetujuan ditandai di grid supaya user tidak
+    // mengajukan ulang angka yang sama.
+    const pendingCorrections = Object.fromEntries(
+      pending
+        .filter((c) => c.pocketId && c.companyStockItemId)
+        .map((c) => [
+          `${c.pocketId}:${c.companyStockItemId}`,
+          { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
+        ])
+    );
+
+    return NextResponse.json(ok({ ...grid, alerts, canManage, pendingCorrections }));
   } catch (e) {
     return handleError(e);
   }

@@ -2,8 +2,12 @@
 **Pusat Kirim Duit Management System**
 
 You have **read-only** access to a PostgreSQL database via the user `oc_pvi_reader`.  
-You can only run `SELECT` queries. All accessible data is exposed through 28 views prefixed with `hv_`.  
+You can only run `SELECT` queries. All accessible data is exposed through 31 views prefixed with `hv_`.  
 Auth-sensitive data (passwords, session tokens, verification codes) is **never** exposed through any view.
+
+> **Agents:** these views are the *read* layer. For a typed tool surface that can also
+> *operate* PVI (reconcile, record mutations) without raw SQL, see the
+> [PVI MCP Layer](./mcp.md) — the read tools there back onto exactly these views.
 
 ---
 
@@ -39,6 +43,11 @@ Auth-sensitive data (passwords, session tokens, verification codes) is **never**
 | `hv_kas_pockets` | Cash (rupiah) pocket list per PT |
 | `hv_kas_daily` | Daily cash balance entries per kas pocket |
 | `hv_kas_balance_by_company` | Latest cash balance per pocket, summed per PT |
+| `hv_stockist_head_confirmations` | Kepala cabang's re-counted stock quantity per item/date vs. system (teller opname) total, with `selisih_quantity` |
+| `hv_stockist_total_head_confirmations` | Kepala cabang's single final IDR total for all stock (currencies + logam mulia) per PT per day |
+| `hv_kas_head_confirmations` | Kepala cabang's re-counted cash total per date vs. system (kas pocket) total, with `selisih_idr_value` |
+| `hv_bank_head_confirmations` | Kepala cabang's re-counted bank total per date vs. system (Bank Harian entries) total, with `selisih_idr_value` |
+| `hv_finance_confirmed_daily` | **Finance source of truth** — kepala cabang confirmed stock+kas+bank total per PT per day, with a reconciliation-completeness flag |
 
 ---
 
@@ -303,6 +312,68 @@ company_id, company_name, company_code,
 active_pocket_count, total_pocket_count, total_balance, as_of_date
 ```
 
+### `hv_stockist_head_confirmations`
+> Kepala cabang re-counts stock manually and confirms it here; `system_quantity` is the sum of
+> that day's teller opname (`StockistDailyCheck.enteredQuantity`) across non-default pockets for
+> the same item. A row only exists once kepala cabang has confirmed that item for that date.
+```
+id, company_id, company_name, company_code,
+stock_item_id, stock_item_name, stock_item_type, stock_item_type_label,
+date, year, month, period_label,
+system_quantity, confirmed_quantity, confirmed_idr_value,
+selisih_quantity, is_match, match_label,
+note, confirmed_by, confirmed_at, created_at, updated_at
+```
+
+### `hv_stockist_total_head_confirmations`
+> One row per PT per day: the final IDR value kepala cabang assigns to the whole stock
+> (currencies + logam mulia) after re-counting. Quantities stay per item in
+> `hv_stockist_head_confirmations`; the IDR number is only kept here.
+```
+id, company_id, company_name, company_code,
+date, year, month, period_label,
+confirmed_idr_value,
+note, confirmed_by, confirmed_at, created_at, updated_at
+```
+
+### `hv_kas_head_confirmations`
+> Kepala cabang re-counts cash manually per PT per day; `system_idr_value` is the sum of that
+> day's `KasDailyEntry.balance` across all of that PT's kas pockets.
+```
+id, company_id, company_name, company_code,
+date, year, month, period_label,
+system_idr_value, confirmed_idr_value, selisih_idr_value,
+is_match, match_label,
+note, confirmed_by, confirmed_at, created_at, updated_at
+```
+
+### `hv_bank_head_confirmations`
+> Kepala cabang re-counts the combined bank balance per PT per day; `system_idr_value` is the sum
+> of that day's `DailyBankEntry.balance` across all of that PT's active bank accounts.
+```
+id, company_id, company_name, company_code,
+date, year, month, period_label,
+system_idr_value, confirmed_idr_value, selisih_idr_value,
+is_match, match_label,
+note, confirmed_by, confirmed_at, created_at, updated_at
+```
+
+### `hv_finance_confirmed_daily`
+> **Use this view, not the raw stock/kas system totals, when a query asks for "actual" or
+> "official" stock/cash numbers for finance purposes.** It's the kepala cabang-confirmed rollup —
+> data that's already been cross-checked and is ready to use ("sudah matang, siap diolah"), unlike
+> `hv_stockist_stock_by_company` / `hv_kas_balance_by_company` which reflect unverified teller/
+> marketing input. `is_fully_reconciled = false` means kepala cabang hasn't confirmed every active
+> stock item, the stock IDR total, kas, and/or bank for that PT/day yet — treat
+> `total_confirmed_idr` as provisional until then.
+```
+id, company_id, company_name, company_code,
+date, year, month, period_label,
+stock_confirmed_idr, kas_confirmed_idr, bank_confirmed_idr, total_confirmed_idr,
+items_confirmed_count, active_item_count,
+is_fully_reconciled, reconciliation_status_label, context_summary, updated_at
+```
+
 ---
 
 ## Common Query Patterns
@@ -393,6 +464,23 @@ WHERE status = 'BELUM_REVIEW' AND date = CURRENT_DATE
 ORDER BY company_name, pocket_name;
 ```
 
+### Total finance yang sudah dikonfirmasi kepala cabang hari ini, per PT?
+```sql
+SELECT company_name, stock_confirmed_idr, kas_confirmed_idr, total_confirmed_idr,
+       reconciliation_status_label
+FROM hv_finance_confirmed_daily
+WHERE date = CURRENT_DATE
+ORDER BY company_name;
+```
+
+### Item stock mana yang masih selisih setelah dikonfirmasi kepala cabang?
+```sql
+SELECT company_name, stock_item_name, system_quantity, confirmed_quantity, selisih_quantity
+FROM hv_stockist_head_confirmations
+WHERE NOT is_match AND date = CURRENT_DATE
+ORDER BY company_name, stock_item_name;
+```
+
 ### Context summary untuk AI — karyawan dengan payroll bulan ini?
 ```sql
 SELECT context_summary
@@ -420,4 +508,6 @@ ORDER BY company_name, employee_name;
 - **`is_total_pocket = true`** in `hv_stockist_pockets` marks the app's auto-computed "Total" row — it never has balances or mutations of its own; use `hv_stockist_stock_by_company` for the aggregate instead.
 - **Stockist mutation types:** `OPENING`, `TOP_UP`, `WITHDRAWAL`, `TRANSFER_IN`, `TRANSFER_OUT`, `ADJUSTMENT`
 - **Stockist daily-check status:** `BELUM_REVIEW` (belum direview), `BEDA` (selisih), `BENAR` (cocok)
-- **Employee `company_id` fallback:** if an employee row has no `companyId` set directly, the employee-based views fall back to their branch's `companyId`. This means `company_id` can differ from the raw `"user"."companyId"` column in the source table — always trust the view's `company_id`/`company_name`, not the raw table.
+- **Employee `company_id`:** a user's PT is derived solely from their branch (`Branch.companyId`) — there is no `companyId` column on the user table anymore. Always use the view's `company_id`/`company_name`, not any raw table.
+- **Kepala cabang confirmation views** (`hv_stockist_head_confirmations`, `hv_kas_head_confirmations`, `hv_finance_confirmed_daily`) are the reconciled, finance-grade numbers — prefer them over the raw `hv_stockist_stock_by_company` / `hv_kas_balance_by_company` system totals whenever a question is about "actual"/"official"/finance-reported stock or cash. A row in the confirmation views only exists once kepala cabang has confirmed that item/date; absence of a row means not yet reconciled, not zero.
+- **`is_match` / `is_fully_reconciled` = false** means there's a selisih (variance) between kepala cabang's re-count and the system total, or the reconciliation for that PT/day is incomplete — flag these rather than treating `total_confirmed_idr` as final.

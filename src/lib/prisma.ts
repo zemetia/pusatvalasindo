@@ -14,7 +14,13 @@ function createPrismaClient() {
     // lookups) behind one round trip, which was the main cause of admin page slowness
   });
   const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
+  // Set PRISMA_LOG_QUERIES=1 to print every SQL statement + its duration to the server console.
+  // Use it to count how many round trips a page/API request actually makes and spot slow queries;
+  // leave it off in normal runs (logging every query adds overhead and noise).
+  return new PrismaClient({
+    adapter,
+    log: process.env.PRISMA_LOG_QUERIES === "1" ? ["query"] : [],
+  });
 }
 
 const prisma = global.prisma ?? createPrismaClient();

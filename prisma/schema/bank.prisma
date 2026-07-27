@@ -34,15 +34,21 @@ model BankMutation {
 }
 
 model DailyBankEntry {
-  id            String      @id @default(cuid())
+  id            String            @id @default(cuid())
   bankAccountId String
-  date          DateTime    @db.Date
-  balance       Decimal     @default(0)
+  date          DateTime          @db.Date
+  balance       Decimal           @default(0)
   note          String?
   createdBy     String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  // Verifikasi H+1: saldo yang diisi hari ini baru bisa dikonfirmasi "Benar/Beda" besoknya.
+  // Kalau Beda, angka penggantinya tidak langsung dipakai — masuk CorrectionRequest dulu.
+  verifyStatus  DailyVerifyStatus @default(BELUM_REVIEW)
+  verifyNote    String?
+  verifiedBy    String?
+  verifiedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  bankAccount   BankAccount       @relation(fields: [bankAccountId], references: [id])
 
   @@unique([bankAccountId, date])
   @@index([bankAccountId, date])

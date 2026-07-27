@@ -24,6 +24,25 @@ export const bankAccountRepository = {
       orderBy: [{ company: { name: "asc" } }, { bankName: "asc" }],
     }),
 
+  // Lean list for the Bank Harian daily page (single PT). Drops the `company` relation entirely
+  // (unused there, and loaded as its own query on this client) and orders by sortOrder instead of
+  // company.name — no cross-table JOIN, and only `currency.code` is pulled. Selecting scalars keeps
+  // the round-trip count minimal versus the shared `findAll` (accounts + company + currency).
+  findActiveForDaily: (companyId: string) =>
+    prisma.bankAccount.findMany({
+      where: { companyId, isActive: true },
+      select: {
+        id: true,
+        bankName: true,
+        accountNumber: true,
+        accountName: true,
+        balance: true,
+        sortOrder: true,
+        currency: { select: { code: true } },
+      },
+      orderBy: [{ sortOrder: "asc" }, { bankName: "asc" }],
+    }),
+
   findById: (id: string) =>
     prisma.bankAccount.findUnique({
       where: { id },

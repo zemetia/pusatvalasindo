@@ -7,6 +7,18 @@ export const stockistDailyCheckRepository = {
       where: { pocketId: { in: pocketIds }, date },
     }),
 
+  // Same set of rows as findByPocketsAndDate over a company's real (non-default, active) pockets,
+  // but resolved via a pocket relation-filter so callers don't need to fetch the pocket list first
+  // (removes a query waterfall). Only the columns needed to sum the system total are selected.
+  findByCompanyAndDate: (companyId: string, date: Date) =>
+    prisma.stockistDailyCheck.findMany({
+      where: {
+        date,
+        pocket: { companyId, isDefault: false, isActive: true, deletedAt: null },
+      },
+      select: { companyStockItemId: true, enteredQuantity: true },
+    }),
+
   findByPocketItemDate: (pocketId: string, companyStockItemId: string, date: Date) =>
     prisma.stockistDailyCheck.findUnique({
       where: { pocketId_companyStockItemId_date: { pocketId, companyStockItemId, date } },

@@ -10,6 +10,8 @@ import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { ForbiddenError } from "@/backend/errors/app-error";
 import { bankAccountRepository } from "@/backend/repositories/bank-account.repository";
 import { dailyBankEntryRepository } from "@/backend/repositories/daily-bank-entry.repository";
+import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
+import { todayDateOnly } from "@/backend/helpers/date-only";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -26,13 +28,6 @@ const saveSchema = z.object({
 });
 
 type SaveBody = z.infer<typeof saveSchema>;
-
-// Dates flow through this route as UTC-midnight (parsed from "YYYY-MM-DD"), matching the
-// convention used in stockist-head-confirmation.service.ts.
-function todayDateOnly(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-}
 
 /** Anyone with BANK_DAILY_INPUT can edit today's entry; editing a past date requires Super Admin/Owner. */
 function assertEditableDate(roleName: string, date: Date) {
@@ -62,10 +57,11 @@ export async function GET(req: NextRequest) {
     }
 
     const date = new Date(dateStr);
-    const [accounts, todayEntries, previousEntries] = await Promise.all([
-      bankAccountRepository.findAll(companyId, true),
+    const [accounts, todayEntries, previousEntries, pendingCorrections] = await Promise.all([
+      bankAccountRepository.findActiveForDaily(companyId),
       dailyBankEntryRepository.findByCompanyAndDate(companyId, date),
       dailyBankEntryRepository.findLatestBeforeDate(companyId, date),
+      correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ['BANK']),
     ]);
 
     const canInput = caller.permissions.includes(PERMISSIONS.BANK_DAILY_INPUT);
@@ -81,11 +77,27 @@ export async function GET(req: NextRequest) {
           referenceBalance: a.balance.toString(),
           sortOrder: a.sortOrder,
         })),
+        serverDate: todayDateOnly().toISOString().slice(0, 10),
         entries: Object.fromEntries(
           todayEntries.map((e) => [
             e.bankAccountId,
-            { balance: e.balance.toString(), note: e.note },
+            {
+              balance: e.balance.toString(),
+              note: e.note,
+              verifyStatus: e.verifyStatus,
+              verifyNote: e.verifyNote,
+            },
           ])
+        ),
+        // Sel yang koreksinya masih menunggu persetujuan ditandai di grid supaya user tidak
+        // mengajukan ulang angka yang sama.
+        pendingCorrections: Object.fromEntries(
+          pendingCorrections
+            .filter((c) => c.bankAccountId)
+            .map((c) => [
+              c.bankAccountId as string,
+              { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
+            ])
         ),
         previous: Object.fromEntries(
           previousEntries.map((e) => [

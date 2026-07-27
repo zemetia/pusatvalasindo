@@ -7,6 +7,7 @@ import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket
 import { stockistBalanceRepository } from "@/backend/repositories/stockist-balance.repository";
 import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
 import { companyStockItemRepository } from "@/backend/repositories/company-stock-item.repository";
+import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
 
 type TxClient = Prisma.TransactionClient;
 
@@ -31,7 +32,7 @@ export type ApplyMutationInput = {
   createdBy?: string;
 };
 
-async function applyMutationInTx(tx: TxClient, input: ApplyMutationInput) {
+export async function applyMutationInTx(tx: TxClient, input: ApplyMutationInput) {
   if (input.type === StockistMutationType.ADJUSTMENT) {
     if (input.quantity === 0) throw new ValidationError("Quantity koreksi tidak boleh 0");
   } else if (input.quantity <= 0) {
@@ -145,14 +146,22 @@ export const stockistService = {
   // Grid lengkap untuk satu tanggal. Baris check TIDAK di-auto-create lagi untuk semua sel —
   // sel baru punya baris check setelah user benar-benar mengisi opname (lihat fillDailyCheck).
   getOrCreateGridForDate: async (companyId: string, date: Date) => {
-    await stockistPocketRepository.ensureTotalPocket(companyId);
-
-    const [pockets, rawCurrencies] = await Promise.all([
+    const [pockets0, rawCurrencies] = await Promise.all([
       stockistPocketRepository.findAllByCompany(companyId, true),
       companyStockItemRepository.findByCompany(companyId, true),
     ]);
     const currencies = sortLogamMuliaFirst(rawCurrencies);
-    const totalPocket = pockets.find((p) => p.isDefault);
+
+    // Pocket "Total" dihitung ulang tiap request; barisnya cukup dipastikan ada. Reuse daftar
+    // pockets yang sudah diambil — buat hanya kalau memang belum ada, jadi tidak ada query
+    // findFirst terpisah di tiap load (kasus umum: Total sudah ada).
+    let pockets = pockets0;
+    let totalPocket = pockets0.find((p) => p.isDefault);
+    if (!totalPocket) {
+      totalPocket = await stockistPocketRepository.ensureTotalPocket(companyId);
+      pockets = [...pockets0, totalPocket];
+    }
+
     const realPockets = pockets.filter((p) => !p.isDefault);
     const serverDate = todayDateOnly().toISOString().slice(0, 10);
     if (realPockets.length === 0 || currencies.length === 0) {
@@ -161,7 +170,7 @@ export const stockistService = {
 
     const realPocketIds = realPockets.map((p) => p.id);
     const [rawBalances, checks] = await Promise.all([
-      stockistBalanceRepository.findByPocketIds(realPocketIds),
+      stockistBalanceRepository.findQuantitiesByPocketIds(realPocketIds),
       stockistDailyCheckRepository.findByPocketsAndDate(realPocketIds, date),
     ]);
 
@@ -236,6 +245,10 @@ export const stockistService = {
     });
   },
 
+  // Review opname H+1. Menandai "Beda" hanya MENANDAI — angka pengganti (correctedQuantity)
+  // tidak langsung mengubah saldo, tapi diajukan sebagai CorrectionRequest yang harus
+  // disetujui Owner/Super Admin di halaman Persetujuan Koreksi. Saldo baru berubah saat
+  // pengajuan itu di-approve (lihat correction.service.approve).
   markDailyCheck: async (input: {
     pocketId: string;
     companyStockItemId: string;
@@ -249,73 +262,89 @@ export const stockistService = {
       throw new ValidationError("Catatan wajib diisi saat menandai Beda");
     }
 
-    return prisma.$transaction(async (tx) => {
-      const check = await tx.stockistDailyCheck.findUnique({
-        where: {
-          pocketId_companyStockItemId_date: {
-            pocketId: input.pocketId,
-            companyStockItemId: input.companyStockItemId,
-            date: input.date,
-          },
-        },
-      });
-      if (!check || check.enteredQuantity === null) {
-        throw new NotFoundError("Sel ini belum diisi opname — tidak ada yang bisa direview");
-      }
-      if (input.date.getTime() >= todayDateOnly().getTime()) {
-        throw new ValidationError("Sel yang diisi hari ini baru bisa direview mulai besok");
-      }
+    const check = await stockistDailyCheckRepository.findByPocketItemDate(
+      input.pocketId,
+      input.companyStockItemId,
+      input.date
+    );
+    if (!check || check.enteredQuantity === null) {
+      throw new NotFoundError("Sel ini belum diisi opname — tidak ada yang bisa direview");
+    }
+    if (input.date.getTime() >= todayDateOnly().getTime()) {
+      throw new ValidationError("Sel yang diisi hari ini baru bisa direview mulai besok");
+    }
 
-      if (input.status === StockistCheckStatus.BEDA && input.correctedQuantity !== undefined) {
-        const balance = await tx.stockistBalance.findUnique({
-          where: {
-            pocketId_companyStockItemId: {
-              pocketId: input.pocketId,
-              companyStockItemId: input.companyStockItemId,
-            },
-          },
-        });
-        const currentQty = balance ? Number(balance.quantity) : 0;
-        const delta = input.correctedQuantity - currentQty;
-        if (delta !== 0) {
-          await applyMutationInTx(tx, {
-            pocketId: input.pocketId,
-            companyStockItemId: input.companyStockItemId,
-            type: StockistMutationType.ADJUSTMENT,
-            quantity: delta,
-            note: input.note,
-            createdBy: input.reviewedBy,
-          });
-        }
-      }
-
-      return tx.stockistDailyCheck.update({
-        where: { id: check.id },
-        data: {
-          status: input.status,
-          note: input.note,
-          reviewedBy: input.reviewedBy,
-          reviewedAt: new Date(),
-        },
-      });
+    const updated = await prisma.stockistDailyCheck.update({
+      where: { id: check.id },
+      data: {
+        status: input.status,
+        note: input.note,
+        reviewedBy: input.reviewedBy,
+        reviewedAt: new Date(),
+      },
     });
+
+    if (input.status !== StockistCheckStatus.BEDA || input.correctedQuantity === undefined) {
+      return { check: updated, correctionRequest: null };
+    }
+
+    const [pocket, item, balance] = await Promise.all([
+      stockistPocketRepository.findById(input.pocketId),
+      companyStockItemRepository.findById(input.companyStockItemId),
+      stockistBalanceRepository.findByPocketAndItem(input.pocketId, input.companyStockItemId),
+    ]);
+    if (!pocket) throw new NotFoundError("Pocket tidak ditemukan");
+
+    const currentQty = balance ? Number(balance.quantity) : 0;
+    if (input.correctedQuantity === currentQty) {
+      return { check: updated, correctionRequest: null };
+    }
+
+    const ref = { pocketId: input.pocketId, companyStockItemId: input.companyStockItemId };
+    const existing = await correctionRequestRepository.findPending(
+      pocket.companyId,
+      "STOCKIST",
+      ref,
+      input.date
+    );
+    const payload = {
+      currentValue: currentQty,
+      proposedValue: input.correctedQuantity,
+      reason: input.note as string,
+      requestedBy: input.reviewedBy,
+    };
+
+    const correctionRequest = existing
+      ? await correctionRequestRepository.updatePending(existing.id, payload)
+      : await correctionRequestRepository.create({
+          companyId: pocket.companyId,
+          target: "STOCKIST",
+          date: input.date,
+          ref,
+          targetLabel: `${pocket.name} — ${item?.code ?? item?.name ?? "?"}`,
+          ...payload,
+        });
+
+    return { check: updated, correctionRequest };
   },
 
-  getCompanyAlerts: async (companyId: string, date: Date) => {
-    const [allPockets, currencies] = await Promise.all([
-      stockistPocketRepository.findAllByCompany(companyId, true),
-      companyStockItemRepository.findByCompany(companyId, true),
-    ]);
-    // Pocket Total tidak pernah punya baris opname sendiri — jangan ikut dihitung di sini.
-    const pockets = allPockets.filter((p) => !p.isDefault);
-    const totalCells = pockets.length * currencies.length;
+  // Alerts dihitung dari data grid yang SUDAH diambil (pockets/currencies/checks) — bukan query
+  // ulang. Sebelumnya endpoint grid menembak getOrCreateGridForDate + getCompanyAlerts paralel,
+  // dan keduanya sama-sama mengambil pockets, currencies, dan checks (3 query duplikat tiap load).
+  // Pocket "Total" tidak pernah punya baris opname sendiri — jangan ikut dihitung.
+  computeAlerts: (
+    pockets: { isDefault: boolean }[],
+    currencies: unknown[],
+    checks: { enteredQuantity: unknown; status: StockistCheckStatus }[],
+    date: Date
+  ) => {
+    const realPockets = pockets.filter((p) => !p.isDefault);
+    const totalCells = realPockets.length * currencies.length;
     const isToday = date.getTime() === todayDateOnly().getTime();
     if (totalCells === 0) {
       return { beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0, isToday };
     }
 
-    const pocketIds = pockets.map((p) => p.id);
-    const checks = await stockistDailyCheckRepository.findByPocketsAndDate(pocketIds, date);
     const filled = checks.filter((c) => c.enteredQuantity !== null);
     const beda = filled.filter((c) => c.status === StockistCheckStatus.BEDA).length;
     const benar = filled.filter((c) => c.status === StockistCheckStatus.BENAR).length;

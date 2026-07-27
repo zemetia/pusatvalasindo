@@ -90,6 +90,14 @@ enum StockistCheckStatus {
   BENAR
 }
 
+// Status verifikasi H+1 untuk entri harian kas & bank — sengaja dipisah dari
+// StockistCheckStatus supaya kedua alur bisa berkembang sendiri-sendiri.
+enum DailyVerifyStatus {
+  BELUM_REVIEW
+  BENAR
+  BEDA
+}
+
 // Bagian 3 — Tunai (Kas): pocket kas rupiah, entitas sendiri (bukan reuse StockistPocket),
 // dimiliki 1 PT (Company) sama seperti StockistPocket — bukan per cabang.
 model KasPocket {
@@ -110,14 +118,20 @@ model KasPocket {
 }
 
 model KasDailyEntry {
-  id          String   @id @default(cuid())
-  kasPocketId String
-  date        DateTime @db.Date
-  balance     Decimal  @default(0) // saldo tunai hari itu — user cuma isi ini, tanpa dimensi currency
-  note        String?
-  createdBy   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String            @id @default(cuid())
+  kasPocketId  String
+  date         DateTime          @db.Date
+  balance      Decimal           @default(0) // saldo tunai hari itu — user cuma isi ini, tanpa dimensi currency
+  note         String?
+  createdBy    String?
+  // Verifikasi H+1, sama polanya dengan StockistDailyCheck: saldo yang diisi hari ini
+  // baru bisa dikonfirmasi besoknya. Angka pengganti lewat CorrectionRequest.
+  verifyStatus DailyVerifyStatus @default(BELUM_REVIEW)
+  verifyNote   String?
+  verifiedBy   String?
+  verifiedAt   DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   kasPocket KasPocket @relation(fields: [kasPocketId], references: [id])
 
@@ -126,15 +140,18 @@ model KasDailyEntry {
 }
 
 // Bagian 4 — Konfirmasi Kepala Cabang: hitung ulang manual kepala cabang atas total
-// stock (per item) dan total kas (gabungan), dibandingkan dengan total sistem hasil
+// stock (per item), total kas, dan total bank, dibandingkan dengan total sistem hasil
 // input teller dalam. Hanya kepala cabang yang bisa mengisi/melihat nilai IDR di sini.
 model StockistHeadConfirmation {
   id                 String    @id @default(cuid())
   companyId          String
   companyStockItemId String
   date               DateTime  @db.Date
-  confirmedQuantity  Decimal // total stock asli hasil hitung ulang kepala cabang
-  confirmedIdrValue  Decimal // total dalam IDR hasil hitung ulang kepala cabang
+  confirmedQuantity  Decimal // total stock asli hasil hitung ulang kepala cabang (dalam satuan item)
+  // Legacy: dulu nilai IDR diisi per item. Sekarang kepala cabang hanya mengisi satu
+  // total IDR final untuk seluruh stock (lihat StockistTotalHeadConfirmation), jadi
+  // kolom ini tidak lagi diisi dari UI dan dibiarkan null untuk baris baru.
+  confirmedIdrValue  Decimal?
   note               String?
   confirmedBy        String?
   confirmedAt        DateTime?
@@ -145,6 +162,26 @@ model StockistHeadConfirmation {
   companyStockItem CompanyStockItem @relation(fields: [companyStockItemId], references: [id])
 
   @@unique([companyId, companyStockItemId, date])
+  @@index([companyId, date])
+}
+
+// Total IDR final seluruh stock (valas + logam mulia) hasil hitung ulang kepala cabang,
+// satu angka per PT per tanggal — bukan lagi per item. Kuantitas per item tetap
+// dicocokkan baris per baris di StockistHeadConfirmation.
+model StockistTotalHeadConfirmation {
+  id                String    @id @default(cuid())
+  companyId         String
+  date              DateTime  @db.Date
+  confirmedIdrValue Decimal
+  note              String?
+  confirmedBy       String?
+  confirmedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, date])
   @@index([companyId, date])
 }
 
@@ -165,14 +202,84 @@ model KasHeadConfirmation {
   @@index([companyId, date])
 }
 
+// Konfirmasi total saldo bank (semua rekening PT, gabungan) oleh kepala cabang —
+// dibandingkan dengan total sistem = sum(DailyBankEntry.balance) tanggal itu.
+model BankHeadConfirmation {
+  id                String    @id @default(cuid())
+  companyId         String
+  date              DateTime  @db.Date
+  confirmedIdrValue Decimal
+  note              String?
+  confirmedBy       String?
+  confirmedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, date])
+  @@index([companyId, date])
+}
+
 model CompanyHeadConfirmationTotal {
   id        String   @id @default(cuid())
   companyId String
   date      DateTime @db.Date
-  totalIdr  Decimal // sum(StockistHeadConfirmation.confirmedIdrValue) + KasHeadConfirmation.confirmedIdrValue, hari itu
+  totalIdr  Decimal // StockistTotalHeadConfirmation + KasHeadConfirmation + BankHeadConfirmation, hari itu
   updatedAt DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id])
 
   @@unique([companyId, date])
+}
+
+// Bagian 5 — Pengajuan Koreksi: saat verifikasi H+1 (stock / kas / bank harian) angkanya
+// dinyatakan tidak sesuai, angka pengganti TIDAK langsung dipakai. Dia disimpan di sini
+// sebagai pengajuan dan baru mengubah data setelah disetujui Owner / Super Admin.
+// Referensi target disimpan sebagai id polos (tanpa FK) + label snapshot, supaya satu tabel
+// bisa melayani tiga domain tanpa kolom relasi yang saling eksklusif.
+model CorrectionRequest {
+  id        String               @id @default(cuid())
+  companyId String
+  target    CorrectionTargetType
+  date      DateTime             @db.Date // tanggal data yang dikoreksi
+
+  // Hanya kolom yang relevan dengan `target` yang diisi.
+  pocketId           String? // CorrectionTargetType.STOCKIST — StockistPocket
+  companyStockItemId String? // CorrectionTargetType.STOCKIST — CompanyStockItem
+  kasPocketId        String? // CorrectionTargetType.KAS
+  bankAccountId      String? // CorrectionTargetType.BANK
+
+  targetLabel   String // snapshot nama target saat diajukan, mis. "Kas Kecil — USD"
+  currentValue  Decimal // angka yang tersimpan saat pengajuan dibuat
+  proposedValue Decimal // angka pengganti usulan
+  reason        String // alasan wajib dari pengaju
+
+  status       CorrectionStatus @default(PENDING)
+  requestedBy  String?
+  requestedAt  DateTime         @default(now())
+  decidedBy    String?
+  decidedAt    DateTime?
+  decisionNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId, status, requestedAt])
+  @@index([status, requestedAt])
+  @@index([target, date])
+}
+
+enum CorrectionTargetType {
+  STOCKIST
+  KAS
+  BANK
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

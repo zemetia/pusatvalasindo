@@ -28,7 +28,7 @@ export default async function UsersPage() {
       prisma.user.findMany({
         where: scopedCompanyId !== undefined ? { branch: { companyId: scopedCompanyId } } : undefined,
         include: {
-          branch: { select: { id: true, name: true } },
+          branch: { select: { id: true, name: true, company: { select: { code: true } } } },
           customRole: { select: { id: true, name: true } },
         },
         orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],

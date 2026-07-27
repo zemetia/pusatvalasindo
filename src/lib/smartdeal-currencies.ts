@@ -1,0 +1,42 @@
+// Static snapshot of the currency codes SmartDeal quotes (see
+// watcher-valas.service.ts, which scrapes these live). Patokan Harga needs a
+// stable list to persist adjustment rules against even if SmartDeal's live
+// list changes or is briefly unavailable, so it's kept here rather than
+// re-scraped on every load.
+export const SMARTDEAL_CURRENCIES: { code: string; name: string }[] = [
+  { code: "USD", name: "Dollar Amerika" },
+  { code: "EUR", name: "Euro" },
+  { code: "AUD", name: "Dollar Australia" },
+  { code: "NZD", name: "Dollar Selandia Baru" },
+  { code: "CAD", name: "Dollar Kanada" },
+  { code: "CHF", name: "Franc Swiss" },
+  { code: "GBP", name: "Poundsterling Inggris" },
+  { code: "JPY", name: "Yen Jepang" },
+  { code: "SGD", name: "Dollar Singapura" },
+  { code: "BND", name: "Dollar Brunei" },
+  { code: "MYR", name: "Ringgit Malaysia" },
+  { code: "THB", name: "Baht Thailand" },
+  { code: "HKD", name: "Dollar Hong Kong" },
+  { code: "CNY", name: "Yuan China" },
+  { code: "TWD", name: "Dollar Taiwan" },
+  { code: "KRW", name: "Won Korea Selatan" },
+  { code: "PHP", name: "Peso Filipina" },
+  { code: "INR", name: "Rupee India" },
+  { code: "VND", name: "Dong Vietnam" },
+  { code: "SAR", name: "Riyal Arab Saudi" },
+  { code: "AED", name: "Dirham Uni Emirat Arab" },
+  { code: "QAR", name: "Riyal Qatar" },
+  { code: "BHD", name: "Dinar Bahrain" },
+  { code: "OMR", name: "Rial Oman" },
+  { code: "KWD", name: "Dinar Kuwait" },
+  { code: "JOD", name: "Dinar Yordania" },
+  { code: "TRY", name: "Lira Turki" },
+  { code: "IQD", name: "Dinar Irak" },
+  { code: "SEK", name: "Krona Swedia" },
+  { code: "NOK", name: "Krone Norwegia" },
+  { code: "DKK", name: "Krone Denmark" },
+  { code: "RUB", name: "Rubel Rusia" },
+  { code: "ZAR", name: "Rand Afrika Selatan" },
+  { code: "MOP", name: "Pataca Macau" },
+  { code: "KHR", name: "Riel Kamboja" },
+];

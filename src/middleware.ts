@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { auth } from "@/lib/auth";
 import { fail } from "@/backend/helpers/api-response";
@@ -32,7 +33,10 @@ export async function middleware(request: NextRequest) {
 
   const isApi = targetPathname.startsWith("/api/");
 
-  if (isApi && !targetPathname.startsWith("/api/auth")) {
+  // /api/auth       — Better Auth's own endpoints
+  // /api/mcp        — the MCP endpoint authenticates via Bearer key (withMcpAuth),
+  //                   not a session cookie, so it must bypass the session gate here.
+  if (isApi && !targetPathname.startsWith("/api/auth") && !targetPathname.startsWith("/api/mcp")) {
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user) {
       return applySecurityHeaders(

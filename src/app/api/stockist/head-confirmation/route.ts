@@ -13,7 +13,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // GET /api/stockist/head-confirmation?companyId=X&date=YYYY-MM-DD
 // Grid konfirmasi kepala cabang untuk stock (mata uang + logam mulia): total sistem vs total
-// hitung ulang kepala cabang, plus total keseluruhan IDR PT hari itu.
+// hitung ulang kepala cabang, plus baris total stock, kas, bank, dan total keseluruhan IDR PT.
 export async function GET(req: NextRequest) {
   try {
     const caller = await requirePermission(PERMISSIONS.STOCKIST_VERIFY);
@@ -30,14 +30,10 @@ export async function GET(req: NextRequest) {
     assertCompanyAccess(caller, companyId);
 
     const date = new Date(dateStr);
-    const [rows, companyTotal] = await Promise.all([
-      stockistHeadConfirmationService.getStockConfirmationGrid(companyId, date),
-      stockistHeadConfirmationService.getCompanyTotal(companyId, date),
-    ]);
+    // Satu batch query paralel untuk seluruh halaman: stock grid + kas + total PT.
+    const data = await stockistHeadConfirmationService.getFullConfirmation(companyId, date);
 
-    return NextResponse.json(
-      ok({ rows, companyTotal: companyTotal ? Number(companyTotal.totalIdr) : 0 })
-    );
+    return NextResponse.json(ok(data));
   } catch (e) {
     return handleError(e);
   }
@@ -48,13 +44,13 @@ const upsertSchema = z.object({
   companyStockItemId: z.string().min(1),
   date: z.string().regex(DATE_RE),
   confirmedQuantity: z.number(),
-  confirmedIdrValue: z.number(),
   note: z.string().optional(),
 });
 
 type Body = z.infer<typeof upsertSchema>;
 
-// PATCH /api/stockist/head-confirmation — simpan konfirmasi kepala cabang untuk satu stock item.
+// PATCH /api/stockist/head-confirmation — simpan kuantitas hitung ulang kepala cabang untuk
+// satu stock item. Nilai IDR-nya diisi terpisah sebagai satu total final di /total.
 export const PATCH = withValidation(upsertSchema)(
   async (_req: NextRequest, ctx: { body: Body }) => {
     try {
@@ -63,17 +59,16 @@ export const PATCH = withValidation(upsertSchema)(
 
       assertCompanyAccess(caller, ctx.body.companyId);
 
-      const result = await stockistHeadConfirmationService.upsertStockConfirmation({
+      const confirmation = await stockistHeadConfirmationService.upsertStockConfirmation({
         companyId: ctx.body.companyId,
         companyStockItemId: ctx.body.companyStockItemId,
         date: new Date(ctx.body.date),
         confirmedQuantity: ctx.body.confirmedQuantity,
-        confirmedIdrValue: ctx.body.confirmedIdrValue,
         note: ctx.body.note,
         caller,
       });
 
-      return NextResponse.json(ok(result, "Konfirmasi berhasil disimpan"));
+      return NextResponse.json(ok({ confirmation }, "Konfirmasi berhasil disimpan"));
     } catch (e) {
       return handleError(e);
     }

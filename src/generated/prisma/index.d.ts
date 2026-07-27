@@ -74,6 +74,11 @@ export type Company = $Result.DefaultSelection<Prisma.$CompanyPayload>
  */
 export type Currency = $Result.DefaultSelection<Prisma.$CurrencyPayload>
 /**
+ * Model PriceBenchmark
+ * 
+ */
+export type PriceBenchmark = $Result.DefaultSelection<Prisma.$PriceBenchmarkPayload>
+/**
  * Model CompanyStockItem
  * 
  */
@@ -194,15 +199,30 @@ export type KasDailyEntry = $Result.DefaultSelection<Prisma.$KasDailyEntryPayloa
  */
 export type StockistHeadConfirmation = $Result.DefaultSelection<Prisma.$StockistHeadConfirmationPayload>
 /**
+ * Model StockistTotalHeadConfirmation
+ * 
+ */
+export type StockistTotalHeadConfirmation = $Result.DefaultSelection<Prisma.$StockistTotalHeadConfirmationPayload>
+/**
  * Model KasHeadConfirmation
  * 
  */
 export type KasHeadConfirmation = $Result.DefaultSelection<Prisma.$KasHeadConfirmationPayload>
 /**
+ * Model BankHeadConfirmation
+ * 
+ */
+export type BankHeadConfirmation = $Result.DefaultSelection<Prisma.$BankHeadConfirmationPayload>
+/**
  * Model CompanyHeadConfirmationTotal
  * 
  */
 export type CompanyHeadConfirmationTotal = $Result.DefaultSelection<Prisma.$CompanyHeadConfirmationTotalPayload>
+/**
+ * Model CorrectionRequest
+ * 
+ */
+export type CorrectionRequest = $Result.DefaultSelection<Prisma.$CorrectionRequestPayload>
 
 /**
  * Enums
@@ -360,6 +380,33 @@ export const StockistCheckStatus: {
 
 export type StockistCheckStatus = (typeof StockistCheckStatus)[keyof typeof StockistCheckStatus]
 
+
+export const DailyVerifyStatus: {
+  BELUM_REVIEW: 'BELUM_REVIEW',
+  BENAR: 'BENAR',
+  BEDA: 'BEDA'
+};
+
+export type DailyVerifyStatus = (typeof DailyVerifyStatus)[keyof typeof DailyVerifyStatus]
+
+
+export const CorrectionTargetType: {
+  STOCKIST: 'STOCKIST',
+  KAS: 'KAS',
+  BANK: 'BANK'
+};
+
+export type CorrectionTargetType = (typeof CorrectionTargetType)[keyof typeof CorrectionTargetType]
+
+
+export const CorrectionStatus: {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+};
+
+export type CorrectionStatus = (typeof CorrectionStatus)[keyof typeof CorrectionStatus]
+
 }
 
 export type AttendanceStatus = $Enums.AttendanceStatus
@@ -421,6 +468,18 @@ export const StockistMutationType: typeof $Enums.StockistMutationType
 export type StockistCheckStatus = $Enums.StockistCheckStatus
 
 export const StockistCheckStatus: typeof $Enums.StockistCheckStatus
+
+export type DailyVerifyStatus = $Enums.DailyVerifyStatus
+
+export const DailyVerifyStatus: typeof $Enums.DailyVerifyStatus
+
+export type CorrectionTargetType = $Enums.CorrectionTargetType
+
+export const CorrectionTargetType: typeof $Enums.CorrectionTargetType
+
+export type CorrectionStatus = $Enums.CorrectionStatus
+
+export const CorrectionStatus: typeof $Enums.CorrectionStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -664,6 +723,16 @@ export class PrismaClient<
   get currency(): Prisma.CurrencyDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.priceBenchmark`: Exposes CRUD operations for the **PriceBenchmark** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PriceBenchmarks
+    * const priceBenchmarks = await prisma.priceBenchmark.findMany()
+    * ```
+    */
+  get priceBenchmark(): Prisma.PriceBenchmarkDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.companyStockItem`: Exposes CRUD operations for the **CompanyStockItem** model.
     * Example usage:
     * ```ts
@@ -904,6 +973,16 @@ export class PrismaClient<
   get stockistHeadConfirmation(): Prisma.StockistHeadConfirmationDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.stockistTotalHeadConfirmation`: Exposes CRUD operations for the **StockistTotalHeadConfirmation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StockistTotalHeadConfirmations
+    * const stockistTotalHeadConfirmations = await prisma.stockistTotalHeadConfirmation.findMany()
+    * ```
+    */
+  get stockistTotalHeadConfirmation(): Prisma.StockistTotalHeadConfirmationDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.kasHeadConfirmation`: Exposes CRUD operations for the **KasHeadConfirmation** model.
     * Example usage:
     * ```ts
@@ -914,6 +993,16 @@ export class PrismaClient<
   get kasHeadConfirmation(): Prisma.KasHeadConfirmationDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.bankHeadConfirmation`: Exposes CRUD operations for the **BankHeadConfirmation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BankHeadConfirmations
+    * const bankHeadConfirmations = await prisma.bankHeadConfirmation.findMany()
+    * ```
+    */
+  get bankHeadConfirmation(): Prisma.BankHeadConfirmationDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.companyHeadConfirmationTotal`: Exposes CRUD operations for the **CompanyHeadConfirmationTotal** model.
     * Example usage:
     * ```ts
@@ -922,6 +1011,16 @@ export class PrismaClient<
     * ```
     */
   get companyHeadConfirmationTotal(): Prisma.CompanyHeadConfirmationTotalDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.correctionRequest`: Exposes CRUD operations for the **CorrectionRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CorrectionRequests
+    * const correctionRequests = await prisma.correctionRequest.findMany()
+    * ```
+    */
+  get correctionRequest(): Prisma.CorrectionRequestDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1368,6 +1467,7 @@ export namespace Prisma {
     Branch: 'Branch',
     Company: 'Company',
     Currency: 'Currency',
+    PriceBenchmark: 'PriceBenchmark',
     CompanyStockItem: 'CompanyStockItem',
     KpiDefinition: 'KpiDefinition',
     RoleKpi: 'RoleKpi',
@@ -1392,8 +1492,11 @@ export namespace Prisma {
     KasPocket: 'KasPocket',
     KasDailyEntry: 'KasDailyEntry',
     StockistHeadConfirmation: 'StockistHeadConfirmation',
+    StockistTotalHeadConfirmation: 'StockistTotalHeadConfirmation',
     KasHeadConfirmation: 'KasHeadConfirmation',
-    CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal'
+    BankHeadConfirmation: 'BankHeadConfirmation',
+    CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal',
+    CorrectionRequest: 'CorrectionRequest'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1409,7 +1512,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiLog" | "revenue" | "bonusMatrix" | "bonusTier" | "kpiMonthlyResult" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "kasHeadConfirmation" | "companyHeadConfirmationTotal"
+      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "priceBenchmark" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiLog" | "revenue" | "bonusMatrix" | "bonusTier" | "kpiMonthlyResult" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2298,6 +2401,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CurrencyCountArgs<ExtArgs>
             result: $Utils.Optional<CurrencyCountAggregateOutputType> | number
+          }
+        }
+      }
+      PriceBenchmark: {
+        payload: Prisma.$PriceBenchmarkPayload<ExtArgs>
+        fields: Prisma.PriceBenchmarkFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PriceBenchmarkFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PriceBenchmarkFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          findFirst: {
+            args: Prisma.PriceBenchmarkFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PriceBenchmarkFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          findMany: {
+            args: Prisma.PriceBenchmarkFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>[]
+          }
+          create: {
+            args: Prisma.PriceBenchmarkCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          createMany: {
+            args: Prisma.PriceBenchmarkCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PriceBenchmarkCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>[]
+          }
+          delete: {
+            args: Prisma.PriceBenchmarkDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          update: {
+            args: Prisma.PriceBenchmarkUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          deleteMany: {
+            args: Prisma.PriceBenchmarkDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PriceBenchmarkUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PriceBenchmarkUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>[]
+          }
+          upsert: {
+            args: Prisma.PriceBenchmarkUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PriceBenchmarkPayload>
+          }
+          aggregate: {
+            args: Prisma.PriceBenchmarkAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePriceBenchmark>
+          }
+          groupBy: {
+            args: Prisma.PriceBenchmarkGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PriceBenchmarkGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PriceBenchmarkCountArgs<ExtArgs>
+            result: $Utils.Optional<PriceBenchmarkCountAggregateOutputType> | number
           }
         }
       }
@@ -4077,6 +4254,80 @@ export namespace Prisma {
           }
         }
       }
+      StockistTotalHeadConfirmation: {
+        payload: Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>
+        fields: Prisma.StockistTotalHeadConfirmationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StockistTotalHeadConfirmationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StockistTotalHeadConfirmationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          findFirst: {
+            args: Prisma.StockistTotalHeadConfirmationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StockistTotalHeadConfirmationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          findMany: {
+            args: Prisma.StockistTotalHeadConfirmationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>[]
+          }
+          create: {
+            args: Prisma.StockistTotalHeadConfirmationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          createMany: {
+            args: Prisma.StockistTotalHeadConfirmationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StockistTotalHeadConfirmationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>[]
+          }
+          delete: {
+            args: Prisma.StockistTotalHeadConfirmationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          update: {
+            args: Prisma.StockistTotalHeadConfirmationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          deleteMany: {
+            args: Prisma.StockistTotalHeadConfirmationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StockistTotalHeadConfirmationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StockistTotalHeadConfirmationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>[]
+          }
+          upsert: {
+            args: Prisma.StockistTotalHeadConfirmationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockistTotalHeadConfirmationPayload>
+          }
+          aggregate: {
+            args: Prisma.StockistTotalHeadConfirmationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStockistTotalHeadConfirmation>
+          }
+          groupBy: {
+            args: Prisma.StockistTotalHeadConfirmationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StockistTotalHeadConfirmationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StockistTotalHeadConfirmationCountArgs<ExtArgs>
+            result: $Utils.Optional<StockistTotalHeadConfirmationCountAggregateOutputType> | number
+          }
+        }
+      }
       KasHeadConfirmation: {
         payload: Prisma.$KasHeadConfirmationPayload<ExtArgs>
         fields: Prisma.KasHeadConfirmationFieldRefs
@@ -4151,6 +4402,80 @@ export namespace Prisma {
           }
         }
       }
+      BankHeadConfirmation: {
+        payload: Prisma.$BankHeadConfirmationPayload<ExtArgs>
+        fields: Prisma.BankHeadConfirmationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BankHeadConfirmationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BankHeadConfirmationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          findFirst: {
+            args: Prisma.BankHeadConfirmationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BankHeadConfirmationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          findMany: {
+            args: Prisma.BankHeadConfirmationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>[]
+          }
+          create: {
+            args: Prisma.BankHeadConfirmationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          createMany: {
+            args: Prisma.BankHeadConfirmationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BankHeadConfirmationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>[]
+          }
+          delete: {
+            args: Prisma.BankHeadConfirmationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          update: {
+            args: Prisma.BankHeadConfirmationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          deleteMany: {
+            args: Prisma.BankHeadConfirmationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BankHeadConfirmationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BankHeadConfirmationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>[]
+          }
+          upsert: {
+            args: Prisma.BankHeadConfirmationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankHeadConfirmationPayload>
+          }
+          aggregate: {
+            args: Prisma.BankHeadConfirmationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBankHeadConfirmation>
+          }
+          groupBy: {
+            args: Prisma.BankHeadConfirmationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BankHeadConfirmationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BankHeadConfirmationCountArgs<ExtArgs>
+            result: $Utils.Optional<BankHeadConfirmationCountAggregateOutputType> | number
+          }
+        }
+      }
       CompanyHeadConfirmationTotal: {
         payload: Prisma.$CompanyHeadConfirmationTotalPayload<ExtArgs>
         fields: Prisma.CompanyHeadConfirmationTotalFieldRefs
@@ -4222,6 +4547,80 @@ export namespace Prisma {
           count: {
             args: Prisma.CompanyHeadConfirmationTotalCountArgs<ExtArgs>
             result: $Utils.Optional<CompanyHeadConfirmationTotalCountAggregateOutputType> | number
+          }
+        }
+      }
+      CorrectionRequest: {
+        payload: Prisma.$CorrectionRequestPayload<ExtArgs>
+        fields: Prisma.CorrectionRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CorrectionRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CorrectionRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.CorrectionRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CorrectionRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          findMany: {
+            args: Prisma.CorrectionRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>[]
+          }
+          create: {
+            args: Prisma.CorrectionRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          createMany: {
+            args: Prisma.CorrectionRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CorrectionRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.CorrectionRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          update: {
+            args: Prisma.CorrectionRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.CorrectionRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CorrectionRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CorrectionRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.CorrectionRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CorrectionRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.CorrectionRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCorrectionRequest>
+          }
+          groupBy: {
+            args: Prisma.CorrectionRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CorrectionRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CorrectionRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<CorrectionRequestCountAggregateOutputType> | number
           }
         }
       }
@@ -4345,6 +4744,7 @@ export namespace Prisma {
     branch?: BranchOmit
     company?: CompanyOmit
     currency?: CurrencyOmit
+    priceBenchmark?: PriceBenchmarkOmit
     companyStockItem?: CompanyStockItemOmit
     kpiDefinition?: KpiDefinitionOmit
     roleKpi?: RoleKpiOmit
@@ -4369,8 +4769,11 @@ export namespace Prisma {
     kasPocket?: KasPocketOmit
     kasDailyEntry?: KasDailyEntryOmit
     stockistHeadConfirmation?: StockistHeadConfirmationOmit
+    stockistTotalHeadConfirmation?: StockistTotalHeadConfirmationOmit
     kasHeadConfirmation?: KasHeadConfirmationOmit
+    bankHeadConfirmation?: BankHeadConfirmationOmit
     companyHeadConfirmationTotal?: CompanyHeadConfirmationTotalOmit
+    correctionRequest?: CorrectionRequestOmit
   }
 
   /* Types for Logging */
@@ -4701,8 +5104,11 @@ export namespace Prisma {
     companyStockItems: number
     bankAccounts: number
     stockistHeadConfirmations: number
+    stockistTotalHeadConfirms: number
     kasHeadConfirmations: number
+    bankHeadConfirmations: number
     headConfirmationTotals: number
+    correctionRequests: number
   }
 
   export type CompanyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4715,8 +5121,11 @@ export namespace Prisma {
     companyStockItems?: boolean | CompanyCountOutputTypeCountCompanyStockItemsArgs
     bankAccounts?: boolean | CompanyCountOutputTypeCountBankAccountsArgs
     stockistHeadConfirmations?: boolean | CompanyCountOutputTypeCountStockistHeadConfirmationsArgs
+    stockistTotalHeadConfirms?: boolean | CompanyCountOutputTypeCountStockistTotalHeadConfirmsArgs
     kasHeadConfirmations?: boolean | CompanyCountOutputTypeCountKasHeadConfirmationsArgs
+    bankHeadConfirmations?: boolean | CompanyCountOutputTypeCountBankHeadConfirmationsArgs
     headConfirmationTotals?: boolean | CompanyCountOutputTypeCountHeadConfirmationTotalsArgs
+    correctionRequests?: boolean | CompanyCountOutputTypeCountCorrectionRequestsArgs
   }
 
   // Custom InputTypes
@@ -4796,6 +5205,13 @@ export namespace Prisma {
   /**
    * CompanyCountOutputType without action
    */
+  export type CompanyCountOutputTypeCountStockistTotalHeadConfirmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockistTotalHeadConfirmationWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
   export type CompanyCountOutputTypeCountKasHeadConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: KasHeadConfirmationWhereInput
   }
@@ -4803,8 +5219,22 @@ export namespace Prisma {
   /**
    * CompanyCountOutputType without action
    */
+  export type CompanyCountOutputTypeCountBankHeadConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BankHeadConfirmationWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
   export type CompanyCountOutputTypeCountHeadConfirmationTotalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CompanyHeadConfirmationTotalWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountCorrectionRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CorrectionRequestWhereInput
   }
 
 
@@ -14918,6 +15348,10 @@ export namespace Prisma {
     balance: Decimal | null
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus | null
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14929,6 +15363,10 @@ export namespace Prisma {
     balance: Decimal | null
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus | null
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -14940,6 +15378,10 @@ export namespace Prisma {
     balance: number
     note: number
     createdBy: number
+    verifyStatus: number
+    verifyNote: number
+    verifiedBy: number
+    verifiedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -14961,6 +15403,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14972,6 +15418,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14983,6 +15433,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -15081,6 +15535,10 @@ export namespace Prisma {
     balance: Decimal
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: DailyBankEntryCountAggregateOutputType | null
@@ -15111,6 +15569,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     bankAccount?: boolean | BankAccountDefaultArgs<ExtArgs>
@@ -15123,6 +15585,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     bankAccount?: boolean | BankAccountDefaultArgs<ExtArgs>
@@ -15135,6 +15601,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     bankAccount?: boolean | BankAccountDefaultArgs<ExtArgs>
@@ -15147,11 +15617,15 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DailyBankEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bankAccountId" | "date" | "balance" | "note" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["dailyBankEntry"]>
+  export type DailyBankEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bankAccountId" | "date" | "balance" | "note" | "createdBy" | "verifyStatus" | "verifyNote" | "verifiedBy" | "verifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["dailyBankEntry"]>
   export type DailyBankEntryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bankAccount?: boolean | BankAccountDefaultArgs<ExtArgs>
   }
@@ -15174,6 +15648,10 @@ export namespace Prisma {
       balance: Prisma.Decimal
       note: string | null
       createdBy: string | null
+      verifyStatus: $Enums.DailyVerifyStatus
+      verifyNote: string | null
+      verifiedBy: string | null
+      verifiedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["dailyBankEntry"]>
@@ -15606,6 +16084,10 @@ export namespace Prisma {
     readonly balance: FieldRef<"DailyBankEntry", 'Decimal'>
     readonly note: FieldRef<"DailyBankEntry", 'String'>
     readonly createdBy: FieldRef<"DailyBankEntry", 'String'>
+    readonly verifyStatus: FieldRef<"DailyBankEntry", 'DailyVerifyStatus'>
+    readonly verifyNote: FieldRef<"DailyBankEntry", 'String'>
+    readonly verifiedBy: FieldRef<"DailyBankEntry", 'String'>
+    readonly verifiedAt: FieldRef<"DailyBankEntry", 'DateTime'>
     readonly createdAt: FieldRef<"DailyBankEntry", 'DateTime'>
     readonly updatedAt: FieldRef<"DailyBankEntry", 'DateTime'>
   }
@@ -17552,8 +18034,11 @@ export namespace Prisma {
     companyStockItems?: boolean | Company$companyStockItemsArgs<ExtArgs>
     bankAccounts?: boolean | Company$bankAccountsArgs<ExtArgs>
     stockistHeadConfirmations?: boolean | Company$stockistHeadConfirmationsArgs<ExtArgs>
+    stockistTotalHeadConfirms?: boolean | Company$stockistTotalHeadConfirmsArgs<ExtArgs>
     kasHeadConfirmations?: boolean | Company$kasHeadConfirmationsArgs<ExtArgs>
+    bankHeadConfirmations?: boolean | Company$bankHeadConfirmationsArgs<ExtArgs>
     headConfirmationTotals?: boolean | Company$headConfirmationTotalsArgs<ExtArgs>
+    correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
 
@@ -17595,8 +18080,11 @@ export namespace Prisma {
     companyStockItems?: boolean | Company$companyStockItemsArgs<ExtArgs>
     bankAccounts?: boolean | Company$bankAccountsArgs<ExtArgs>
     stockistHeadConfirmations?: boolean | Company$stockistHeadConfirmationsArgs<ExtArgs>
+    stockistTotalHeadConfirms?: boolean | Company$stockistTotalHeadConfirmsArgs<ExtArgs>
     kasHeadConfirmations?: boolean | Company$kasHeadConfirmationsArgs<ExtArgs>
+    bankHeadConfirmations?: boolean | Company$bankHeadConfirmationsArgs<ExtArgs>
     headConfirmationTotals?: boolean | Company$headConfirmationTotalsArgs<ExtArgs>
+    correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CompanyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -17614,8 +18102,11 @@ export namespace Prisma {
       companyStockItems: Prisma.$CompanyStockItemPayload<ExtArgs>[]
       bankAccounts: Prisma.$BankAccountPayload<ExtArgs>[]
       stockistHeadConfirmations: Prisma.$StockistHeadConfirmationPayload<ExtArgs>[]
+      stockistTotalHeadConfirms: Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>[]
       kasHeadConfirmations: Prisma.$KasHeadConfirmationPayload<ExtArgs>[]
+      bankHeadConfirmations: Prisma.$BankHeadConfirmationPayload<ExtArgs>[]
       headConfirmationTotals: Prisma.$CompanyHeadConfirmationTotalPayload<ExtArgs>[]
+      correctionRequests: Prisma.$CorrectionRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -18027,8 +18518,11 @@ export namespace Prisma {
     companyStockItems<T extends Company$companyStockItemsArgs<ExtArgs> = {}>(args?: Subset<T, Company$companyStockItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompanyStockItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bankAccounts<T extends Company$bankAccountsArgs<ExtArgs> = {}>(args?: Subset<T, Company$bankAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockistHeadConfirmations<T extends Company$stockistHeadConfirmationsArgs<ExtArgs> = {}>(args?: Subset<T, Company$stockistHeadConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    stockistTotalHeadConfirms<T extends Company$stockistTotalHeadConfirmsArgs<ExtArgs> = {}>(args?: Subset<T, Company$stockistTotalHeadConfirmsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kasHeadConfirmations<T extends Company$kasHeadConfirmationsArgs<ExtArgs> = {}>(args?: Subset<T, Company$kasHeadConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KasHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    bankHeadConfirmations<T extends Company$bankHeadConfirmationsArgs<ExtArgs> = {}>(args?: Subset<T, Company$bankHeadConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     headConfirmationTotals<T extends Company$headConfirmationTotalsArgs<ExtArgs> = {}>(args?: Subset<T, Company$headConfirmationTotalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompanyHeadConfirmationTotalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    correctionRequests<T extends Company$correctionRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Company$correctionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18673,6 +19167,30 @@ export namespace Prisma {
   }
 
   /**
+   * Company.stockistTotalHeadConfirms
+   */
+  export type Company$stockistTotalHeadConfirmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    where?: StockistTotalHeadConfirmationWhereInput
+    orderBy?: StockistTotalHeadConfirmationOrderByWithRelationInput | StockistTotalHeadConfirmationOrderByWithRelationInput[]
+    cursor?: StockistTotalHeadConfirmationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StockistTotalHeadConfirmationScalarFieldEnum | StockistTotalHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
    * Company.kasHeadConfirmations
    */
   export type Company$kasHeadConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18697,6 +19215,30 @@ export namespace Prisma {
   }
 
   /**
+   * Company.bankHeadConfirmations
+   */
+  export type Company$bankHeadConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    where?: BankHeadConfirmationWhereInput
+    orderBy?: BankHeadConfirmationOrderByWithRelationInput | BankHeadConfirmationOrderByWithRelationInput[]
+    cursor?: BankHeadConfirmationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BankHeadConfirmationScalarFieldEnum | BankHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
    * Company.headConfirmationTotals
    */
   export type Company$headConfirmationTotalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18718,6 +19260,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CompanyHeadConfirmationTotalScalarFieldEnum | CompanyHeadConfirmationTotalScalarFieldEnum[]
+  }
+
+  /**
+   * Company.correctionRequests
+   */
+  export type Company$correctionRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    where?: CorrectionRequestWhereInput
+    orderBy?: CorrectionRequestOrderByWithRelationInput | CorrectionRequestOrderByWithRelationInput[]
+    cursor?: CorrectionRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CorrectionRequestScalarFieldEnum | CorrectionRequestScalarFieldEnum[]
   }
 
   /**
@@ -19893,6 +20459,1045 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CurrencyInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PriceBenchmark
+   */
+
+  export type AggregatePriceBenchmark = {
+    _count: PriceBenchmarkCountAggregateOutputType | null
+    _min: PriceBenchmarkMinAggregateOutputType | null
+    _max: PriceBenchmarkMaxAggregateOutputType | null
+  }
+
+  export type PriceBenchmarkMinAggregateOutputType = {
+    id: string | null
+    code: string | null
+    name: string | null
+    sellAdjustment: string | null
+    buyAdjustment: string | null
+    updatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PriceBenchmarkMaxAggregateOutputType = {
+    id: string | null
+    code: string | null
+    name: string | null
+    sellAdjustment: string | null
+    buyAdjustment: string | null
+    updatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PriceBenchmarkCountAggregateOutputType = {
+    id: number
+    code: number
+    name: number
+    sellAdjustment: number
+    buyAdjustment: number
+    updatedBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PriceBenchmarkMinAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    sellAdjustment?: true
+    buyAdjustment?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PriceBenchmarkMaxAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    sellAdjustment?: true
+    buyAdjustment?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PriceBenchmarkCountAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    sellAdjustment?: true
+    buyAdjustment?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PriceBenchmarkAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PriceBenchmark to aggregate.
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PriceBenchmarks to fetch.
+     */
+    orderBy?: PriceBenchmarkOrderByWithRelationInput | PriceBenchmarkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PriceBenchmarkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PriceBenchmarks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PriceBenchmarks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PriceBenchmarks
+    **/
+    _count?: true | PriceBenchmarkCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PriceBenchmarkMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PriceBenchmarkMaxAggregateInputType
+  }
+
+  export type GetPriceBenchmarkAggregateType<T extends PriceBenchmarkAggregateArgs> = {
+        [P in keyof T & keyof AggregatePriceBenchmark]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePriceBenchmark[P]>
+      : GetScalarType<T[P], AggregatePriceBenchmark[P]>
+  }
+
+
+
+
+  export type PriceBenchmarkGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PriceBenchmarkWhereInput
+    orderBy?: PriceBenchmarkOrderByWithAggregationInput | PriceBenchmarkOrderByWithAggregationInput[]
+    by: PriceBenchmarkScalarFieldEnum[] | PriceBenchmarkScalarFieldEnum
+    having?: PriceBenchmarkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PriceBenchmarkCountAggregateInputType | true
+    _min?: PriceBenchmarkMinAggregateInputType
+    _max?: PriceBenchmarkMaxAggregateInputType
+  }
+
+  export type PriceBenchmarkGroupByOutputType = {
+    id: string
+    code: string
+    name: string
+    sellAdjustment: string
+    buyAdjustment: string
+    updatedBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PriceBenchmarkCountAggregateOutputType | null
+    _min: PriceBenchmarkMinAggregateOutputType | null
+    _max: PriceBenchmarkMaxAggregateOutputType | null
+  }
+
+  type GetPriceBenchmarkGroupByPayload<T extends PriceBenchmarkGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PriceBenchmarkGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PriceBenchmarkGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PriceBenchmarkGroupByOutputType[P]>
+            : GetScalarType<T[P], PriceBenchmarkGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PriceBenchmarkSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    sellAdjustment?: boolean
+    buyAdjustment?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["priceBenchmark"]>
+
+  export type PriceBenchmarkSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    sellAdjustment?: boolean
+    buyAdjustment?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["priceBenchmark"]>
+
+  export type PriceBenchmarkSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    sellAdjustment?: boolean
+    buyAdjustment?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["priceBenchmark"]>
+
+  export type PriceBenchmarkSelectScalar = {
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    sellAdjustment?: boolean
+    buyAdjustment?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PriceBenchmarkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "code" | "name" | "sellAdjustment" | "buyAdjustment" | "updatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["priceBenchmark"]>
+
+  export type $PriceBenchmarkPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PriceBenchmark"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      code: string
+      name: string
+      sellAdjustment: string
+      buyAdjustment: string
+      updatedBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["priceBenchmark"]>
+    composites: {}
+  }
+
+  type PriceBenchmarkGetPayload<S extends boolean | null | undefined | PriceBenchmarkDefaultArgs> = $Result.GetResult<Prisma.$PriceBenchmarkPayload, S>
+
+  type PriceBenchmarkCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PriceBenchmarkFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PriceBenchmarkCountAggregateInputType | true
+    }
+
+  export interface PriceBenchmarkDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PriceBenchmark'], meta: { name: 'PriceBenchmark' } }
+    /**
+     * Find zero or one PriceBenchmark that matches the filter.
+     * @param {PriceBenchmarkFindUniqueArgs} args - Arguments to find a PriceBenchmark
+     * @example
+     * // Get one PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PriceBenchmarkFindUniqueArgs>(args: SelectSubset<T, PriceBenchmarkFindUniqueArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PriceBenchmark that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PriceBenchmarkFindUniqueOrThrowArgs} args - Arguments to find a PriceBenchmark
+     * @example
+     * // Get one PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PriceBenchmarkFindUniqueOrThrowArgs>(args: SelectSubset<T, PriceBenchmarkFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PriceBenchmark that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkFindFirstArgs} args - Arguments to find a PriceBenchmark
+     * @example
+     * // Get one PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PriceBenchmarkFindFirstArgs>(args?: SelectSubset<T, PriceBenchmarkFindFirstArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PriceBenchmark that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkFindFirstOrThrowArgs} args - Arguments to find a PriceBenchmark
+     * @example
+     * // Get one PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PriceBenchmarkFindFirstOrThrowArgs>(args?: SelectSubset<T, PriceBenchmarkFindFirstOrThrowArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PriceBenchmarks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PriceBenchmarks
+     * const priceBenchmarks = await prisma.priceBenchmark.findMany()
+     * 
+     * // Get first 10 PriceBenchmarks
+     * const priceBenchmarks = await prisma.priceBenchmark.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const priceBenchmarkWithIdOnly = await prisma.priceBenchmark.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PriceBenchmarkFindManyArgs>(args?: SelectSubset<T, PriceBenchmarkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PriceBenchmark.
+     * @param {PriceBenchmarkCreateArgs} args - Arguments to create a PriceBenchmark.
+     * @example
+     * // Create one PriceBenchmark
+     * const PriceBenchmark = await prisma.priceBenchmark.create({
+     *   data: {
+     *     // ... data to create a PriceBenchmark
+     *   }
+     * })
+     * 
+     */
+    create<T extends PriceBenchmarkCreateArgs>(args: SelectSubset<T, PriceBenchmarkCreateArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PriceBenchmarks.
+     * @param {PriceBenchmarkCreateManyArgs} args - Arguments to create many PriceBenchmarks.
+     * @example
+     * // Create many PriceBenchmarks
+     * const priceBenchmark = await prisma.priceBenchmark.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PriceBenchmarkCreateManyArgs>(args?: SelectSubset<T, PriceBenchmarkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PriceBenchmarks and returns the data saved in the database.
+     * @param {PriceBenchmarkCreateManyAndReturnArgs} args - Arguments to create many PriceBenchmarks.
+     * @example
+     * // Create many PriceBenchmarks
+     * const priceBenchmark = await prisma.priceBenchmark.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PriceBenchmarks and only return the `id`
+     * const priceBenchmarkWithIdOnly = await prisma.priceBenchmark.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PriceBenchmarkCreateManyAndReturnArgs>(args?: SelectSubset<T, PriceBenchmarkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PriceBenchmark.
+     * @param {PriceBenchmarkDeleteArgs} args - Arguments to delete one PriceBenchmark.
+     * @example
+     * // Delete one PriceBenchmark
+     * const PriceBenchmark = await prisma.priceBenchmark.delete({
+     *   where: {
+     *     // ... filter to delete one PriceBenchmark
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PriceBenchmarkDeleteArgs>(args: SelectSubset<T, PriceBenchmarkDeleteArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PriceBenchmark.
+     * @param {PriceBenchmarkUpdateArgs} args - Arguments to update one PriceBenchmark.
+     * @example
+     * // Update one PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PriceBenchmarkUpdateArgs>(args: SelectSubset<T, PriceBenchmarkUpdateArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PriceBenchmarks.
+     * @param {PriceBenchmarkDeleteManyArgs} args - Arguments to filter PriceBenchmarks to delete.
+     * @example
+     * // Delete a few PriceBenchmarks
+     * const { count } = await prisma.priceBenchmark.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PriceBenchmarkDeleteManyArgs>(args?: SelectSubset<T, PriceBenchmarkDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PriceBenchmarks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PriceBenchmarks
+     * const priceBenchmark = await prisma.priceBenchmark.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PriceBenchmarkUpdateManyArgs>(args: SelectSubset<T, PriceBenchmarkUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PriceBenchmarks and returns the data updated in the database.
+     * @param {PriceBenchmarkUpdateManyAndReturnArgs} args - Arguments to update many PriceBenchmarks.
+     * @example
+     * // Update many PriceBenchmarks
+     * const priceBenchmark = await prisma.priceBenchmark.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PriceBenchmarks and only return the `id`
+     * const priceBenchmarkWithIdOnly = await prisma.priceBenchmark.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PriceBenchmarkUpdateManyAndReturnArgs>(args: SelectSubset<T, PriceBenchmarkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PriceBenchmark.
+     * @param {PriceBenchmarkUpsertArgs} args - Arguments to update or create a PriceBenchmark.
+     * @example
+     * // Update or create a PriceBenchmark
+     * const priceBenchmark = await prisma.priceBenchmark.upsert({
+     *   create: {
+     *     // ... data to create a PriceBenchmark
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PriceBenchmark we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PriceBenchmarkUpsertArgs>(args: SelectSubset<T, PriceBenchmarkUpsertArgs<ExtArgs>>): Prisma__PriceBenchmarkClient<$Result.GetResult<Prisma.$PriceBenchmarkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PriceBenchmarks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkCountArgs} args - Arguments to filter PriceBenchmarks to count.
+     * @example
+     * // Count the number of PriceBenchmarks
+     * const count = await prisma.priceBenchmark.count({
+     *   where: {
+     *     // ... the filter for the PriceBenchmarks we want to count
+     *   }
+     * })
+    **/
+    count<T extends PriceBenchmarkCountArgs>(
+      args?: Subset<T, PriceBenchmarkCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PriceBenchmarkCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PriceBenchmark.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PriceBenchmarkAggregateArgs>(args: Subset<T, PriceBenchmarkAggregateArgs>): Prisma.PrismaPromise<GetPriceBenchmarkAggregateType<T>>
+
+    /**
+     * Group by PriceBenchmark.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PriceBenchmarkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PriceBenchmarkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PriceBenchmarkGroupByArgs['orderBy'] }
+        : { orderBy?: PriceBenchmarkGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PriceBenchmarkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPriceBenchmarkGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PriceBenchmark model
+   */
+  readonly fields: PriceBenchmarkFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PriceBenchmark.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PriceBenchmarkClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PriceBenchmark model
+   */
+  interface PriceBenchmarkFieldRefs {
+    readonly id: FieldRef<"PriceBenchmark", 'String'>
+    readonly code: FieldRef<"PriceBenchmark", 'String'>
+    readonly name: FieldRef<"PriceBenchmark", 'String'>
+    readonly sellAdjustment: FieldRef<"PriceBenchmark", 'String'>
+    readonly buyAdjustment: FieldRef<"PriceBenchmark", 'String'>
+    readonly updatedBy: FieldRef<"PriceBenchmark", 'String'>
+    readonly createdAt: FieldRef<"PriceBenchmark", 'DateTime'>
+    readonly updatedAt: FieldRef<"PriceBenchmark", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PriceBenchmark findUnique
+   */
+  export type PriceBenchmarkFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter, which PriceBenchmark to fetch.
+     */
+    where: PriceBenchmarkWhereUniqueInput
+  }
+
+  /**
+   * PriceBenchmark findUniqueOrThrow
+   */
+  export type PriceBenchmarkFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter, which PriceBenchmark to fetch.
+     */
+    where: PriceBenchmarkWhereUniqueInput
+  }
+
+  /**
+   * PriceBenchmark findFirst
+   */
+  export type PriceBenchmarkFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter, which PriceBenchmark to fetch.
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PriceBenchmarks to fetch.
+     */
+    orderBy?: PriceBenchmarkOrderByWithRelationInput | PriceBenchmarkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PriceBenchmarks.
+     */
+    cursor?: PriceBenchmarkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PriceBenchmarks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PriceBenchmarks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PriceBenchmarks.
+     */
+    distinct?: PriceBenchmarkScalarFieldEnum | PriceBenchmarkScalarFieldEnum[]
+  }
+
+  /**
+   * PriceBenchmark findFirstOrThrow
+   */
+  export type PriceBenchmarkFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter, which PriceBenchmark to fetch.
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PriceBenchmarks to fetch.
+     */
+    orderBy?: PriceBenchmarkOrderByWithRelationInput | PriceBenchmarkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PriceBenchmarks.
+     */
+    cursor?: PriceBenchmarkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PriceBenchmarks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PriceBenchmarks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PriceBenchmarks.
+     */
+    distinct?: PriceBenchmarkScalarFieldEnum | PriceBenchmarkScalarFieldEnum[]
+  }
+
+  /**
+   * PriceBenchmark findMany
+   */
+  export type PriceBenchmarkFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter, which PriceBenchmarks to fetch.
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PriceBenchmarks to fetch.
+     */
+    orderBy?: PriceBenchmarkOrderByWithRelationInput | PriceBenchmarkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PriceBenchmarks.
+     */
+    cursor?: PriceBenchmarkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PriceBenchmarks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PriceBenchmarks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PriceBenchmarks.
+     */
+    distinct?: PriceBenchmarkScalarFieldEnum | PriceBenchmarkScalarFieldEnum[]
+  }
+
+  /**
+   * PriceBenchmark create
+   */
+  export type PriceBenchmarkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PriceBenchmark.
+     */
+    data: XOR<PriceBenchmarkCreateInput, PriceBenchmarkUncheckedCreateInput>
+  }
+
+  /**
+   * PriceBenchmark createMany
+   */
+  export type PriceBenchmarkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PriceBenchmarks.
+     */
+    data: PriceBenchmarkCreateManyInput | PriceBenchmarkCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PriceBenchmark createManyAndReturn
+   */
+  export type PriceBenchmarkCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * The data used to create many PriceBenchmarks.
+     */
+    data: PriceBenchmarkCreateManyInput | PriceBenchmarkCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PriceBenchmark update
+   */
+  export type PriceBenchmarkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PriceBenchmark.
+     */
+    data: XOR<PriceBenchmarkUpdateInput, PriceBenchmarkUncheckedUpdateInput>
+    /**
+     * Choose, which PriceBenchmark to update.
+     */
+    where: PriceBenchmarkWhereUniqueInput
+  }
+
+  /**
+   * PriceBenchmark updateMany
+   */
+  export type PriceBenchmarkUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PriceBenchmarks.
+     */
+    data: XOR<PriceBenchmarkUpdateManyMutationInput, PriceBenchmarkUncheckedUpdateManyInput>
+    /**
+     * Filter which PriceBenchmarks to update
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * Limit how many PriceBenchmarks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PriceBenchmark updateManyAndReturn
+   */
+  export type PriceBenchmarkUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * The data used to update PriceBenchmarks.
+     */
+    data: XOR<PriceBenchmarkUpdateManyMutationInput, PriceBenchmarkUncheckedUpdateManyInput>
+    /**
+     * Filter which PriceBenchmarks to update
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * Limit how many PriceBenchmarks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PriceBenchmark upsert
+   */
+  export type PriceBenchmarkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PriceBenchmark to update in case it exists.
+     */
+    where: PriceBenchmarkWhereUniqueInput
+    /**
+     * In case the PriceBenchmark found by the `where` argument doesn't exist, create a new PriceBenchmark with this data.
+     */
+    create: XOR<PriceBenchmarkCreateInput, PriceBenchmarkUncheckedCreateInput>
+    /**
+     * In case the PriceBenchmark was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PriceBenchmarkUpdateInput, PriceBenchmarkUncheckedUpdateInput>
+  }
+
+  /**
+   * PriceBenchmark delete
+   */
+  export type PriceBenchmarkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
+    /**
+     * Filter which PriceBenchmark to delete.
+     */
+    where: PriceBenchmarkWhereUniqueInput
+  }
+
+  /**
+   * PriceBenchmark deleteMany
+   */
+  export type PriceBenchmarkDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PriceBenchmarks to delete
+     */
+    where?: PriceBenchmarkWhereInput
+    /**
+     * Limit how many PriceBenchmarks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PriceBenchmark without action
+   */
+  export type PriceBenchmarkDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PriceBenchmark
+     */
+    select?: PriceBenchmarkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PriceBenchmark
+     */
+    omit?: PriceBenchmarkOmit<ExtArgs> | null
   }
 
 
@@ -45727,6 +47332,10 @@ export namespace Prisma {
     balance: Decimal | null
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus | null
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -45738,6 +47347,10 @@ export namespace Prisma {
     balance: Decimal | null
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus | null
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -45749,6 +47362,10 @@ export namespace Prisma {
     balance: number
     note: number
     createdBy: number
+    verifyStatus: number
+    verifyNote: number
+    verifiedBy: number
+    verifiedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -45770,6 +47387,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -45781,6 +47402,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -45792,6 +47417,10 @@ export namespace Prisma {
     balance?: true
     note?: true
     createdBy?: true
+    verifyStatus?: true
+    verifyNote?: true
+    verifiedBy?: true
+    verifiedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -45890,6 +47519,10 @@ export namespace Prisma {
     balance: Decimal
     note: string | null
     createdBy: string | null
+    verifyStatus: $Enums.DailyVerifyStatus
+    verifyNote: string | null
+    verifiedBy: string | null
+    verifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: KasDailyEntryCountAggregateOutputType | null
@@ -45920,6 +47553,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     kasPocket?: boolean | KasPocketDefaultArgs<ExtArgs>
@@ -45932,6 +47569,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     kasPocket?: boolean | KasPocketDefaultArgs<ExtArgs>
@@ -45944,6 +47585,10 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     kasPocket?: boolean | KasPocketDefaultArgs<ExtArgs>
@@ -45956,11 +47601,15 @@ export namespace Prisma {
     balance?: boolean
     note?: boolean
     createdBy?: boolean
+    verifyStatus?: boolean
+    verifyNote?: boolean
+    verifiedBy?: boolean
+    verifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type KasDailyEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "kasPocketId" | "date" | "balance" | "note" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["kasDailyEntry"]>
+  export type KasDailyEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "kasPocketId" | "date" | "balance" | "note" | "createdBy" | "verifyStatus" | "verifyNote" | "verifiedBy" | "verifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["kasDailyEntry"]>
   export type KasDailyEntryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kasPocket?: boolean | KasPocketDefaultArgs<ExtArgs>
   }
@@ -45983,6 +47632,10 @@ export namespace Prisma {
       balance: Prisma.Decimal
       note: string | null
       createdBy: string | null
+      verifyStatus: $Enums.DailyVerifyStatus
+      verifyNote: string | null
+      verifiedBy: string | null
+      verifiedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["kasDailyEntry"]>
@@ -46415,6 +48068,10 @@ export namespace Prisma {
     readonly balance: FieldRef<"KasDailyEntry", 'Decimal'>
     readonly note: FieldRef<"KasDailyEntry", 'String'>
     readonly createdBy: FieldRef<"KasDailyEntry", 'String'>
+    readonly verifyStatus: FieldRef<"KasDailyEntry", 'DailyVerifyStatus'>
+    readonly verifyNote: FieldRef<"KasDailyEntry", 'String'>
+    readonly verifiedBy: FieldRef<"KasDailyEntry", 'String'>
+    readonly verifiedAt: FieldRef<"KasDailyEntry", 'DateTime'>
     readonly createdAt: FieldRef<"KasDailyEntry", 'DateTime'>
     readonly updatedAt: FieldRef<"KasDailyEntry", 'DateTime'>
   }
@@ -47047,7 +48704,7 @@ export namespace Prisma {
     companyStockItemId: string
     date: Date
     confirmedQuantity: Decimal
-    confirmedIdrValue: Decimal
+    confirmedIdrValue: Decimal | null
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
@@ -47162,7 +48819,7 @@ export namespace Prisma {
       companyStockItemId: string
       date: Date
       confirmedQuantity: Prisma.Decimal
-      confirmedIdrValue: Prisma.Decimal
+      confirmedIdrValue: Prisma.Decimal | null
       note: string | null
       confirmedBy: string | null
       confirmedAt: Date | null
@@ -48020,6 +49677,1155 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StockistHeadConfirmationInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StockistTotalHeadConfirmation
+   */
+
+  export type AggregateStockistTotalHeadConfirmation = {
+    _count: StockistTotalHeadConfirmationCountAggregateOutputType | null
+    _avg: StockistTotalHeadConfirmationAvgAggregateOutputType | null
+    _sum: StockistTotalHeadConfirmationSumAggregateOutputType | null
+    _min: StockistTotalHeadConfirmationMinAggregateOutputType | null
+    _max: StockistTotalHeadConfirmationMaxAggregateOutputType | null
+  }
+
+  export type StockistTotalHeadConfirmationAvgAggregateOutputType = {
+    confirmedIdrValue: Decimal | null
+  }
+
+  export type StockistTotalHeadConfirmationSumAggregateOutputType = {
+    confirmedIdrValue: Decimal | null
+  }
+
+  export type StockistTotalHeadConfirmationMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    confirmedIdrValue: Decimal | null
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StockistTotalHeadConfirmationMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    confirmedIdrValue: Decimal | null
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StockistTotalHeadConfirmationCountAggregateOutputType = {
+    id: number
+    companyId: number
+    date: number
+    confirmedIdrValue: number
+    note: number
+    confirmedBy: number
+    confirmedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type StockistTotalHeadConfirmationAvgAggregateInputType = {
+    confirmedIdrValue?: true
+  }
+
+  export type StockistTotalHeadConfirmationSumAggregateInputType = {
+    confirmedIdrValue?: true
+  }
+
+  export type StockistTotalHeadConfirmationMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StockistTotalHeadConfirmationMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StockistTotalHeadConfirmationCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type StockistTotalHeadConfirmationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockistTotalHeadConfirmation to aggregate.
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockistTotalHeadConfirmations to fetch.
+     */
+    orderBy?: StockistTotalHeadConfirmationOrderByWithRelationInput | StockistTotalHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StockistTotalHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockistTotalHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockistTotalHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StockistTotalHeadConfirmations
+    **/
+    _count?: true | StockistTotalHeadConfirmationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: StockistTotalHeadConfirmationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: StockistTotalHeadConfirmationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StockistTotalHeadConfirmationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StockistTotalHeadConfirmationMaxAggregateInputType
+  }
+
+  export type GetStockistTotalHeadConfirmationAggregateType<T extends StockistTotalHeadConfirmationAggregateArgs> = {
+        [P in keyof T & keyof AggregateStockistTotalHeadConfirmation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStockistTotalHeadConfirmation[P]>
+      : GetScalarType<T[P], AggregateStockistTotalHeadConfirmation[P]>
+  }
+
+
+
+
+  export type StockistTotalHeadConfirmationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockistTotalHeadConfirmationWhereInput
+    orderBy?: StockistTotalHeadConfirmationOrderByWithAggregationInput | StockistTotalHeadConfirmationOrderByWithAggregationInput[]
+    by: StockistTotalHeadConfirmationScalarFieldEnum[] | StockistTotalHeadConfirmationScalarFieldEnum
+    having?: StockistTotalHeadConfirmationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StockistTotalHeadConfirmationCountAggregateInputType | true
+    _avg?: StockistTotalHeadConfirmationAvgAggregateInputType
+    _sum?: StockistTotalHeadConfirmationSumAggregateInputType
+    _min?: StockistTotalHeadConfirmationMinAggregateInputType
+    _max?: StockistTotalHeadConfirmationMaxAggregateInputType
+  }
+
+  export type StockistTotalHeadConfirmationGroupByOutputType = {
+    id: string
+    companyId: string
+    date: Date
+    confirmedIdrValue: Decimal
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: StockistTotalHeadConfirmationCountAggregateOutputType | null
+    _avg: StockistTotalHeadConfirmationAvgAggregateOutputType | null
+    _sum: StockistTotalHeadConfirmationSumAggregateOutputType | null
+    _min: StockistTotalHeadConfirmationMinAggregateOutputType | null
+    _max: StockistTotalHeadConfirmationMaxAggregateOutputType | null
+  }
+
+  type GetStockistTotalHeadConfirmationGroupByPayload<T extends StockistTotalHeadConfirmationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StockistTotalHeadConfirmationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StockistTotalHeadConfirmationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StockistTotalHeadConfirmationGroupByOutputType[P]>
+            : GetScalarType<T[P], StockistTotalHeadConfirmationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StockistTotalHeadConfirmationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["stockistTotalHeadConfirmation"]>
+
+  export type StockistTotalHeadConfirmationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["stockistTotalHeadConfirmation"]>
+
+  export type StockistTotalHeadConfirmationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["stockistTotalHeadConfirmation"]>
+
+  export type StockistTotalHeadConfirmationSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type StockistTotalHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["stockistTotalHeadConfirmation"]>
+  export type StockistTotalHeadConfirmationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type StockistTotalHeadConfirmationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type StockistTotalHeadConfirmationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+
+  export type $StockistTotalHeadConfirmationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StockistTotalHeadConfirmation"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      date: Date
+      confirmedIdrValue: Prisma.Decimal
+      note: string | null
+      confirmedBy: string | null
+      confirmedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["stockistTotalHeadConfirmation"]>
+    composites: {}
+  }
+
+  type StockistTotalHeadConfirmationGetPayload<S extends boolean | null | undefined | StockistTotalHeadConfirmationDefaultArgs> = $Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload, S>
+
+  type StockistTotalHeadConfirmationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StockistTotalHeadConfirmationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StockistTotalHeadConfirmationCountAggregateInputType | true
+    }
+
+  export interface StockistTotalHeadConfirmationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StockistTotalHeadConfirmation'], meta: { name: 'StockistTotalHeadConfirmation' } }
+    /**
+     * Find zero or one StockistTotalHeadConfirmation that matches the filter.
+     * @param {StockistTotalHeadConfirmationFindUniqueArgs} args - Arguments to find a StockistTotalHeadConfirmation
+     * @example
+     * // Get one StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StockistTotalHeadConfirmationFindUniqueArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationFindUniqueArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StockistTotalHeadConfirmation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StockistTotalHeadConfirmationFindUniqueOrThrowArgs} args - Arguments to find a StockistTotalHeadConfirmation
+     * @example
+     * // Get one StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StockistTotalHeadConfirmationFindUniqueOrThrowArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StockistTotalHeadConfirmation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationFindFirstArgs} args - Arguments to find a StockistTotalHeadConfirmation
+     * @example
+     * // Get one StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StockistTotalHeadConfirmationFindFirstArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationFindFirstArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StockistTotalHeadConfirmation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationFindFirstOrThrowArgs} args - Arguments to find a StockistTotalHeadConfirmation
+     * @example
+     * // Get one StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StockistTotalHeadConfirmationFindFirstOrThrowArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationFindFirstOrThrowArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StockistTotalHeadConfirmations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmations = await prisma.stockistTotalHeadConfirmation.findMany()
+     * 
+     * // Get first 10 StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmations = await prisma.stockistTotalHeadConfirmation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const stockistTotalHeadConfirmationWithIdOnly = await prisma.stockistTotalHeadConfirmation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StockistTotalHeadConfirmationFindManyArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StockistTotalHeadConfirmation.
+     * @param {StockistTotalHeadConfirmationCreateArgs} args - Arguments to create a StockistTotalHeadConfirmation.
+     * @example
+     * // Create one StockistTotalHeadConfirmation
+     * const StockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.create({
+     *   data: {
+     *     // ... data to create a StockistTotalHeadConfirmation
+     *   }
+     * })
+     * 
+     */
+    create<T extends StockistTotalHeadConfirmationCreateArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationCreateArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StockistTotalHeadConfirmations.
+     * @param {StockistTotalHeadConfirmationCreateManyArgs} args - Arguments to create many StockistTotalHeadConfirmations.
+     * @example
+     * // Create many StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StockistTotalHeadConfirmationCreateManyArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StockistTotalHeadConfirmations and returns the data saved in the database.
+     * @param {StockistTotalHeadConfirmationCreateManyAndReturnArgs} args - Arguments to create many StockistTotalHeadConfirmations.
+     * @example
+     * // Create many StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StockistTotalHeadConfirmations and only return the `id`
+     * const stockistTotalHeadConfirmationWithIdOnly = await prisma.stockistTotalHeadConfirmation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StockistTotalHeadConfirmationCreateManyAndReturnArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StockistTotalHeadConfirmation.
+     * @param {StockistTotalHeadConfirmationDeleteArgs} args - Arguments to delete one StockistTotalHeadConfirmation.
+     * @example
+     * // Delete one StockistTotalHeadConfirmation
+     * const StockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.delete({
+     *   where: {
+     *     // ... filter to delete one StockistTotalHeadConfirmation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StockistTotalHeadConfirmationDeleteArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationDeleteArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StockistTotalHeadConfirmation.
+     * @param {StockistTotalHeadConfirmationUpdateArgs} args - Arguments to update one StockistTotalHeadConfirmation.
+     * @example
+     * // Update one StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StockistTotalHeadConfirmationUpdateArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationUpdateArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StockistTotalHeadConfirmations.
+     * @param {StockistTotalHeadConfirmationDeleteManyArgs} args - Arguments to filter StockistTotalHeadConfirmations to delete.
+     * @example
+     * // Delete a few StockistTotalHeadConfirmations
+     * const { count } = await prisma.stockistTotalHeadConfirmation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StockistTotalHeadConfirmationDeleteManyArgs>(args?: SelectSubset<T, StockistTotalHeadConfirmationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StockistTotalHeadConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StockistTotalHeadConfirmationUpdateManyArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StockistTotalHeadConfirmations and returns the data updated in the database.
+     * @param {StockistTotalHeadConfirmationUpdateManyAndReturnArgs} args - Arguments to update many StockistTotalHeadConfirmations.
+     * @example
+     * // Update many StockistTotalHeadConfirmations
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StockistTotalHeadConfirmations and only return the `id`
+     * const stockistTotalHeadConfirmationWithIdOnly = await prisma.stockistTotalHeadConfirmation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StockistTotalHeadConfirmationUpdateManyAndReturnArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StockistTotalHeadConfirmation.
+     * @param {StockistTotalHeadConfirmationUpsertArgs} args - Arguments to update or create a StockistTotalHeadConfirmation.
+     * @example
+     * // Update or create a StockistTotalHeadConfirmation
+     * const stockistTotalHeadConfirmation = await prisma.stockistTotalHeadConfirmation.upsert({
+     *   create: {
+     *     // ... data to create a StockistTotalHeadConfirmation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StockistTotalHeadConfirmation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StockistTotalHeadConfirmationUpsertArgs>(args: SelectSubset<T, StockistTotalHeadConfirmationUpsertArgs<ExtArgs>>): Prisma__StockistTotalHeadConfirmationClient<$Result.GetResult<Prisma.$StockistTotalHeadConfirmationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StockistTotalHeadConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationCountArgs} args - Arguments to filter StockistTotalHeadConfirmations to count.
+     * @example
+     * // Count the number of StockistTotalHeadConfirmations
+     * const count = await prisma.stockistTotalHeadConfirmation.count({
+     *   where: {
+     *     // ... the filter for the StockistTotalHeadConfirmations we want to count
+     *   }
+     * })
+    **/
+    count<T extends StockistTotalHeadConfirmationCountArgs>(
+      args?: Subset<T, StockistTotalHeadConfirmationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StockistTotalHeadConfirmationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StockistTotalHeadConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StockistTotalHeadConfirmationAggregateArgs>(args: Subset<T, StockistTotalHeadConfirmationAggregateArgs>): Prisma.PrismaPromise<GetStockistTotalHeadConfirmationAggregateType<T>>
+
+    /**
+     * Group by StockistTotalHeadConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockistTotalHeadConfirmationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StockistTotalHeadConfirmationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StockistTotalHeadConfirmationGroupByArgs['orderBy'] }
+        : { orderBy?: StockistTotalHeadConfirmationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StockistTotalHeadConfirmationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStockistTotalHeadConfirmationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StockistTotalHeadConfirmation model
+   */
+  readonly fields: StockistTotalHeadConfirmationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StockistTotalHeadConfirmation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StockistTotalHeadConfirmationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StockistTotalHeadConfirmation model
+   */
+  interface StockistTotalHeadConfirmationFieldRefs {
+    readonly id: FieldRef<"StockistTotalHeadConfirmation", 'String'>
+    readonly companyId: FieldRef<"StockistTotalHeadConfirmation", 'String'>
+    readonly date: FieldRef<"StockistTotalHeadConfirmation", 'DateTime'>
+    readonly confirmedIdrValue: FieldRef<"StockistTotalHeadConfirmation", 'Decimal'>
+    readonly note: FieldRef<"StockistTotalHeadConfirmation", 'String'>
+    readonly confirmedBy: FieldRef<"StockistTotalHeadConfirmation", 'String'>
+    readonly confirmedAt: FieldRef<"StockistTotalHeadConfirmation", 'DateTime'>
+    readonly createdAt: FieldRef<"StockistTotalHeadConfirmation", 'DateTime'>
+    readonly updatedAt: FieldRef<"StockistTotalHeadConfirmation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StockistTotalHeadConfirmation findUnique
+   */
+  export type StockistTotalHeadConfirmationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which StockistTotalHeadConfirmation to fetch.
+     */
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * StockistTotalHeadConfirmation findUniqueOrThrow
+   */
+  export type StockistTotalHeadConfirmationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which StockistTotalHeadConfirmation to fetch.
+     */
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * StockistTotalHeadConfirmation findFirst
+   */
+  export type StockistTotalHeadConfirmationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which StockistTotalHeadConfirmation to fetch.
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockistTotalHeadConfirmations to fetch.
+     */
+    orderBy?: StockistTotalHeadConfirmationOrderByWithRelationInput | StockistTotalHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockistTotalHeadConfirmations.
+     */
+    cursor?: StockistTotalHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockistTotalHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockistTotalHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockistTotalHeadConfirmations.
+     */
+    distinct?: StockistTotalHeadConfirmationScalarFieldEnum | StockistTotalHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * StockistTotalHeadConfirmation findFirstOrThrow
+   */
+  export type StockistTotalHeadConfirmationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which StockistTotalHeadConfirmation to fetch.
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockistTotalHeadConfirmations to fetch.
+     */
+    orderBy?: StockistTotalHeadConfirmationOrderByWithRelationInput | StockistTotalHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockistTotalHeadConfirmations.
+     */
+    cursor?: StockistTotalHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockistTotalHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockistTotalHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockistTotalHeadConfirmations.
+     */
+    distinct?: StockistTotalHeadConfirmationScalarFieldEnum | StockistTotalHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * StockistTotalHeadConfirmation findMany
+   */
+  export type StockistTotalHeadConfirmationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which StockistTotalHeadConfirmations to fetch.
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockistTotalHeadConfirmations to fetch.
+     */
+    orderBy?: StockistTotalHeadConfirmationOrderByWithRelationInput | StockistTotalHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StockistTotalHeadConfirmations.
+     */
+    cursor?: StockistTotalHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockistTotalHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockistTotalHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockistTotalHeadConfirmations.
+     */
+    distinct?: StockistTotalHeadConfirmationScalarFieldEnum | StockistTotalHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * StockistTotalHeadConfirmation create
+   */
+  export type StockistTotalHeadConfirmationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StockistTotalHeadConfirmation.
+     */
+    data: XOR<StockistTotalHeadConfirmationCreateInput, StockistTotalHeadConfirmationUncheckedCreateInput>
+  }
+
+  /**
+   * StockistTotalHeadConfirmation createMany
+   */
+  export type StockistTotalHeadConfirmationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StockistTotalHeadConfirmations.
+     */
+    data: StockistTotalHeadConfirmationCreateManyInput | StockistTotalHeadConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StockistTotalHeadConfirmation createManyAndReturn
+   */
+  export type StockistTotalHeadConfirmationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to create many StockistTotalHeadConfirmations.
+     */
+    data: StockistTotalHeadConfirmationCreateManyInput | StockistTotalHeadConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StockistTotalHeadConfirmation update
+   */
+  export type StockistTotalHeadConfirmationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StockistTotalHeadConfirmation.
+     */
+    data: XOR<StockistTotalHeadConfirmationUpdateInput, StockistTotalHeadConfirmationUncheckedUpdateInput>
+    /**
+     * Choose, which StockistTotalHeadConfirmation to update.
+     */
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * StockistTotalHeadConfirmation updateMany
+   */
+  export type StockistTotalHeadConfirmationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StockistTotalHeadConfirmations.
+     */
+    data: XOR<StockistTotalHeadConfirmationUpdateManyMutationInput, StockistTotalHeadConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which StockistTotalHeadConfirmations to update
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * Limit how many StockistTotalHeadConfirmations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StockistTotalHeadConfirmation updateManyAndReturn
+   */
+  export type StockistTotalHeadConfirmationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to update StockistTotalHeadConfirmations.
+     */
+    data: XOR<StockistTotalHeadConfirmationUpdateManyMutationInput, StockistTotalHeadConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which StockistTotalHeadConfirmations to update
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * Limit how many StockistTotalHeadConfirmations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StockistTotalHeadConfirmation upsert
+   */
+  export type StockistTotalHeadConfirmationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StockistTotalHeadConfirmation to update in case it exists.
+     */
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+    /**
+     * In case the StockistTotalHeadConfirmation found by the `where` argument doesn't exist, create a new StockistTotalHeadConfirmation with this data.
+     */
+    create: XOR<StockistTotalHeadConfirmationCreateInput, StockistTotalHeadConfirmationUncheckedCreateInput>
+    /**
+     * In case the StockistTotalHeadConfirmation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StockistTotalHeadConfirmationUpdateInput, StockistTotalHeadConfirmationUncheckedUpdateInput>
+  }
+
+  /**
+   * StockistTotalHeadConfirmation delete
+   */
+  export type StockistTotalHeadConfirmationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter which StockistTotalHeadConfirmation to delete.
+     */
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * StockistTotalHeadConfirmation deleteMany
+   */
+  export type StockistTotalHeadConfirmationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockistTotalHeadConfirmations to delete
+     */
+    where?: StockistTotalHeadConfirmationWhereInput
+    /**
+     * Limit how many StockistTotalHeadConfirmations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StockistTotalHeadConfirmation without action
+   */
+  export type StockistTotalHeadConfirmationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockistTotalHeadConfirmation
+     */
+    select?: StockistTotalHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockistTotalHeadConfirmation
+     */
+    omit?: StockistTotalHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StockistTotalHeadConfirmationInclude<ExtArgs> | null
   }
 
 
@@ -49173,6 +51979,1155 @@ export namespace Prisma {
 
 
   /**
+   * Model BankHeadConfirmation
+   */
+
+  export type AggregateBankHeadConfirmation = {
+    _count: BankHeadConfirmationCountAggregateOutputType | null
+    _avg: BankHeadConfirmationAvgAggregateOutputType | null
+    _sum: BankHeadConfirmationSumAggregateOutputType | null
+    _min: BankHeadConfirmationMinAggregateOutputType | null
+    _max: BankHeadConfirmationMaxAggregateOutputType | null
+  }
+
+  export type BankHeadConfirmationAvgAggregateOutputType = {
+    confirmedIdrValue: Decimal | null
+  }
+
+  export type BankHeadConfirmationSumAggregateOutputType = {
+    confirmedIdrValue: Decimal | null
+  }
+
+  export type BankHeadConfirmationMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    confirmedIdrValue: Decimal | null
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BankHeadConfirmationMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    confirmedIdrValue: Decimal | null
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BankHeadConfirmationCountAggregateOutputType = {
+    id: number
+    companyId: number
+    date: number
+    confirmedIdrValue: number
+    note: number
+    confirmedBy: number
+    confirmedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BankHeadConfirmationAvgAggregateInputType = {
+    confirmedIdrValue?: true
+  }
+
+  export type BankHeadConfirmationSumAggregateInputType = {
+    confirmedIdrValue?: true
+  }
+
+  export type BankHeadConfirmationMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BankHeadConfirmationMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BankHeadConfirmationCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    confirmedIdrValue?: true
+    note?: true
+    confirmedBy?: true
+    confirmedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BankHeadConfirmationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BankHeadConfirmation to aggregate.
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankHeadConfirmations to fetch.
+     */
+    orderBy?: BankHeadConfirmationOrderByWithRelationInput | BankHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BankHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BankHeadConfirmations
+    **/
+    _count?: true | BankHeadConfirmationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BankHeadConfirmationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BankHeadConfirmationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BankHeadConfirmationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BankHeadConfirmationMaxAggregateInputType
+  }
+
+  export type GetBankHeadConfirmationAggregateType<T extends BankHeadConfirmationAggregateArgs> = {
+        [P in keyof T & keyof AggregateBankHeadConfirmation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBankHeadConfirmation[P]>
+      : GetScalarType<T[P], AggregateBankHeadConfirmation[P]>
+  }
+
+
+
+
+  export type BankHeadConfirmationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BankHeadConfirmationWhereInput
+    orderBy?: BankHeadConfirmationOrderByWithAggregationInput | BankHeadConfirmationOrderByWithAggregationInput[]
+    by: BankHeadConfirmationScalarFieldEnum[] | BankHeadConfirmationScalarFieldEnum
+    having?: BankHeadConfirmationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BankHeadConfirmationCountAggregateInputType | true
+    _avg?: BankHeadConfirmationAvgAggregateInputType
+    _sum?: BankHeadConfirmationSumAggregateInputType
+    _min?: BankHeadConfirmationMinAggregateInputType
+    _max?: BankHeadConfirmationMaxAggregateInputType
+  }
+
+  export type BankHeadConfirmationGroupByOutputType = {
+    id: string
+    companyId: string
+    date: Date
+    confirmedIdrValue: Decimal
+    note: string | null
+    confirmedBy: string | null
+    confirmedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BankHeadConfirmationCountAggregateOutputType | null
+    _avg: BankHeadConfirmationAvgAggregateOutputType | null
+    _sum: BankHeadConfirmationSumAggregateOutputType | null
+    _min: BankHeadConfirmationMinAggregateOutputType | null
+    _max: BankHeadConfirmationMaxAggregateOutputType | null
+  }
+
+  type GetBankHeadConfirmationGroupByPayload<T extends BankHeadConfirmationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BankHeadConfirmationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BankHeadConfirmationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BankHeadConfirmationGroupByOutputType[P]>
+            : GetScalarType<T[P], BankHeadConfirmationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BankHeadConfirmationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bankHeadConfirmation"]>
+
+  export type BankHeadConfirmationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bankHeadConfirmation"]>
+
+  export type BankHeadConfirmationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bankHeadConfirmation"]>
+
+  export type BankHeadConfirmationSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    confirmedIdrValue?: boolean
+    note?: boolean
+    confirmedBy?: boolean
+    confirmedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BankHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["bankHeadConfirmation"]>
+  export type BankHeadConfirmationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type BankHeadConfirmationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type BankHeadConfirmationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+
+  export type $BankHeadConfirmationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BankHeadConfirmation"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      date: Date
+      confirmedIdrValue: Prisma.Decimal
+      note: string | null
+      confirmedBy: string | null
+      confirmedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["bankHeadConfirmation"]>
+    composites: {}
+  }
+
+  type BankHeadConfirmationGetPayload<S extends boolean | null | undefined | BankHeadConfirmationDefaultArgs> = $Result.GetResult<Prisma.$BankHeadConfirmationPayload, S>
+
+  type BankHeadConfirmationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BankHeadConfirmationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BankHeadConfirmationCountAggregateInputType | true
+    }
+
+  export interface BankHeadConfirmationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BankHeadConfirmation'], meta: { name: 'BankHeadConfirmation' } }
+    /**
+     * Find zero or one BankHeadConfirmation that matches the filter.
+     * @param {BankHeadConfirmationFindUniqueArgs} args - Arguments to find a BankHeadConfirmation
+     * @example
+     * // Get one BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BankHeadConfirmationFindUniqueArgs>(args: SelectSubset<T, BankHeadConfirmationFindUniqueArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BankHeadConfirmation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BankHeadConfirmationFindUniqueOrThrowArgs} args - Arguments to find a BankHeadConfirmation
+     * @example
+     * // Get one BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BankHeadConfirmationFindUniqueOrThrowArgs>(args: SelectSubset<T, BankHeadConfirmationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BankHeadConfirmation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationFindFirstArgs} args - Arguments to find a BankHeadConfirmation
+     * @example
+     * // Get one BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BankHeadConfirmationFindFirstArgs>(args?: SelectSubset<T, BankHeadConfirmationFindFirstArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BankHeadConfirmation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationFindFirstOrThrowArgs} args - Arguments to find a BankHeadConfirmation
+     * @example
+     * // Get one BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BankHeadConfirmationFindFirstOrThrowArgs>(args?: SelectSubset<T, BankHeadConfirmationFindFirstOrThrowArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BankHeadConfirmations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BankHeadConfirmations
+     * const bankHeadConfirmations = await prisma.bankHeadConfirmation.findMany()
+     * 
+     * // Get first 10 BankHeadConfirmations
+     * const bankHeadConfirmations = await prisma.bankHeadConfirmation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const bankHeadConfirmationWithIdOnly = await prisma.bankHeadConfirmation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BankHeadConfirmationFindManyArgs>(args?: SelectSubset<T, BankHeadConfirmationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BankHeadConfirmation.
+     * @param {BankHeadConfirmationCreateArgs} args - Arguments to create a BankHeadConfirmation.
+     * @example
+     * // Create one BankHeadConfirmation
+     * const BankHeadConfirmation = await prisma.bankHeadConfirmation.create({
+     *   data: {
+     *     // ... data to create a BankHeadConfirmation
+     *   }
+     * })
+     * 
+     */
+    create<T extends BankHeadConfirmationCreateArgs>(args: SelectSubset<T, BankHeadConfirmationCreateArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BankHeadConfirmations.
+     * @param {BankHeadConfirmationCreateManyArgs} args - Arguments to create many BankHeadConfirmations.
+     * @example
+     * // Create many BankHeadConfirmations
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BankHeadConfirmationCreateManyArgs>(args?: SelectSubset<T, BankHeadConfirmationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BankHeadConfirmations and returns the data saved in the database.
+     * @param {BankHeadConfirmationCreateManyAndReturnArgs} args - Arguments to create many BankHeadConfirmations.
+     * @example
+     * // Create many BankHeadConfirmations
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BankHeadConfirmations and only return the `id`
+     * const bankHeadConfirmationWithIdOnly = await prisma.bankHeadConfirmation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BankHeadConfirmationCreateManyAndReturnArgs>(args?: SelectSubset<T, BankHeadConfirmationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BankHeadConfirmation.
+     * @param {BankHeadConfirmationDeleteArgs} args - Arguments to delete one BankHeadConfirmation.
+     * @example
+     * // Delete one BankHeadConfirmation
+     * const BankHeadConfirmation = await prisma.bankHeadConfirmation.delete({
+     *   where: {
+     *     // ... filter to delete one BankHeadConfirmation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BankHeadConfirmationDeleteArgs>(args: SelectSubset<T, BankHeadConfirmationDeleteArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BankHeadConfirmation.
+     * @param {BankHeadConfirmationUpdateArgs} args - Arguments to update one BankHeadConfirmation.
+     * @example
+     * // Update one BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BankHeadConfirmationUpdateArgs>(args: SelectSubset<T, BankHeadConfirmationUpdateArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BankHeadConfirmations.
+     * @param {BankHeadConfirmationDeleteManyArgs} args - Arguments to filter BankHeadConfirmations to delete.
+     * @example
+     * // Delete a few BankHeadConfirmations
+     * const { count } = await prisma.bankHeadConfirmation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BankHeadConfirmationDeleteManyArgs>(args?: SelectSubset<T, BankHeadConfirmationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BankHeadConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BankHeadConfirmations
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BankHeadConfirmationUpdateManyArgs>(args: SelectSubset<T, BankHeadConfirmationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BankHeadConfirmations and returns the data updated in the database.
+     * @param {BankHeadConfirmationUpdateManyAndReturnArgs} args - Arguments to update many BankHeadConfirmations.
+     * @example
+     * // Update many BankHeadConfirmations
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BankHeadConfirmations and only return the `id`
+     * const bankHeadConfirmationWithIdOnly = await prisma.bankHeadConfirmation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BankHeadConfirmationUpdateManyAndReturnArgs>(args: SelectSubset<T, BankHeadConfirmationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BankHeadConfirmation.
+     * @param {BankHeadConfirmationUpsertArgs} args - Arguments to update or create a BankHeadConfirmation.
+     * @example
+     * // Update or create a BankHeadConfirmation
+     * const bankHeadConfirmation = await prisma.bankHeadConfirmation.upsert({
+     *   create: {
+     *     // ... data to create a BankHeadConfirmation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BankHeadConfirmation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BankHeadConfirmationUpsertArgs>(args: SelectSubset<T, BankHeadConfirmationUpsertArgs<ExtArgs>>): Prisma__BankHeadConfirmationClient<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BankHeadConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationCountArgs} args - Arguments to filter BankHeadConfirmations to count.
+     * @example
+     * // Count the number of BankHeadConfirmations
+     * const count = await prisma.bankHeadConfirmation.count({
+     *   where: {
+     *     // ... the filter for the BankHeadConfirmations we want to count
+     *   }
+     * })
+    **/
+    count<T extends BankHeadConfirmationCountArgs>(
+      args?: Subset<T, BankHeadConfirmationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BankHeadConfirmationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BankHeadConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BankHeadConfirmationAggregateArgs>(args: Subset<T, BankHeadConfirmationAggregateArgs>): Prisma.PrismaPromise<GetBankHeadConfirmationAggregateType<T>>
+
+    /**
+     * Group by BankHeadConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankHeadConfirmationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BankHeadConfirmationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BankHeadConfirmationGroupByArgs['orderBy'] }
+        : { orderBy?: BankHeadConfirmationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BankHeadConfirmationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBankHeadConfirmationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BankHeadConfirmation model
+   */
+  readonly fields: BankHeadConfirmationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BankHeadConfirmation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BankHeadConfirmationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BankHeadConfirmation model
+   */
+  interface BankHeadConfirmationFieldRefs {
+    readonly id: FieldRef<"BankHeadConfirmation", 'String'>
+    readonly companyId: FieldRef<"BankHeadConfirmation", 'String'>
+    readonly date: FieldRef<"BankHeadConfirmation", 'DateTime'>
+    readonly confirmedIdrValue: FieldRef<"BankHeadConfirmation", 'Decimal'>
+    readonly note: FieldRef<"BankHeadConfirmation", 'String'>
+    readonly confirmedBy: FieldRef<"BankHeadConfirmation", 'String'>
+    readonly confirmedAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
+    readonly createdAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
+    readonly updatedAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BankHeadConfirmation findUnique
+   */
+  export type BankHeadConfirmationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which BankHeadConfirmation to fetch.
+     */
+    where: BankHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * BankHeadConfirmation findUniqueOrThrow
+   */
+  export type BankHeadConfirmationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which BankHeadConfirmation to fetch.
+     */
+    where: BankHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * BankHeadConfirmation findFirst
+   */
+  export type BankHeadConfirmationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which BankHeadConfirmation to fetch.
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankHeadConfirmations to fetch.
+     */
+    orderBy?: BankHeadConfirmationOrderByWithRelationInput | BankHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BankHeadConfirmations.
+     */
+    cursor?: BankHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankHeadConfirmations.
+     */
+    distinct?: BankHeadConfirmationScalarFieldEnum | BankHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * BankHeadConfirmation findFirstOrThrow
+   */
+  export type BankHeadConfirmationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which BankHeadConfirmation to fetch.
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankHeadConfirmations to fetch.
+     */
+    orderBy?: BankHeadConfirmationOrderByWithRelationInput | BankHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BankHeadConfirmations.
+     */
+    cursor?: BankHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankHeadConfirmations.
+     */
+    distinct?: BankHeadConfirmationScalarFieldEnum | BankHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * BankHeadConfirmation findMany
+   */
+  export type BankHeadConfirmationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which BankHeadConfirmations to fetch.
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankHeadConfirmations to fetch.
+     */
+    orderBy?: BankHeadConfirmationOrderByWithRelationInput | BankHeadConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BankHeadConfirmations.
+     */
+    cursor?: BankHeadConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankHeadConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankHeadConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankHeadConfirmations.
+     */
+    distinct?: BankHeadConfirmationScalarFieldEnum | BankHeadConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * BankHeadConfirmation create
+   */
+  export type BankHeadConfirmationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BankHeadConfirmation.
+     */
+    data: XOR<BankHeadConfirmationCreateInput, BankHeadConfirmationUncheckedCreateInput>
+  }
+
+  /**
+   * BankHeadConfirmation createMany
+   */
+  export type BankHeadConfirmationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BankHeadConfirmations.
+     */
+    data: BankHeadConfirmationCreateManyInput | BankHeadConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BankHeadConfirmation createManyAndReturn
+   */
+  export type BankHeadConfirmationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to create many BankHeadConfirmations.
+     */
+    data: BankHeadConfirmationCreateManyInput | BankHeadConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BankHeadConfirmation update
+   */
+  export type BankHeadConfirmationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BankHeadConfirmation.
+     */
+    data: XOR<BankHeadConfirmationUpdateInput, BankHeadConfirmationUncheckedUpdateInput>
+    /**
+     * Choose, which BankHeadConfirmation to update.
+     */
+    where: BankHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * BankHeadConfirmation updateMany
+   */
+  export type BankHeadConfirmationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BankHeadConfirmations.
+     */
+    data: XOR<BankHeadConfirmationUpdateManyMutationInput, BankHeadConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which BankHeadConfirmations to update
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * Limit how many BankHeadConfirmations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BankHeadConfirmation updateManyAndReturn
+   */
+  export type BankHeadConfirmationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to update BankHeadConfirmations.
+     */
+    data: XOR<BankHeadConfirmationUpdateManyMutationInput, BankHeadConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which BankHeadConfirmations to update
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * Limit how many BankHeadConfirmations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BankHeadConfirmation upsert
+   */
+  export type BankHeadConfirmationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BankHeadConfirmation to update in case it exists.
+     */
+    where: BankHeadConfirmationWhereUniqueInput
+    /**
+     * In case the BankHeadConfirmation found by the `where` argument doesn't exist, create a new BankHeadConfirmation with this data.
+     */
+    create: XOR<BankHeadConfirmationCreateInput, BankHeadConfirmationUncheckedCreateInput>
+    /**
+     * In case the BankHeadConfirmation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BankHeadConfirmationUpdateInput, BankHeadConfirmationUncheckedUpdateInput>
+  }
+
+  /**
+   * BankHeadConfirmation delete
+   */
+  export type BankHeadConfirmationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter which BankHeadConfirmation to delete.
+     */
+    where: BankHeadConfirmationWhereUniqueInput
+  }
+
+  /**
+   * BankHeadConfirmation deleteMany
+   */
+  export type BankHeadConfirmationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BankHeadConfirmations to delete
+     */
+    where?: BankHeadConfirmationWhereInput
+    /**
+     * Limit how many BankHeadConfirmations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BankHeadConfirmation without action
+   */
+  export type BankHeadConfirmationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankHeadConfirmation
+     */
+    select?: BankHeadConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankHeadConfirmation
+     */
+    omit?: BankHeadConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankHeadConfirmationInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model CompanyHeadConfirmationTotal
    */
 
@@ -50270,6 +54225,1302 @@ export namespace Prisma {
 
 
   /**
+   * Model CorrectionRequest
+   */
+
+  export type AggregateCorrectionRequest = {
+    _count: CorrectionRequestCountAggregateOutputType | null
+    _avg: CorrectionRequestAvgAggregateOutputType | null
+    _sum: CorrectionRequestSumAggregateOutputType | null
+    _min: CorrectionRequestMinAggregateOutputType | null
+    _max: CorrectionRequestMaxAggregateOutputType | null
+  }
+
+  export type CorrectionRequestAvgAggregateOutputType = {
+    currentValue: Decimal | null
+    proposedValue: Decimal | null
+  }
+
+  export type CorrectionRequestSumAggregateOutputType = {
+    currentValue: Decimal | null
+    proposedValue: Decimal | null
+  }
+
+  export type CorrectionRequestMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    target: $Enums.CorrectionTargetType | null
+    date: Date | null
+    pocketId: string | null
+    companyStockItemId: string | null
+    kasPocketId: string | null
+    bankAccountId: string | null
+    targetLabel: string | null
+    currentValue: Decimal | null
+    proposedValue: Decimal | null
+    reason: string | null
+    status: $Enums.CorrectionStatus | null
+    requestedBy: string | null
+    requestedAt: Date | null
+    decidedBy: string | null
+    decidedAt: Date | null
+    decisionNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CorrectionRequestMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    target: $Enums.CorrectionTargetType | null
+    date: Date | null
+    pocketId: string | null
+    companyStockItemId: string | null
+    kasPocketId: string | null
+    bankAccountId: string | null
+    targetLabel: string | null
+    currentValue: Decimal | null
+    proposedValue: Decimal | null
+    reason: string | null
+    status: $Enums.CorrectionStatus | null
+    requestedBy: string | null
+    requestedAt: Date | null
+    decidedBy: string | null
+    decidedAt: Date | null
+    decisionNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CorrectionRequestCountAggregateOutputType = {
+    id: number
+    companyId: number
+    target: number
+    date: number
+    pocketId: number
+    companyStockItemId: number
+    kasPocketId: number
+    bankAccountId: number
+    targetLabel: number
+    currentValue: number
+    proposedValue: number
+    reason: number
+    status: number
+    requestedBy: number
+    requestedAt: number
+    decidedBy: number
+    decidedAt: number
+    decisionNote: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CorrectionRequestAvgAggregateInputType = {
+    currentValue?: true
+    proposedValue?: true
+  }
+
+  export type CorrectionRequestSumAggregateInputType = {
+    currentValue?: true
+    proposedValue?: true
+  }
+
+  export type CorrectionRequestMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    target?: true
+    date?: true
+    pocketId?: true
+    companyStockItemId?: true
+    kasPocketId?: true
+    bankAccountId?: true
+    targetLabel?: true
+    currentValue?: true
+    proposedValue?: true
+    reason?: true
+    status?: true
+    requestedBy?: true
+    requestedAt?: true
+    decidedBy?: true
+    decidedAt?: true
+    decisionNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CorrectionRequestMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    target?: true
+    date?: true
+    pocketId?: true
+    companyStockItemId?: true
+    kasPocketId?: true
+    bankAccountId?: true
+    targetLabel?: true
+    currentValue?: true
+    proposedValue?: true
+    reason?: true
+    status?: true
+    requestedBy?: true
+    requestedAt?: true
+    decidedBy?: true
+    decidedAt?: true
+    decisionNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CorrectionRequestCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    target?: true
+    date?: true
+    pocketId?: true
+    companyStockItemId?: true
+    kasPocketId?: true
+    bankAccountId?: true
+    targetLabel?: true
+    currentValue?: true
+    proposedValue?: true
+    reason?: true
+    status?: true
+    requestedBy?: true
+    requestedAt?: true
+    decidedBy?: true
+    decidedAt?: true
+    decisionNote?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CorrectionRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CorrectionRequest to aggregate.
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CorrectionRequests to fetch.
+     */
+    orderBy?: CorrectionRequestOrderByWithRelationInput | CorrectionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CorrectionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CorrectionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CorrectionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CorrectionRequests
+    **/
+    _count?: true | CorrectionRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CorrectionRequestAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CorrectionRequestSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CorrectionRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CorrectionRequestMaxAggregateInputType
+  }
+
+  export type GetCorrectionRequestAggregateType<T extends CorrectionRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateCorrectionRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCorrectionRequest[P]>
+      : GetScalarType<T[P], AggregateCorrectionRequest[P]>
+  }
+
+
+
+
+  export type CorrectionRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CorrectionRequestWhereInput
+    orderBy?: CorrectionRequestOrderByWithAggregationInput | CorrectionRequestOrderByWithAggregationInput[]
+    by: CorrectionRequestScalarFieldEnum[] | CorrectionRequestScalarFieldEnum
+    having?: CorrectionRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CorrectionRequestCountAggregateInputType | true
+    _avg?: CorrectionRequestAvgAggregateInputType
+    _sum?: CorrectionRequestSumAggregateInputType
+    _min?: CorrectionRequestMinAggregateInputType
+    _max?: CorrectionRequestMaxAggregateInputType
+  }
+
+  export type CorrectionRequestGroupByOutputType = {
+    id: string
+    companyId: string
+    target: $Enums.CorrectionTargetType
+    date: Date
+    pocketId: string | null
+    companyStockItemId: string | null
+    kasPocketId: string | null
+    bankAccountId: string | null
+    targetLabel: string
+    currentValue: Decimal
+    proposedValue: Decimal
+    reason: string
+    status: $Enums.CorrectionStatus
+    requestedBy: string | null
+    requestedAt: Date
+    decidedBy: string | null
+    decidedAt: Date | null
+    decisionNote: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: CorrectionRequestCountAggregateOutputType | null
+    _avg: CorrectionRequestAvgAggregateOutputType | null
+    _sum: CorrectionRequestSumAggregateOutputType | null
+    _min: CorrectionRequestMinAggregateOutputType | null
+    _max: CorrectionRequestMaxAggregateOutputType | null
+  }
+
+  type GetCorrectionRequestGroupByPayload<T extends CorrectionRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CorrectionRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CorrectionRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CorrectionRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], CorrectionRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CorrectionRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    target?: boolean
+    date?: boolean
+    pocketId?: boolean
+    companyStockItemId?: boolean
+    kasPocketId?: boolean
+    bankAccountId?: boolean
+    targetLabel?: boolean
+    currentValue?: boolean
+    proposedValue?: boolean
+    reason?: boolean
+    status?: boolean
+    requestedBy?: boolean
+    requestedAt?: boolean
+    decidedBy?: boolean
+    decidedAt?: boolean
+    decisionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["correctionRequest"]>
+
+  export type CorrectionRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    target?: boolean
+    date?: boolean
+    pocketId?: boolean
+    companyStockItemId?: boolean
+    kasPocketId?: boolean
+    bankAccountId?: boolean
+    targetLabel?: boolean
+    currentValue?: boolean
+    proposedValue?: boolean
+    reason?: boolean
+    status?: boolean
+    requestedBy?: boolean
+    requestedAt?: boolean
+    decidedBy?: boolean
+    decidedAt?: boolean
+    decisionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["correctionRequest"]>
+
+  export type CorrectionRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    target?: boolean
+    date?: boolean
+    pocketId?: boolean
+    companyStockItemId?: boolean
+    kasPocketId?: boolean
+    bankAccountId?: boolean
+    targetLabel?: boolean
+    currentValue?: boolean
+    proposedValue?: boolean
+    reason?: boolean
+    status?: boolean
+    requestedBy?: boolean
+    requestedAt?: boolean
+    decidedBy?: boolean
+    decidedAt?: boolean
+    decisionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["correctionRequest"]>
+
+  export type CorrectionRequestSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    target?: boolean
+    date?: boolean
+    pocketId?: boolean
+    companyStockItemId?: boolean
+    kasPocketId?: boolean
+    bankAccountId?: boolean
+    targetLabel?: boolean
+    currentValue?: boolean
+    proposedValue?: boolean
+    reason?: boolean
+    status?: boolean
+    requestedBy?: boolean
+    requestedAt?: boolean
+    decidedBy?: boolean
+    decidedAt?: boolean
+    decisionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CorrectionRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "target" | "date" | "pocketId" | "companyStockItemId" | "kasPocketId" | "bankAccountId" | "targetLabel" | "currentValue" | "proposedValue" | "reason" | "status" | "requestedBy" | "requestedAt" | "decidedBy" | "decidedAt" | "decisionNote" | "createdAt" | "updatedAt", ExtArgs["result"]["correctionRequest"]>
+  export type CorrectionRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type CorrectionRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type CorrectionRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+
+  export type $CorrectionRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CorrectionRequest"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      target: $Enums.CorrectionTargetType
+      date: Date
+      pocketId: string | null
+      companyStockItemId: string | null
+      kasPocketId: string | null
+      bankAccountId: string | null
+      targetLabel: string
+      currentValue: Prisma.Decimal
+      proposedValue: Prisma.Decimal
+      reason: string
+      status: $Enums.CorrectionStatus
+      requestedBy: string | null
+      requestedAt: Date
+      decidedBy: string | null
+      decidedAt: Date | null
+      decisionNote: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["correctionRequest"]>
+    composites: {}
+  }
+
+  type CorrectionRequestGetPayload<S extends boolean | null | undefined | CorrectionRequestDefaultArgs> = $Result.GetResult<Prisma.$CorrectionRequestPayload, S>
+
+  type CorrectionRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CorrectionRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CorrectionRequestCountAggregateInputType | true
+    }
+
+  export interface CorrectionRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CorrectionRequest'], meta: { name: 'CorrectionRequest' } }
+    /**
+     * Find zero or one CorrectionRequest that matches the filter.
+     * @param {CorrectionRequestFindUniqueArgs} args - Arguments to find a CorrectionRequest
+     * @example
+     * // Get one CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CorrectionRequestFindUniqueArgs>(args: SelectSubset<T, CorrectionRequestFindUniqueArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CorrectionRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CorrectionRequestFindUniqueOrThrowArgs} args - Arguments to find a CorrectionRequest
+     * @example
+     * // Get one CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CorrectionRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, CorrectionRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CorrectionRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestFindFirstArgs} args - Arguments to find a CorrectionRequest
+     * @example
+     * // Get one CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CorrectionRequestFindFirstArgs>(args?: SelectSubset<T, CorrectionRequestFindFirstArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CorrectionRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestFindFirstOrThrowArgs} args - Arguments to find a CorrectionRequest
+     * @example
+     * // Get one CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CorrectionRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, CorrectionRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CorrectionRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CorrectionRequests
+     * const correctionRequests = await prisma.correctionRequest.findMany()
+     * 
+     * // Get first 10 CorrectionRequests
+     * const correctionRequests = await prisma.correctionRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const correctionRequestWithIdOnly = await prisma.correctionRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CorrectionRequestFindManyArgs>(args?: SelectSubset<T, CorrectionRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CorrectionRequest.
+     * @param {CorrectionRequestCreateArgs} args - Arguments to create a CorrectionRequest.
+     * @example
+     * // Create one CorrectionRequest
+     * const CorrectionRequest = await prisma.correctionRequest.create({
+     *   data: {
+     *     // ... data to create a CorrectionRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends CorrectionRequestCreateArgs>(args: SelectSubset<T, CorrectionRequestCreateArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CorrectionRequests.
+     * @param {CorrectionRequestCreateManyArgs} args - Arguments to create many CorrectionRequests.
+     * @example
+     * // Create many CorrectionRequests
+     * const correctionRequest = await prisma.correctionRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CorrectionRequestCreateManyArgs>(args?: SelectSubset<T, CorrectionRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CorrectionRequests and returns the data saved in the database.
+     * @param {CorrectionRequestCreateManyAndReturnArgs} args - Arguments to create many CorrectionRequests.
+     * @example
+     * // Create many CorrectionRequests
+     * const correctionRequest = await prisma.correctionRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CorrectionRequests and only return the `id`
+     * const correctionRequestWithIdOnly = await prisma.correctionRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CorrectionRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, CorrectionRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CorrectionRequest.
+     * @param {CorrectionRequestDeleteArgs} args - Arguments to delete one CorrectionRequest.
+     * @example
+     * // Delete one CorrectionRequest
+     * const CorrectionRequest = await prisma.correctionRequest.delete({
+     *   where: {
+     *     // ... filter to delete one CorrectionRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CorrectionRequestDeleteArgs>(args: SelectSubset<T, CorrectionRequestDeleteArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CorrectionRequest.
+     * @param {CorrectionRequestUpdateArgs} args - Arguments to update one CorrectionRequest.
+     * @example
+     * // Update one CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CorrectionRequestUpdateArgs>(args: SelectSubset<T, CorrectionRequestUpdateArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CorrectionRequests.
+     * @param {CorrectionRequestDeleteManyArgs} args - Arguments to filter CorrectionRequests to delete.
+     * @example
+     * // Delete a few CorrectionRequests
+     * const { count } = await prisma.correctionRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CorrectionRequestDeleteManyArgs>(args?: SelectSubset<T, CorrectionRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CorrectionRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CorrectionRequests
+     * const correctionRequest = await prisma.correctionRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CorrectionRequestUpdateManyArgs>(args: SelectSubset<T, CorrectionRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CorrectionRequests and returns the data updated in the database.
+     * @param {CorrectionRequestUpdateManyAndReturnArgs} args - Arguments to update many CorrectionRequests.
+     * @example
+     * // Update many CorrectionRequests
+     * const correctionRequest = await prisma.correctionRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CorrectionRequests and only return the `id`
+     * const correctionRequestWithIdOnly = await prisma.correctionRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CorrectionRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, CorrectionRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CorrectionRequest.
+     * @param {CorrectionRequestUpsertArgs} args - Arguments to update or create a CorrectionRequest.
+     * @example
+     * // Update or create a CorrectionRequest
+     * const correctionRequest = await prisma.correctionRequest.upsert({
+     *   create: {
+     *     // ... data to create a CorrectionRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CorrectionRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CorrectionRequestUpsertArgs>(args: SelectSubset<T, CorrectionRequestUpsertArgs<ExtArgs>>): Prisma__CorrectionRequestClient<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CorrectionRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestCountArgs} args - Arguments to filter CorrectionRequests to count.
+     * @example
+     * // Count the number of CorrectionRequests
+     * const count = await prisma.correctionRequest.count({
+     *   where: {
+     *     // ... the filter for the CorrectionRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends CorrectionRequestCountArgs>(
+      args?: Subset<T, CorrectionRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CorrectionRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CorrectionRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CorrectionRequestAggregateArgs>(args: Subset<T, CorrectionRequestAggregateArgs>): Prisma.PrismaPromise<GetCorrectionRequestAggregateType<T>>
+
+    /**
+     * Group by CorrectionRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CorrectionRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CorrectionRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CorrectionRequestGroupByArgs['orderBy'] }
+        : { orderBy?: CorrectionRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CorrectionRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCorrectionRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CorrectionRequest model
+   */
+  readonly fields: CorrectionRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CorrectionRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CorrectionRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CorrectionRequest model
+   */
+  interface CorrectionRequestFieldRefs {
+    readonly id: FieldRef<"CorrectionRequest", 'String'>
+    readonly companyId: FieldRef<"CorrectionRequest", 'String'>
+    readonly target: FieldRef<"CorrectionRequest", 'CorrectionTargetType'>
+    readonly date: FieldRef<"CorrectionRequest", 'DateTime'>
+    readonly pocketId: FieldRef<"CorrectionRequest", 'String'>
+    readonly companyStockItemId: FieldRef<"CorrectionRequest", 'String'>
+    readonly kasPocketId: FieldRef<"CorrectionRequest", 'String'>
+    readonly bankAccountId: FieldRef<"CorrectionRequest", 'String'>
+    readonly targetLabel: FieldRef<"CorrectionRequest", 'String'>
+    readonly currentValue: FieldRef<"CorrectionRequest", 'Decimal'>
+    readonly proposedValue: FieldRef<"CorrectionRequest", 'Decimal'>
+    readonly reason: FieldRef<"CorrectionRequest", 'String'>
+    readonly status: FieldRef<"CorrectionRequest", 'CorrectionStatus'>
+    readonly requestedBy: FieldRef<"CorrectionRequest", 'String'>
+    readonly requestedAt: FieldRef<"CorrectionRequest", 'DateTime'>
+    readonly decidedBy: FieldRef<"CorrectionRequest", 'String'>
+    readonly decidedAt: FieldRef<"CorrectionRequest", 'DateTime'>
+    readonly decisionNote: FieldRef<"CorrectionRequest", 'String'>
+    readonly createdAt: FieldRef<"CorrectionRequest", 'DateTime'>
+    readonly updatedAt: FieldRef<"CorrectionRequest", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CorrectionRequest findUnique
+   */
+  export type CorrectionRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which CorrectionRequest to fetch.
+     */
+    where: CorrectionRequestWhereUniqueInput
+  }
+
+  /**
+   * CorrectionRequest findUniqueOrThrow
+   */
+  export type CorrectionRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which CorrectionRequest to fetch.
+     */
+    where: CorrectionRequestWhereUniqueInput
+  }
+
+  /**
+   * CorrectionRequest findFirst
+   */
+  export type CorrectionRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which CorrectionRequest to fetch.
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CorrectionRequests to fetch.
+     */
+    orderBy?: CorrectionRequestOrderByWithRelationInput | CorrectionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CorrectionRequests.
+     */
+    cursor?: CorrectionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CorrectionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CorrectionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CorrectionRequests.
+     */
+    distinct?: CorrectionRequestScalarFieldEnum | CorrectionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * CorrectionRequest findFirstOrThrow
+   */
+  export type CorrectionRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which CorrectionRequest to fetch.
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CorrectionRequests to fetch.
+     */
+    orderBy?: CorrectionRequestOrderByWithRelationInput | CorrectionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CorrectionRequests.
+     */
+    cursor?: CorrectionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CorrectionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CorrectionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CorrectionRequests.
+     */
+    distinct?: CorrectionRequestScalarFieldEnum | CorrectionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * CorrectionRequest findMany
+   */
+  export type CorrectionRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which CorrectionRequests to fetch.
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CorrectionRequests to fetch.
+     */
+    orderBy?: CorrectionRequestOrderByWithRelationInput | CorrectionRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CorrectionRequests.
+     */
+    cursor?: CorrectionRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CorrectionRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CorrectionRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CorrectionRequests.
+     */
+    distinct?: CorrectionRequestScalarFieldEnum | CorrectionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * CorrectionRequest create
+   */
+  export type CorrectionRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CorrectionRequest.
+     */
+    data: XOR<CorrectionRequestCreateInput, CorrectionRequestUncheckedCreateInput>
+  }
+
+  /**
+   * CorrectionRequest createMany
+   */
+  export type CorrectionRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CorrectionRequests.
+     */
+    data: CorrectionRequestCreateManyInput | CorrectionRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CorrectionRequest createManyAndReturn
+   */
+  export type CorrectionRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many CorrectionRequests.
+     */
+    data: CorrectionRequestCreateManyInput | CorrectionRequestCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CorrectionRequest update
+   */
+  export type CorrectionRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CorrectionRequest.
+     */
+    data: XOR<CorrectionRequestUpdateInput, CorrectionRequestUncheckedUpdateInput>
+    /**
+     * Choose, which CorrectionRequest to update.
+     */
+    where: CorrectionRequestWhereUniqueInput
+  }
+
+  /**
+   * CorrectionRequest updateMany
+   */
+  export type CorrectionRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CorrectionRequests.
+     */
+    data: XOR<CorrectionRequestUpdateManyMutationInput, CorrectionRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which CorrectionRequests to update
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * Limit how many CorrectionRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CorrectionRequest updateManyAndReturn
+   */
+  export type CorrectionRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update CorrectionRequests.
+     */
+    data: XOR<CorrectionRequestUpdateManyMutationInput, CorrectionRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which CorrectionRequests to update
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * Limit how many CorrectionRequests to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CorrectionRequest upsert
+   */
+  export type CorrectionRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CorrectionRequest to update in case it exists.
+     */
+    where: CorrectionRequestWhereUniqueInput
+    /**
+     * In case the CorrectionRequest found by the `where` argument doesn't exist, create a new CorrectionRequest with this data.
+     */
+    create: XOR<CorrectionRequestCreateInput, CorrectionRequestUncheckedCreateInput>
+    /**
+     * In case the CorrectionRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CorrectionRequestUpdateInput, CorrectionRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * CorrectionRequest delete
+   */
+  export type CorrectionRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+    /**
+     * Filter which CorrectionRequest to delete.
+     */
+    where: CorrectionRequestWhereUniqueInput
+  }
+
+  /**
+   * CorrectionRequest deleteMany
+   */
+  export type CorrectionRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CorrectionRequests to delete
+     */
+    where?: CorrectionRequestWhereInput
+    /**
+     * Limit how many CorrectionRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CorrectionRequest without action
+   */
+  export type CorrectionRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CorrectionRequest
+     */
+    select?: CorrectionRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CorrectionRequest
+     */
+    omit?: CorrectionRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CorrectionRequestInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -50428,6 +55679,10 @@ export namespace Prisma {
     balance: 'balance',
     note: 'note',
     createdBy: 'createdBy',
+    verifyStatus: 'verifyStatus',
+    verifyNote: 'verifyNote',
+    verifiedBy: 'verifiedBy',
+    verifiedAt: 'verifiedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -50475,6 +55730,20 @@ export namespace Prisma {
   };
 
   export type CurrencyScalarFieldEnum = (typeof CurrencyScalarFieldEnum)[keyof typeof CurrencyScalarFieldEnum]
+
+
+  export const PriceBenchmarkScalarFieldEnum: {
+    id: 'id',
+    code: 'code',
+    name: 'name',
+    sellAdjustment: 'sellAdjustment',
+    buyAdjustment: 'buyAdjustment',
+    updatedBy: 'updatedBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PriceBenchmarkScalarFieldEnum = (typeof PriceBenchmarkScalarFieldEnum)[keyof typeof PriceBenchmarkScalarFieldEnum]
 
 
   export const CompanyStockItemScalarFieldEnum: {
@@ -50817,6 +56086,10 @@ export namespace Prisma {
     balance: 'balance',
     note: 'note',
     createdBy: 'createdBy',
+    verifyStatus: 'verifyStatus',
+    verifyNote: 'verifyNote',
+    verifiedBy: 'verifiedBy',
+    verifiedAt: 'verifiedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -50841,6 +56114,21 @@ export namespace Prisma {
   export type StockistHeadConfirmationScalarFieldEnum = (typeof StockistHeadConfirmationScalarFieldEnum)[keyof typeof StockistHeadConfirmationScalarFieldEnum]
 
 
+  export const StockistTotalHeadConfirmationScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    date: 'date',
+    confirmedIdrValue: 'confirmedIdrValue',
+    note: 'note',
+    confirmedBy: 'confirmedBy',
+    confirmedAt: 'confirmedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type StockistTotalHeadConfirmationScalarFieldEnum = (typeof StockistTotalHeadConfirmationScalarFieldEnum)[keyof typeof StockistTotalHeadConfirmationScalarFieldEnum]
+
+
   export const KasHeadConfirmationScalarFieldEnum: {
     id: 'id',
     companyId: 'companyId',
@@ -50856,6 +56144,21 @@ export namespace Prisma {
   export type KasHeadConfirmationScalarFieldEnum = (typeof KasHeadConfirmationScalarFieldEnum)[keyof typeof KasHeadConfirmationScalarFieldEnum]
 
 
+  export const BankHeadConfirmationScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    date: 'date',
+    confirmedIdrValue: 'confirmedIdrValue',
+    note: 'note',
+    confirmedBy: 'confirmedBy',
+    confirmedAt: 'confirmedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BankHeadConfirmationScalarFieldEnum = (typeof BankHeadConfirmationScalarFieldEnum)[keyof typeof BankHeadConfirmationScalarFieldEnum]
+
+
   export const CompanyHeadConfirmationTotalScalarFieldEnum: {
     id: 'id',
     companyId: 'companyId',
@@ -50865,6 +56168,32 @@ export namespace Prisma {
   };
 
   export type CompanyHeadConfirmationTotalScalarFieldEnum = (typeof CompanyHeadConfirmationTotalScalarFieldEnum)[keyof typeof CompanyHeadConfirmationTotalScalarFieldEnum]
+
+
+  export const CorrectionRequestScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    target: 'target',
+    date: 'date',
+    pocketId: 'pocketId',
+    companyStockItemId: 'companyStockItemId',
+    kasPocketId: 'kasPocketId',
+    bankAccountId: 'bankAccountId',
+    targetLabel: 'targetLabel',
+    currentValue: 'currentValue',
+    proposedValue: 'proposedValue',
+    reason: 'reason',
+    status: 'status',
+    requestedBy: 'requestedBy',
+    requestedAt: 'requestedAt',
+    decidedBy: 'decidedBy',
+    decidedAt: 'decidedAt',
+    decisionNote: 'decisionNote',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CorrectionRequestScalarFieldEnum = (typeof CorrectionRequestScalarFieldEnum)[keyof typeof CorrectionRequestScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -51022,6 +56351,20 @@ export namespace Prisma {
    * Reference to a field of type 'BankMutationType[]'
    */
   export type ListEnumBankMutationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BankMutationType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DailyVerifyStatus'
+   */
+  export type EnumDailyVerifyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DailyVerifyStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'DailyVerifyStatus[]'
+   */
+  export type ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DailyVerifyStatus[]'>
     
 
 
@@ -51218,6 +56561,34 @@ export namespace Prisma {
    * Reference to a field of type 'StockistCheckStatus[]'
    */
   export type ListEnumStockistCheckStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockistCheckStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CorrectionTargetType'
+   */
+  export type EnumCorrectionTargetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CorrectionTargetType'>
+    
+
+
+  /**
+   * Reference to a field of type 'CorrectionTargetType[]'
+   */
+  export type ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CorrectionTargetType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CorrectionStatus'
+   */
+  export type EnumCorrectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CorrectionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'CorrectionStatus[]'
+   */
+  export type ListEnumCorrectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CorrectionStatus[]'>
     
   /**
    * Deep Input Types
@@ -51976,6 +57347,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"DailyBankEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"DailyBankEntry"> | string | null
     createdBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"DailyBankEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"DailyBankEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
     updatedAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
     bankAccount?: XOR<BankAccountScalarRelationFilter, BankAccountWhereInput>
@@ -51988,6 +57363,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrderInput | SortOrder
+    verifiedBy?: SortOrderInput | SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     bankAccount?: BankAccountOrderByWithRelationInput
@@ -52004,6 +57383,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"DailyBankEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"DailyBankEntry"> | string | null
     createdBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"DailyBankEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"DailyBankEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
     updatedAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
     bankAccount?: XOR<BankAccountScalarRelationFilter, BankAccountWhereInput>
@@ -52016,6 +57399,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrderInput | SortOrder
+    verifiedBy?: SortOrderInput | SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DailyBankEntryCountOrderByAggregateInput
@@ -52035,6 +57422,10 @@ export namespace Prisma {
     balance?: DecimalWithAggregatesFilter<"DailyBankEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableWithAggregatesFilter<"DailyBankEntry"> | string | null
     createdBy?: StringNullableWithAggregatesFilter<"DailyBankEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusWithAggregatesFilter<"DailyBankEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableWithAggregatesFilter<"DailyBankEntry"> | string | null
+    verifiedBy?: StringNullableWithAggregatesFilter<"DailyBankEntry"> | string | null
+    verifiedAt?: DateTimeNullableWithAggregatesFilter<"DailyBankEntry"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DailyBankEntry"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DailyBankEntry"> | Date | string
   }
@@ -52160,8 +57551,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemListRelationFilter
     bankAccounts?: BankAccountListRelationFilter
     stockistHeadConfirmations?: StockistHeadConfirmationListRelationFilter
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationListRelationFilter
     kasHeadConfirmations?: KasHeadConfirmationListRelationFilter
+    bankHeadConfirmations?: BankHeadConfirmationListRelationFilter
     headConfirmationTotals?: CompanyHeadConfirmationTotalListRelationFilter
+    correctionRequests?: CorrectionRequestListRelationFilter
   }
 
   export type CompanyOrderByWithRelationInput = {
@@ -52180,8 +57574,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemOrderByRelationAggregateInput
     bankAccounts?: BankAccountOrderByRelationAggregateInput
     stockistHeadConfirmations?: StockistHeadConfirmationOrderByRelationAggregateInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationOrderByRelationAggregateInput
     kasHeadConfirmations?: KasHeadConfirmationOrderByRelationAggregateInput
+    bankHeadConfirmations?: BankHeadConfirmationOrderByRelationAggregateInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalOrderByRelationAggregateInput
+    correctionRequests?: CorrectionRequestOrderByRelationAggregateInput
   }
 
   export type CompanyWhereUniqueInput = Prisma.AtLeast<{
@@ -52203,8 +57600,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemListRelationFilter
     bankAccounts?: BankAccountListRelationFilter
     stockistHeadConfirmations?: StockistHeadConfirmationListRelationFilter
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationListRelationFilter
     kasHeadConfirmations?: KasHeadConfirmationListRelationFilter
+    bankHeadConfirmations?: BankHeadConfirmationListRelationFilter
     headConfirmationTotals?: CompanyHeadConfirmationTotalListRelationFilter
+    correctionRequests?: CorrectionRequestListRelationFilter
   }, "id" | "name" | "code">
 
   export type CompanyOrderByWithAggregationInput = {
@@ -52300,6 +57700,73 @@ export namespace Prisma {
     isActive?: BoolWithAggregatesFilter<"Currency"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Currency"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Currency"> | Date | string
+  }
+
+  export type PriceBenchmarkWhereInput = {
+    AND?: PriceBenchmarkWhereInput | PriceBenchmarkWhereInput[]
+    OR?: PriceBenchmarkWhereInput[]
+    NOT?: PriceBenchmarkWhereInput | PriceBenchmarkWhereInput[]
+    id?: StringFilter<"PriceBenchmark"> | string
+    code?: StringFilter<"PriceBenchmark"> | string
+    name?: StringFilter<"PriceBenchmark"> | string
+    sellAdjustment?: StringFilter<"PriceBenchmark"> | string
+    buyAdjustment?: StringFilter<"PriceBenchmark"> | string
+    updatedBy?: StringNullableFilter<"PriceBenchmark"> | string | null
+    createdAt?: DateTimeFilter<"PriceBenchmark"> | Date | string
+    updatedAt?: DateTimeFilter<"PriceBenchmark"> | Date | string
+  }
+
+  export type PriceBenchmarkOrderByWithRelationInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    sellAdjustment?: SortOrder
+    buyAdjustment?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PriceBenchmarkWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    code?: string
+    AND?: PriceBenchmarkWhereInput | PriceBenchmarkWhereInput[]
+    OR?: PriceBenchmarkWhereInput[]
+    NOT?: PriceBenchmarkWhereInput | PriceBenchmarkWhereInput[]
+    name?: StringFilter<"PriceBenchmark"> | string
+    sellAdjustment?: StringFilter<"PriceBenchmark"> | string
+    buyAdjustment?: StringFilter<"PriceBenchmark"> | string
+    updatedBy?: StringNullableFilter<"PriceBenchmark"> | string | null
+    createdAt?: DateTimeFilter<"PriceBenchmark"> | Date | string
+    updatedAt?: DateTimeFilter<"PriceBenchmark"> | Date | string
+  }, "id" | "code">
+
+  export type PriceBenchmarkOrderByWithAggregationInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    sellAdjustment?: SortOrder
+    buyAdjustment?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PriceBenchmarkCountOrderByAggregateInput
+    _max?: PriceBenchmarkMaxOrderByAggregateInput
+    _min?: PriceBenchmarkMinOrderByAggregateInput
+  }
+
+  export type PriceBenchmarkScalarWhereWithAggregatesInput = {
+    AND?: PriceBenchmarkScalarWhereWithAggregatesInput | PriceBenchmarkScalarWhereWithAggregatesInput[]
+    OR?: PriceBenchmarkScalarWhereWithAggregatesInput[]
+    NOT?: PriceBenchmarkScalarWhereWithAggregatesInput | PriceBenchmarkScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PriceBenchmark"> | string
+    code?: StringWithAggregatesFilter<"PriceBenchmark"> | string
+    name?: StringWithAggregatesFilter<"PriceBenchmark"> | string
+    sellAdjustment?: StringWithAggregatesFilter<"PriceBenchmark"> | string
+    buyAdjustment?: StringWithAggregatesFilter<"PriceBenchmark"> | string
+    updatedBy?: StringNullableWithAggregatesFilter<"PriceBenchmark"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PriceBenchmark"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PriceBenchmark"> | Date | string
   }
 
   export type CompanyStockItemWhereInput = {
@@ -54087,6 +59554,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"KasDailyEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"KasDailyEntry"> | string | null
     createdBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"KasDailyEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"KasDailyEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
     updatedAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
     kasPocket?: XOR<KasPocketScalarRelationFilter, KasPocketWhereInput>
@@ -54099,6 +59570,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrderInput | SortOrder
+    verifiedBy?: SortOrderInput | SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     kasPocket?: KasPocketOrderByWithRelationInput
@@ -54115,6 +59590,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"KasDailyEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"KasDailyEntry"> | string | null
     createdBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"KasDailyEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"KasDailyEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
     updatedAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
     kasPocket?: XOR<KasPocketScalarRelationFilter, KasPocketWhereInput>
@@ -54127,6 +59606,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrderInput | SortOrder
     createdBy?: SortOrderInput | SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrderInput | SortOrder
+    verifiedBy?: SortOrderInput | SortOrder
+    verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: KasDailyEntryCountOrderByAggregateInput
@@ -54146,6 +59629,10 @@ export namespace Prisma {
     balance?: DecimalWithAggregatesFilter<"KasDailyEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableWithAggregatesFilter<"KasDailyEntry"> | string | null
     createdBy?: StringNullableWithAggregatesFilter<"KasDailyEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusWithAggregatesFilter<"KasDailyEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableWithAggregatesFilter<"KasDailyEntry"> | string | null
+    verifiedBy?: StringNullableWithAggregatesFilter<"KasDailyEntry"> | string | null
+    verifiedAt?: DateTimeNullableWithAggregatesFilter<"KasDailyEntry"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"KasDailyEntry"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"KasDailyEntry"> | Date | string
   }
@@ -54159,7 +59646,7 @@ export namespace Prisma {
     companyStockItemId?: StringFilter<"StockistHeadConfirmation"> | string
     date?: DateTimeFilter<"StockistHeadConfirmation"> | Date | string
     confirmedQuantity?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: DecimalNullableFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string | null
     note?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"StockistHeadConfirmation"> | Date | string | null
@@ -54175,7 +59662,7 @@ export namespace Prisma {
     companyStockItemId?: SortOrder
     date?: SortOrder
     confirmedQuantity?: SortOrder
-    confirmedIdrValue?: SortOrder
+    confirmedIdrValue?: SortOrderInput | SortOrder
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
@@ -54195,7 +59682,7 @@ export namespace Prisma {
     companyStockItemId?: StringFilter<"StockistHeadConfirmation"> | string
     date?: DateTimeFilter<"StockistHeadConfirmation"> | Date | string
     confirmedQuantity?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: DecimalNullableFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string | null
     note?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"StockistHeadConfirmation"> | Date | string | null
@@ -54211,7 +59698,7 @@ export namespace Prisma {
     companyStockItemId?: SortOrder
     date?: SortOrder
     confirmedQuantity?: SortOrder
-    confirmedIdrValue?: SortOrder
+    confirmedIdrValue?: SortOrderInput | SortOrder
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
@@ -54233,12 +59720,90 @@ export namespace Prisma {
     companyStockItemId?: StringWithAggregatesFilter<"StockistHeadConfirmation"> | string
     date?: DateTimeWithAggregatesFilter<"StockistHeadConfirmation"> | Date | string
     confirmedQuantity?: DecimalWithAggregatesFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalWithAggregatesFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: DecimalNullableWithAggregatesFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string | null
     note?: StringNullableWithAggregatesFilter<"StockistHeadConfirmation"> | string | null
     confirmedBy?: StringNullableWithAggregatesFilter<"StockistHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableWithAggregatesFilter<"StockistHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StockistHeadConfirmation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StockistHeadConfirmation"> | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationWhereInput = {
+    AND?: StockistTotalHeadConfirmationWhereInput | StockistTotalHeadConfirmationWhereInput[]
+    OR?: StockistTotalHeadConfirmationWhereInput[]
+    NOT?: StockistTotalHeadConfirmationWhereInput | StockistTotalHeadConfirmationWhereInput[]
+    id?: StringFilter<"StockistTotalHeadConfirmation"> | string
+    companyId?: StringFilter<"StockistTotalHeadConfirmation"> | string
+    date?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"StockistTotalHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"StockistTotalHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }
+
+  export type StockistTotalHeadConfirmationOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrderInput | SortOrder
+    confirmedBy?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+  }
+
+  export type StockistTotalHeadConfirmationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    companyId_date?: StockistTotalHeadConfirmationCompanyIdDateCompoundUniqueInput
+    AND?: StockistTotalHeadConfirmationWhereInput | StockistTotalHeadConfirmationWhereInput[]
+    OR?: StockistTotalHeadConfirmationWhereInput[]
+    NOT?: StockistTotalHeadConfirmationWhereInput | StockistTotalHeadConfirmationWhereInput[]
+    companyId?: StringFilter<"StockistTotalHeadConfirmation"> | string
+    date?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"StockistTotalHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"StockistTotalHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }, "id" | "companyId_date">
+
+  export type StockistTotalHeadConfirmationOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrderInput | SortOrder
+    confirmedBy?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: StockistTotalHeadConfirmationCountOrderByAggregateInput
+    _avg?: StockistTotalHeadConfirmationAvgOrderByAggregateInput
+    _max?: StockistTotalHeadConfirmationMaxOrderByAggregateInput
+    _min?: StockistTotalHeadConfirmationMinOrderByAggregateInput
+    _sum?: StockistTotalHeadConfirmationSumOrderByAggregateInput
+  }
+
+  export type StockistTotalHeadConfirmationScalarWhereWithAggregatesInput = {
+    AND?: StockistTotalHeadConfirmationScalarWhereWithAggregatesInput | StockistTotalHeadConfirmationScalarWhereWithAggregatesInput[]
+    OR?: StockistTotalHeadConfirmationScalarWhereWithAggregatesInput[]
+    NOT?: StockistTotalHeadConfirmationScalarWhereWithAggregatesInput | StockistTotalHeadConfirmationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StockistTotalHeadConfirmation"> | string
+    companyId?: StringWithAggregatesFilter<"StockistTotalHeadConfirmation"> | string
+    date?: DateTimeWithAggregatesFilter<"StockistTotalHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalWithAggregatesFilter<"StockistTotalHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableWithAggregatesFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableWithAggregatesFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableWithAggregatesFilter<"StockistTotalHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"StockistTotalHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"StockistTotalHeadConfirmation"> | Date | string
   }
 
   export type KasHeadConfirmationWhereInput = {
@@ -54319,6 +59884,84 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"KasHeadConfirmation"> | Date | string
   }
 
+  export type BankHeadConfirmationWhereInput = {
+    AND?: BankHeadConfirmationWhereInput | BankHeadConfirmationWhereInput[]
+    OR?: BankHeadConfirmationWhereInput[]
+    NOT?: BankHeadConfirmationWhereInput | BankHeadConfirmationWhereInput[]
+    id?: StringFilter<"BankHeadConfirmation"> | string
+    companyId?: StringFilter<"BankHeadConfirmation"> | string
+    date?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"BankHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }
+
+  export type BankHeadConfirmationOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrderInput | SortOrder
+    confirmedBy?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+  }
+
+  export type BankHeadConfirmationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    companyId_date?: BankHeadConfirmationCompanyIdDateCompoundUniqueInput
+    AND?: BankHeadConfirmationWhereInput | BankHeadConfirmationWhereInput[]
+    OR?: BankHeadConfirmationWhereInput[]
+    NOT?: BankHeadConfirmationWhereInput | BankHeadConfirmationWhereInput[]
+    companyId?: StringFilter<"BankHeadConfirmation"> | string
+    date?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"BankHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }, "id" | "companyId_date">
+
+  export type BankHeadConfirmationOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrderInput | SortOrder
+    confirmedBy?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BankHeadConfirmationCountOrderByAggregateInput
+    _avg?: BankHeadConfirmationAvgOrderByAggregateInput
+    _max?: BankHeadConfirmationMaxOrderByAggregateInput
+    _min?: BankHeadConfirmationMinOrderByAggregateInput
+    _sum?: BankHeadConfirmationSumOrderByAggregateInput
+  }
+
+  export type BankHeadConfirmationScalarWhereWithAggregatesInput = {
+    AND?: BankHeadConfirmationScalarWhereWithAggregatesInput | BankHeadConfirmationScalarWhereWithAggregatesInput[]
+    OR?: BankHeadConfirmationScalarWhereWithAggregatesInput[]
+    NOT?: BankHeadConfirmationScalarWhereWithAggregatesInput | BankHeadConfirmationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BankHeadConfirmation"> | string
+    companyId?: StringWithAggregatesFilter<"BankHeadConfirmation"> | string
+    date?: DateTimeWithAggregatesFilter<"BankHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalWithAggregatesFilter<"BankHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableWithAggregatesFilter<"BankHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableWithAggregatesFilter<"BankHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableWithAggregatesFilter<"BankHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BankHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BankHeadConfirmation"> | Date | string
+  }
+
   export type CompanyHeadConfirmationTotalWhereInput = {
     AND?: CompanyHeadConfirmationTotalWhereInput | CompanyHeadConfirmationTotalWhereInput[]
     OR?: CompanyHeadConfirmationTotalWhereInput[]
@@ -54375,6 +60018,138 @@ export namespace Prisma {
     date?: DateTimeWithAggregatesFilter<"CompanyHeadConfirmationTotal"> | Date | string
     totalIdr?: DecimalWithAggregatesFilter<"CompanyHeadConfirmationTotal"> | Decimal | DecimalJsLike | number | string
     updatedAt?: DateTimeWithAggregatesFilter<"CompanyHeadConfirmationTotal"> | Date | string
+  }
+
+  export type CorrectionRequestWhereInput = {
+    AND?: CorrectionRequestWhereInput | CorrectionRequestWhereInput[]
+    OR?: CorrectionRequestWhereInput[]
+    NOT?: CorrectionRequestWhereInput | CorrectionRequestWhereInput[]
+    id?: StringFilter<"CorrectionRequest"> | string
+    companyId?: StringFilter<"CorrectionRequest"> | string
+    target?: EnumCorrectionTargetTypeFilter<"CorrectionRequest"> | $Enums.CorrectionTargetType
+    date?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    pocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    companyStockItemId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    kasPocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    bankAccountId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    targetLabel?: StringFilter<"CorrectionRequest"> | string
+    currentValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    reason?: StringFilter<"CorrectionRequest"> | string
+    status?: EnumCorrectionStatusFilter<"CorrectionRequest"> | $Enums.CorrectionStatus
+    requestedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    requestedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    decidedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    decidedAt?: DateTimeNullableFilter<"CorrectionRequest"> | Date | string | null
+    decisionNote?: StringNullableFilter<"CorrectionRequest"> | string | null
+    createdAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }
+
+  export type CorrectionRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    target?: SortOrder
+    date?: SortOrder
+    pocketId?: SortOrderInput | SortOrder
+    companyStockItemId?: SortOrderInput | SortOrder
+    kasPocketId?: SortOrderInput | SortOrder
+    bankAccountId?: SortOrderInput | SortOrder
+    targetLabel?: SortOrder
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    requestedBy?: SortOrderInput | SortOrder
+    requestedAt?: SortOrder
+    decidedBy?: SortOrderInput | SortOrder
+    decidedAt?: SortOrderInput | SortOrder
+    decisionNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+  }
+
+  export type CorrectionRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CorrectionRequestWhereInput | CorrectionRequestWhereInput[]
+    OR?: CorrectionRequestWhereInput[]
+    NOT?: CorrectionRequestWhereInput | CorrectionRequestWhereInput[]
+    companyId?: StringFilter<"CorrectionRequest"> | string
+    target?: EnumCorrectionTargetTypeFilter<"CorrectionRequest"> | $Enums.CorrectionTargetType
+    date?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    pocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    companyStockItemId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    kasPocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    bankAccountId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    targetLabel?: StringFilter<"CorrectionRequest"> | string
+    currentValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    reason?: StringFilter<"CorrectionRequest"> | string
+    status?: EnumCorrectionStatusFilter<"CorrectionRequest"> | $Enums.CorrectionStatus
+    requestedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    requestedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    decidedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    decidedAt?: DateTimeNullableFilter<"CorrectionRequest"> | Date | string | null
+    decisionNote?: StringNullableFilter<"CorrectionRequest"> | string | null
+    createdAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }, "id">
+
+  export type CorrectionRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    target?: SortOrder
+    date?: SortOrder
+    pocketId?: SortOrderInput | SortOrder
+    companyStockItemId?: SortOrderInput | SortOrder
+    kasPocketId?: SortOrderInput | SortOrder
+    bankAccountId?: SortOrderInput | SortOrder
+    targetLabel?: SortOrder
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    requestedBy?: SortOrderInput | SortOrder
+    requestedAt?: SortOrder
+    decidedBy?: SortOrderInput | SortOrder
+    decidedAt?: SortOrderInput | SortOrder
+    decisionNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CorrectionRequestCountOrderByAggregateInput
+    _avg?: CorrectionRequestAvgOrderByAggregateInput
+    _max?: CorrectionRequestMaxOrderByAggregateInput
+    _min?: CorrectionRequestMinOrderByAggregateInput
+    _sum?: CorrectionRequestSumOrderByAggregateInput
+  }
+
+  export type CorrectionRequestScalarWhereWithAggregatesInput = {
+    AND?: CorrectionRequestScalarWhereWithAggregatesInput | CorrectionRequestScalarWhereWithAggregatesInput[]
+    OR?: CorrectionRequestScalarWhereWithAggregatesInput[]
+    NOT?: CorrectionRequestScalarWhereWithAggregatesInput | CorrectionRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CorrectionRequest"> | string
+    companyId?: StringWithAggregatesFilter<"CorrectionRequest"> | string
+    target?: EnumCorrectionTargetTypeWithAggregatesFilter<"CorrectionRequest"> | $Enums.CorrectionTargetType
+    date?: DateTimeWithAggregatesFilter<"CorrectionRequest"> | Date | string
+    pocketId?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    companyStockItemId?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    kasPocketId?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    bankAccountId?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    targetLabel?: StringWithAggregatesFilter<"CorrectionRequest"> | string
+    currentValue?: DecimalWithAggregatesFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalWithAggregatesFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    reason?: StringWithAggregatesFilter<"CorrectionRequest"> | string
+    status?: EnumCorrectionStatusWithAggregatesFilter<"CorrectionRequest"> | $Enums.CorrectionStatus
+    requestedBy?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    requestedAt?: DateTimeWithAggregatesFilter<"CorrectionRequest"> | Date | string
+    decidedBy?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    decidedAt?: DateTimeNullableWithAggregatesFilter<"CorrectionRequest"> | Date | string | null
+    decisionNote?: StringNullableWithAggregatesFilter<"CorrectionRequest"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CorrectionRequest"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CorrectionRequest"> | Date | string
   }
 
   export type AttendanceCreateInput = {
@@ -55219,6 +60994,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     bankAccount: BankAccountCreateNestedOneWithoutDailyEntriesInput
@@ -55231,6 +61010,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -55241,6 +61024,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccount?: BankAccountUpdateOneRequiredWithoutDailyEntriesNestedInput
@@ -55253,6 +61040,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55264,6 +61055,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -55274,6 +61069,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55285,6 +61084,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -55422,8 +61225,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateInput = {
@@ -55442,8 +61248,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUpdateInput = {
@@ -55462,8 +61271,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateInput = {
@@ -55482,8 +61294,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateManyInput = {
@@ -55591,6 +61406,83 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     symbol?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PriceBenchmarkCreateInput = {
+    id?: string
+    code: string
+    name: string
+    sellAdjustment?: string
+    buyAdjustment?: string
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PriceBenchmarkUncheckedCreateInput = {
+    id?: string
+    code: string
+    name: string
+    sellAdjustment?: string
+    buyAdjustment?: string
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PriceBenchmarkUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sellAdjustment?: StringFieldUpdateOperationsInput | string
+    buyAdjustment?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PriceBenchmarkUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sellAdjustment?: StringFieldUpdateOperationsInput | string
+    buyAdjustment?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PriceBenchmarkCreateManyInput = {
+    id?: string
+    code: string
+    name: string
+    sellAdjustment?: string
+    buyAdjustment?: string
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PriceBenchmarkUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sellAdjustment?: StringFieldUpdateOperationsInput | string
+    buyAdjustment?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PriceBenchmarkUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sellAdjustment?: StringFieldUpdateOperationsInput | string
+    buyAdjustment?: StringFieldUpdateOperationsInput | string
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -57501,6 +63393,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     kasPocket: KasPocketCreateNestedOneWithoutDailyEntriesInput
@@ -57513,6 +63409,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -57523,6 +63423,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     kasPocket?: KasPocketUpdateOneRequiredWithoutDailyEntriesNestedInput
@@ -57535,6 +63439,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -57546,6 +63454,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -57556,6 +63468,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -57567,6 +63483,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -57575,7 +63495,7 @@ export namespace Prisma {
     id?: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -57591,7 +63511,7 @@ export namespace Prisma {
     companyStockItemId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -57603,7 +63523,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57619,7 +63539,7 @@ export namespace Prisma {
     companyStockItemId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57633,7 +63553,7 @@ export namespace Prisma {
     companyStockItemId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -57645,7 +63565,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57659,6 +63579,89 @@ export namespace Prisma {
     companyStockItemId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationCreateInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutStockistTotalHeadConfirmsInput
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutStockistTotalHeadConfirmsNestedInput
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationCreateManyInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
@@ -57750,6 +63753,89 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BankHeadConfirmationCreateInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutBankHeadConfirmationsInput
+  }
+
+  export type BankHeadConfirmationUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankHeadConfirmationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutBankHeadConfirmationsNestedInput
+  }
+
+  export type BankHeadConfirmationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankHeadConfirmationCreateManyInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankHeadConfirmationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankHeadConfirmationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CompanyHeadConfirmationTotalCreateInput = {
     id?: string
     date: Date | string
@@ -57802,6 +63888,166 @@ export namespace Prisma {
     companyId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestCreateInput = {
+    id?: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutCorrectionRequestsInput
+  }
+
+  export type CorrectionRequestUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CorrectionRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutCorrectionRequestsNestedInput
+  }
+
+  export type CorrectionRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestCreateManyInput = {
+    id?: string
+    companyId: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CorrectionRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -58642,6 +64888,13 @@ export namespace Prisma {
     _max?: NestedEnumBankMutationTypeFilter<$PrismaModel>
   }
 
+  export type EnumDailyVerifyStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DailyVerifyStatus | EnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDailyVerifyStatusFilter<$PrismaModel> | $Enums.DailyVerifyStatus
+  }
+
   export type DailyBankEntryBankAccountIdDateCompoundUniqueInput = {
     bankAccountId: string
     date: Date | string
@@ -58654,6 +64907,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -58669,6 +64926,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -58680,12 +64941,26 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type DailyBankEntrySumOrderByAggregateInput = {
     balance?: SortOrder
+  }
+
+  export type EnumDailyVerifyStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DailyVerifyStatus | EnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDailyVerifyStatusWithAggregatesFilter<$PrismaModel> | $Enums.DailyVerifyStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDailyVerifyStatusFilter<$PrismaModel>
+    _max?: NestedEnumDailyVerifyStatusFilter<$PrismaModel>
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -58841,16 +65116,34 @@ export namespace Prisma {
     none?: StockistHeadConfirmationWhereInput
   }
 
+  export type StockistTotalHeadConfirmationListRelationFilter = {
+    every?: StockistTotalHeadConfirmationWhereInput
+    some?: StockistTotalHeadConfirmationWhereInput
+    none?: StockistTotalHeadConfirmationWhereInput
+  }
+
   export type KasHeadConfirmationListRelationFilter = {
     every?: KasHeadConfirmationWhereInput
     some?: KasHeadConfirmationWhereInput
     none?: KasHeadConfirmationWhereInput
   }
 
+  export type BankHeadConfirmationListRelationFilter = {
+    every?: BankHeadConfirmationWhereInput
+    some?: BankHeadConfirmationWhereInput
+    none?: BankHeadConfirmationWhereInput
+  }
+
   export type CompanyHeadConfirmationTotalListRelationFilter = {
     every?: CompanyHeadConfirmationTotalWhereInput
     some?: CompanyHeadConfirmationTotalWhereInput
     none?: CompanyHeadConfirmationTotalWhereInput
+  }
+
+  export type CorrectionRequestListRelationFilter = {
+    every?: CorrectionRequestWhereInput
+    some?: CorrectionRequestWhereInput
+    none?: CorrectionRequestWhereInput
   }
 
   export type BranchOrderByRelationAggregateInput = {
@@ -58881,11 +65174,23 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type StockistTotalHeadConfirmationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type KasHeadConfirmationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
+  export type BankHeadConfirmationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type CompanyHeadConfirmationTotalOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CorrectionRequestOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -58942,6 +65247,39 @@ export namespace Prisma {
     name?: SortOrder
     symbol?: SortOrder
     isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PriceBenchmarkCountOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    sellAdjustment?: SortOrder
+    buyAdjustment?: SortOrder
+    updatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PriceBenchmarkMaxOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    sellAdjustment?: SortOrder
+    buyAdjustment?: SortOrder
+    updatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PriceBenchmarkMinOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    sellAdjustment?: SortOrder
+    buyAdjustment?: SortOrder
+    updatedBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -60468,6 +66806,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -60483,6 +66825,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -60494,6 +66840,10 @@ export namespace Prisma {
     balance?: SortOrder
     note?: SortOrder
     createdBy?: SortOrder
+    verifyStatus?: SortOrder
+    verifyNote?: SortOrder
+    verifiedBy?: SortOrder
+    verifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -60560,6 +66910,55 @@ export namespace Prisma {
     confirmedIdrValue?: SortOrder
   }
 
+  export type StockistTotalHeadConfirmationCompanyIdDateCompoundUniqueInput = {
+    companyId: string
+    date: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockistTotalHeadConfirmationAvgOrderByAggregateInput = {
+    confirmedIdrValue?: SortOrder
+  }
+
+  export type StockistTotalHeadConfirmationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockistTotalHeadConfirmationMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockistTotalHeadConfirmationSumOrderByAggregateInput = {
+    confirmedIdrValue?: SortOrder
+  }
+
   export type KasHeadConfirmationCompanyIdDateCompoundUniqueInput = {
     companyId: string
     date: Date | string
@@ -60609,6 +67008,55 @@ export namespace Prisma {
     confirmedIdrValue?: SortOrder
   }
 
+  export type BankHeadConfirmationCompanyIdDateCompoundUniqueInput = {
+    companyId: string
+    date: Date | string
+  }
+
+  export type BankHeadConfirmationCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BankHeadConfirmationAvgOrderByAggregateInput = {
+    confirmedIdrValue?: SortOrder
+  }
+
+  export type BankHeadConfirmationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BankHeadConfirmationMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    confirmedIdrValue?: SortOrder
+    note?: SortOrder
+    confirmedBy?: SortOrder
+    confirmedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BankHeadConfirmationSumOrderByAggregateInput = {
+    confirmedIdrValue?: SortOrder
+  }
+
   export type CompanyHeadConfirmationTotalCompanyIdDateCompoundUniqueInput = {
     companyId: string
     date: Date | string
@@ -60644,6 +67092,119 @@ export namespace Prisma {
 
   export type CompanyHeadConfirmationTotalSumOrderByAggregateInput = {
     totalIdr?: SortOrder
+  }
+
+  export type EnumCorrectionTargetTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionTargetType | EnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel> | $Enums.CorrectionTargetType
+  }
+
+  export type EnumCorrectionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionStatus | EnumCorrectionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionStatusFilter<$PrismaModel> | $Enums.CorrectionStatus
+  }
+
+  export type CorrectionRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    target?: SortOrder
+    date?: SortOrder
+    pocketId?: SortOrder
+    companyStockItemId?: SortOrder
+    kasPocketId?: SortOrder
+    bankAccountId?: SortOrder
+    targetLabel?: SortOrder
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    requestedBy?: SortOrder
+    requestedAt?: SortOrder
+    decidedBy?: SortOrder
+    decidedAt?: SortOrder
+    decisionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CorrectionRequestAvgOrderByAggregateInput = {
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+  }
+
+  export type CorrectionRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    target?: SortOrder
+    date?: SortOrder
+    pocketId?: SortOrder
+    companyStockItemId?: SortOrder
+    kasPocketId?: SortOrder
+    bankAccountId?: SortOrder
+    targetLabel?: SortOrder
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    requestedBy?: SortOrder
+    requestedAt?: SortOrder
+    decidedBy?: SortOrder
+    decidedAt?: SortOrder
+    decisionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CorrectionRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    target?: SortOrder
+    date?: SortOrder
+    pocketId?: SortOrder
+    companyStockItemId?: SortOrder
+    kasPocketId?: SortOrder
+    bankAccountId?: SortOrder
+    targetLabel?: SortOrder
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    requestedBy?: SortOrder
+    requestedAt?: SortOrder
+    decidedBy?: SortOrder
+    decidedAt?: SortOrder
+    decisionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CorrectionRequestSumOrderByAggregateInput = {
+    currentValue?: SortOrder
+    proposedValue?: SortOrder
+  }
+
+  export type EnumCorrectionTargetTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionTargetType | EnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionTargetTypeWithAggregatesFilter<$PrismaModel> | $Enums.CorrectionTargetType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel>
+    _max?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel>
+  }
+
+  export type EnumCorrectionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionStatus | EnumCorrectionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CorrectionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCorrectionStatusFilter<$PrismaModel>
+    _max?: NestedEnumCorrectionStatusFilter<$PrismaModel>
   }
 
   export type userCreateNestedOneWithoutAttendancesInput = {
@@ -61382,6 +67943,10 @@ export namespace Prisma {
     connect?: BankAccountWhereUniqueInput
   }
 
+  export type EnumDailyVerifyStatusFieldUpdateOperationsInput = {
+    set?: $Enums.DailyVerifyStatus
+  }
+
   export type BankAccountUpdateOneRequiredWithoutDailyEntriesNestedInput = {
     create?: XOR<BankAccountCreateWithoutDailyEntriesInput, BankAccountUncheckedCreateWithoutDailyEntriesInput>
     connectOrCreate?: BankAccountCreateOrConnectWithoutDailyEntriesInput
@@ -61687,6 +68252,13 @@ export namespace Prisma {
     connect?: StockistHeadConfirmationWhereUniqueInput | StockistHeadConfirmationWhereUniqueInput[]
   }
 
+  export type StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput> | StockistTotalHeadConfirmationCreateWithoutCompanyInput[] | StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput | StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    createMany?: StockistTotalHeadConfirmationCreateManyCompanyInputEnvelope
+    connect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+  }
+
   export type KasHeadConfirmationCreateNestedManyWithoutCompanyInput = {
     create?: XOR<KasHeadConfirmationCreateWithoutCompanyInput, KasHeadConfirmationUncheckedCreateWithoutCompanyInput> | KasHeadConfirmationCreateWithoutCompanyInput[] | KasHeadConfirmationUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: KasHeadConfirmationCreateOrConnectWithoutCompanyInput | KasHeadConfirmationCreateOrConnectWithoutCompanyInput[]
@@ -61694,11 +68266,25 @@ export namespace Prisma {
     connect?: KasHeadConfirmationWhereUniqueInput | KasHeadConfirmationWhereUniqueInput[]
   }
 
+  export type BankHeadConfirmationCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput> | BankHeadConfirmationCreateWithoutCompanyInput[] | BankHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: BankHeadConfirmationCreateOrConnectWithoutCompanyInput | BankHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    createMany?: BankHeadConfirmationCreateManyCompanyInputEnvelope
+    connect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+  }
+
   export type CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput = {
     create?: XOR<CompanyHeadConfirmationTotalCreateWithoutCompanyInput, CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput> | CompanyHeadConfirmationTotalCreateWithoutCompanyInput[] | CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput | CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput[]
     createMany?: CompanyHeadConfirmationTotalCreateManyCompanyInputEnvelope
     connect?: CompanyHeadConfirmationTotalWhereUniqueInput | CompanyHeadConfirmationTotalWhereUniqueInput[]
+  }
+
+  export type CorrectionRequestCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput> | CorrectionRequestCreateWithoutCompanyInput[] | CorrectionRequestUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: CorrectionRequestCreateOrConnectWithoutCompanyInput | CorrectionRequestCreateOrConnectWithoutCompanyInput[]
+    createMany?: CorrectionRequestCreateManyCompanyInputEnvelope
+    connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
   }
 
   export type BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput = {
@@ -61764,6 +68350,13 @@ export namespace Prisma {
     connect?: StockistHeadConfirmationWhereUniqueInput | StockistHeadConfirmationWhereUniqueInput[]
   }
 
+  export type StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput> | StockistTotalHeadConfirmationCreateWithoutCompanyInput[] | StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput | StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    createMany?: StockistTotalHeadConfirmationCreateManyCompanyInputEnvelope
+    connect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+  }
+
   export type KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<KasHeadConfirmationCreateWithoutCompanyInput, KasHeadConfirmationUncheckedCreateWithoutCompanyInput> | KasHeadConfirmationCreateWithoutCompanyInput[] | KasHeadConfirmationUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: KasHeadConfirmationCreateOrConnectWithoutCompanyInput | KasHeadConfirmationCreateOrConnectWithoutCompanyInput[]
@@ -61771,11 +68364,25 @@ export namespace Prisma {
     connect?: KasHeadConfirmationWhereUniqueInput | KasHeadConfirmationWhereUniqueInput[]
   }
 
+  export type BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput> | BankHeadConfirmationCreateWithoutCompanyInput[] | BankHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: BankHeadConfirmationCreateOrConnectWithoutCompanyInput | BankHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    createMany?: BankHeadConfirmationCreateManyCompanyInputEnvelope
+    connect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+  }
+
   export type CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<CompanyHeadConfirmationTotalCreateWithoutCompanyInput, CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput> | CompanyHeadConfirmationTotalCreateWithoutCompanyInput[] | CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput | CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput[]
     createMany?: CompanyHeadConfirmationTotalCreateManyCompanyInputEnvelope
     connect?: CompanyHeadConfirmationTotalWhereUniqueInput | CompanyHeadConfirmationTotalWhereUniqueInput[]
+  }
+
+  export type CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput> | CorrectionRequestCreateWithoutCompanyInput[] | CorrectionRequestUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: CorrectionRequestCreateOrConnectWithoutCompanyInput | CorrectionRequestCreateOrConnectWithoutCompanyInput[]
+    createMany?: CorrectionRequestCreateManyCompanyInputEnvelope
+    connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
   }
 
   export type BonusMatrixUpdateManyWithoutCompanyNestedInput = {
@@ -61904,6 +68511,20 @@ export namespace Prisma {
     deleteMany?: StockistHeadConfirmationScalarWhereInput | StockistHeadConfirmationScalarWhereInput[]
   }
 
+  export type StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput> | StockistTotalHeadConfirmationCreateWithoutCompanyInput[] | StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput | StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    upsert?: StockistTotalHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput | StockistTotalHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: StockistTotalHeadConfirmationCreateManyCompanyInputEnvelope
+    set?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    disconnect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    delete?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    connect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    update?: StockistTotalHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput | StockistTotalHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: StockistTotalHeadConfirmationUpdateManyWithWhereWithoutCompanyInput | StockistTotalHeadConfirmationUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: StockistTotalHeadConfirmationScalarWhereInput | StockistTotalHeadConfirmationScalarWhereInput[]
+  }
+
   export type KasHeadConfirmationUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<KasHeadConfirmationCreateWithoutCompanyInput, KasHeadConfirmationUncheckedCreateWithoutCompanyInput> | KasHeadConfirmationCreateWithoutCompanyInput[] | KasHeadConfirmationUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: KasHeadConfirmationCreateOrConnectWithoutCompanyInput | KasHeadConfirmationCreateOrConnectWithoutCompanyInput[]
@@ -61918,6 +68539,20 @@ export namespace Prisma {
     deleteMany?: KasHeadConfirmationScalarWhereInput | KasHeadConfirmationScalarWhereInput[]
   }
 
+  export type BankHeadConfirmationUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput> | BankHeadConfirmationCreateWithoutCompanyInput[] | BankHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: BankHeadConfirmationCreateOrConnectWithoutCompanyInput | BankHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    upsert?: BankHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput | BankHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: BankHeadConfirmationCreateManyCompanyInputEnvelope
+    set?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    disconnect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    delete?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    connect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    update?: BankHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput | BankHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: BankHeadConfirmationUpdateManyWithWhereWithoutCompanyInput | BankHeadConfirmationUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: BankHeadConfirmationScalarWhereInput | BankHeadConfirmationScalarWhereInput[]
+  }
+
   export type CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<CompanyHeadConfirmationTotalCreateWithoutCompanyInput, CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput> | CompanyHeadConfirmationTotalCreateWithoutCompanyInput[] | CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput | CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput[]
@@ -61930,6 +68565,20 @@ export namespace Prisma {
     update?: CompanyHeadConfirmationTotalUpdateWithWhereUniqueWithoutCompanyInput | CompanyHeadConfirmationTotalUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: CompanyHeadConfirmationTotalUpdateManyWithWhereWithoutCompanyInput | CompanyHeadConfirmationTotalUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: CompanyHeadConfirmationTotalScalarWhereInput | CompanyHeadConfirmationTotalScalarWhereInput[]
+  }
+
+  export type CorrectionRequestUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput> | CorrectionRequestCreateWithoutCompanyInput[] | CorrectionRequestUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: CorrectionRequestCreateOrConnectWithoutCompanyInput | CorrectionRequestCreateOrConnectWithoutCompanyInput[]
+    upsert?: CorrectionRequestUpsertWithWhereUniqueWithoutCompanyInput | CorrectionRequestUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: CorrectionRequestCreateManyCompanyInputEnvelope
+    set?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    disconnect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    delete?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    update?: CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput | CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: CorrectionRequestUpdateManyWithWhereWithoutCompanyInput | CorrectionRequestUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
   }
 
   export type BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput = {
@@ -62058,6 +68707,20 @@ export namespace Prisma {
     deleteMany?: StockistHeadConfirmationScalarWhereInput | StockistHeadConfirmationScalarWhereInput[]
   }
 
+  export type StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput> | StockistTotalHeadConfirmationCreateWithoutCompanyInput[] | StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput | StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    upsert?: StockistTotalHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput | StockistTotalHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: StockistTotalHeadConfirmationCreateManyCompanyInputEnvelope
+    set?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    disconnect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    delete?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    connect?: StockistTotalHeadConfirmationWhereUniqueInput | StockistTotalHeadConfirmationWhereUniqueInput[]
+    update?: StockistTotalHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput | StockistTotalHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: StockistTotalHeadConfirmationUpdateManyWithWhereWithoutCompanyInput | StockistTotalHeadConfirmationUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: StockistTotalHeadConfirmationScalarWhereInput | StockistTotalHeadConfirmationScalarWhereInput[]
+  }
+
   export type KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<KasHeadConfirmationCreateWithoutCompanyInput, KasHeadConfirmationUncheckedCreateWithoutCompanyInput> | KasHeadConfirmationCreateWithoutCompanyInput[] | KasHeadConfirmationUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: KasHeadConfirmationCreateOrConnectWithoutCompanyInput | KasHeadConfirmationCreateOrConnectWithoutCompanyInput[]
@@ -62072,6 +68735,20 @@ export namespace Prisma {
     deleteMany?: KasHeadConfirmationScalarWhereInput | KasHeadConfirmationScalarWhereInput[]
   }
 
+  export type BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput> | BankHeadConfirmationCreateWithoutCompanyInput[] | BankHeadConfirmationUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: BankHeadConfirmationCreateOrConnectWithoutCompanyInput | BankHeadConfirmationCreateOrConnectWithoutCompanyInput[]
+    upsert?: BankHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput | BankHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: BankHeadConfirmationCreateManyCompanyInputEnvelope
+    set?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    disconnect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    delete?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    connect?: BankHeadConfirmationWhereUniqueInput | BankHeadConfirmationWhereUniqueInput[]
+    update?: BankHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput | BankHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: BankHeadConfirmationUpdateManyWithWhereWithoutCompanyInput | BankHeadConfirmationUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: BankHeadConfirmationScalarWhereInput | BankHeadConfirmationScalarWhereInput[]
+  }
+
   export type CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<CompanyHeadConfirmationTotalCreateWithoutCompanyInput, CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput> | CompanyHeadConfirmationTotalCreateWithoutCompanyInput[] | CompanyHeadConfirmationTotalUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput | CompanyHeadConfirmationTotalCreateOrConnectWithoutCompanyInput[]
@@ -62084,6 +68761,20 @@ export namespace Prisma {
     update?: CompanyHeadConfirmationTotalUpdateWithWhereUniqueWithoutCompanyInput | CompanyHeadConfirmationTotalUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: CompanyHeadConfirmationTotalUpdateManyWithWhereWithoutCompanyInput | CompanyHeadConfirmationTotalUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: CompanyHeadConfirmationTotalScalarWhereInput | CompanyHeadConfirmationTotalScalarWhereInput[]
+  }
+
+  export type CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput> | CorrectionRequestCreateWithoutCompanyInput[] | CorrectionRequestUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: CorrectionRequestCreateOrConnectWithoutCompanyInput | CorrectionRequestCreateOrConnectWithoutCompanyInput[]
+    upsert?: CorrectionRequestUpsertWithWhereUniqueWithoutCompanyInput | CorrectionRequestUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: CorrectionRequestCreateManyCompanyInputEnvelope
+    set?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    disconnect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    delete?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+    update?: CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput | CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: CorrectionRequestUpdateManyWithWhereWithoutCompanyInput | CorrectionRequestUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
   }
 
   export type BankAccountCreateNestedManyWithoutCurrencyInput = {
@@ -63360,6 +70051,20 @@ export namespace Prisma {
     update?: XOR<XOR<CompanyStockItemUpdateToOneWithWhereWithoutStockistHeadConfirmationsInput, CompanyStockItemUpdateWithoutStockistHeadConfirmationsInput>, CompanyStockItemUncheckedUpdateWithoutStockistHeadConfirmationsInput>
   }
 
+  export type CompanyCreateNestedOneWithoutStockistTotalHeadConfirmsInput = {
+    create?: XOR<CompanyCreateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutStockistTotalHeadConfirmsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type CompanyUpdateOneRequiredWithoutStockistTotalHeadConfirmsNestedInput = {
+    create?: XOR<CompanyCreateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutStockistTotalHeadConfirmsInput
+    upsert?: CompanyUpsertWithoutStockistTotalHeadConfirmsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutStockistTotalHeadConfirmsInput, CompanyUpdateWithoutStockistTotalHeadConfirmsInput>, CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput>
+  }
+
   export type CompanyCreateNestedOneWithoutKasHeadConfirmationsInput = {
     create?: XOR<CompanyCreateWithoutKasHeadConfirmationsInput, CompanyUncheckedCreateWithoutKasHeadConfirmationsInput>
     connectOrCreate?: CompanyCreateOrConnectWithoutKasHeadConfirmationsInput
@@ -63374,6 +70079,20 @@ export namespace Prisma {
     update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutKasHeadConfirmationsInput, CompanyUpdateWithoutKasHeadConfirmationsInput>, CompanyUncheckedUpdateWithoutKasHeadConfirmationsInput>
   }
 
+  export type CompanyCreateNestedOneWithoutBankHeadConfirmationsInput = {
+    create?: XOR<CompanyCreateWithoutBankHeadConfirmationsInput, CompanyUncheckedCreateWithoutBankHeadConfirmationsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutBankHeadConfirmationsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type CompanyUpdateOneRequiredWithoutBankHeadConfirmationsNestedInput = {
+    create?: XOR<CompanyCreateWithoutBankHeadConfirmationsInput, CompanyUncheckedCreateWithoutBankHeadConfirmationsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutBankHeadConfirmationsInput
+    upsert?: CompanyUpsertWithoutBankHeadConfirmationsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutBankHeadConfirmationsInput, CompanyUpdateWithoutBankHeadConfirmationsInput>, CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput>
+  }
+
   export type CompanyCreateNestedOneWithoutHeadConfirmationTotalsInput = {
     create?: XOR<CompanyCreateWithoutHeadConfirmationTotalsInput, CompanyUncheckedCreateWithoutHeadConfirmationTotalsInput>
     connectOrCreate?: CompanyCreateOrConnectWithoutHeadConfirmationTotalsInput
@@ -63386,6 +70105,28 @@ export namespace Prisma {
     upsert?: CompanyUpsertWithoutHeadConfirmationTotalsInput
     connect?: CompanyWhereUniqueInput
     update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutHeadConfirmationTotalsInput, CompanyUpdateWithoutHeadConfirmationTotalsInput>, CompanyUncheckedUpdateWithoutHeadConfirmationTotalsInput>
+  }
+
+  export type CompanyCreateNestedOneWithoutCorrectionRequestsInput = {
+    create?: XOR<CompanyCreateWithoutCorrectionRequestsInput, CompanyUncheckedCreateWithoutCorrectionRequestsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutCorrectionRequestsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type EnumCorrectionTargetTypeFieldUpdateOperationsInput = {
+    set?: $Enums.CorrectionTargetType
+  }
+
+  export type EnumCorrectionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.CorrectionStatus
+  }
+
+  export type CompanyUpdateOneRequiredWithoutCorrectionRequestsNestedInput = {
+    create?: XOR<CompanyCreateWithoutCorrectionRequestsInput, CompanyUncheckedCreateWithoutCorrectionRequestsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutCorrectionRequestsInput
+    upsert?: CompanyUpsertWithoutCorrectionRequestsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutCorrectionRequestsInput, CompanyUpdateWithoutCorrectionRequestsInput>, CompanyUncheckedUpdateWithoutCorrectionRequestsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -63675,6 +70416,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBankMutationTypeFilter<$PrismaModel>
     _max?: NestedEnumBankMutationTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDailyVerifyStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DailyVerifyStatus | EnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDailyVerifyStatusFilter<$PrismaModel> | $Enums.DailyVerifyStatus
+  }
+
+  export type NestedEnumDailyVerifyStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DailyVerifyStatus | EnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DailyVerifyStatus[] | ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDailyVerifyStatusWithAggregatesFilter<$PrismaModel> | $Enums.DailyVerifyStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDailyVerifyStatusFilter<$PrismaModel>
+    _max?: NestedEnumDailyVerifyStatusFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -63975,6 +70733,40 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStockistCheckStatusFilter<$PrismaModel>
     _max?: NestedEnumStockistCheckStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCorrectionTargetTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionTargetType | EnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel> | $Enums.CorrectionTargetType
+  }
+
+  export type NestedEnumCorrectionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionStatus | EnumCorrectionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionStatusFilter<$PrismaModel> | $Enums.CorrectionStatus
+  }
+
+  export type NestedEnumCorrectionTargetTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionTargetType | EnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionTargetType[] | ListEnumCorrectionTargetTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionTargetTypeWithAggregatesFilter<$PrismaModel> | $Enums.CorrectionTargetType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel>
+    _max?: NestedEnumCorrectionTargetTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCorrectionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CorrectionStatus | EnumCorrectionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CorrectionStatus[] | ListEnumCorrectionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCorrectionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CorrectionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCorrectionStatusFilter<$PrismaModel>
+    _max?: NestedEnumCorrectionStatusFilter<$PrismaModel>
   }
 
   export type userCreateWithoutAttendancesInput = {
@@ -64500,8 +71292,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCustom_rolesInput = {
@@ -64519,8 +71314,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCustom_rolesInput = {
@@ -64675,8 +71473,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCustom_rolesInput = {
@@ -64694,8 +71495,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type userUpsertWithWhereUniqueWithoutCustomRoleInput = {
@@ -65381,8 +72185,11 @@ export namespace Prisma {
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBankAccountsInput = {
@@ -65400,8 +72207,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBankAccountsInput = {
@@ -65474,6 +72284,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -65484,6 +72298,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -65524,8 +72342,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBankAccountsInput = {
@@ -65543,8 +72364,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyUpsertWithoutBankAccountsInput = {
@@ -65638,6 +72462,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"DailyBankEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"DailyBankEntry"> | string | null
     createdBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"DailyBankEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"DailyBankEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"DailyBankEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
     updatedAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
   }
@@ -65817,8 +72645,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBranchesInput = {
@@ -65836,8 +72667,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBranchesInput = {
@@ -66081,8 +72915,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBranchesInput = {
@@ -66100,8 +72937,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyStockUpsertWithWhereUniqueWithoutBranchInput = {
@@ -66529,7 +73369,7 @@ export namespace Prisma {
     id?: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -66543,7 +73383,7 @@ export namespace Prisma {
     companyStockItemId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -66558,6 +73398,38 @@ export namespace Prisma {
 
   export type StockistHeadConfirmationCreateManyCompanyInputEnvelope = {
     data: StockistHeadConfirmationCreateManyCompanyInput | StockistHeadConfirmationCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StockistTotalHeadConfirmationCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationCreateOrConnectWithoutCompanyInput = {
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+    create: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type StockistTotalHeadConfirmationCreateManyCompanyInputEnvelope = {
+    data: StockistTotalHeadConfirmationCreateManyCompanyInput | StockistTotalHeadConfirmationCreateManyCompanyInput[]
     skipDuplicates?: boolean
   }
 
@@ -66593,6 +73465,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type BankHeadConfirmationCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankHeadConfirmationUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankHeadConfirmationCreateOrConnectWithoutCompanyInput = {
+    where: BankHeadConfirmationWhereUniqueInput
+    create: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type BankHeadConfirmationCreateManyCompanyInputEnvelope = {
+    data: BankHeadConfirmationCreateManyCompanyInput | BankHeadConfirmationCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CompanyHeadConfirmationTotalCreateWithoutCompanyInput = {
     id?: string
     date: Date | string
@@ -66614,6 +73518,60 @@ export namespace Prisma {
 
   export type CompanyHeadConfirmationTotalCreateManyCompanyInputEnvelope = {
     data: CompanyHeadConfirmationTotalCreateManyCompanyInput | CompanyHeadConfirmationTotalCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CorrectionRequestCreateWithoutCompanyInput = {
+    id?: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CorrectionRequestUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CorrectionRequestCreateOrConnectWithoutCompanyInput = {
+    where: CorrectionRequestWhereUniqueInput
+    create: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type CorrectionRequestCreateManyCompanyInputEnvelope = {
+    data: CorrectionRequestCreateManyCompanyInput | CorrectionRequestCreateManyCompanyInput[]
     skipDuplicates?: boolean
   }
 
@@ -66864,12 +73822,43 @@ export namespace Prisma {
     companyStockItemId?: StringFilter<"StockistHeadConfirmation"> | string
     date?: DateTimeFilter<"StockistHeadConfirmation"> | Date | string
     confirmedQuantity?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: DecimalNullableFilter<"StockistHeadConfirmation"> | Decimal | DecimalJsLike | number | string | null
     note?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"StockistHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"StockistHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"StockistHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"StockistHeadConfirmation"> | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+    update: XOR<StockistTotalHeadConfirmationUpdateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedUpdateWithoutCompanyInput>
+    create: XOR<StockistTotalHeadConfirmationCreateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type StockistTotalHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: StockistTotalHeadConfirmationWhereUniqueInput
+    data: XOR<StockistTotalHeadConfirmationUpdateWithoutCompanyInput, StockistTotalHeadConfirmationUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type StockistTotalHeadConfirmationUpdateManyWithWhereWithoutCompanyInput = {
+    where: StockistTotalHeadConfirmationScalarWhereInput
+    data: XOR<StockistTotalHeadConfirmationUpdateManyMutationInput, StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type StockistTotalHeadConfirmationScalarWhereInput = {
+    AND?: StockistTotalHeadConfirmationScalarWhereInput | StockistTotalHeadConfirmationScalarWhereInput[]
+    OR?: StockistTotalHeadConfirmationScalarWhereInput[]
+    NOT?: StockistTotalHeadConfirmationScalarWhereInput | StockistTotalHeadConfirmationScalarWhereInput[]
+    id?: StringFilter<"StockistTotalHeadConfirmation"> | string
+    companyId?: StringFilter<"StockistTotalHeadConfirmation"> | string
+    date?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"StockistTotalHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"StockistTotalHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"StockistTotalHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"StockistTotalHeadConfirmation"> | Date | string
   }
 
   export type KasHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput = {
@@ -66903,6 +73892,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
   }
 
+  export type BankHeadConfirmationUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: BankHeadConfirmationWhereUniqueInput
+    update: XOR<BankHeadConfirmationUpdateWithoutCompanyInput, BankHeadConfirmationUncheckedUpdateWithoutCompanyInput>
+    create: XOR<BankHeadConfirmationCreateWithoutCompanyInput, BankHeadConfirmationUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type BankHeadConfirmationUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: BankHeadConfirmationWhereUniqueInput
+    data: XOR<BankHeadConfirmationUpdateWithoutCompanyInput, BankHeadConfirmationUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type BankHeadConfirmationUpdateManyWithWhereWithoutCompanyInput = {
+    where: BankHeadConfirmationScalarWhereInput
+    data: XOR<BankHeadConfirmationUpdateManyMutationInput, BankHeadConfirmationUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type BankHeadConfirmationScalarWhereInput = {
+    AND?: BankHeadConfirmationScalarWhereInput | BankHeadConfirmationScalarWhereInput[]
+    OR?: BankHeadConfirmationScalarWhereInput[]
+    NOT?: BankHeadConfirmationScalarWhereInput | BankHeadConfirmationScalarWhereInput[]
+    id?: StringFilter<"BankHeadConfirmation"> | string
+    companyId?: StringFilter<"BankHeadConfirmation"> | string
+    date?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    confirmedIdrValue?: DecimalFilter<"BankHeadConfirmation"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+    updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
+  }
+
   export type CompanyHeadConfirmationTotalUpsertWithWhereUniqueWithoutCompanyInput = {
     where: CompanyHeadConfirmationTotalWhereUniqueInput
     update: XOR<CompanyHeadConfirmationTotalUpdateWithoutCompanyInput, CompanyHeadConfirmationTotalUncheckedUpdateWithoutCompanyInput>
@@ -66928,6 +73948,48 @@ export namespace Prisma {
     date?: DateTimeFilter<"CompanyHeadConfirmationTotal"> | Date | string
     totalIdr?: DecimalFilter<"CompanyHeadConfirmationTotal"> | Decimal | DecimalJsLike | number | string
     updatedAt?: DateTimeFilter<"CompanyHeadConfirmationTotal"> | Date | string
+  }
+
+  export type CorrectionRequestUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: CorrectionRequestWhereUniqueInput
+    update: XOR<CorrectionRequestUpdateWithoutCompanyInput, CorrectionRequestUncheckedUpdateWithoutCompanyInput>
+    create: XOR<CorrectionRequestCreateWithoutCompanyInput, CorrectionRequestUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: CorrectionRequestWhereUniqueInput
+    data: XOR<CorrectionRequestUpdateWithoutCompanyInput, CorrectionRequestUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type CorrectionRequestUpdateManyWithWhereWithoutCompanyInput = {
+    where: CorrectionRequestScalarWhereInput
+    data: XOR<CorrectionRequestUpdateManyMutationInput, CorrectionRequestUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type CorrectionRequestScalarWhereInput = {
+    AND?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
+    OR?: CorrectionRequestScalarWhereInput[]
+    NOT?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
+    id?: StringFilter<"CorrectionRequest"> | string
+    companyId?: StringFilter<"CorrectionRequest"> | string
+    target?: EnumCorrectionTargetTypeFilter<"CorrectionRequest"> | $Enums.CorrectionTargetType
+    date?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    pocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    companyStockItemId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    kasPocketId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    bankAccountId?: StringNullableFilter<"CorrectionRequest"> | string | null
+    targetLabel?: StringFilter<"CorrectionRequest"> | string
+    currentValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFilter<"CorrectionRequest"> | Decimal | DecimalJsLike | number | string
+    reason?: StringFilter<"CorrectionRequest"> | string
+    status?: EnumCorrectionStatusFilter<"CorrectionRequest"> | $Enums.CorrectionStatus
+    requestedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    requestedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    decidedBy?: StringNullableFilter<"CorrectionRequest"> | string | null
+    decidedAt?: DateTimeNullableFilter<"CorrectionRequest"> | Date | string | null
+    decisionNote?: StringNullableFilter<"CorrectionRequest"> | string | null
+    createdAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
   }
 
   export type BankAccountCreateWithoutCurrencyInput = {
@@ -67099,8 +74161,11 @@ export namespace Prisma {
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCompanyStockItemsInput = {
@@ -67118,8 +74183,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCompanyStockItemsInput = {
@@ -67227,7 +74295,7 @@ export namespace Prisma {
     id?: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -67241,7 +74309,7 @@ export namespace Prisma {
     companyId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -67285,8 +74353,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCompanyStockItemsInput = {
@@ -67304,8 +74375,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutCompanyStockItemInput = {
@@ -67524,8 +74598,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutRoleKpisInput = {
@@ -67543,8 +74620,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutRoleKpisInput = {
@@ -67632,8 +74712,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutRoleKpisInput = {
@@ -67651,8 +74734,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type custom_roleUpsertWithoutRoleKpisInput = {
@@ -68028,8 +75114,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBonusMatricesInput = {
@@ -68047,8 +75136,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBonusMatricesInput = {
@@ -68141,8 +75233,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBonusMatricesInput = {
@@ -68160,8 +75255,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type custom_roleUpsertWithoutBonusMatricesInput = {
@@ -69513,8 +76611,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistPocketsInput = {
@@ -69532,8 +76633,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistPocketsInput = {
@@ -69663,8 +76767,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistPocketsInput = {
@@ -69682,8 +76789,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutPocketInput = {
@@ -70205,8 +77315,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasPocketsInput = {
@@ -70224,8 +77337,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasPocketsInput = {
@@ -70239,6 +77355,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70249,6 +77369,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70289,8 +77413,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasPocketsInput = {
@@ -70308,8 +77435,11 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type KasDailyEntryUpsertWithWhereUniqueWithoutKasPocketInput = {
@@ -70338,6 +77468,10 @@ export namespace Prisma {
     balance?: DecimalFilter<"KasDailyEntry"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"KasDailyEntry"> | string | null
     createdBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifyStatus?: EnumDailyVerifyStatusFilter<"KasDailyEntry"> | $Enums.DailyVerifyStatus
+    verifyNote?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedBy?: StringNullableFilter<"KasDailyEntry"> | string | null
+    verifiedAt?: DateTimeNullableFilter<"KasDailyEntry"> | Date | string | null
     createdAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
     updatedAt?: DateTimeFilter<"KasDailyEntry"> | Date | string
   }
@@ -70417,8 +77551,11 @@ export namespace Prisma {
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistHeadConfirmationsInput = {
@@ -70436,8 +77573,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistHeadConfirmationsInput = {
@@ -70506,8 +77646,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistHeadConfirmationsInput = {
@@ -70525,8 +77668,11 @@ export namespace Prisma {
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyStockItemUpsertWithoutStockistHeadConfirmationsInput = {
@@ -70570,6 +77716,110 @@ export namespace Prisma {
     stockistDailyChecks?: StockistDailyCheckUncheckedUpdateManyWithoutCompanyStockItemNestedInput
   }
 
+  export type CompanyCreateWithoutStockistTotalHeadConfirmsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutStockistTotalHeadConfirmsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput>
+  }
+
+  export type CompanyUpsertWithoutStockistTotalHeadConfirmsInput = {
+    update: XOR<CompanyUpdateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput>
+    create: XOR<CompanyCreateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutStockistTotalHeadConfirmsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutStockistTotalHeadConfirmsInput, CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput>
+  }
+
+  export type CompanyUpdateWithoutStockistTotalHeadConfirmsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
   export type CompanyCreateWithoutKasHeadConfirmationsInput = {
     id?: string
     name: string
@@ -70586,7 +77836,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasHeadConfirmationsInput = {
@@ -70605,7 +77858,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasHeadConfirmationsInput = {
@@ -70640,7 +77896,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasHeadConfirmationsInput = {
@@ -70659,7 +77918,114 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyCreateWithoutBankHeadConfirmationsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutBankHeadConfirmationsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutBankHeadConfirmationsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutBankHeadConfirmationsInput, CompanyUncheckedCreateWithoutBankHeadConfirmationsInput>
+  }
+
+  export type CompanyUpsertWithoutBankHeadConfirmationsInput = {
+    update: XOR<CompanyUpdateWithoutBankHeadConfirmationsInput, CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput>
+    create: XOR<CompanyCreateWithoutBankHeadConfirmationsInput, CompanyUncheckedCreateWithoutBankHeadConfirmationsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutBankHeadConfirmationsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutBankHeadConfirmationsInput, CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput>
+  }
+
+  export type CompanyUpdateWithoutBankHeadConfirmationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutHeadConfirmationTotalsInput = {
@@ -70678,7 +78044,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutHeadConfirmationTotalsInput = {
@@ -70697,7 +78066,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutHeadConfirmationTotalsInput = {
@@ -70732,7 +78104,10 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutHeadConfirmationTotalsInput = {
@@ -70751,7 +78126,114 @@ export namespace Prisma {
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
     stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyCreateWithoutCorrectionRequestsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutCorrectionRequestsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bonusMatrices?: BonusMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutCorrectionRequestsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutCorrectionRequestsInput, CompanyUncheckedCreateWithoutCorrectionRequestsInput>
+  }
+
+  export type CompanyUpsertWithoutCorrectionRequestsInput = {
+    update: XOR<CompanyUpdateWithoutCorrectionRequestsInput, CompanyUncheckedUpdateWithoutCorrectionRequestsInput>
+    create: XOR<CompanyCreateWithoutCorrectionRequestsInput, CompanyUncheckedCreateWithoutCorrectionRequestsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutCorrectionRequestsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutCorrectionRequestsInput, CompanyUncheckedUpdateWithoutCorrectionRequestsInput>
+  }
+
+  export type CompanyUpdateWithoutCorrectionRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutCorrectionRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bonusMatrices?: BonusMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type BonusMatrixCreateManyCustomRoleInput = {
@@ -71288,6 +78770,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -71328,6 +78814,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -71338,6 +78828,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -71348,6 +78842,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -71750,6 +79248,17 @@ export namespace Prisma {
     companyStockItemId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StockistTotalHeadConfirmationCreateManyCompanyInput = {
+    id?: string
+    date: Date | string
     confirmedIdrValue: Decimal | DecimalJsLike | number | string
     note?: string | null
     confirmedBy?: string | null
@@ -71769,10 +79278,43 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type BankHeadConfirmationCreateManyCompanyInput = {
+    id?: string
+    date: Date | string
+    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    confirmedBy?: string | null
+    confirmedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CompanyHeadConfirmationTotalCreateManyCompanyInput = {
     id?: string
     date: Date | string
     totalIdr: Decimal | DecimalJsLike | number | string
+    updatedAt?: Date | string
+  }
+
+  export type CorrectionRequestCreateManyCompanyInput = {
+    id?: string
+    target: $Enums.CorrectionTargetType
+    date: Date | string
+    pocketId?: string | null
+    companyStockItemId?: string | null
+    kasPocketId?: string | null
+    bankAccountId?: string | null
+    targetLabel: string
+    currentValue: Decimal | DecimalJsLike | number | string
+    proposedValue: Decimal | DecimalJsLike | number | string
+    reason: string
+    status?: $Enums.CorrectionStatus
+    requestedBy?: string | null
+    requestedAt?: Date | string
+    decidedBy?: string | null
+    decidedAt?: Date | string | null
+    decisionNote?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
@@ -72085,7 +79627,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72099,7 +79641,7 @@ export namespace Prisma {
     companyStockItemId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72112,6 +79654,39 @@ export namespace Prisma {
     companyStockItemId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
@@ -72153,6 +79728,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BankHeadConfirmationUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankHeadConfirmationUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankHeadConfirmationUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CompanyHeadConfirmationTotalUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -72171,6 +79779,72 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CorrectionRequestUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    target?: EnumCorrectionTargetTypeFieldUpdateOperationsInput | $Enums.CorrectionTargetType
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    pocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    companyStockItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    kasPocketId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetLabel?: StringFieldUpdateOperationsInput | string
+    currentValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    proposedValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: EnumCorrectionStatusFieldUpdateOperationsInput | $Enums.CorrectionStatus
+    requestedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -72360,7 +80034,7 @@ export namespace Prisma {
     companyId: string
     date: Date | string
     confirmedQuantity: Decimal | DecimalJsLike | number | string
-    confirmedIdrValue: Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: Decimal | DecimalJsLike | number | string | null
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
@@ -72471,7 +80145,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72485,7 +80159,7 @@ export namespace Prisma {
     companyId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72498,7 +80172,7 @@ export namespace Prisma {
     companyId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     confirmedQuantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    confirmedIdrValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    confirmedIdrValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72994,6 +80668,10 @@ export namespace Prisma {
     balance?: Decimal | DecimalJsLike | number | string
     note?: string | null
     createdBy?: string | null
+    verifyStatus?: $Enums.DailyVerifyStatus
+    verifyNote?: string | null
+    verifiedBy?: string | null
+    verifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -73004,6 +80682,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -73014,6 +80696,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -73024,6 +80710,10 @@ export namespace Prisma {
     balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifyStatus?: EnumDailyVerifyStatusFieldUpdateOperationsInput | $Enums.DailyVerifyStatus
+    verifyNote?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

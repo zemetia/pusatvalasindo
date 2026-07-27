@@ -23,6 +23,11 @@ import {
 import { IconAlertTriangle, IconCheck, IconLoader2, IconMinus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
+import {
+  DailyVerifyCell,
+  type DailyVerifyStatus,
+  type PendingCorrection,
+} from "@/components/admin/stockist/daily-verify-cell"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean }
 
@@ -39,6 +44,9 @@ type Row = {
   savedNote: string
   saveState: SaveState
   hasEntry: boolean
+  verifyStatus: DailyVerifyStatus
+  verifyNote: string | null
+  pendingCorrection?: PendingCorrection
 }
 
 function fmt(n: number) {
@@ -60,6 +68,7 @@ interface Props {
 export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
   const [pockets, setPockets] = useState<Pocket[]>([])
   const [rows, setRows] = useState<Row[]>([])
+  const [serverDate, setServerDate] = useState<string | null>(null)
   const [fetching, setFetching] = useState(false)
   const rowsRef = useRef<Row[]>([])
   rowsRef.current = rows
@@ -79,11 +88,15 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
       }
 
       const pocketList: Pocket[] = (data.data.pockets ?? []).filter((p: Pocket) => p.isActive)
-      const entries: Record<string, { balance: string; note: string | null }> =
-        data.data.entries ?? {}
+      const entries: Record<
+        string,
+        { balance: string; note: string | null; verifyStatus: DailyVerifyStatus; verifyNote: string | null }
+      > = data.data.entries ?? {}
       const previous: Record<string, { balance: string; date: string }> = data.data.previous ?? {}
+      const pendingCorrections: Record<string, PendingCorrection> = data.data.pendingCorrections ?? {}
 
       setPockets(data.data.pockets ?? [])
+      setServerDate(data.data.serverDate ?? null)
 
       const builtRows: Row[] = pocketList.map((p) => {
         const entry = entries[p.id]
@@ -101,6 +114,9 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
           savedNote: note,
           saveState: "idle",
           hasEntry: Boolean(entry),
+          verifyStatus: entry?.verifyStatus ?? "BELUM_REVIEW",
+          verifyNote: entry?.verifyNote ?? null,
+          pendingCorrection: pendingCorrections[p.id],
         }
       })
       setRows(builtRows)
@@ -153,18 +169,66 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
     }
   }
 
+  // Tanggal lampau = mode verifikasi H+1: saldonya dikunci dan hanya bisa diubah lewat
+  // pengajuan koreksi yang disetujui Owner/Super Admin.
+  const isPast = serverDate !== null && date < serverDate
+
+  const verifyRow = async (
+    kasPocketId: string,
+    status: "BENAR" | "BEDA",
+    note?: string,
+    correctedBalance?: number
+  ) => {
+    try {
+      const res = await fetch("/api/stockist/kas/verify", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kasPocketId, date, status, note, correctedBalance }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
+      toast.success(data.message ?? "Verifikasi tersimpan")
+      setRows((prev) =>
+        prev.map((r) =>
+          r.kasPocketId === kasPocketId
+            ? {
+                ...r,
+                verifyStatus: status,
+                verifyNote: note ?? null,
+                pendingCorrection: data.data?.correctionRequestId
+                  ? {
+                      id: data.data.correctionRequestId,
+                      proposedValue: String(correctedBalance ?? ""),
+                      reason: note ?? "",
+                    }
+                  : undefined,
+              }
+            : r
+        )
+      )
+      return true
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
+      return false
+    }
+  }
+
   const totals = useMemo(() => {
     let totalBalance = 0
     let totalDelta = 0
     let unfilled = 0
+    let belumVerifikasi = 0
     for (const r of rows) {
       const balance = parseNum(r.balance)
       const ref = r.previousBalance ?? 0
       totalBalance += balance
       totalDelta += balance - ref
       if (!r.hasEntry) unfilled += 1
+      if (r.hasEntry && r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) {
+        belumVerifikasi += 1
+      }
     }
-    return { totalBalance, totalDelta, unfilled }
+    return { totalBalance, totalDelta, unfilled, belumVerifikasi }
   }, [rows])
 
   const onUnfilledChangeRef = useRef(onUnfilledChange)
@@ -193,7 +257,18 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        {totals.unfilled > 0 ? (
+        {isPast ? (
+          totals.belumVerifikasi > 0 ? (
+            <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+              <IconAlertTriangle className="size-4" />
+              {totals.belumVerifikasi} pocket belum dikonfirmasi untuk tanggal ini.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Semua saldo tanggal ini sudah dikonfirmasi.
+            </p>
+          )
+        ) : totals.unfilled > 0 ? (
           <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
             <IconAlertTriangle className="size-4" />
             {totals.unfilled} pocket belum diisi hari ini.
@@ -212,9 +287,14 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
             <TableRow className="hover:bg-transparent">
               <TableHead className="sticky top-0 z-20 bg-background">Pocket</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-40 text-right">Saldo Kemarin</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">Saldo Hari Ini</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">
+                {isPast ? "Saldo Tanggal Ini" : "Saldo Hari Ini"}
+              </TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
+              {isPast && (
+                <TableHead className="sticky top-0 z-20 bg-background w-56">Konfirmasi</TableHead>
+              )}
               <TableHead className="sticky top-0 z-20 bg-background w-10" />
             </TableRow>
           </TableHeader>
@@ -224,8 +304,10 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
                 key={r.kasPocketId}
                 row={r}
                 canManage={canManage}
+                isPast={isPast}
                 onChange={updateRow}
                 onBlurSave={saveRow}
+                onVerify={verifyRow}
                 inputRefs={inputRefs}
                 rowIndex={i}
                 rowCount={rows.length}
@@ -245,7 +327,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
                 {totals.totalDelta > 0 ? "+" : ""}
                 {fmt(totals.totalDelta)}
               </TableCell>
-              <TableCell colSpan={2} />
+              <TableCell colSpan={isPast ? 3 : 2} />
             </TableRow>
           </TableBody>
         </Table>
@@ -264,16 +346,25 @@ function SaveIndicator({ state }: { state: SaveState }) {
 function KasRowEdit({
   row,
   canManage,
+  isPast,
   onChange,
   onBlurSave,
+  onVerify,
   inputRefs,
   rowIndex,
   rowCount,
 }: {
   row: Row
   canManage: boolean
+  isPast: boolean
   onChange: (id: string, field: "balance" | "note", val: string) => void
   onBlurSave: (id: string) => void
+  onVerify: (
+    id: string,
+    status: "BENAR" | "BEDA",
+    note?: string,
+    correctedBalance?: number
+  ) => Promise<boolean>
   inputRefs: RefObject<Map<string, HTMLInputElement>>
   rowIndex: number
   rowCount: number
@@ -282,6 +373,8 @@ function KasRowEdit({
   const reference = row.previousBalance ?? 0
   const delta = balance - reference
   const isUnfilled = !row.hasEntry
+  // Saldo tanggal lampau dikunci — perubahannya wajib lewat pengajuan koreksi.
+  const editable = canManage && !isPast
 
   const registerRef = (field: "balance" | "note") => (el: HTMLInputElement | null) => {
     const key = `${rowIndex}:${field}`
@@ -323,7 +416,7 @@ function KasRowEdit({
         <NumberInput
           ref={registerRef("balance")}
           value={row.balance}
-          disabled={!canManage}
+          disabled={!editable}
           onValueChange={(val) => onChange(row.kasPocketId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.kasPocketId)}
           onKeyDown={handleEnter("balance")}
@@ -345,7 +438,7 @@ function KasRowEdit({
           ref={registerRef("note")}
           type="text"
           value={row.note}
-          disabled={!canManage}
+          disabled={!editable}
           placeholder="Opsional"
           onChange={(e) => onChange(row.kasPocketId, "note", e.target.value)}
           onBlur={() => onBlurSave(row.kasPocketId)}
@@ -353,6 +446,24 @@ function KasRowEdit({
           className="w-full text-sm"
         />
       </TableCell>
+      {isPast && (
+        <TableCell>
+          {row.hasEntry ? (
+            <DailyVerifyCell
+              status={row.verifyStatus}
+              note={row.verifyNote}
+              balance={balance}
+              pending={row.pendingCorrection}
+              canVerify={canManage}
+              onVerify={(status, note, correctedBalance) =>
+                onVerify(row.kasPocketId, status, note, correctedBalance)
+              }
+            />
+          ) : (
+            <span className="text-xs text-muted-foreground">Tidak diisi</span>
+          )}
+        </TableCell>
+      )}
       <TableCell>
         <SaveIndicator state={row.saveState} />
       </TableCell>

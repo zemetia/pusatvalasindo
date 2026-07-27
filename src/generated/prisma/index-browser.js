@@ -241,6 +241,10 @@ exports.Prisma.DailyBankEntryScalarFieldEnum = {
   balance: 'balance',
   note: 'note',
   createdBy: 'createdBy',
+  verifyStatus: 'verifyStatus',
+  verifyNote: 'verifyNote',
+  verifiedBy: 'verifiedBy',
+  verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -274,6 +278,17 @@ exports.Prisma.CurrencyScalarFieldEnum = {
   name: 'name',
   symbol: 'symbol',
   isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PriceBenchmarkScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  sellAdjustment: 'sellAdjustment',
+  buyAdjustment: 'buyAdjustment',
+  updatedBy: 'updatedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -552,6 +567,10 @@ exports.Prisma.KasDailyEntryScalarFieldEnum = {
   balance: 'balance',
   note: 'note',
   createdBy: 'createdBy',
+  verifyStatus: 'verifyStatus',
+  verifyNote: 'verifyNote',
+  verifiedBy: 'verifiedBy',
+  verifiedAt: 'verifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -562,6 +581,18 @@ exports.Prisma.StockistHeadConfirmationScalarFieldEnum = {
   companyStockItemId: 'companyStockItemId',
   date: 'date',
   confirmedQuantity: 'confirmedQuantity',
+  confirmedIdrValue: 'confirmedIdrValue',
+  note: 'note',
+  confirmedBy: 'confirmedBy',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockistTotalHeadConfirmationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  date: 'date',
   confirmedIdrValue: 'confirmedIdrValue',
   note: 'note',
   confirmedBy: 'confirmedBy',
@@ -582,11 +613,46 @@ exports.Prisma.KasHeadConfirmationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BankHeadConfirmationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  date: 'date',
+  confirmedIdrValue: 'confirmedIdrValue',
+  note: 'note',
+  confirmedBy: 'confirmedBy',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CompanyHeadConfirmationTotalScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
   date: 'date',
   totalIdr: 'totalIdr',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CorrectionRequestScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  target: 'target',
+  date: 'date',
+  pocketId: 'pocketId',
+  companyStockItemId: 'companyStockItemId',
+  kasPocketId: 'kasPocketId',
+  bankAccountId: 'bankAccountId',
+  targetLabel: 'targetLabel',
+  currentValue: 'currentValue',
+  proposedValue: 'proposedValue',
+  reason: 'reason',
+  status: 'status',
+  requestedBy: 'requestedBy',
+  requestedAt: 'requestedAt',
+  decidedBy: 'decidedBy',
+  decidedAt: 'decidedAt',
+  decisionNote: 'decisionNote',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
@@ -631,6 +697,12 @@ exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
 exports.BankMutationType = exports.$Enums.BankMutationType = {
   CREDIT: 'CREDIT',
   DEBIT: 'DEBIT'
+};
+
+exports.DailyVerifyStatus = exports.$Enums.DailyVerifyStatus = {
+  BELUM_REVIEW: 'BELUM_REVIEW',
+  BENAR: 'BENAR',
+  BEDA: 'BEDA'
 };
 
 exports.CompanyStockItemType = exports.$Enums.CompanyStockItemType = {
@@ -727,6 +799,18 @@ exports.StockistCheckStatus = exports.$Enums.StockistCheckStatus = {
   BENAR: 'BENAR'
 };
 
+exports.CorrectionTargetType = exports.$Enums.CorrectionTargetType = {
+  STOCKIST: 'STOCKIST',
+  KAS: 'KAS',
+  BANK: 'BANK'
+};
+
+exports.CorrectionStatus = exports.$Enums.CorrectionStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+};
+
 exports.Prisma.ModelName = {
   Attendance: 'Attendance',
   account: 'account',
@@ -740,6 +824,7 @@ exports.Prisma.ModelName = {
   Branch: 'Branch',
   Company: 'Company',
   Currency: 'Currency',
+  PriceBenchmark: 'PriceBenchmark',
   CompanyStockItem: 'CompanyStockItem',
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
@@ -764,8 +849,11 @@ exports.Prisma.ModelName = {
   KasPocket: 'KasPocket',
   KasDailyEntry: 'KasDailyEntry',
   StockistHeadConfirmation: 'StockistHeadConfirmation',
+  StockistTotalHeadConfirmation: 'StockistTotalHeadConfirmation',
   KasHeadConfirmation: 'KasHeadConfirmation',
-  CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal'
+  BankHeadConfirmation: 'BankHeadConfirmation',
+  CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal',
+  CorrectionRequest: 'CorrectionRequest'
 };
 
 /**
