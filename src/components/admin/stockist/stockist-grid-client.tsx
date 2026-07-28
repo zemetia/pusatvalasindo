@@ -50,7 +50,36 @@ interface Props {
   date: string
   canManage: boolean
   onAlertsChange?: (alerts: { beda: number; belumReview: number; belumIsi: number }) => void
+  /** Payload grid yang sudah dirender server (bentuknya identik dengan respons /api/stockist/grid). */
+  initialGrid?: unknown
+  /** `${companyId}:${YYYY-MM-DD}` milik initialGrid — dipakai hanya kalau cocok dengan state sekarang. */
+  initialGridKey?: string | null
 }
+
+// Bentuk payload grid, sama untuk yang datang dari fetch maupun yang dirender server.
+type GridPayload = {
+  pockets?: Pocket[]
+  currencies?: StockItem[]
+  serverDate?: string | null
+  checks?: (Omit<Check, "enteredQuantity"> & { enteredQuantity: string | number | null })[]
+  pendingCorrections?: Record<string, PendingCorrection>
+  alerts?: { beda: number; belumReview: number; belumIsi: number; totalCells: number }
+}
+
+// enteredQuantity datang sebagai string (Decimal yang di-JSON-kan), jadi selalu dinormalkan
+// ke number di sini — dipakai baik oleh payload hasil fetch maupun payload dari server.
+function toCheckMap(checks: GridPayload["checks"]) {
+  const map: Record<string, Check> = {}
+  for (const c of checks ?? []) {
+    map[`${c.pocketId}:${c.companyStockItemId}`] = {
+      ...c,
+      enteredQuantity: c.enteredQuantity === null ? null : Number(c.enteredQuantity),
+    }
+  }
+  return map
+}
+
+const EMPTY_ALERTS = { beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0 }
 
 function fmt(n: number) {
   return n.toLocaleString("id-ID", { maximumFractionDigits: 2 })
@@ -90,15 +119,37 @@ function stateLabel(state: CellState) {
   return "Tidak diisi"
 }
 
-export function StockistGridClient({ companyId, date, canManage, onAlertsChange }: Props) {
+export function StockistGridClient({
+  companyId,
+  date,
+  canManage,
+  onAlertsChange,
+  initialGrid,
+  initialGridKey,
+}: Props) {
   const isMobile = useIsMobile()
-  const [pockets, setPockets] = useState<Pocket[]>([])
-  const [currencies, setCurrencies] = useState<StockItem[]>([])
-  const [checks, setChecks] = useState<Record<string, Check>>({})
+
+  // Payload dari server hanya sah untuk kombinasi PT + tanggal yang dipakai saat halaman
+  // dirender. Kalau user sudah ganti salah satunya (atau tanggal browser beda dengan tanggal
+  // server), seed diabaikan dan grid dimuat lewat fetch seperti biasa.
+  const seedRef = useRef<GridPayload | null>(
+    initialGrid && initialGridKey && initialGridKey === `${companyId}:${date}`
+      ? (initialGrid as GridPayload)
+      : null
+  )
+  const seed = seedRef.current
+
+  const [pockets, setPockets] = useState<Pocket[]>(
+    () => (seed?.pockets ?? []).filter((p) => p.isActive)
+  )
+  const [currencies, setCurrencies] = useState<StockItem[]>(() => seed?.currencies ?? [])
+  const [checks, setChecks] = useState<Record<string, Check>>(() => toCheckMap(seed?.checks))
   // key: `${pocketId}:${companyStockItemId}` — koreksi yang masih menunggu keputusan owner.
-  const [pendingCorrections, setPendingCorrections] = useState<Record<string, PendingCorrection>>({})
-  const [serverDate, setServerDate] = useState<string | null>(null)
-  const [alerts, setAlerts] = useState({ beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0 })
+  const [pendingCorrections, setPendingCorrections] = useState<Record<string, PendingCorrection>>(
+    () => seed?.pendingCorrections ?? {}
+  )
+  const [serverDate, setServerDate] = useState<string | null>(() => seed?.serverDate ?? null)
+  const [alerts, setAlerts] = useState(() => seed?.alerts ?? EMPTY_ALERTS)
   const [loading, setLoading] = useState(false)
   const [markingAll, setMarkingAll] = useState(false)
   const [activeCell, setActiveCell] = useState<{ pocketId: string; companyStockItemId: string } | null>(
@@ -128,20 +179,13 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
         toast.error(data.error || data.message || "Gagal memuat data")
         return
       }
-      const g = data.data
-      setPockets((g.pockets ?? []).filter((p: Pocket) => p.isActive))
+      const g = data.data as GridPayload
+      setPockets((g.pockets ?? []).filter((p) => p.isActive))
       setCurrencies(g.currencies ?? [])
       setServerDate(g.serverDate ?? null)
-      const checkMap: Record<string, Check> = {}
-      for (const c of g.checks ?? []) {
-        checkMap[`${c.pocketId}:${c.companyStockItemId}`] = {
-          ...c,
-          enteredQuantity: c.enteredQuantity === null ? null : Number(c.enteredQuantity),
-        }
-      }
-      setChecks(checkMap)
+      setChecks(toCheckMap(g.checks))
       setPendingCorrections(g.pendingCorrections ?? {})
-      setAlerts(g.alerts ?? { beda: 0, belumReview: 0, belumIsi: 0, totalCells: 0 })
+      setAlerts(g.alerts ?? EMPTY_ALERTS)
     } catch {
       toast.error("Gagal memuat data")
     } finally {
@@ -149,7 +193,15 @@ export function StockistGridClient({ companyId, date, canManage, onAlertsChange 
     }
   }, [companyId, date])
 
+  // Kalau grid awal sudah datang bersama HTML, lewati fetch pertama — itu persis data yang
+  // sama. Perubahan companyId/date sesudahnya mengganti identitas `load`, jadi fetch tetap
+  // jalan normal.
+  const skipFirstLoadRef = useRef(seed !== null)
   useEffect(() => {
+    if (skipFirstLoadRef.current) {
+      skipFirstLoadRef.current = false
+      return
+    }
     load()
   }, [load])
 

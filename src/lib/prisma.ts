@@ -9,9 +9,18 @@ declare global {
 function createPrismaClient() {
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 10, // this app runs as a long-lived `next start` process, not serverless —
-    // a single-connection pool serialized every query (including auth session
-    // lookups) behind one round trip, which was the main cause of admin page slowness
+    // This app is deployed to Vercel, so each function instance is its own short-lived
+    // process — NOT the long-lived `next start` server this file used to assume. Every
+    // cold instance opens a fresh TCP + TLS + Postgres handshake to the remote DB, and
+    // a large pool per instance multiplied across concurrent lambdas will exhaust the
+    // server's `max_connections`. Keep the per-instance pool small and let PgBouncer
+    // (DATABASE_URL should point at the pooler, transaction mode) do the real pooling.
+    max: 3,
+    // Don't hold sockets open across the idle gaps between invocations — a dead socket
+    // costs a full failed round trip to discover.
+    idleTimeoutMillis: 10_000,
+    // Fail fast instead of hanging the whole request if the pooler is saturated.
+    connectionTimeoutMillis: 10_000,
   });
   const adapter = new PrismaPg(pool);
   // Set PRISMA_LOG_QUERIES=1 to print every SQL statement + its duration to the server console.

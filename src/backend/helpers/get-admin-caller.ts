@@ -137,6 +137,32 @@ export async function getCaller(): Promise<AdminCaller | null> {
 }
 
 /**
+ * Requires only a valid session — no role, no permission.
+ *
+ * This is the guard the global middleware used to apply to every /api/* request.
+ * That check moved into the routes themselves so the middleware no longer has to
+ * import Prisma + Better Auth (which made every request pay for a heavyweight
+ * middleware bundle). Routes that have a meaningful permission should use
+ * `requirePermission`; this exists for endpoints where "logged in" genuinely is
+ * the whole requirement, so that removing the middleware gate changes nothing.
+ */
+export async function requireAuth(): Promise<AdminCaller | NextResponse> {
+  const caller = await getCallerRecord();
+  if (!caller) {
+    return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+  }
+
+  return {
+    id: caller.id,
+    companyId: caller.companyId,
+    branchId: caller.branchId,
+    roleName: caller.roleName,
+    permissions: caller.permissions,
+    payrollCompanyIds: caller.payrollCompanyIds,
+  };
+}
+
+/**
  * Middleware helper for page/API routes that require a specific permission.
  * Returns the caller if authorized, or a 401/403 NextResponse.
  */

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { auth } from "@/lib/auth";
 import { fail } from "@/backend/helpers/api-response";
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
@@ -33,12 +32,24 @@ export async function middleware(request: NextRequest) {
 
   const isApi = targetPathname.startsWith("/api/");
 
+  // Cheap, optimistic gate: reject requests that carry no session cookie at all.
+  //
+  // This deliberately does NOT validate the cookie — `getSessionCookie` only parses it
+  // and performs no signature verification. Real enforcement lives in the routes, which each
+  // call `requirePermission`/`requireAuth` and hit the database through the
+  // request-cached `getCallerRecord`. Doing it there instead of here is what lets this
+  // file avoid importing `@/lib/auth` (and with it Prisma + the pg driver): the
+  // middleware runs on EVERY request, so that import made every page navigation pay for
+  // a heavyweight middleware bundle and a second session round trip on top of the one
+  // the route was already doing.
+  //
+  // If you add a route, give it its own guard — this check will not protect it.
+  //
   // /api/auth       — Better Auth's own endpoints
   // /api/mcp        — the MCP endpoint authenticates via Bearer key (withMcpAuth),
   //                   not a session cookie, so it must bypass the session gate here.
   if (isApi && !targetPathname.startsWith("/api/auth") && !targetPathname.startsWith("/api/mcp")) {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user) {
+    if (!sessionCookie) {
       return applySecurityHeaders(
         NextResponse.json(fail("Unauthorized", "You must be logged in"), { status: 401 })
       );

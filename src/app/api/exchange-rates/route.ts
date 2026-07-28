@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/backend/helpers/get-admin-caller'
 
 // GET /api/exchange-rates?codes=USD,EUR,SGD
 // Returns IDR rates fetched from Yahoo Finance (e.g. USDIDR=X)
 export async function GET(req: NextRequest) {
+  // Endpoint ini memanggil API eksternal atas nama server — jangan biarkan terbuka
+  // untuk publik meski datanya sendiri tidak sensitif.
+  const caller = await requireAuth()
+  if (caller instanceof NextResponse) return caller
+
   const codes = req.nextUrl.searchParams.get('codes')
   if (!codes) {
     return NextResponse.json({ error: 'codes param required' }, { status: 400 })

@@ -4,6 +4,8 @@ import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
+import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { PERMISSIONS } from "@/lib/permissions";
 
 const createSchema = z.object({
   employeeId: z.string().min(1),
@@ -15,6 +17,11 @@ type CreateBody = z.infer<typeof createSchema>;
 
 export async function GET(req: NextRequest) {
   try {
+    // Target/revenue per karyawan adalah bagian dari modul KPI dan bisa dibaca untuk
+    // employeeId mana pun lewat query param, jadi ikut izin lihat-semua KPI.
+    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+    if (caller instanceof NextResponse) return caller;
+
     const employeeId = req.nextUrl.searchParams.get("employeeId");
     if (!employeeId) {
       return NextResponse.json(
@@ -40,6 +47,9 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
+      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      if (caller instanceof NextResponse) return caller;
+
       const revenue = await kpiService.createRevenue(ctx.body);
       return NextResponse.json(ok(revenue, "Target dicatat"), { status: 201 });
     } catch (e) {

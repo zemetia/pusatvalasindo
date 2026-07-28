@@ -4,8 +4,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
 import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess, stockistService } from "@/backend/services/stockist.service";
-import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
+import { buildStockistGridPayload } from "@/backend/services/stockist.service";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -24,29 +23,11 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    assertCompanyAccess(caller, companyId);
+    // Payload dibangun di service supaya identik dengan yang dirender server di halaman
+    // stockist (initialGrid) — satu sumber kebenaran, tidak bisa beda bentuk.
+    const payload = await buildStockistGridPayload(caller, companyId, new Date(dateStr));
 
-    const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
-    const date = new Date(dateStr);
-    // Satu kali ambil grid; alerts dihitung dari data yang sama (tanpa query duplikat).
-    const [grid, pending] = await Promise.all([
-      stockistService.getOrCreateGridForDate(companyId, date),
-      correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["STOCKIST"]),
-    ]);
-    const alerts = stockistService.computeAlerts(grid.pockets, grid.currencies, grid.checks, date);
-
-    // Sel yang koreksinya masih menunggu persetujuan ditandai di grid supaya user tidak
-    // mengajukan ulang angka yang sama.
-    const pendingCorrections = Object.fromEntries(
-      pending
-        .filter((c) => c.pocketId && c.companyStockItemId)
-        .map((c) => [
-          `${c.pocketId}:${c.companyStockItemId}`,
-          { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
-        ])
-    );
-
-    return NextResponse.json(ok({ ...grid, alerts, canManage, pendingCorrections }));
+    return NextResponse.json(ok(payload));
   } catch (e) {
     return handleError(e);
   }
