@@ -158,8 +158,8 @@ const AKUNTAN_PERMISSIONS: Permission[] = [
 ];
 
 // Base perms shared by Kasir and Teller Dalam/Luar (currency stock handlers).
-// Sales & Compliance (marketing) is defined separately below, NOT from this
-// base — it must not see foreign currency stock at all (bank/rekening only).
+// Marketing is defined separately below, NOT from this base — it must not
+// see foreign currency stock at all (bank/rekening only).
 const KASIR_BASE_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
@@ -190,7 +190,7 @@ const TELLER_LUAR_PERMISSIONS: Permission[] = [
 ];
 
 // Marketing: focused on rekening (bank) only — no stock/currency visibility.
-const SALES_COMPLIANCE_PERMISSIONS: Permission[] = [
+const MARKETING_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
   PERMISSIONS.KPI_FILL_OWN,
@@ -232,8 +232,8 @@ const ROLE_PERMISSION_MAP: Record<string, Permission[]> = {
   // Teller Dalam bisa manage Stockist (reconciliation harian); Teller Luar cuma view.
   "Teller Dalam": TELLER_DALAM_PERMISSIONS,
   "Teller Luar": TELLER_LUAR_PERMISSIONS,
-  // Sales & Compliance ("marketing") input saldo bank harian, tapi tidak manage Stockist.
-  "Sales & Compliance": SALES_COMPLIANCE_PERMISSIONS,
+  // Marketing input saldo bank harian, tapi tidak manage Stockist.
+  Marketing: MARKETING_PERMISSIONS,
   Kurir: KURIR_PERMISSIONS,
 };
 

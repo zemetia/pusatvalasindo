@@ -114,12 +114,12 @@ const USERS: UserDef[] = [
     branchName: 'Tangerang',
     baseSalary: 3_500_000,
   },
-  // Sales & Compliance — Tangerang
+  // Marketing — Tangerang
   {
     id: 'usr_sales_pvi_tangerang',
-    name: 'Sales Compliance Tangerang',
+    name: 'Marketing Tangerang',
     email: 'sales.tangerang@pvi.local',
-    roleName: 'Sales & Compliance',
+    roleName: 'Marketing',
     companyCode: 'PVI',
     branchName: 'Tangerang',
     baseSalary: 3_800_000,
@@ -156,12 +156,12 @@ const USERS: UserDef[] = [
     branchName: 'Pluit',
     baseSalary: 3_500_000,
   },
-  // Sales & Compliance — Pluit
+  // Marketing — Pluit
   {
     id: 'usr_sales_ptu_pluit',
-    name: 'Sales Compliance Pluit',
+    name: 'Marketing Pluit',
     email: 'sales.pluit@ptu.local',
-    roleName: 'Sales & Compliance',
+    roleName: 'Marketing',
     companyCode: 'PTU',
     branchName: 'Pluit',
     baseSalary: 3_800_000,
@@ -342,7 +342,7 @@ export async function seedUsers(
     { label: 'SUPER_ADMIN', users: USERS.filter(u => u.roleName === 'SUPER_ADMIN') },
     { label: 'OWNER',       users: USERS.filter(u => u.roleName === 'OWNER') },
     { label: 'Kepala',      users: USERS.filter(u => u.roleName.startsWith('Kepala')) },
-    { label: 'Teller/Sales',users: USERS.filter(u => ['Teller Dalam','Teller Luar','Sales & Compliance'].includes(u.roleName)) },
+    { label: 'Teller/Sales',users: USERS.filter(u => ['Teller Dalam','Teller Luar','Marketing'].includes(u.roleName)) },
     { label: 'Kurir',       users: USERS.filter(u => u.roleName === 'Kurir') },
   ]
   for (const g of groups) {

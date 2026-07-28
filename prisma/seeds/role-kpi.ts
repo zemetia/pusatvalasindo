@@ -1,8 +1,8 @@
 import type { PrismaClient } from '../../src/generated/prisma/client'
 
 const ROLE_MAP: Record<string, string> = {
-  'SALES/MARKETING': 'Sales & Compliance',
-  'SALES/MARKETING(nadine dan vinny)': 'Sales & Compliance',
+  'SALES/MARKETING': 'Marketing',
+  'SALES/MARKETING(nadine dan vinny)': 'Marketing',
   'Teller Luar': 'Teller Luar',
   'Teller Dalam': 'Teller Dalam',
   'Kurir': 'Kurir',

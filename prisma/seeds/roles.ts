@@ -10,7 +10,7 @@ const CANONICAL_ROLES = [
   'Kepala Marketing',
   'Teller Dalam',
   'Teller Luar',
-  'Sales & Compliance',
+  'Marketing',
   'Kurir',
 ]
 
