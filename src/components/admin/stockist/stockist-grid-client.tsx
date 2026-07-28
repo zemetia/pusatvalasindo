@@ -131,13 +131,13 @@ export function StockistGridClient({
 
   // Payload dari server hanya sah untuk kombinasi PT + tanggal yang dipakai saat halaman
   // dirender. Kalau user sudah ganti salah satunya (atau tanggal browser beda dengan tanggal
-  // server), seed diabaikan dan grid dimuat lewat fetch seperti biasa.
-  const seedRef = useRef<GridPayload | null>(
+  // server), seed diabaikan dan grid dimuat lewat fetch seperti biasa. Dihitung sekali lewat
+  // lazy initializer dan tidak pernah berubah.
+  const [seed] = useState<GridPayload | null>(() =>
     initialGrid && initialGridKey && initialGridKey === `${companyId}:${date}`
       ? (initialGrid as GridPayload)
       : null
   )
-  const seed = seedRef.current
 
   const [pockets, setPockets] = useState<Pocket[]>(
     () => (seed?.pockets ?? []).filter((p) => p.isActive)

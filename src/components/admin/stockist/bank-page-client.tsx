@@ -37,9 +37,20 @@ interface Props {
   defaultCompanyId: string | null
   canManage: boolean
   canSelectCompany: boolean
+  /** Grid hari ini yang sudah dirender server, kalau PT-nya sudah pasti. */
+  initialGrid?: unknown
+  /** `${companyId}:${YYYY-MM-DD}` milik initialGrid — dipakai hanya kalau cocok. */
+  initialGridKey?: string | null
 }
 
-export function BankPageClient({ companies, defaultCompanyId, canManage, canSelectCompany }: Props) {
+export function BankPageClient({
+  companies,
+  defaultCompanyId,
+  canManage,
+  canSelectCompany,
+  initialGrid,
+  initialGridKey,
+}: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? "")
   const [date, setDate] = useState(toDate(new Date()))
   const [bankUnfilled, setBankUnfilled] = useState(0)
@@ -167,6 +178,8 @@ export function BankPageClient({ companies, defaultCompanyId, canManage, canSele
           date={date}
           canManage={canManage}
           onUnfilledChange={setBankUnfilled}
+          initialGrid={initialGrid}
+          initialGridKey={initialGridKey}
         />
       )}
     </div>

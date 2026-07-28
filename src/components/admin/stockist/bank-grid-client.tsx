@@ -61,16 +61,79 @@ function parseNum(s: string): number {
   return parseFloat(cleaned) || 0
 }
 
+// Bentuk payload bank harian, sama untuk yang datang dari fetch maupun yang dirender server.
+type BankPayload = {
+  accounts?: Account[]
+  serverDate?: string | null
+  entries?: Record<
+    string,
+    { balance: string; note: string | null; verifyStatus: DailyVerifyStatus; verifyNote: string | null }
+  >
+  previous?: Record<string, { balance: string; date: string }>
+  pendingCorrections?: Record<string, PendingCorrection>
+}
+
+function buildRows(payload: BankPayload): Row[] {
+  const entries = payload.entries ?? {}
+  const previous = payload.previous ?? {}
+  const pendingCorrections = payload.pendingCorrections ?? {}
+
+  return (payload.accounts ?? []).map((acc) => {
+    const entry = entries[acc.id]
+    const prev = previous[acc.id]
+    const balance = entry?.balance ?? "0"
+    const note = entry?.note ?? ""
+    return {
+      bankAccountId: acc.id,
+      bankName: acc.bankName,
+      accountName: acc.accountName,
+      currencyCode: acc.currencyCode,
+      previousBalance: prev ? Number(prev.balance) : null,
+      previousDate: prev?.date ?? null,
+      fallbackBalance: Number(acc.referenceBalance ?? 0),
+      balance,
+      note,
+      savedBalance: balance,
+      savedNote: note,
+      saveState: "idle",
+      hasEntry: Boolean(entry),
+      verifyStatus: entry?.verifyStatus ?? "BELUM_REVIEW",
+      verifyNote: entry?.verifyNote ?? null,
+      pendingCorrection: pendingCorrections[acc.id],
+    }
+  })
+}
+
 interface Props {
   companyId: string
   date: string
   canManage: boolean
   onUnfilledChange?: (count: number) => void
+  /** Payload yang sudah dirender server (bentuknya identik dengan respons /api/bank-harian). */
+  initialGrid?: unknown
+  /** `${companyId}:${YYYY-MM-DD}` milik initialGrid — dipakai hanya kalau cocok. */
+  initialGridKey?: string | null
 }
 
-export function BankGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
-  const [rows, setRows] = useState<Row[]>([])
-  const [serverDate, setServerDate] = useState<string | null>(null)
+export function BankGridClient({
+  companyId,
+  date,
+  canManage,
+  onUnfilledChange,
+  initialGrid,
+  initialGridKey,
+}: Props) {
+  // Payload server hanya sah untuk kombinasi PT + tanggal saat halaman dirender. Dihitung
+  // sekali lewat lazy initializer dan tidak pernah berubah — begitu user ganti PT/tanggal,
+  // data selalu datang dari fetch.
+  const [seed] = useState<BankPayload | null>(() =>
+    initialGrid && initialGridKey && initialGridKey === `${companyId}:${date}`
+      ? (initialGrid as BankPayload)
+      : null
+  )
+
+  const [rows, setRows] = useState<Row[]>(() => (seed ? buildRows(seed) : []))
+  const [serverDate, setServerDate] = useState<string | null>(() => seed?.serverDate ?? null)
   const [fetching, setFetching] = useState(false)
   const rowsRef = useRef<Row[]>([])
   rowsRef.current = rows
@@ -88,40 +151,9 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
         return
       }
 
-      const accounts: Account[] = data.data.accounts ?? []
-      const entries: Record<
-        string,
-        { balance: string; note: string | null; verifyStatus: DailyVerifyStatus; verifyNote: string | null }
-      > = data.data.entries ?? {}
-      const previous: Record<string, { balance: string; date: string }> = data.data.previous ?? {}
-      const pendingCorrections: Record<string, PendingCorrection> = data.data.pendingCorrections ?? {}
-      setServerDate(data.data.serverDate ?? null)
-
-      const builtRows: Row[] = accounts.map((acc) => {
-        const entry = entries[acc.id]
-        const prev = previous[acc.id]
-        const balance = entry?.balance ?? "0"
-        const note = entry?.note ?? ""
-        return {
-          bankAccountId: acc.id,
-          bankName: acc.bankName,
-          accountName: acc.accountName,
-          currencyCode: acc.currencyCode,
-          previousBalance: prev ? Number(prev.balance) : null,
-          previousDate: prev?.date ?? null,
-          fallbackBalance: Number(acc.referenceBalance ?? 0),
-          balance,
-          note,
-          savedBalance: balance,
-          savedNote: note,
-          saveState: "idle",
-          hasEntry: Boolean(entry),
-          verifyStatus: entry?.verifyStatus ?? "BELUM_REVIEW",
-          verifyNote: entry?.verifyNote ?? null,
-          pendingCorrection: pendingCorrections[acc.id],
-        }
-      })
-      setRows(builtRows)
+      const payload = data.data as BankPayload
+      setServerDate(payload.serverDate ?? null)
+      setRows(buildRows(payload))
     } catch {
       toast.error("Gagal memuat data")
       setRows([])
@@ -130,7 +162,13 @@ export function BankGridClient({ companyId, date, canManage, onUnfilledChange }:
     }
   }, [companyId, date])
 
+  // Kalau grid awal sudah datang bersama HTML, lewati fetch pertama — data yang sama persis.
+  const skipFirstLoadRef = useRef(seed !== null)
   useEffect(() => {
+    if (skipFirstLoadRef.current) {
+      skipFirstLoadRef.current = false
+      return
+    }
     loadData()
   }, [loadData])
 
