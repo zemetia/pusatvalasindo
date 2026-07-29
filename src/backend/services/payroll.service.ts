@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import { kpiService } from "./kpi.service";
+import { payrollIncentiveService } from "./payroll-incentive.service";
 import { NotFoundError, ForbiddenError } from "@/backend/errors/app-error";
-import type { BreakdownItem } from "@/lib/kpi-utils";
+import type { KpiBreakdown } from "@/lib/kpi-utils";
 import { can, PERMISSIONS } from "@/lib/permissions";
 import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
 
@@ -9,23 +10,37 @@ const WORK_START_HOUR = 17;
 const WORK_START_MINUTE = 40;
 
 /**
- * Guards payroll visibility per caller's permission tier:
+ * Payroll visibility per caller's permission tier:
  * - PAYROLL_VIEW_ALL: any employee.
  * - PAYROLL_VIEW_COMPANY: only employees in payrollCompanyIds (falls back to
  *   the caller's own company if that list is empty).
  * - PAYROLL_VIEW_OWN: only the caller's own record.
+ *
+ * Predikat (bukan guard) supaya halaman bisa memutuskan menyembunyikan bagian
+ * gaji tanpa menangkap exception — aturannya tetap satu tempat.
  */
-export function assertPayrollAccess(caller: AdminCaller, targetUserId: string, targetCompanyId: string | null) {
-  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL)) return;
+export function canViewPayrollOf(
+  caller: AdminCaller,
+  targetUserId: string,
+  targetCompanyId: string | null
+): boolean {
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL)) return true;
 
   if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
     const allowedCompanyIds = caller.payrollCompanyIds.length > 0 ? caller.payrollCompanyIds : [caller.companyId];
-    if (targetCompanyId && allowedCompanyIds.includes(targetCompanyId)) return;
-    throw new ForbiddenError("Tidak punya akses ke gaji PT ini");
+    return Boolean(targetCompanyId && allowedCompanyIds.includes(targetCompanyId));
   }
 
-  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN) && caller.id === targetUserId) return;
+  return can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN) && caller.id === targetUserId;
+}
 
+/** Versi guard dari `canViewPayrollOf` — dipakai route & service. */
+export function assertPayrollAccess(caller: AdminCaller, targetUserId: string, targetCompanyId: string | null) {
+  if (canViewPayrollOf(caller, targetUserId, targetCompanyId)) return;
+
+  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
+    throw new ForbiddenError("Tidak punya akses ke gaji PT ini");
+  }
   throw new ForbiddenError("Tidak punya akses ke data gaji ini");
 }
 
@@ -93,20 +108,13 @@ export const payrollService = {
       }
     }
 
-    // Determine signed KPI adjustment based on result type
-    const bonusRaw = Number(kpiResult.bonusAmount ?? 0);
-    const resultType = kpiResult.bonusResult;
-    let bonusKpi: number;
-    if (resultType === "PENALTY_DEDUCTION" || resultType === "PENALTY_SATURDAY") {
-      bonusKpi = -bonusRaw;
-    } else if (resultType === "BONUS_CASH" || resultType === "TOP_PERFORMER") {
-      bonusKpi = bonusRaw;
-    } else {
-      bonusKpi = 0; // SAFE_ZONE or undefined
-    }
+    // Konversi skor KPI → rupiah dilakukan di sini, bukan di modul KPI. Harus
+    // menunggu skor tersimpan lebih dulu karena bonus top performer
+    // membandingkan karyawan ini dengan rekan sejabatannya.
+    const incentive = await payrollIncentiveService.resolveForEmployee(employeeId, month, year);
 
     const totalDeductions = totalLateDeduction + totalAbsenceDeduction;
-    const takeHomePay = totalGrossFixed - totalDeductions + bonusKpi;
+    const takeHomePay = totalGrossFixed - totalDeductions + incentive.netAmount;
 
     return {
       employee: {
@@ -125,12 +133,11 @@ export const payrollService = {
       },
       kpi: {
         score: Number(kpiResult.totalScore),
-        bonusAmount: bonusRaw,
-        bonusKpi,
-        resultType,
-        breakdownJson: kpiResult.breakdownJson as { items: BreakdownItem[] },
+        grade: kpiResult.grade,
+        breakdownJson: kpiResult.breakdownJson as unknown as KpiBreakdown,
         calculatedAt: kpiResult.calculatedAt.toISOString(),
       },
+      incentive,
       deductions: {
         late: totalLateDeduction,
         absence: totalAbsenceDeduction,

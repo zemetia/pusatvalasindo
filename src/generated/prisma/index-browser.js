@@ -293,6 +293,17 @@ exports.Prisma.PriceBenchmarkScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SmartdealRateScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  buy: 'buy',
+  sell: 'sell',
+  prevBuy: 'prevBuy',
+  prevSell: 'prevSell',
+  fetchedAt: 'fetchedAt'
+};
+
 exports.Prisma.CompanyStockItemScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -307,8 +318,18 @@ exports.Prisma.CompanyStockItemScalarFieldEnum = {
 
 exports.Prisma.KpiDefinitionScalarFieldEnum = {
   id: 'id',
+  code: 'code',
   name: 'name',
-  type: 'type',
+  objective: 'objective',
+  description: 'description',
+  scoringType: 'scoringType',
+  unit: 'unit',
+  direction: 'direction',
+  defaultInputSource: 'defaultInputSource',
+  defaultRequiresApproval: 'defaultRequiresApproval',
+  defaultRequiresEvidence: 'defaultRequiresEvidence',
+  systemSourceKey: 'systemSourceKey',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -316,50 +337,57 @@ exports.Prisma.KpiDefinitionScalarFieldEnum = {
 exports.Prisma.RoleKpiScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
+  customRoleId: 'customRoleId',
   kpiId: 'kpiId',
-  maxScore: 'maxScore',
-  targetValue: 'targetValue',
-  threshold: 'threshold',
   weight: 'weight',
+  targetValue: 'targetValue',
+  basePoint: 'basePoint',
+  pointPerUnit: 'pointPerUnit',
+  toleranceLimit: 'toleranceLimit',
+  toleranceScope: 'toleranceScope',
+  maxAchievement: 'maxAchievement',
+  minAchievement: 'minAchievement',
+  inputSource: 'inputSource',
+  requiresApproval: 'requiresApproval',
+  requiresEvidence: 'requiresEvidence',
+  systemConfig: 'systemConfig',
+  isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  customRoleId: 'customRoleId'
+  updatedAt: 'updatedAt'
 };
 
-exports.Prisma.KpiLogScalarFieldEnum = {
+exports.Prisma.KpiEntryScalarFieldEnum = {
   id: 'id',
   employeeId: 'employeeId',
-  kpiId: 'kpiId',
-  value: 'value',
+  roleKpiId: 'roleKpiId',
+  occurredAt: 'occurredAt',
+  periodYear: 'periodYear',
+  periodMonth: 'periodMonth',
+  weekOfMonth: 'weekOfMonth',
+  quantity: 'quantity',
   note: 'note',
-  createdAt: 'createdAt'
+  evidenceUrl: 'evidenceUrl',
+  source: 'source',
+  status: 'status',
+  createdById: 'createdById',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  reviewNote: 'reviewNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
-exports.Prisma.RevenueScalarFieldEnum = {
+exports.Prisma.KpiPeriodScalarFieldEnum = {
   id: 'id',
   employeeId: 'employeeId',
-  amount: 'amount',
-  date: 'date',
+  month: 'month',
+  year: 'year',
+  status: 'status',
+  lockedAt: 'lockedAt',
+  lockedById: 'lockedById',
   note: 'note',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.BonusMatrixScalarFieldEnum = {
-  id: 'id',
-  companyId: 'companyId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  customRoleId: 'customRoleId'
-};
-
-exports.Prisma.BonusTierScalarFieldEnum = {
-  id: 'id',
-  matrixId: 'matrixId',
-  minScore: 'minScore',
-  maxScore: 'maxScore',
-  resultType: 'resultType',
-  amount: 'amount',
-  isTopPerformer: 'isTopPerformer'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.KpiMonthlyResultScalarFieldEnum = {
@@ -368,10 +396,33 @@ exports.Prisma.KpiMonthlyResultScalarFieldEnum = {
   month: 'month',
   year: 'year',
   totalScore: 'totalScore',
-  bonusAmount: 'bonusAmount',
-  bonusResult: 'bonusResult',
+  grade: 'grade',
   breakdownJson: 'breakdownJson',
   calculatedAt: 'calculatedAt'
+};
+
+exports.Prisma.PayrollIncentiveMatrixScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  customRoleId: 'customRoleId',
+  name: 'name',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PayrollIncentiveTierScalarFieldEnum = {
+  id: 'id',
+  matrixId: 'matrixId',
+  minScore: 'minScore',
+  maxScore: 'maxScore',
+  outcome: 'outcome',
+  cashAmount: 'cashAmount',
+  mandatorySaturday: 'mandatorySaturday',
+  topRank: 'topRank',
+  note: 'note',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.RefiningBatchScalarFieldEnum = {
@@ -661,12 +712,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -710,16 +761,56 @@ exports.CompanyStockItemType = exports.$Enums.CompanyStockItemType = {
   LOGAM_MULIA: 'LOGAM_MULIA'
 };
 
-exports.KpiType = exports.$Enums.KpiType = {
-  EVENT: 'EVENT',
-  TARGET: 'TARGET'
+exports.KpiScoringType = exports.$Enums.KpiScoringType = {
+  TARGET_VALUE: 'TARGET_VALUE',
+  PENALTY_POINT: 'PENALTY_POINT',
+  REWARD_POINT: 'REWARD_POINT',
+  PENALTY_PERCENT: 'PENALTY_PERCENT',
+  TOLERANCE_LIMIT: 'TOLERANCE_LIMIT',
+  BOOLEAN_DAILY: 'BOOLEAN_DAILY'
 };
 
-exports.BonusResultType = exports.$Enums.BonusResultType = {
+exports.KpiUnit = exports.$Enums.KpiUnit = {
+  OCCURRENCE: 'OCCURRENCE',
+  CURRENCY: 'CURRENCY',
+  POINT: 'POINT',
+  PERCENT: 'PERCENT',
+  DAY: 'DAY',
+  PERSON: 'PERSON'
+};
+
+exports.KpiDirection = exports.$Enums.KpiDirection = {
+  HIGHER_BETTER: 'HIGHER_BETTER',
+  LOWER_BETTER: 'LOWER_BETTER'
+};
+
+exports.KpiInputSource = exports.$Enums.KpiInputSource = {
+  SELF: 'SELF',
+  SUPERVISOR: 'SUPERVISOR',
+  SYSTEM: 'SYSTEM'
+};
+
+exports.KpiToleranceScope = exports.$Enums.KpiToleranceScope = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY'
+};
+
+exports.KpiEntryStatus = exports.$Enums.KpiEntryStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+};
+
+exports.KpiPeriodStatus = exports.$Enums.KpiPeriodStatus = {
+  OPEN: 'OPEN',
+  LOCKED: 'LOCKED'
+};
+
+exports.PayrollIncentiveOutcome = exports.$Enums.PayrollIncentiveOutcome = {
   BONUS_CASH: 'BONUS_CASH',
   SAFE_ZONE: 'SAFE_ZONE',
-  PENALTY_SATURDAY: 'PENALTY_SATURDAY',
-  PENALTY_DEDUCTION: 'PENALTY_DEDUCTION',
+  DEDUCTION: 'DEDUCTION',
   TOP_PERFORMER: 'TOP_PERFORMER'
 };
 
@@ -825,14 +916,15 @@ exports.Prisma.ModelName = {
   Company: 'Company',
   Currency: 'Currency',
   PriceBenchmark: 'PriceBenchmark',
+  SmartdealRate: 'SmartdealRate',
   CompanyStockItem: 'CompanyStockItem',
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
-  KpiLog: 'KpiLog',
-  Revenue: 'Revenue',
-  BonusMatrix: 'BonusMatrix',
-  BonusTier: 'BonusTier',
+  KpiEntry: 'KpiEntry',
+  KpiPeriod: 'KpiPeriod',
   KpiMonthlyResult: 'KpiMonthlyResult',
+  PayrollIncentiveMatrix: 'PayrollIncentiveMatrix',
+  PayrollIncentiveTier: 'PayrollIncentiveTier',
   RefiningBatch: 'RefiningBatch',
   Sample: 'Sample',
   ShipmentProvider: 'ShipmentProvider',

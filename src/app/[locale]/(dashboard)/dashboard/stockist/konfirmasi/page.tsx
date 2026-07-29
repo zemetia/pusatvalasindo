@@ -1,7 +1,7 @@
 import { PERMISSIONS } from "@/lib/permissions";
 import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
 import { StockistHeadConfirmationClient } from "@/components/admin/stockist/stockist-head-confirmation-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IconClipboardCheck, IconBuildingOff } from "@tabler/icons-react";
 
@@ -25,7 +25,7 @@ export default async function StockistHeadConfirmationPage({
   const isUnassigned = !canSelectCompany && !effectiveCompanyId;
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Cross-Check Stock"
         description="Hitung ulang total stock, kas, & bank oleh kepala cabang, dibandingkan otomatis dengan total sistem."
@@ -48,6 +48,6 @@ export default async function StockistHeadConfirmationPage({
           canSelectCompany={canSelectCompany}
         />
       )}
-    </div>
+    </PageShell>
   );
 }

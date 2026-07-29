@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getCaller } from "@/backend/helpers/get-admin-caller";
 import { can, PERMISSIONS } from "@/lib/permissions";
+import { kpiService, resolveInputPolicy } from "@/backend/services/kpi.service";
 import { KpiSelfFillClient } from "@/components/kpi-self-fill-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconPencil } from "@tabler/icons-react";
 
 export default async function KpiSelfPage({
@@ -13,84 +12,59 @@ export default async function KpiSelfPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) redirect(`/${locale}/login`);
+  const caller = await getCaller();
+  if (!caller) redirect(`/${locale}/login`);
 
-  let user;
-  try {
-    user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        branch: { select: { companyId: true } },
-        customRole: { select: { id: true, name: true, permissions: true } },
-      },
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[kpi/self/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
-    )
-  }
-
-  if (!user) redirect(`/${locale}/login`);
-
-  const permissions = user.customRole?.permissions ?? [];
-
-  // Karyawan tanpa permission fill tidak bisa masuk halaman ini
-  if (!can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
+  if (!can(caller.permissions, PERMISSIONS.KPI_FILL_OWN)) {
     redirect(`/${locale}/dashboard`);
   }
 
-  const customRoleId = user.customRole?.id;
-  let roleKpisRaw;
+  let data;
   try {
-    roleKpisRaw = customRoleId
-      ? await prisma.roleKpi.findMany({
-          where: { customRoleId },
-          select: {
-            kpiId: true,
-            definition: { select: { name: true, type: true } },
-          },
-        })
-      : [];
+    data = await kpiService.getRoleKpisForEmployee(caller.id);
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[kpi/self/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
-    )
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return <ErrorPanel source="kpi/self/page" message={msg} />;
   }
 
-  const roleKpis = roleKpisRaw.map((rk) => ({
-    kpiId: rk.kpiId,
-    name: rk.definition.name,
-    type: rk.definition.type as string,
-  }));
+  // Halaman ini hanya menampilkan KPI yang memang boleh diisi sendiri. KPI
+  // bersumber SUPERVISOR/SYSTEM tetap dinilai, tapi tidak lewat sini — itulah
+  // pemisah antara "boleh diisi sendiri" dan "tidak".
+  const fillable = data.roleKpis
+    .filter((rk) => resolveInputPolicy(rk).inputSource === "SELF")
+    .map((rk) => {
+      const policy = resolveInputPolicy(rk);
+      return {
+        roleKpiId: rk.id,
+        name: rk.definition.name,
+        description: rk.definition.description,
+        scoringType: rk.definition.scoringType as string,
+        unit: rk.definition.unit as string,
+        requiresApproval: policy.requiresApproval,
+        requiresEvidence: policy.requiresEvidence,
+        targetValue: rk.targetValue?.toString() ?? null,
+        pointPerUnit: rk.pointPerUnit?.toString() ?? null,
+        toleranceLimit: rk.toleranceLimit?.toString() ?? null,
+      };
+    });
+
+  const supervisorOnlyCount = data.roleKpis.length - fillable.length;
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
-        title="KPI Saya"
-        description="Catat kejadian atau pelanggaran KPI yang terjadi pada diri Anda."
+        title="Input KPI Saya"
+        description="Catat sendiri capaian dan kejadian KPI Anda per tanggal. Sebagian butuh persetujuan atasan sebelum dihitung."
         icon={<IconPencil className="size-5" />}
       />
       <KpiSelfFillClient
-        userId={user.id}
-        userName={user.name}
-        roleName={user.customRole?.name ?? "—"}
-        roleKpis={roleKpis}
-        companyId={user.branch?.companyId ?? ""}
-        customRoleId={user.customRole?.id ?? ""}
+        userId={caller.id}
+        userName={data.employee.name}
+        roleName={data.employee.roleName}
+        companyName={data.employee.companyName}
+        fillableKpis={fillable}
+        supervisorOnlyCount={supervisorOnlyCount}
       />
-    </div>
+    </PageShell>
   );
 }

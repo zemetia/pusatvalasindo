@@ -18,6 +18,22 @@ export async function requirePageCaller(permission: Permission, locale: string) 
   return caller;
 }
 
+/**
+ * Guard untuk halaman yang hanya boleh dilihat role global (Owner & Super Admin),
+ * mis. Laporan Finance yang menampilkan posisi keuangan seluruh PT sekaligus.
+ *
+ * Sengaja role-gated, bukan permission-gated — sama alasannya dengan halaman
+ * Pengguna (lihat `isAdminRole` di lib/permissions): daftar permission tersimpan
+ * di DB per role, jadi gating lewat permission bisa melenceng kalau role di-seed
+ * ulang. Kepala Cabang tidak boleh masuk ke sini: ia hanya berhak atas PT-nya.
+ */
+export async function requireGlobalPageCaller(locale: string) {
+  const caller = await getCallerRecord();
+  if (!caller) redirect(`/${locale}/login`);
+  if (!isGlobalRole(caller.roleName)) redirect(`/${locale}/dashboard`);
+  return caller;
+}
+
 export type CompanyScope = {
   /** True for global roles (Super Admin/Owner) — may pick any PT. */
   canSelectCompany: boolean;

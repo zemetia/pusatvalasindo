@@ -31,7 +31,7 @@ function NavMenu({
   pathname: string;
 }) {
   return (
-    <SidebarMenu className="gap-1">
+    <SidebarMenu className="gap-0.5">
       {items.map((item) => {
         const isActive = item.exact
           ? pathname === item.url
@@ -40,24 +40,21 @@ function NavMenu({
         return (
           <SidebarMenuItem key={item.title}>
             <Link href={item.url} className="w-full">
+              {/* Item aktif ditandai lewat latar lembut + ikon merah brand.
+                  Tidak ada geser/bold saat hover — di daftar sepanjang ini
+                  gerakan per item justru membuat sidebar terasa gelisah. */}
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={isActive}
-                className="relative transition-all duration-300 hover:translate-x-1 group/btn
-                  data-[active=true]:bg-primary/10
-                  data-[active=true]:text-primary
-                  data-[active=true]:font-bold
-                  data-[active=true]:shadow-[inset_2px_0_0_0_theme(colors.primary)]"
+                className="group/btn h-8 text-sm transition-colors
+                  data-[active=true]:bg-primary/8
+                  data-[active=true]:text-foreground
+                  data-[active=true]:font-medium"
               >
                 {item.icon && (
-                  <item.icon
-                    className="size-4 opacity-70 group-hover/btn:opacity-100 group-data-[active=true]/btn:opacity-100 group-data-[active=true]/btn:text-primary transition-colors"
-                  />
+                  <item.icon className="text-muted-foreground group-hover/btn:text-foreground group-data-[active=true]/btn:text-primary size-4 transition-colors" />
                 )}
-                <span className="font-medium tracking-tight">{item.title}</span>
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 bg-primary rounded-r-full" />
-                )}
+                <span className="truncate">{item.title}</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -108,7 +105,7 @@ export function NavMain({
     <Collapsible open={open} onOpenChange={handleOpenChange}>
       <SidebarGroup>
         <CollapsibleTrigger asChild>
-          <SidebarGroupLabel className="flex w-full cursor-pointer items-center justify-between hover:text-foreground transition-colors">
+          <SidebarGroupLabel className="text-muted-foreground/80 hover:text-foreground flex w-full cursor-pointer items-center justify-between text-[11px] font-medium tracking-wider uppercase transition-colors">
             {label}
             <IconChevronRight
               className={`size-3.5 transition-transform duration-200 ${open ? "rotate-90" : ""}`}

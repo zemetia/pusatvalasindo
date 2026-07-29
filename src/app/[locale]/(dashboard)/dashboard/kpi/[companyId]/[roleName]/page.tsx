@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { PageShell, ErrorPanel } from "@/components/admin/page-shell";
 import prisma from "@/lib/prisma";
 import { RoleKpiDetailClient } from "@/components/admin/kpi/role-kpi-detail-client";
 
@@ -22,70 +23,104 @@ export default async function KpiDetailPage({ params }: PageProps) {
         select: { id: true, name: true, code: true },
       }),
       prisma.roleKpi.findMany({
-        where: {
-          companyId,
-          customRoleId: customRoleId
-        },
+        where: { companyId, customRoleId },
         select: {
           id: true,
           kpiId: true,
           customRoleId: true,
-          maxScore: true,
-          targetValue: true,
-          threshold: true,
           weight: true,
-          definition: { select: { id: true, name: true, type: true } },
+          targetValue: true,
+          basePoint: true,
+          pointPerUnit: true,
+          toleranceLimit: true,
+          toleranceScope: true,
+          maxAchievement: true,
+          inputSource: true,
+          requiresApproval: true,
+          requiresEvidence: true,
+          isActive: true,
+          definition: {
+            select: {
+              id: true,
+              name: true,
+              scoringType: true,
+              unit: true,
+              description: true,
+              defaultInputSource: true,
+              defaultRequiresApproval: true,
+              defaultRequiresEvidence: true,
+            },
+          },
         },
-        orderBy: { definition: { name: "asc" } },
+        orderBy: [{ weight: "desc" }, { definition: { name: "asc" } }],
       }),
       prisma.kpiDefinition.findMany({
-        orderBy: [{ type: "asc" }, { name: "asc" }],
+        orderBy: [{ scoringType: "asc" }, { name: "asc" }],
+        include: { _count: { select: { roleKpis: true } } },
       }),
-      prisma.custom_role.findUnique({ where: { id: customRoleId } })
+      prisma.custom_role.findUnique({ where: { id: customRoleId } }),
     ]);
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[kpi/[companyId]/[roleName]/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
-    )
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return <ErrorPanel source="kpi/[companyId]/[roleName]/page" message={msg} />;
   }
   const [company, roleKpisRaw, definitions, customRole] = kpiDetailData;
 
   if (!company || !customRole) notFound();
-  
-  const displayRoleName = customRole.name;
 
   const serializedRoleKpis = roleKpisRaw.map((rk) => ({
     id: rk.id,
     kpiId: rk.kpiId,
     customRoleId: rk.customRoleId,
-    maxScore: rk.maxScore.toString(),
-    targetValue: rk.targetValue?.toString() ?? null,
-    threshold: rk.threshold?.toString() ?? null,
     weight: rk.weight.toString(),
-    definition: rk.definition,
+    targetValue: rk.targetValue?.toString() ?? null,
+    basePoint: rk.basePoint?.toString() ?? null,
+    pointPerUnit: rk.pointPerUnit?.toString() ?? null,
+    toleranceLimit: rk.toleranceLimit?.toString() ?? null,
+    toleranceScope: rk.toleranceScope as string | null,
+    maxAchievement: rk.maxAchievement.toString(),
+    inputSource: rk.inputSource as string | null,
+    requiresApproval: rk.requiresApproval,
+    requiresEvidence: rk.requiresEvidence,
+    isActive: rk.isActive,
+    definition: {
+      id: rk.definition.id,
+      name: rk.definition.name,
+      scoringType: rk.definition.scoringType as string,
+      unit: rk.definition.unit as string,
+      description: rk.definition.description,
+      defaultInputSource: rk.definition.defaultInputSource as string,
+      defaultRequiresApproval: rk.definition.defaultRequiresApproval,
+      defaultRequiresEvidence: rk.definition.defaultRequiresEvidence,
+    },
   }));
 
   const serializedDefinitions = definitions.map((d) => ({
     id: d.id,
+    code: d.code,
     name: d.name,
-    type: d.type as string,
-    _count: { roleKpis: 0, logs: 0 },
+    objective: d.objective,
+    description: d.description,
+    scoringType: d.scoringType as string,
+    unit: d.unit as string,
+    direction: d.direction as string,
+    defaultInputSource: d.defaultInputSource as string,
+    defaultRequiresApproval: d.defaultRequiresApproval,
+    defaultRequiresEvidence: d.defaultRequiresEvidence,
+    systemSourceKey: d.systemSourceKey,
+    isActive: d.isActive,
+    _count: d._count,
   }));
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <RoleKpiDetailClient
         company={company}
         roleName={roleName}
-        displayRoleName={displayRoleName}
+        displayRoleName={customRole.name}
         roleKpis={serializedRoleKpis}
         definitions={serializedDefinitions}
       />
-    </div>
+    </PageShell>
   );
 }

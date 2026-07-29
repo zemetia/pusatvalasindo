@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionCard } from "@/components/admin/page-shell";
 import { IconLoader, IconLock } from "@tabler/icons-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
@@ -65,19 +65,13 @@ export function ChangePasswordForm() {
   }
 
   return (
-    <Card className="border-none shadow-none bg-transparent lg:bg-card lg:border lg:shadow-sm">
-      <CardHeader className="px-0 lg:px-6">
-        <div className="flex items-center gap-2">
-          <IconLock className="w-5 h-5 text-primary" />
-          <CardTitle className="text-lg">{t("title")}</CardTitle>
-        </div>
-        <CardDescription>
-          {t("description")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-0 lg:px-6">
+    <SectionCard
+      title={t("title")}
+      description={t("description")}
+      icon={<IconLock className="size-4" />}
+    >
         {error && (
-          <Alert className="mb-4 border border-red-500" variant="destructive">
+          <Alert className="mb-4" variant="destructive">
             <Terminal className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -127,7 +121,6 @@ export function ChangePasswordForm() {
             )}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+    </SectionCard>
   );
 }

@@ -15,6 +15,7 @@ import { seedStockistPockets } from './seeds/stockist-pockets'
 import { seedKasPockets } from './seeds/kas-pockets'
 import { seedKpi } from './seeds/kpi'
 import { seedRoleKpis } from './seeds/role-kpi'
+import { seedPayrollIncentives } from './seeds/payroll-incentive'
 import { seedUsers } from './seeds/users'
 import { seedRoles } from './seeds/roles'
 
@@ -58,8 +59,11 @@ async function main() {
   await seedKasPockets(prisma, companyIds)
 
   console.log('🌱 Seeding KPI definitions...')
-  await seedKpi(prisma, companyIds)
+  await seedKpi(prisma)
   await seedRoleKpis(prisma, companyIds)
+
+  console.log('🌱 Seeding matriks insentif payroll...')
+  await seedPayrollIncentives(prisma, companyIds)
 
   console.log('🌱 Seeding users...')
   await seedUsers(prisma, companyIds, branchIds)

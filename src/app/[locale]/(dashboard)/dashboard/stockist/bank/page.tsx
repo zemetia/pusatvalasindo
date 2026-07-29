@@ -1,7 +1,7 @@
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
 import { BankPageClient } from "@/components/admin/stockist/bank-page-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { IconBuildingBank } from "@tabler/icons-react";
 import { buildBankHarianPayload } from "@/backend/services/bank-harian.service";
 import { todayDateOnly } from "@/backend/helpers/date-only";
@@ -38,7 +38,7 @@ export default async function BankHarianPage({
   }
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Saldo Bank Harian"
         description="Input & lihat saldo bank harian per PT."
@@ -52,6 +52,6 @@ export default async function BankHarianPage({
         initialGrid={initialGrid}
         initialGridKey={initialGridKey}
       />
-    </div>
+    </PageShell>
   );
 }

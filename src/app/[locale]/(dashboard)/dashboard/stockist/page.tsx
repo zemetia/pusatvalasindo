@@ -4,7 +4,7 @@ import { buildStockistGridPayload } from "@/backend/services/stockist.service";
 import { todayDateOnly } from "@/backend/helpers/date-only";
 import Link from "next/link";
 import { StockistTabs } from "@/components/admin/stockist/stockist-tabs";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { Button } from "@/components/ui/button";
 import { IconHistory, IconWallet } from "@tabler/icons-react";
 
@@ -47,7 +47,7 @@ export default async function StockistPage({
   }
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Stock & Kas"
         description="Stock mata uang & kas tunai per PT."
@@ -69,6 +69,6 @@ export default async function StockistPage({
         initialGrid={initialGrid}
         initialGridKey={initialGridKey}
       />
-    </div>
+    </PageShell>
   );
 }

@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  type KeyboardEvent,
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { NumberInput } from "@/components/ui/number-input"
@@ -22,11 +14,13 @@ import {
 } from "@/components/ui/table"
 import { IconAlertTriangle, IconCheck, IconLoader2, IconMinus } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { useGridKeyboardNav } from "@/hooks/use-grid-keyboard-nav"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
 import {
   DailyVerifyCell,
   type DailyVerifyStatus,
   type PendingCorrection,
+  type ApprovedCorrection,
 } from "@/components/admin/stockist/daily-verify-cell"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean }
@@ -47,6 +41,7 @@ type Row = {
   verifyStatus: DailyVerifyStatus
   verifyNote: string | null
   pendingCorrection?: PendingCorrection
+  approvedCorrection?: ApprovedCorrection
 }
 
 function fmt(n: number) {
@@ -65,6 +60,10 @@ interface Props {
   onUnfilledChange?: (count: number) => void
 }
 
+// Grid kas hanya punya satu arah navigasi (atas/bawah) — antar kolom cukup pakai Tab.
+const NAV_COLUMNS = ["balance", "note"] as const
+const NAV_SELECT_ON_FOCUS = ["balance"] as const
+
 export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
   const [pockets, setPockets] = useState<Pocket[]>([])
   const [rows, setRows] = useState<Row[]>([])
@@ -72,7 +71,11 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
   const [fetching, setFetching] = useState(false)
   const rowsRef = useRef<Row[]>([])
   rowsRef.current = rows
-  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map())
+  const { registerCell, handleCellKeyDown } = useGridKeyboardNav({
+    columns: NAV_COLUMNS,
+    rowCount: rows.length,
+    selectOnFocus: NAV_SELECT_ON_FOCUS,
+  })
 
   const loadData = useCallback(async () => {
     if (!companyId || !date) return
@@ -94,6 +97,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
       > = data.data.entries ?? {}
       const previous: Record<string, { balance: string; date: string }> = data.data.previous ?? {}
       const pendingCorrections: Record<string, PendingCorrection> = data.data.pendingCorrections ?? {}
+      const approvedCorrections: Record<string, ApprovedCorrection> = data.data.approvedCorrections ?? {}
 
       setPockets(data.data.pockets ?? [])
       setServerDate(data.data.serverDate ?? null)
@@ -117,6 +121,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
           verifyStatus: entry?.verifyStatus ?? "BELUM_REVIEW",
           verifyNote: entry?.verifyNote ?? null,
           pendingCorrection: pendingCorrections[p.id],
+          approvedCorrection: approvedCorrections[p.id],
         }
       })
       setRows(builtRows)
@@ -259,7 +264,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
       <div className="flex flex-wrap items-center justify-between gap-2">
         {isPast ? (
           totals.belumVerifikasi > 0 ? (
-            <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+            <p className="flex items-center gap-1.5 text-sm text-warning">
               <IconAlertTriangle className="size-4" />
               {totals.belumVerifikasi} pocket belum dikonfirmasi untuk tanggal ini.
             </p>
@@ -269,7 +274,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
             </p>
           )
         ) : totals.unfilled > 0 ? (
-          <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+          <p className="flex items-center gap-1.5 text-sm text-warning">
             <IconAlertTriangle className="size-4" />
             {totals.unfilled} pocket belum diisi hari ini.
           </p>
@@ -308,9 +313,9 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
                 onChange={updateRow}
                 onBlurSave={saveRow}
                 onVerify={verifyRow}
-                inputRefs={inputRefs}
+                registerCell={registerCell}
+                onCellKeyDown={handleCellKeyDown}
                 rowIndex={i}
-                rowCount={rows.length}
               />
             ))}
             <TableRow className="font-medium bg-muted/50">
@@ -320,7 +325,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
               <TableCell
                 className={cn(
                   "text-right font-mono",
-                  totals.totalDelta > 0 && "text-emerald-600 dark:text-emerald-500",
+                  totals.totalDelta > 0 && "text-success",
                   totals.totalDelta < 0 && "text-destructive"
                 )}
               >
@@ -338,7 +343,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
 
 function SaveIndicator({ state }: { state: SaveState }) {
   if (state === "saving") return <IconLoader2 className="size-4 animate-spin text-muted-foreground" />
-  if (state === "saved") return <IconCheck className="size-4 text-emerald-600 dark:text-emerald-500" />
+  if (state === "saved") return <IconCheck className="size-4 text-success" />
   if (state === "error") return <IconAlertTriangle className="size-4 text-destructive" />
   return <IconMinus className="size-4 text-muted-foreground/30" />
 }
@@ -350,9 +355,9 @@ function KasRowEdit({
   onChange,
   onBlurSave,
   onVerify,
-  inputRefs,
+  registerCell,
+  onCellKeyDown,
   rowIndex,
-  rowCount,
 }: {
   row: Row
   canManage: boolean
@@ -365,9 +370,9 @@ function KasRowEdit({
     note?: string,
     correctedBalance?: number
   ) => Promise<boolean>
-  inputRefs: RefObject<Map<string, HTMLInputElement>>
+  registerCell: ReturnType<typeof useGridKeyboardNav>["registerCell"]
+  onCellKeyDown: ReturnType<typeof useGridKeyboardNav>["handleCellKeyDown"]
   rowIndex: number
-  rowCount: number
 }) {
   const balance = parseNum(row.balance)
   const reference = row.previousBalance ?? 0
@@ -376,32 +381,18 @@ function KasRowEdit({
   // Saldo tanggal lampau dikunci — perubahannya wajib lewat pengajuan koreksi.
   const editable = canManage && !isPast
 
-  const registerRef = (field: "balance" | "note") => (el: HTMLInputElement | null) => {
-    const key = `${rowIndex}:${field}`
-    if (el) inputRefs.current.set(key, el)
-    else inputRefs.current.delete(key)
-  }
-
-  // Enter moves focus to the same field one row down, Excel-style — blur (which
-  // autosaves) fires naturally before the next input takes focus.
-  const focusNextRow = (field: "balance" | "note") => {
-    if (rowIndex >= rowCount - 1) return
-    inputRefs.current.get(`${rowIndex + 1}:${field}`)?.focus()
-  }
-
-  const handleEnter = (field: "balance" | "note") => (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== "Enter") return
-    e.preventDefault()
-    focusNextRow(field)
-  }
-
   return (
-    <TableRow className={cn(isUnfilled && "bg-amber-50/60 dark:bg-amber-950/20")}>
+    <TableRow
+      className={cn(
+        isUnfilled && "bg-warning-muted/60",
+        !isUnfilled && row.approvedCorrection && "bg-destructive/8"
+      )}
+    >
       <TableCell className="font-medium text-sm">
         <span
           className={cn(
             "inline-block size-1.5 rounded-full mr-1.5 align-middle",
-            isUnfilled ? "bg-amber-500" : "bg-emerald-500"
+            isUnfilled ? "bg-warning" : "bg-success"
           )}
         />
         {row.name}
@@ -414,19 +405,19 @@ function KasRowEdit({
       </TableCell>
       <TableCell className="text-right">
         <NumberInput
-          ref={registerRef("balance")}
+          ref={registerCell(rowIndex, "balance")}
           value={row.balance}
           disabled={!editable}
           onValueChange={(val) => onChange(row.kasPocketId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.kasPocketId)}
-          onKeyDown={handleEnter("balance")}
+          onKeyDown={onCellKeyDown(rowIndex, "balance")}
           className="text-right font-mono w-full"
         />
       </TableCell>
       <TableCell
         className={cn(
           "text-right font-mono text-sm",
-          delta > 0 && "text-emerald-600 dark:text-emerald-500",
+          delta > 0 && "text-success",
           delta < 0 && "text-destructive"
         )}
       >
@@ -435,14 +426,14 @@ function KasRowEdit({
       </TableCell>
       <TableCell>
         <Input
-          ref={registerRef("note")}
+          ref={registerCell(rowIndex, "note")}
           type="text"
           value={row.note}
           disabled={!editable}
           placeholder="Opsional"
           onChange={(e) => onChange(row.kasPocketId, "note", e.target.value)}
           onBlur={() => onBlurSave(row.kasPocketId)}
-          onKeyDown={handleEnter("note")}
+          onKeyDown={onCellKeyDown(rowIndex, "note")}
           className="w-full text-sm"
         />
       </TableCell>
@@ -454,6 +445,7 @@ function KasRowEdit({
               note={row.verifyNote}
               balance={balance}
               pending={row.pendingCorrection}
+              approved={row.approvedCorrection}
               canVerify={canManage}
               onVerify={(status, note, correctedBalance) =>
                 onVerify(row.kasPocketId, status, note, correctedBalance)

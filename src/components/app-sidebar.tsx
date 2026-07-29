@@ -21,7 +21,9 @@ import {
   IconClipboardCheck,
   IconGavel,
   IconChartCandle,
+  IconChartHistogram,
   IconAdjustmentsHorizontal,
+  IconReportMoney,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -37,7 +39,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { PERMISSIONS, can, isAdminRole } from "@/lib/permissions";
+import { PERMISSIONS, can, isAdminRole, isGlobalRole } from "@/lib/permissions";
 
 interface NavItem {
   title: string;
@@ -80,7 +82,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
 
   if (can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
     navSelf.push({
-      title: "Isi KPI Saya",
+      title: "Input KPI Saya",
       url: "/dashboard/kpi/self",
       icon: IconPencil,
     });
@@ -103,9 +105,11 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.KPI_VIEW_ALL)) {
+  // Halaman ini juga tempat menyetujui entri yang diisi sendiri karyawan, jadi
+  // atasan dengan KPI_APPROVE harus bisa masuk meski tidak punya KPI_VIEW_ALL.
+  if (can(permissions, PERMISSIONS.KPI_VIEW_ALL) || can(permissions, PERMISSIONS.KPI_APPROVE)) {
     navKPI.push({
-      title: "Log KPI",
+      title: "Penilaian & Persetujuan",
       url: "/dashboard/kpi/log",
       icon: IconReport,
     });
@@ -122,38 +126,87 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  // ── Bank & Treasury ──────────────────────────────────────────────────────
-  const navBank: NavItem[] = [];
+  // ── Laporan (dashboard laporan/analisis untuk Karyawan/KPI, Finance, Watcher Valas) ──
+  const navLaporan: NavItem[] = [];
+
+  // Analisis Kinerja memeringkat karyawan lintas PT, jadi gerbangnya peran
+  // global (Owner & Super Admin) — bukan permission KPI yang terikat satu PT.
+  // Halaman ini menegakkan aturan yang sama lewat isGlobalRole.
+  if (isGlobalRole(roleName)) {
+    navLaporan.push({
+      title: "Analisis Kinerja",
+      url: "/dashboard/kpi/analisis",
+      icon: IconChartHistogram,
+    });
+  }
+
+  // Laporan Finance menyatukan posisi keuangan seluruh PT dalam satu layar,
+  // jadi gerbangnya peran global (Owner & Super Admin) — sama seperti guard
+  // requireGlobalPageCaller di halamannya. Kepala Cabang hanya berhak atas PT-nya.
+  if (isGlobalRole(roleName)) {
+    navLaporan.push({
+      title: "Laporan Finance",
+      url: "/dashboard/laporan-finance",
+      icon: IconReportMoney,
+    });
+  }
+
+  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
+    navLaporan.push({
+      title: "Watcher Valas",
+      url: "/dashboard/watcher-valas",
+      icon: IconChartCandle,
+    });
+  }
+
+  // ── Finance Management ──────────────────────────────────────────────────
+  const navFinanceManagement: NavItem[] = [];
 
   if (can(permissions, PERMISSIONS.BANK_VIEW)) {
-    navBank.push({
+    navFinanceManagement.push({
       title: "Rekening Bank",
       url: "/dashboard/bank-accounts",
       icon: IconBuildingBank,
     });
   }
 
-  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
-    navBank.push({
-      title: "Saldo Bank Harian",
-      url: "/dashboard/stockist/bank",
-      icon: IconBuildingBank,
+  if (can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
+    navFinanceManagement.push({
+      title: "Stock Management (PT)",
+      url: "/dashboard/stock-management-pt",
+      icon: IconDatabase,
     });
   }
 
-  // ── Stock & Valas ────────────────────────────────────────────────────────
-  const navStock: NavItem[] = [];
+  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
+    navFinanceManagement.push({
+      title: "Patokan Harga",
+      url: "/dashboard/patokan-harga",
+      icon: IconAdjustmentsHorizontal,
+    });
+  }
+
+  // ── Finance Daily Input ──────────────────────────────────────────────────
+  const navFinanceDailyInput: NavItem[] = [];
 
   if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
-    navStock.push({
+    navFinanceDailyInput.push({
       title: "Stock & Kas",
       url: "/dashboard/stockist",
       icon: IconWallet,
     });
   }
 
+  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+    navFinanceDailyInput.push({
+      title: "Saldo Bank Harian",
+      url: "/dashboard/stockist/bank",
+      icon: IconBuildingBank,
+    });
+  }
+
   if (can(permissions, PERMISSIONS.STOCKIST_VERIFY)) {
-    navStock.push({
+    navFinanceDailyInput.push({
       title: "Cross-Check Stock",
       url: "/dashboard/stockist/konfirmasi",
       icon: IconClipboardCheck,
@@ -161,34 +214,10 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   }
 
   if (can(permissions, PERMISSIONS.CORRECTION_VIEW)) {
-    navStock.push({
+    navFinanceDailyInput.push({
       title: "Persetujuan Koreksi",
       url: "/dashboard/persetujuan-koreksi",
       icon: IconGavel,
-    });
-  }
-
-  if (can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
-    navStock.push({
-      title: "Stock Management (PT)",
-      url: "/dashboard/stock-management-pt",
-      icon: IconDatabase,
-    });
-  }
-
-  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
-    navStock.push({
-      title: "Watcher Valas",
-      url: "/dashboard/watcher-valas",
-      icon: IconChartCandle,
-    });
-  }
-
-  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
-    navStock.push({
-      title: "Patokan Harga",
-      url: "/dashboard/patokan-harga",
-      icon: IconAdjustmentsHorizontal,
     });
   }
 
@@ -238,16 +267,20 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="py-3 px-4">
+      <SidebarHeader className="h-(--header-height) justify-center border-b px-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="pointer-events-none select-none">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg">
+            <SidebarMenuButton size="lg" className="pointer-events-none h-auto py-1 select-none">
+              <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <IconBrandTabler className="size-5" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Pusat Valas Indo</span>
-                <span className="truncate text-xs text-muted-foreground">Enterprise Suite</span>
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate text-sm font-semibold tracking-tight">
+                  Pusat Valas Indo
+                </span>
+                <span className="text-muted-foreground truncate text-xs">
+                  Enterprise Suite
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -258,14 +291,19 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
         {navSelf.length > 0 && <NavMain items={navSelf} label="Aktivitas Saya" />}
         {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
         {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
-        {navBank.length > 0 && <NavMain items={navBank} label="Bank & Treasury" />}
-        {navStock.length > 0 && <NavMain items={navStock} label="Stock & Valas" />}
+        {navFinanceManagement.length > 0 && (
+          <NavMain items={navFinanceManagement} label="Finance Management" />
+        )}
+        {navFinanceDailyInput.length > 0 && (
+          <NavMain items={navFinanceDailyInput} label="Finance Daily Input" />
+        )}
+        {navLaporan.length > 0 && <NavMain items={navLaporan} label="Laporan" />}
         <NavMain items={navManagement} label="Management" />
         <div className="mt-auto">
           <NavMain items={navSecondary} label="System" />
         </div>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t">
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />

@@ -54,7 +54,7 @@ export function RoleActions({ role, currentCompanyId, companies }: Props) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/5 transition-colors"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
             disabled={deleting}
           >
             <IconTrash className="size-4" />

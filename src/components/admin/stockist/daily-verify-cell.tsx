@@ -13,8 +13,29 @@ export type DailyVerifyStatus = "BELUM_REVIEW" | "BENAR" | "BEDA"
 
 export type PendingCorrection = { id: string; proposedValue: string; reason: string }
 
+export type ApprovedCorrection = {
+  id: string
+  currentValue: string
+  proposedValue: string
+  reason: string
+}
+
 function fmt(n: number) {
   return n.toLocaleString("id-ID", { maximumFractionDigits: 0 })
+}
+
+/** Tag lembut yang menandai sel ini pernah salah dan sudah dikoreksi (disetujui). */
+function CorrectedTag({ approved }: { approved: ApprovedCorrection }) {
+  return (
+    <span
+      title={`Sebelumnya Rp ${fmt(Number(approved.currentValue))} — dikoreksi jadi Rp ${fmt(
+        Number(approved.proposedValue)
+      )}. Alasan: ${approved.reason}`}
+      className="w-fit rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive"
+    >
+      Pernah dikoreksi
+    </span>
+  )
 }
 
 /**
@@ -27,6 +48,7 @@ export function DailyVerifyCell({
   note,
   balance,
   pending,
+  approved,
   canVerify,
   onVerify,
 }: {
@@ -34,6 +56,7 @@ export function DailyVerifyCell({
   note: string | null
   balance: number
   pending?: PendingCorrection
+  approved?: ApprovedCorrection
   canVerify: boolean
   onVerify: (
     status: "BENAR" | "BEDA",
@@ -64,7 +87,7 @@ export function DailyVerifyCell({
   if (pending) {
     return (
       <div className="flex flex-col gap-0.5">
-        <Badge variant="outline" className="w-fit gap-1 border-amber-500/50 text-amber-700 dark:text-amber-400">
+        <Badge variant="outline" className="w-fit gap-1 border-warning/50 text-warning">
           <IconClockPause className="size-3" />
           Menunggu persetujuan
         </Badge>
@@ -77,10 +100,13 @@ export function DailyVerifyCell({
 
   if (status === "BENAR") {
     return (
-      <Badge variant="outline" className="gap-1 border-emerald-500/50 text-emerald-700 dark:text-emerald-400">
-        <IconCheck className="size-3" />
-        Sesuai
-      </Badge>
+      <div className="flex flex-col gap-0.5">
+        <Badge variant="outline" className="w-fit gap-1 border-success/50 text-success">
+          <IconCheck className="size-3" />
+          Sesuai
+        </Badge>
+        {approved && <CorrectedTag approved={approved} />}
+      </div>
     )
   }
 

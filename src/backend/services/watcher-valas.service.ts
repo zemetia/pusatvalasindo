@@ -1,9 +1,11 @@
 import YahooFinance from "yahoo-finance2";
+import { smartdealRateService } from "@/backend/services/smartdeal-rate.service";
 
-// Live currency-rate watcher: cross-references SmartDeal's public counter
-// rates (banknote buy/sell) with Yahoo Finance's market mid-rate. Both
-// sources are fetched live — nothing is persisted, this is a read-only
-// comparison tool.
+// Currency-rate watcher: cross-references SmartDeal's public counter rates
+// (banknote buy/sell) against Yahoo Finance's market mid-rate. SmartDeal
+// rates come from the DB cache kept fresh by an external scheduler hitting
+// src/app/api/scrape/smartdeal/route.ts, rather than a live scrape on every
+// request; Yahoo/ExchangeRate-API are still fetched live here.
 
 const yahooFinance = new YahooFinance();
 
@@ -11,52 +13,27 @@ const DEFAULT_CODES = [
   "USD", "EUR", "SGD", "AUD", "GBP", "JPY", "CNY", "MYR", "THB", "HKD",
 ];
 
-export interface SmartdealRate {
-  code: string;
-  name: string;
-  buy: number;
-  sell: number;
-}
-
 export interface WatcherValasRow {
   code: string;
   name: string;
   smartdealBuy: number | null;
   smartdealSell: number | null;
+  // Value from the previous cron fetch — null if unavailable (first fetch,
+  // or code missing from the cache). Lets the UI flag what moved.
+  smartdealPrevBuy: number | null;
+  smartdealPrevSell: number | null;
   yahooRate: number | null;
   exchangeRateApiRate: number | null;
 }
 
 export interface WatcherValasData {
   updatedAt: string;
+  // Timestamp of the DB-cached SmartDeal snapshot (when the cron job last
+  // fetched it) — distinct from `updatedAt`, which is when this response
+  // itself was assembled. Null if the cron hasn't populated the table yet.
+  smartdealFetchedAt: string | null;
   rows: WatcherValasRow[];
   errors: { source: string; message: string }[];
-}
-
-// SmartDeal server-renders its rate table into a `LIVE_RATES` JS array
-// literal embedded in the homepage <script> tag (no separate JSON API).
-async function fetchSmartdealRates(): Promise<SmartdealRate[]> {
-  const res = await fetch("https://smartdeal.co.id", {
-    headers: { "User-Agent": "Mozilla/5.0" },
-    next: { revalidate: 300 },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-  const html = await res.text();
-  const match = html.match(/const LIVE_RATES\s*=\s*(\[.*?\]);/s);
-  if (!match) throw new Error("rate data not found in page");
-
-  const raw = JSON.parse(match[1]) as Array<{
-    code: string;
-    name: string;
-    buy_raw?: number;
-    sell_raw?: number;
-    base?: boolean;
-  }>;
-
-  return raw
-    .filter((r) => !r.base && typeof r.buy_raw === "number" && typeof r.sell_raw === "number")
-    .map((r) => ({ code: r.code, name: r.name, buy: r.buy_raw as number, sell: r.sell_raw as number }));
 }
 
 // Yahoo's plain HTTP quote endpoint now requires a crumb/cookie handshake
@@ -110,9 +87,23 @@ async function fetchExchangeRateApiRates(): Promise<Record<string, number>> {
 export async function getWatcherValasData(): Promise<WatcherValasData> {
   const errors: { source: string; message: string }[] = [];
 
-  let smartdeal: SmartdealRate[] = [];
+  let smartdeal: {
+    code: string;
+    name: string;
+    buy: number;
+    sell: number;
+    prevBuy: number | null;
+    prevSell: number | null;
+  }[] = [];
+  let smartdealFetchedAt: string | null = null;
   try {
-    smartdeal = await fetchSmartdealRates();
+    const cached = await smartdealRateService.getLatest();
+    if (cached.length === 0) throw new Error("no cached rates yet — cron hasn't run");
+    smartdeal = cached;
+    smartdealFetchedAt = cached.reduce<string | null>(
+      (latest, r) => (latest === null || r.fetchedAt > latest ? r.fetchedAt : latest),
+      null
+    );
   } catch (e) {
     errors.push({ source: "SmartDeal", message: e instanceof Error ? e.message : String(e) });
   }
@@ -144,10 +135,12 @@ export async function getWatcherValasData(): Promise<WatcherValasData> {
         name: sd?.name ?? code,
         smartdealBuy: sd?.buy ?? null,
         smartdealSell: sd?.sell ?? null,
+        smartdealPrevBuy: sd?.prevBuy ?? null,
+        smartdealPrevSell: sd?.prevSell ?? null,
         yahooRate: yahoo[code] ?? null,
         exchangeRateApiRate: exchangeRateApi[code] ?? null,
       };
     });
 
-  return { updatedAt: new Date().toISOString(), rows, errors };
+  return { updatedAt: new Date().toISOString(), smartdealFetchedAt, rows, errors };
 }

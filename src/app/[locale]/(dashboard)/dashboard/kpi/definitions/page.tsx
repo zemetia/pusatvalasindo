@@ -1,41 +1,45 @@
 import prisma from "@/lib/prisma";
 import { DefinitionsPageClient } from "@/components/admin/kpi/definitions-page-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconListDetails } from "@tabler/icons-react";
 
 export default async function KpiDefinitionsPage() {
   let definitions;
   try {
     definitions = await prisma.kpiDefinition.findMany({
-      orderBy: [{ type: "asc" }, { name: "asc" }],
-      include: { _count: { select: { roleKpis: true, logs: true } } },
+      orderBy: [{ isActive: "desc" }, { scoringType: "asc" }, { name: "asc" }],
+      include: { _count: { select: { roleKpis: true } } },
     });
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[kpi/definitions/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
-    )
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return <ErrorPanel source="kpi/definitions/page" message={msg} />;
   }
 
   const serialized = definitions.map((d) => ({
     id: d.id,
+    code: d.code,
     name: d.name,
-    type: d.type as string,
+    objective: d.objective,
+    description: d.description,
+    scoringType: d.scoringType as string,
+    unit: d.unit as string,
+    direction: d.direction as string,
+    defaultInputSource: d.defaultInputSource as string,
+    defaultRequiresApproval: d.defaultRequiresApproval,
+    defaultRequiresEvidence: d.defaultRequiresEvidence,
+    systemSourceKey: d.systemSourceKey,
+    isActive: d.isActive,
     _count: d._count,
   }));
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Definisi KPI"
-        description="Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak jabatan."
+        description="Katalog KPI: bagaimana tiap KPI dinilai dan siapa yang boleh mencatatnya. Angka target dan bobotnya disetel per jabatan."
         icon={<IconListDetails className="size-5" />}
       />
       <DefinitionsPageClient definitions={serialized} />
-    </div>
+    </PageShell>
   );
 }

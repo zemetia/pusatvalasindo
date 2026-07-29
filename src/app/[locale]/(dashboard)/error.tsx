@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 import { Button } from "@/components/ui/button"
+import { IconAlertTriangle, IconHome, IconRefresh } from "@tabler/icons-react"
+import { PageShell } from "@/components/admin/page-shell"
 
 export default function Error({
   error,
@@ -15,17 +17,28 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 text-center">
-      <h2 className="text-2xl font-bold">Something went wrong!</h2>
-      <p className="text-muted-foreground max-w-md">
-        {error.message || "An unexpected error occurred while rendering the dashboard."}
-      </p>
-      <div className="flex gap-2">
-        <Button onClick={() => reset()}>Try again</Button>
-        <Button variant="outline" onClick={() => window.location.href = '/'}>
-          Go Home
-        </Button>
+    <PageShell width="narrow">
+      <div className="bg-card flex flex-col items-center gap-4 rounded-xl border px-6 py-14 text-center shadow-sm">
+        <span className="bg-destructive/10 text-destructive flex size-12 items-center justify-center rounded-full">
+          <IconAlertTriangle className="size-6" />
+        </span>
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">Terjadi kesalahan</h2>
+          <p className="text-muted-foreground mx-auto max-w-md text-sm text-pretty">
+            {error.message || "Halaman gagal dimuat. Coba lagi, atau kembali ke dashboard."}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button onClick={() => reset()}>
+            <IconRefresh className="size-4" />
+            Coba lagi
+          </Button>
+          <Button variant="outline" onClick={() => (window.location.href = '/')}>
+            <IconHome className="size-4" />
+            Ke Beranda
+          </Button>
+        </div>
       </div>
-    </div>
+    </PageShell>
   )
 }

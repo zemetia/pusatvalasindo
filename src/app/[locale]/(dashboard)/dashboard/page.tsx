@@ -37,13 +37,21 @@ import {
   IconUserCircle,
   IconAlertTriangle,
   IconUserOff,
-  IconChartBar,
   IconDashboard,
   IconClipboardCheck,
-  IconWallet,
   IconClockCheck,
 } from "@tabler/icons-react";
-import { PageHeader } from "@/components/admin/page-header";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+  ErrorPanel,
+  MetricRow,
+  MetricBlock,
+  MetricLabel,
+  DeltaPill,
+} from "@/components/admin/page-shell";
 import { getCaller } from "@/backend/helpers/get-admin-caller";
 import { can, isGlobalRole, isAdminRole, PERMISSIONS } from "@/lib/permissions";
 
@@ -68,18 +76,26 @@ const statusLabel: Record<string, string> = {
   HOLIDAY: "Libur",
 };
 
-const bonusLabel: Record<string, string> = {
-  BONUS_CASH: "Bonus",
-  TOP_PERFORMER: "Top Performer",
-  SAFE_ZONE: "Safe Zone",
-  PENALTY_SATURDAY: "Penalti Sabtu",
-  PENALTY_DEDUCTION: "Penalti Potong",
-};
+// Skor KPI adalah rasio (1 = 100% target tercapai). Ambang ini hanya untuk
+// menyorot performa tinggi di dashboard; nominal bonusnya ditentukan matriks
+// insentif di modul payroll, bukan di sini.
+const HIGH_PERFORMER_SCORE = 0.8;
 
 function roleLabel(roleName: string): string {
   if (roleName === "SUPER_ADMIN") return "Super Admin";
   if (roleName === "OWNER") return "Owner";
   return roleName || "Pengguna";
+}
+
+/** Simbol mata uang untuk prefix angka — `Rp` untuk rupiah, kode ISO untuk sisanya. */
+function currencySymbol(code: string): string {
+  return code === "IDR" ? "Rp" : code;
+}
+
+/** Angka tanpa kode mata uang — kode/simbolnya dirender terpisah & meredup. */
+function fmtAmount(val: Numeric): string {
+  if (val == null) return "—";
+  return Number(val.toString()).toLocaleString("id-ID");
 }
 
 export default async function DashboardPage({
@@ -114,6 +130,8 @@ export default async function DashboardPage({
   const currentYear = now.getFullYear();
   const monthStart = new Date(currentYear, currentMonth - 1, 1);
   const monthEnd = new Date(currentYear, currentMonth, 1);
+  const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+  const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
   // ── Section visibility flags (permission-driven; mirrors app-sidebar.tsx) ──
   const showOwnAttendance = can(permissions, PERMISSIONS.ATTENDANCE_VIEW_OWN);
@@ -162,10 +180,10 @@ export default async function DashboardPage({
           })
         : Promise.resolve(null),
 
-      // Own KPI logs entered this month (progress indicator before results are calculated)
+      // Own KPI entries this month (progress indicator before results are calculated)
       showOwnKpi
-        ? prisma.kpiLog.count({
-            where: { employeeId: userId, createdAt: { gte: monthStart, lt: monthEnd } },
+        ? prisma.kpiEntry.count({
+            where: { employeeId: userId, periodMonth: currentMonth, periodYear: currentYear },
           })
         : Promise.resolve(0),
 
@@ -215,11 +233,12 @@ export default async function DashboardPage({
           })
         : Promise.resolve(0),
 
-      // KPI logs this month (team)
+      // KPI entries this month (team)
       showKpiAll
-        ? prisma.kpiLog.count({
+        ? prisma.kpiEntry.count({
             where: {
-              createdAt: { gte: monthStart, lt: monthEnd },
+              periodMonth: currentMonth,
+              periodYear: currentYear,
               ...(global ? {} : { employee: { branch: { companyId: scopedCompanyId } } }),
             },
           })
@@ -324,15 +343,91 @@ export default async function DashboardPage({
             take: 5,
           })
         : Promise.resolve([]),
+
+      // KPI: rata-rata skor tim bulan ini & bulan lalu (untuk trend naik/turun)
+      showKpiAll
+        ? prisma.kpiMonthlyResult.aggregate({
+            _avg: { totalScore: true },
+            where: {
+              month: currentMonth,
+              year: currentYear,
+              ...(global ? {} : { employee: { branch: { companyId: scopedCompanyId } } }),
+            },
+          })
+        : Promise.resolve({ _avg: { totalScore: null } }),
+
+      showKpiAll
+        ? prisma.kpiMonthlyResult.aggregate({
+            _avg: { totalScore: true },
+            where: {
+              month: prevMonth,
+              year: prevYear,
+              ...(global ? {} : { employee: { branch: { companyId: scopedCompanyId } } }),
+            },
+          })
+        : Promise.resolve({ _avg: { totalScore: null } }),
+
+      // Jumlah karyawan berkinerja tinggi bulan ini & bulan lalu (untuk trend).
+      // Nominal bonusnya tidak diagregasi di sini: bonus top performer perlu
+      // memeringkat antar-karyawan dan dihitung payroll saat slip dibuat.
+      showPayrollTeam
+        ? prisma.kpiMonthlyResult.count({
+            where: {
+              month: currentMonth,
+              year: currentYear,
+              totalScore: { gte: HIGH_PERFORMER_SCORE },
+              ...(payrollCompanyIdList !== undefined
+                ? { employee: { branch: { companyId: { in: payrollCompanyIdList } } } }
+                : {}),
+            },
+          })
+        : Promise.resolve(0),
+
+      showPayrollTeam
+        ? prisma.kpiMonthlyResult.count({
+            where: {
+              month: prevMonth,
+              year: prevYear,
+              totalScore: { gte: HIGH_PERFORMER_SCORE },
+              ...(payrollCompanyIdList !== undefined
+                ? { employee: { branch: { companyId: { in: payrollCompanyIdList } } } }
+                : {}),
+            },
+          })
+        : Promise.resolve(0),
+
+      // Kurs mata uang: rate transaksi terakhir sebelum hari ini (pembanding trend)
+      showStock
+        ? prisma.stockMutation.findMany({
+            where: {
+              rate: { not: null },
+              createdAt: { lt: todayDate },
+              ...(global
+                ? {}
+                : companyWide
+                  ? { branch: { companyId: scopedCompanyId } }
+                  : { branchId: scopedBranchId }),
+            },
+            orderBy: { createdAt: "desc" },
+            take: 300,
+            select: { currencyId: true, rate: true },
+          })
+        : Promise.resolve([]),
+
+      // Saldo bank harian (untuk trend naik/turun saldo per mata uang)
+      showBank
+        ? prisma.dailyBankEntry.findMany({
+            where: { bankAccount: { ...(global ? {} : { companyId: scopedCompanyId }) } },
+            orderBy: { date: "desc" },
+            take: 200,
+            select: { date: true, balance: true, bankAccount: { select: { currencyId: true } } },
+          })
+        : Promise.resolve([]),
     ]);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[dashboard/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="dashboard/page" message={msg} />
     );
   }
 
@@ -354,6 +449,12 @@ export default async function DashboardPage({
     bankAccounts,
     recentMutations,
     kpiResults,
+    kpiAvgThisMonthAgg,
+    kpiAvgPrevMonthAgg,
+    highPerformersThisMonth,
+    highPerformersPrevMonth,
+    prevRateMutations,
+    dailyBankEntriesRaw,
   ] = dashboardData as [
     Awaited<ReturnType<typeof prisma.attendance.findFirst>>,
     Awaited<ReturnType<typeof prisma.kpiMonthlyResult.findFirst>>,
@@ -372,9 +473,136 @@ export default async function DashboardPage({
     Awaited<ReturnType<typeof prisma.bankAccount.findMany<{ include: { company: true; currency: true } }>>>,
     Awaited<ReturnType<typeof prisma.bankMutation.findMany<{ include: { bankAccount: { include: { company: true; currency: true } } } }>>>,
     Awaited<ReturnType<typeof prisma.kpiMonthlyResult.findMany<{ include: { employee: { select: { name: true; branch: { select: { name: true } } } } } }>>>,
+    Awaited<ReturnType<typeof prisma.kpiMonthlyResult.aggregate<{ _avg: { totalScore: true } }>>>,
+    Awaited<ReturnType<typeof prisma.kpiMonthlyResult.aggregate<{ _avg: { totalScore: true } }>>>,
+    number,
+    number,
+    Awaited<ReturnType<typeof prisma.stockMutation.findMany<{ select: { currencyId: true; rate: true } }>>>,
+    Awaited<
+      ReturnType<
+        typeof prisma.dailyBankEntry.findMany<{
+          select: { date: true; balance: true; bankAccount: { select: { currencyId: true } } };
+        }>
+      >
+    >,
   ];
 
   const activeBankAccountsCount = bankAccounts.length;
+
+  // ── Trend & ringkasan turunan (dihitung dari data yang sudah diambil) ──────
+
+  const attendancePct = totalUsers > 0 ? (todayAttendanceCount / totalUsers) * 100 : null;
+
+  const kpiAvgThisMonth =
+    kpiAvgThisMonthAgg._avg.totalScore != null ? Number(kpiAvgThisMonthAgg._avg.totalScore.toString()) : null;
+  const kpiAvgPrevMonth =
+    kpiAvgPrevMonthAgg._avg.totalScore != null ? Number(kpiAvgPrevMonthAgg._avg.totalScore.toString()) : null;
+  const kpiTrendPct =
+    kpiAvgThisMonth != null && kpiAvgPrevMonth ? ((kpiAvgThisMonth - kpiAvgPrevMonth) / kpiAvgPrevMonth) * 100 : null;
+
+  const highPerformerTrendPct =
+    highPerformersPrevMonth > 0
+      ? ((highPerformersThisMonth - highPerformersPrevMonth) / highPerformersPrevMonth) * 100
+      : null;
+
+  // currencyId -> rate transaksi terakhir sebelum hari ini (mutasi terurut desc, ambil kemunculan pertama)
+  const prevRateByCurrency = new Map<string, number>();
+  for (const m of prevRateMutations) {
+    if (m.rate != null && !prevRateByCurrency.has(m.currencyId)) {
+      prevRateByCurrency.set(m.currencyId, Number(m.rate.toString()));
+    }
+  }
+
+  type CurrencyCard = {
+    currencyId: string;
+    code: string;
+    name: string;
+    avgBuy: number | null;
+    avgSell: number | null;
+    marginPct: number | null;
+    trendPct: number | null;
+    quantity: number;
+    branchCount: number;
+  };
+  const currencyAcc = new Map<
+    string,
+    { code: string; name: string; buySum: number; buyCount: number; sellSum: number; sellCount: number; quantity: number; branchCount: number }
+  >();
+  for (const cs of currencyStocks) {
+    const g = currencyAcc.get(cs.currencyId) ?? {
+      code: cs.currency.code,
+      name: cs.currency.name,
+      buySum: 0,
+      buyCount: 0,
+      sellSum: 0,
+      sellCount: 0,
+      quantity: 0,
+      branchCount: 0,
+    };
+    if (cs.buyRate != null) {
+      g.buySum += Number(cs.buyRate.toString());
+      g.buyCount += 1;
+    }
+    if (cs.sellRate != null) {
+      g.sellSum += Number(cs.sellRate.toString());
+      g.sellCount += 1;
+    }
+    g.quantity += Number(cs.quantity.toString());
+    g.branchCount += 1;
+    currencyAcc.set(cs.currencyId, g);
+  }
+  const currencyCards: CurrencyCard[] = Array.from(currencyAcc.entries())
+    .map(([currencyId, g]) => {
+      const avgBuy = g.buyCount ? g.buySum / g.buyCount : null;
+      const avgSell = g.sellCount ? g.sellSum / g.sellCount : null;
+      const marginPct = avgBuy && avgSell ? ((avgSell - avgBuy) / avgBuy) * 100 : null;
+      const refRate = avgBuy ?? avgSell;
+      const prevRate = prevRateByCurrency.get(currencyId) ?? null;
+      const trendPct = refRate != null && prevRate ? ((refRate - prevRate) / prevRate) * 100 : null;
+      return {
+        currencyId,
+        code: g.code,
+        name: g.name,
+        avgBuy,
+        avgSell,
+        marginPct,
+        trendPct,
+        quantity: g.quantity,
+        branchCount: g.branchCount,
+      };
+    })
+    .sort((a, b) => a.code.localeCompare(b.code));
+
+  // Saldo bank dikelompokkan per mata uang — tidak dijumlah lintas mata uang karena nilainya tidak sepadan.
+  type BankCurrencyGroup = { currencyId: string; code: string; total: number; count: number };
+  const bankAcc = new Map<string, BankCurrencyGroup>();
+  for (const acc of bankAccounts) {
+    const g = bankAcc.get(acc.currencyId) ?? { currencyId: acc.currencyId, code: acc.currency.code, total: 0, count: 0 };
+    g.total += Number(acc.balance.toString());
+    g.count += 1;
+    bankAcc.set(acc.currencyId, g);
+  }
+  const bankGroups = Array.from(bankAcc.values()).sort((a, b) => b.total - a.total);
+  const primaryBankGroup = bankGroups.find((g) => g.code === "IDR") ?? bankGroups[0] ?? null;
+
+  let bankTrendPct: number | null = null;
+  if (primaryBankGroup) {
+    const sumByDate = new Map<string, number>();
+    for (const e of dailyBankEntriesRaw) {
+      if (e.bankAccount.currencyId !== primaryBankGroup.currencyId) continue;
+      const key = e.date.toISOString().slice(0, 10);
+      sumByDate.set(key, (sumByDate.get(key) ?? 0) + Number(e.balance.toString()));
+    }
+    const sortedEntries = Array.from(sumByDate.entries()).sort((a, b) => (a[0] < b[0] ? 1 : -1));
+    if (sortedEntries.length >= 2) {
+      const [, latest] = sortedEntries[0];
+      const [, prevVal] = sortedEntries[1];
+      if (prevVal !== 0) bankTrendPct = ((latest - prevVal) / prevVal) * 100;
+    }
+  }
+
+  const showBentoOverview =
+    showUsersCount || showBranchesCount || showAttendanceAll || showKpiAll || showBank || showPayrollTeam;
 
   const quickLinksAll: {
     href: string;
@@ -389,7 +617,7 @@ export default async function DashboardPage({
     { href: "/dashboard/kpi/log", label: "Log KPI", icon: IconReport, show: showKpiAll },
     { href: "/dashboard/payroll", label: "Hitung Gaji", icon: IconCoin, show: can(permissions, PERMISSIONS.PAYROLL_MANAGE) },
     { href: "/dashboard/bank-accounts", label: "Rekening Bank", icon: IconBuildingBank, show: showBank },
-    { href: "/dashboard/stockist", label: "Stock Mata Uang", icon: IconDatabase, show: can(permissions, PERMISSIONS.STOCKIST_VIEW) },
+    { href: "/dashboard/stockist", label: "Stockist", icon: IconDatabase, show: can(permissions, PERMISSIONS.STOCKIST_VIEW) },
     { href: "/dashboard/stockist/konfirmasi", label: "Konfirmasi Stockist", icon: IconClipboardCheck, show: showStockistVerify },
     { href: "/dashboard/persetujuan-koreksi", label: "Persetujuan Koreksi", icon: IconClockCheck, show: canApproveCorrections },
     { href: "/dashboard/users", label: "Pengguna", icon: IconUsers, show: showUsersCount },
@@ -400,7 +628,7 @@ export default async function DashboardPage({
   const quickLinks = quickLinksAll.filter((l) => l.show);
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       {/* Page Header */}
       <PageHeader
         title={`Halo, ${session.user.name?.split(" ")[0] ?? ""}`}
@@ -415,11 +643,11 @@ export default async function DashboardPage({
 
       {/* Alert: Presensi Mencurigakan */}
       {showSuspicious && suspectAttendance.length > 0 && (
-        <Card className="border-orange-300 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30">
-          <CardHeader className="pb-2">
+        <Card className="border-warning/40 gap-0 overflow-hidden py-0">
+          <CardHeader className="bg-warning-muted/60 border-b py-4">
             <div className="flex items-center gap-2">
-              <IconAlertTriangle className="size-5 text-orange-500" />
-              <CardTitle className="text-base text-orange-700 dark:text-orange-400">
+              <IconAlertTriangle className="text-warning size-5" />
+              <CardTitle className="text-warning-foreground text-sm">
                 Presensi Lokasi Mencurigakan — {suspectAttendance.length} karyawan
               </CardTitle>
             </div>
@@ -445,7 +673,7 @@ export default async function DashboardPage({
                         : "-"}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="destructive" className="text-xs">GPS Tidak Sesuai</Badge>
+                      <Badge variant="danger">GPS Tidak Sesuai</Badge>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -457,12 +685,12 @@ export default async function DashboardPage({
 
       {/* Alert: Pengajuan Koreksi Pending */}
       {showCorrections && pendingCorrections.length > 0 && (
-        <Card className="border-blue-300 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30">
-          <CardHeader className="pb-2">
+        <Card className="border-info/40 gap-0 overflow-hidden py-0">
+          <CardHeader className="bg-info-muted/60 border-b py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <IconClockCheck className="size-5 text-blue-500" />
-                <CardTitle className="text-base text-blue-700 dark:text-blue-400">
+                <IconClockCheck className="text-info size-5" />
+                <CardTitle className="text-sm">
                   Pengajuan Koreksi Menunggu — {pendingCorrections.length}
                 </CardTitle>
               </div>
@@ -500,314 +728,301 @@ export default async function DashboardPage({
         </Card>
       )}
 
-      {/* Ringkasan Saya (personal) */}
+      {/* Ringkasan Saya — blok data editorial, tanpa kartu */}
       {(showOwnAttendance || showOwnKpi || showOwnPayroll) && (
-        <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
+        <MetricRow title="Ringkasan Saya" columns={3}>
           {showOwnAttendance && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Presensi Saya Hari Ini</CardTitle>
-                <IconClockCheck className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                {ownAttendanceToday ? (
-                  <>
-                    <div className="text-2xl font-bold font-mono">
-                      {ownAttendanceToday.checkIn
-                        ? ownAttendanceToday.checkIn.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
-                        : "-"}
-                    </div>
-                    <Badge
-                      variant={
-                        ownAttendanceToday.status === "PRESENT"
-                          ? "default"
-                          : ownAttendanceToday.status === "LATE"
-                            ? "destructive"
-                            : "secondary"
-                      }
-                      className="mt-1 text-xs"
-                    >
-                      {statusLabel[ownAttendanceToday.status] ?? ownAttendanceToday.status}
-                    </Badge>
-                  </>
+            <MetricBlock
+              label="Presensi Saya Hari Ini"
+              size="secondary"
+              tone={ownAttendanceToday ? "default" : "muted"}
+              value={
+                ownAttendanceToday?.checkIn
+                  ? ownAttendanceToday.checkIn.toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "—"
+              }
+              meta={
+                ownAttendanceToday ? (
+                  <Badge
+                    variant={
+                      ownAttendanceToday.status === "PRESENT"
+                        ? "success"
+                        : ownAttendanceToday.status === "LATE"
+                          ? "warning"
+                          : "soft"
+                    }
+                  >
+                    {statusLabel[ownAttendanceToday.status] ?? ownAttendanceToday.status}
+                  </Badge>
                 ) : (
-                  <>
-                    <div className="text-sm text-muted-foreground mb-2">Belum absen hari ini</div>
-                    <Button size="sm" asChild>
-                      <Link href="/dashboard/attendance">Absen Sekarang</Link>
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                  "Belum absen hari ini"
+                )
+              }
+              action={
+                !ownAttendanceToday && (
+                  <Button size="sm" asChild>
+                    <Link href="/dashboard/attendance">Absen Sekarang</Link>
+                  </Button>
+                )
+              }
+            />
           )}
 
           {showOwnKpi && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">KPI Saya Bulan Ini</CardTitle>
-                <IconTargetArrow className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                {ownKpiThisMonth ? (
-                  <>
-                    <div className="text-2xl font-bold">{Number(ownKpiThisMonth.totalScore).toFixed(1)}</div>
-                    {ownKpiThisMonth.bonusResult && (
-                      <Badge className="mt-1 text-xs">
-                        {bonusLabel[ownKpiThisMonth.bonusResult] ?? ownKpiThisMonth.bonusResult}
-                      </Badge>
-                    )}
-                  </>
+            <MetricBlock
+              label="KPI Saya Bulan Ini"
+              size="secondary"
+              tone={ownKpiThisMonth ? "default" : "muted"}
+              value={
+                ownKpiThisMonth
+                  ? `${(Number(ownKpiThisMonth.totalScore) * 100).toFixed(1)}%`
+                  : "—"
+              }
+              meta={
+                ownKpiThisMonth ? (
+                  <Badge variant="soft">Grade {ownKpiThisMonth.grade}</Badge>
                 ) : (
-                  <>
-                    <div className="text-sm text-muted-foreground mb-2">
-                      {ownKpiLogsThisMonth} entri KPI tercatat bulan ini
-                    </div>
-                    {can(permissions, PERMISSIONS.KPI_FILL_OWN) && (
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href="/dashboard/kpi/self">Isi KPI</Link>
-                      </Button>
-                    )}
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                  `${ownKpiLogsThisMonth} entri KPI tercatat bulan ini`
+                )
+              }
+              action={
+                !ownKpiThisMonth &&
+                can(permissions, PERMISSIONS.KPI_FILL_OWN) && (
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/dashboard/kpi/self">Isi KPI</Link>
+                  </Button>
+                )
+              }
+            />
           )}
 
           {showOwnPayroll && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Status Gaji Saya</CardTitle>
-                <IconWallet className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                {ownKpiThisMonth?.bonusAmount != null ? (
-                  <div className="text-2xl font-bold">{fmtCurrency(ownKpiThisMonth.bonusAmount)}</div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">Belum dihitung bulan ini</div>
-                )}
-                <p className="text-xs text-muted-foreground mt-1">
-                  {now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-                </p>
-              </CardContent>
-            </Card>
+            <MetricBlock
+              label="Status Gaji Saya"
+              size="secondary"
+              tone={ownKpiThisMonth ? "default" : "muted"}
+              value={ownKpiThisMonth ? `Grade ${ownKpiThisMonth.grade}` : "—"}
+              meta={
+                ownKpiThisMonth
+                  ? `Bonus/potongan ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })} dihitung saat slip gaji dibuat`
+                  : "KPI bulan ini belum dihitung"
+              }
+            />
           )}
-        </div>
+        </MetricRow>
       )}
 
-      {/* Summary Cards (team) */}
-      {(showUsersCount || showBranchesCount || showAttendanceAll || showKpiAll) && (
-        <div className="grid grid-cols-2 gap-4 @xl/main:grid-cols-4">
-          {showUsersCount && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Karyawan Aktif</CardTitle>
-                <IconUsers className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{totalUsers}</div>
-                <p className="text-xs text-muted-foreground mt-1">Total karyawan terdaftar</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {showBranchesCount && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Cabang Aktif</CardTitle>
-                <IconBuilding className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{totalBranches}</div>
-                <p className="text-xs text-muted-foreground mt-1">Cabang beroperasi</p>
-              </CardContent>
-            </Card>
+      {/* Ringkasan Bisnis — metrik utama, dipisah garis rambut bukan kartu */}
+      {showBentoOverview && (
+        <MetricRow title="Ringkasan Bisnis" columns={4} className="-mt-px">
+          {showBank && primaryBankGroup && (
+            <MetricBlock
+              label="Saldo Bank"
+              prefix={currencySymbol(primaryBankGroup.code)}
+              value={fmtAmount(primaryBankGroup.total)}
+              delta={bankTrendPct}
+              period="vs hari sebelumnya"
+              meta={
+                <>
+                  {primaryBankGroup.count} rekening {primaryBankGroup.code}
+                  {bankGroups.length > 1 && (
+                    <span className="text-muted-foreground">
+                      {" · "}
+                      {bankGroups
+                        .filter((g) => g.currencyId !== primaryBankGroup.currencyId)
+                        .map((g) => `${g.code} ${g.total.toLocaleString("id-ID")}`)
+                        .join(" · ")}
+                    </span>
+                  )}
+                </>
+              }
+            />
           )}
 
           {showAttendanceAll && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Presensi Hari Ini</CardTitle>
-                <IconFingerprint className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{todayAttendanceCount}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Hadir{totalUsers ? ` dari ${totalUsers} karyawan` : ""}
-                </p>
-              </CardContent>
-            </Card>
+            <MetricBlock
+              label="Presensi Hari Ini"
+              value={todayAttendanceCount.toLocaleString("id-ID")}
+              suffix={`dari ${totalUsers}`}
+              meta={
+                attendancePct != null
+                  ? `${attendancePct.toFixed(0)}% karyawan hadir`
+                  : "Belum ada data kehadiran"
+              }
+            />
           )}
 
           {showKpiAll && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Log KPI Bulan Ini</CardTitle>
-                <IconTargetArrow className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{kpiLogsThisMonth}</div>
-                <p className="text-xs text-muted-foreground mt-1">Entri KPI dicatat</p>
-              </CardContent>
-            </Card>
+            <MetricBlock
+              label="KPI Bulan Ini"
+              value={kpiAvgThisMonth != null ? kpiAvgThisMonth.toFixed(1) : kpiLogsThisMonth}
+              delta={kpiTrendPct}
+              period="vs bulan lalu"
+              meta={
+                kpiAvgThisMonth != null
+                  ? `Rata-rata skor tim · ${kpiLogsThisMonth} entri`
+                  : `${kpiLogsThisMonth} entri KPI tercatat`
+              }
+            />
           )}
-        </div>
+
+          {showPayrollTeam && (
+            <MetricBlock
+              label="Payroll Bulan Ini"
+              value={payrollDoneCount.toLocaleString("id-ID")}
+              suffix={`/ ${payrollTotalEmployees}`}
+              delta={highPerformerTrendPct}
+              period={`${highPerformersThisMonth} skor ≥80% vs bulan lalu`}
+              meta="karyawan sudah dihitung"
+              action={
+                can(permissions, PERMISSIONS.PAYROLL_MANAGE) &&
+                payrollDoneCount < payrollTotalEmployees ? (
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/dashboard/payroll">Hitung Gaji →</Link>
+                  </Button>
+                ) : payrollTotalEmployees > 0 ? (
+                  <Badge variant="success">✓ Selesai</Badge>
+                ) : undefined
+              }
+            />
+          )}
+        </MetricRow>
       )}
 
-      {/* Status Payroll (team) */}
-      {showPayrollTeam && (
-        <div className="grid gap-4 @xl/main:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">Status Payroll</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-                  </p>
-                </div>
-                <IconChartBar className="size-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                <div className="text-center">
-                  <div className="text-4xl font-bold">
-                    {payrollDoneCount}
-                    <span className="text-xl font-normal text-muted-foreground">/{payrollTotalEmployees}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">karyawan sudah dihitung</p>
-                </div>
-
-                <div className="w-full bg-muted rounded-full h-2.5">
-                  <div
-                    className="bg-primary h-2.5 rounded-full transition-all"
-                    style={{
-                      width:
-                        payrollTotalEmployees > 0
-                          ? `${Math.min(100, (payrollDoneCount / payrollTotalEmployees) * 100)}%`
-                          : "0%",
-                    }}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="rounded-md bg-muted p-2">
-                    <div className="font-semibold text-sm">{payrollDoneCount}</div>
-                    <div className="text-muted-foreground">Selesai</div>
-                  </div>
-                  <div className="rounded-md bg-muted p-2">
-                    <div className="font-semibold text-sm">{payrollTotalEmployees - payrollDoneCount}</div>
-                    <div className="text-muted-foreground">Belum</div>
-                  </div>
-                </div>
-
-                {can(permissions, PERMISSIONS.PAYROLL_MANAGE) && payrollDoneCount < payrollTotalEmployees && (
-                  <Button size="sm" asChild className="w-full">
-                    <Link href="/dashboard/payroll">Hitung Sekarang</Link>
-                  </Button>
-                )}
-                {payrollDoneCount >= payrollTotalEmployees && payrollTotalEmployees > 0 && (
-                  <Badge className="justify-center py-1">✓ Semua karyawan selesai</Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Organisasi */}
+      {(showUsersCount || showBranchesCount) && (
+        <MetricRow title="Organisasi" columns={2} className="-mt-px">
+          {showUsersCount && (
+            <MetricBlock
+              label="Karyawan Aktif"
+              size="secondary"
+              value={totalUsers.toLocaleString("id-ID")}
+              meta="Total karyawan terdaftar"
+            />
+          )}
+          {showBranchesCount && (
+            <MetricBlock
+              label="Cabang Aktif"
+              size="secondary"
+              value={totalBranches.toLocaleString("id-ID")}
+              meta="Cabang beroperasi"
+            />
+          )}
+        </MetricRow>
       )}
 
       {/* Currency Rates + Quick Links */}
       <div className="grid gap-6 @xl/main:grid-cols-3">
         {showStock && (
           <div className="@xl/main:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">Kurs Mata Uang</CardTitle>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href="/dashboard/stockist">Lihat Semua →</Link>
-                  </Button>
+            <SectionCard
+              title="Kurs Mata Uang"
+              description={`${currencyCards.length} mata uang aktif`}
+              action={
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/dashboard/stockist">Lihat Semua →</Link>
+                </Button>
+              }
+            >
+              {currencyCards.length === 0 ? (
+                <EmptyState
+                  title="Belum ada data kurs mata uang"
+                  description={
+                    <>
+                      Tambahkan melalui menu{" "}
+                      <Link href="/dashboard/stockist" className="underline">
+                        Stock Mata Uang
+                      </Link>
+                      .
+                    </>
+                  }
+                />
+              ) : (
+                <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 @2xl/main:grid-cols-3">
+                  {currencyCards.map((c) => (
+                    <div key={c.currencyId} className="border-border border-t pt-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <div className="flex min-w-0 items-baseline gap-2">
+                          <span className="font-mono text-sm font-medium">{c.code}</span>
+                          <span className="text-muted-foreground truncate text-xs">{c.name}</span>
+                        </div>
+                        <DeltaPill value={c.trendPct} />
+                      </div>
+                      <div className="mt-3 flex items-start gap-8">
+                        <div>
+                          <MetricLabel>Beli</MetricLabel>
+                          <p className="tabular mt-1 text-xl leading-none font-semibold tracking-tight">
+                            {fmtRate(c.avgBuy)}
+                          </p>
+                        </div>
+                        <div>
+                          <MetricLabel>Jual</MetricLabel>
+                          <p className="tabular mt-1 text-xl leading-none font-semibold tracking-tight">
+                            {fmtRate(c.avgSell)}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground mt-3 text-xs">
+                        {c.branchCount} cabang · stok {c.quantity.toLocaleString("id-ID")}
+                        {c.marginPct != null && (
+                          <>
+                            {" · "}
+                            <span className="text-foreground font-medium">
+                              margin {c.marginPct.toFixed(1).replace(".", ",")}%
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {currencyStocks.length === 0 ? (
-                  <div className="py-10 text-center text-muted-foreground text-sm px-6">
-                    Belum ada data kurs mata uang. Tambahkan melalui menu{" "}
-                    <Link href="/dashboard/stockist" className="underline">Stock Mata Uang</Link>.
-                  </div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Cabang</TableHead>
-                        <TableHead>Mata Uang</TableHead>
-                        <TableHead className="text-right">Kurs Beli</TableHead>
-                        <TableHead className="text-right">Kurs Jual</TableHead>
-                        <TableHead className="text-right">Stok</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {currencyStocks.map((cs) => (
-                        <TableRow key={cs.id}>
-                          <TableCell className="text-sm">{cs.branch?.name ?? "Tanpa Cabang"}</TableCell>
-                          <TableCell><Badge variant="outline">{cs.currency.code}</Badge></TableCell>
-                          <TableCell className="text-right font-mono text-sm">{fmtRate(cs.buyRate)}</TableCell>
-                          <TableCell className="text-right font-mono text-sm">{fmtRate(cs.sellRate)}</TableCell>
-                          <TableCell className="text-right font-mono text-sm">
-                            {Number(cs.quantity).toLocaleString("id-ID")}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </SectionCard>
           </div>
         )}
 
         {/* Quick Navigation */}
         <div className={showStock ? "" : "@xl/main:col-span-3"}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Navigasi Cepat</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 pb-4">
+          <SectionCard title="Navigasi Cepat">
+            <div className="flex flex-col gap-2">
               {quickLinks.map(({ href, label, icon: Icon }) => (
-                <Button key={href} variant="outline" size="sm" asChild className="justify-start gap-2">
+                <Button
+                  key={href}
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="justify-start gap-2"
+                >
                   <Link href={href}>
                     <Icon className="size-4 shrink-0" />
                     {label}
                   </Link>
                 </Button>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         </div>
       </div>
 
       {/* Belum Absen + Kehadiran Hari Ini */}
       {showAttendanceAll && (
         <div className="grid gap-6 @xl/main:grid-cols-2">
-          <Card className={notYetAbsent.length > 0 ? "border-yellow-300 dark:border-yellow-800" : ""}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <IconUserOff className="size-4 text-muted-foreground" />
-                  <CardTitle className="text-base">Belum Absen Hari Ini</CardTitle>
-                </div>
-                {notYetAbsent.length > 0 && (
-                  <Badge variant="outline" className="border-yellow-400 text-yellow-700 dark:text-yellow-400">
-                    {notYetAbsent.length} karyawan
-                  </Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
+          <SectionCard
+            title="Belum Absen Hari Ini"
+            icon={<IconUserOff className="size-4" />}
+            padded={false}
+            className={notYetAbsent.length > 0 ? "border-warning/40" : ""}
+            action={
+              notYetAbsent.length > 0 ? (
+                <Badge variant="warning">{notYetAbsent.length} karyawan</Badge>
+              ) : undefined
+            }
+          >
               {notYetAbsent.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground text-sm px-6">
-                  <span className="text-green-600 font-medium">✓ Semua karyawan sudah absen</span>
-                </div>
+                <EmptyState title="✓ Semua karyawan sudah absen" />
               ) : (
                 <Table>
                   <TableHeader>
@@ -820,29 +1035,25 @@ export default async function DashboardPage({
                     {notYetAbsent.map((u) => (
                       <TableRow key={u.id}>
                         <TableCell className="font-medium text-sm">{u.name}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{u.branch?.name ?? "-"}</TableCell>
+                        <TableCell className="text-muted-foreground">{u.branch?.name ?? "-"}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               )}
-            </CardContent>
-          </Card>
+          </SectionCard>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Kehadiran Hari Ini</CardTitle>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/attendance">Lihat →</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
+          <SectionCard
+            title="Kehadiran Hari Ini"
+            padded={false}
+            action={
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/attendance">Lihat →</Link>
+              </Button>
+            }
+          >
               {todayAttendanceList.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground text-sm px-6">
-                  Belum ada presensi hari ini
-                </div>
+                <EmptyState title="Belum ada presensi hari ini" />
               ) : (
                 <Table>
                   <TableHeader>
@@ -866,9 +1077,12 @@ export default async function DashboardPage({
                         <TableCell>
                           <Badge
                             variant={
-                              att.status === "PRESENT" ? "default" : att.status === "LATE" ? "destructive" : "secondary"
+                              att.status === "PRESENT"
+                                ? "success"
+                                : att.status === "LATE"
+                                  ? "warning"
+                                  : "soft"
                             }
-                            className="text-xs"
                           >
                             {statusLabel[att.status] ?? att.status}
                           </Badge>
@@ -878,26 +1092,24 @@ export default async function DashboardPage({
                   </TableBody>
                 </Table>
               )}
-            </CardContent>
-          </Card>
+          </SectionCard>
         </div>
       )}
 
       {/* Bank Mutations + Bank Accounts */}
       {showBank && (
         <div className="grid gap-6 @xl/main:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Mutasi Bank Terbaru</CardTitle>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/bank-accounts">Lihat →</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
+          <SectionCard
+            title="Mutasi Bank Terbaru"
+            padded={false}
+            action={
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/bank-accounts">Lihat →</Link>
+              </Button>
+            }
+          >
               {recentMutations.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground text-sm px-6">Belum ada mutasi bank</div>
+                <EmptyState title="Belum ada mutasi bank" />
               ) : (
                 <Table>
                   <TableHeader>
@@ -917,21 +1129,21 @@ export default async function DashboardPage({
                         </TableCell>
                         <TableCell>
                           {mut.type === "CREDIT" ? (
-                            <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                            <span className="text-success flex items-center gap-1 text-sm font-medium">
                               <IconArrowUpRight className="size-3.5" />
                               Masuk
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-red-600 text-sm font-medium">
+                            <span className="text-destructive flex items-center gap-1 text-sm font-medium">
                               <IconArrowDownRight className="size-3.5" />
                               Keluar
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-right font-mono text-sm">
+                        <TableCell className="tabular text-right">
                           {fmtCurrency(mut.amount, mut.bankAccount.currency.code)}
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
+                        <TableCell className="text-muted-foreground">
                           {mut.createdAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}
                         </TableCell>
                       </TableRow>
@@ -939,26 +1151,20 @@ export default async function DashboardPage({
                   </TableBody>
                 </Table>
               )}
-            </CardContent>
-          </Card>
+          </SectionCard>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">Rekening Bank Aktif</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {activeBankAccountsCount} rekening{global ? " di semua PT" : ""}
-                  </p>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/bank-accounts">Kelola →</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
+          <SectionCard
+            title="Rekening Bank Aktif"
+            description={`${activeBankAccountsCount} rekening${global ? " di semua PT" : ""}`}
+            padded={false}
+            action={
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard/bank-accounts">Kelola →</Link>
+              </Button>
+            }
+          >
               {bankAccounts.length === 0 ? (
-                <div className="py-10 text-center text-muted-foreground text-sm px-6">Belum ada rekening bank aktif</div>
+                <EmptyState title="Belum ada rekening bank aktif" />
               ) : (
                 <Table>
                   <TableHeader>
@@ -974,8 +1180,12 @@ export default async function DashboardPage({
                       <TableRow key={acc.id}>
                         <TableCell className="text-sm">{acc.company.name}</TableCell>
                         <TableCell className="font-medium text-sm">{acc.bankName}</TableCell>
-                        <TableCell><Badge variant="outline">{acc.currency.code}</Badge></TableCell>
-                        <TableCell className="text-right font-mono text-sm font-semibold">
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono">
+                            {acc.currency.code}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="tabular text-right font-medium">
                           {fmtCurrency(acc.balance, acc.currency.code)}
                         </TableCell>
                       </TableRow>
@@ -983,28 +1193,25 @@ export default async function DashboardPage({
                   </TableBody>
                 </Table>
               )}
-            </CardContent>
-          </Card>
+          </SectionCard>
         </div>
       )}
 
       {/* KPI Monthly Results */}
       {showKpiAll && kpiResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base">Hasil KPI Bulan Ini</CardTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Top performers — {now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-                </p>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard/kpi/log">Lihat Log →</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
+        <SectionCard
+          title="Hasil KPI Bulan Ini"
+          description={`Top performers — ${now.toLocaleDateString("id-ID", {
+            month: "long",
+            year: "numeric",
+          })}`}
+          padded={false}
+          action={
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/dashboard/kpi/log">Lihat Log →</Link>
+            </Button>
+          }
+        >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -1012,41 +1219,33 @@ export default async function DashboardPage({
                   <TableHead>Karyawan</TableHead>
                   <TableHead>Cabang</TableHead>
                   <TableHead className="text-right">Total Skor</TableHead>
-                  <TableHead>Hasil Bonus</TableHead>
-                  <TableHead className="text-right">Nominal Bonus</TableHead>
+                  <TableHead>Grade</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {kpiResults.map((r, i) => (
                   <TableRow key={r.id}>
-                    <TableCell className="text-muted-foreground text-sm">{i + 1}</TableCell>
-                    <TableCell className="font-medium text-sm">{r.employee.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{r.employee.branch?.name ?? "-"}</TableCell>
-                    <TableCell className="text-right font-mono font-semibold">
-                      {Number(r.totalScore).toFixed(1)}
+                    <TableCell className="text-muted-foreground tabular">{i + 1}</TableCell>
+                    <TableCell className="font-medium">{r.employee.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{r.employee.branch?.name ?? "-"}</TableCell>
+                    <TableCell className="tabular text-right font-medium">
+                      {(Number(r.totalScore) * 100).toFixed(1)}%
                     </TableCell>
                     <TableCell>
-                      {r.bonusResult && (
-                        <Badge
-                          variant={
-                            r.bonusResult === "BONUS_CASH" || r.bonusResult === "TOP_PERFORMER" ? "default" : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {bonusLabel[r.bonusResult] ?? r.bonusResult}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm">
-                      {r.bonusAmount != null ? fmtCurrency(r.bonusAmount) : "-"}
+                      <Badge
+                        variant={
+                          r.grade === "A" || r.grade === "B" ? "success" : "soft"
+                        }
+                      >
+                        {r.grade}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+        </SectionCard>
       )}
-    </div>
+    </PageShell>
   );
 }

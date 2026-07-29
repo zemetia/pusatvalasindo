@@ -12,6 +12,7 @@ Cross-linked reference for AI agents. Every path is a backlink. Read this file f
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Request lifecycle, provider tree, proxy, integration wiring | Debugging system-level issues, adding integrations |
 | [COMPONENTS.md](./COMPONENTS.md) | CVA pattern, four-file rule, shadcn, Storybook, tests | Building or modifying UI |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | `@theme {}` tokens, oklch palette, typography, radius | Applying styles, adding tokens |
+| [DATA_PRESENTATION.md](./DATA_PRESENTATION.md) | Editorial data paradigm — metrics, KPI blocks, delta pills, number formatting, tables, charts | **Mandatory** before rendering any metric, KPI, total, or analytics view |
 | [BEST_PRACTICE.md](./BEST_PRACTICE.md) | TypeScript constraints, ESLint rules, naming, anti-patterns | All code changes |
 | [I18N.md](./I18N.md) | next-intl routing, translations, navigation, static gen | Any page or text work |
 | [SERVICES.md](./SERVICES.md) | ApiClient, interceptors, domain services, Zod schemas | API calls, validation, error handling |
@@ -98,6 +99,7 @@ import { PostHogProvider }             from '@/providers';
 | 3 | `npm run lint` must exit 0 (zero warnings) | ESLint `--max-warnings 0` |
 | 4 | No `setState` inside `useEffect` | Use `useSyncExternalStore` |
 | 5 | All colors via design tokens | No raw hex/oklch/Tailwind color utilities |
+| 5a | Metrics follow [DATA_PRESENTATION.md](./DATA_PRESENTATION.md) — editorial data blocks, never boxed stat cards | Any number wrapped in `border`/`bg-card`/`shadow` |
 | 6 | `import type` for type-only imports | `@typescript-eslint/consistent-type-imports` |
 | 7 | `array[n]` returns `T \| undefined` | `noUncheckedIndexedAccess` — guard with `?.` |
 | 8 | One `<Toaster />` mount only | [src/app/[locale]/layout.tsx](../../src/app/%5Blocale%5D/layout.tsx) |

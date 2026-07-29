@@ -8,6 +8,20 @@ This is the **Pusat Kirim Duit** management system — a web-based platform for 
 
 See `SYSTEM_PLAN.md` for the full architecture specification and module breakdown.
 
+## Data Presentation Paradigm (MANDATORY)
+
+**Paradigm source file: [`docs/blueprint/DATA_PRESENTATION.md`](docs/blueprint/DATA_PRESENTATION.md)** — read it before writing or modifying any UI that renders a metric, KPI, total, balance, ratio, chart, or analytics view.
+
+Summary of the binding rules (the source file is authoritative):
+- **No boxed statistic cards.** Metrics are borderless, background-less data blocks — no `border`, no `bg-card`, no `shadow`, no per-metric radius.
+- **Typography is the hierarchy.** Large bold number, small muted uppercase label above it, generous whitespace. Separation via spacing and hairline rules, never containers.
+- **Supporting info is inline** — percentage change (colored pill), comparison period, and trend sit next to the value, not in a separate card.
+- **Editorial, not widgets.** Reference points: Stripe Dashboard, Vercel Analytics, Linear, Apple financial reports. Every metric should read as part of a financial report.
+- `.tabular` on every numeral; `id-ID` number formatting; colors via design tokens only.
+- Use the primitives in `src/components/admin/page-shell.tsx`: `MetricRow`, `MetricBlock`, `MetricValue`, `MetricLabel`, `DeltaPill`, `MetricInline`. The old `StatCard` / `StatGrid` were deleted — don't reintroduce boxed stat tiles.
+
+Other blueprint docs live in `docs/blueprint/` — start at [`docs/blueprint/INDEX.md`](docs/blueprint/INDEX.md).
+
 ## Commands
 
 ```bash

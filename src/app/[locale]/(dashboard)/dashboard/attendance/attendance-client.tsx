@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { IconFingerprint, IconLoader2, IconLogout } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { MetricBlock } from "@/components/admin/page-shell";
 
 interface BranchGeofence {
   latitude: number;
@@ -224,10 +225,16 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       {/* Left Column: Action */}
       <div className="lg:col-span-7 space-y-6">
-        <Card className="border-none shadow-xl bg-white/50 backdrop-blur-xl ring-1 ring-slate-200">
+        <Card>
           <CardHeader>
             <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <div className={`p-2 rounded-lg text-white ${todayRecord && !todayRecord.checkOut ? "bg-amber-500" : "bg-primary"}`}>
+              <div
+                className={`rounded-lg p-2 ${
+                  todayRecord && !todayRecord.checkOut
+                    ? "bg-warning text-warning-foreground"
+                    : "bg-primary text-primary-foreground"
+                }`}
+              >
                 {todayRecord && !todayRecord.checkOut ? <IconLogout size={20} /> : <IconFingerprint size={20} />}
               </div>
               {todayRecord && !todayRecord.checkOut ? "Check Out" : t("checkIn")}
@@ -271,35 +278,34 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
               </>
             ) : todayRecord.checkOut ? (
               /* Already checked in AND checked out */
-              <div className="flex flex-col items-center justify-center py-10 space-y-4 bg-slate-50 rounded-3xl border border-slate-200 animate-in zoom-in duration-500">
-                <div className="flex gap-6">
-                  <div className="text-center">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">Check In</p>
-                    <p className="text-lg font-bold text-slate-700">
-                      {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
-                    </p>
-                  </div>
-                  <div className="w-px bg-slate-200" />
-                  <div className="text-center">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">Check Out</p>
-                    <p className="text-lg font-bold text-slate-700">
-                      {format(new Date(todayRecord.checkOut), "HH:mm")} WIB
-                    </p>
-                  </div>
+              <section className="border-border animate-in fade-in border-y py-8 duration-500">
+                <div className="grid grid-cols-2 gap-8 sm:gap-0 sm:[&>*:last-child]:border-l sm:[&>*:last-child]:pl-8">
+                  <MetricBlock
+                    label="Check In"
+                    size="secondary"
+                    value={format(new Date(todayRecord.checkIn!), "HH:mm")}
+                    suffix="WIB"
+                  />
+                  <MetricBlock
+                    label="Check Out"
+                    size="secondary"
+                    value={format(new Date(todayRecord.checkOut), "HH:mm")}
+                    suffix="WIB"
+                  />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">Presensi hari ini selesai.</p>
-              </div>
+                <p className="text-muted-foreground mt-6 text-sm">Presensi hari ini selesai.</p>
+              </section>
             ) : (
               /* Checked in, waiting for checkout */
               <div className="space-y-6">
-                <div className="flex items-center justify-between px-4 py-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                <div className="flex items-center justify-between px-4 py-3 bg-success-muted rounded-2xl border border-success/25">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                    <div className="h-9 w-9 bg-success-muted text-success rounded-full flex items-center justify-center">
                       <IconFingerprint size={20} />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Check In</p>
-                      <p className="text-sm font-bold text-emerald-900">
+                      <p className="text-success text-xs font-medium tracking-wide uppercase">Check In</p>
+                      <p className="text-success tabular text-sm font-medium">
                         Pukul {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
                       </p>
                     </div>
@@ -307,7 +313,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold text-slate-600 mb-3">Foto Check Out</p>
+                  <p className="mb-3 text-sm font-medium">Foto Check Out</p>
                   <CameraCapture
                     onCapture={setCheckoutFile}
                     capturedImage={checkoutImage}
@@ -319,7 +325,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
                   onClick={handleCheckout}
                   disabled={isCheckingOut || !checkoutFile}
                   variant="secondary"
-                  className="w-full h-14 text-lg font-bold rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-200"
+                  className="bg-warning hover:bg-warning/90 text-warning-foreground h-14 w-full rounded-2xl text-lg font-bold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {isCheckingOut ? (
                     <>

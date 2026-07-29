@@ -99,6 +99,7 @@ const AVAILABLE_PERMISSIONS: PermissionGroup[] = [
     items: [
       { id: "users.view", label: "Lihat Pengguna", description: "Lihat daftar pengguna sistem" },
       { id: "users.manage", label: "Kelola Pengguna", description: "Tambah, edit, dan nonaktifkan pengguna" },
+      { id: "users.view_detail", label: "Lihat Detail Karyawan", description: "Buka rapor satu karyawan: KPI, komponen gaji, dan kalender kehadiran setahun" },
       { id: "branches.view", label: "Lihat Cabang", description: "Lihat daftar kantor cabang" },
       { id: "branches.manage", label: "Kelola Cabang", description: "Tambah dan edit data cabang" },
       { id: "roles.view", label: "Lihat Role", description: "Lihat daftar role dan hak akses" },
@@ -233,7 +234,7 @@ export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: P
         <div className="flex flex-col gap-5">
           {AVAILABLE_PERMISSIONS.map((group) => (
             <div key={group.group}>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2 pl-1">{group.group}</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2 pl-1">{group.group}</p>
               <div className="grid gap-2">
                 {group.items.map((p) => {
                   const isSelected = form.permissions.includes(p.id);
@@ -245,23 +246,23 @@ export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: P
                         "flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer group",
                         isSelected
                           ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
-                          : "bg-white/50 border-slate-200/60 hover:border-primary/20 hover:bg-slate-50"
+                          : "bg-card/50 border-border hover:border-primary/20 hover:bg-muted"
                       )}
                     >
                       <div className={cn(
                         "mt-0.5 transition-colors",
-                        isSelected ? "text-primary" : "text-slate-300 group-hover:text-slate-400"
+                        isSelected ? "text-primary" : "text-muted-foreground/60 group-hover:text-muted-foreground"
                       )}>
                         {isSelected ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
                       </div>
                       <div className="flex-1">
                         <p className={cn(
                           "text-[13px] font-bold transition-colors",
-                          isSelected ? "text-slate-900" : "text-slate-600"
+                          isSelected ? "text-foreground" : "text-muted-foreground"
                         )}>
                           {p.label}
                         </p>
-                        <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">
                           {p.description}
                         </p>
                       </div>
@@ -276,7 +277,7 @@ export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: P
 
       {form.permissions.includes("payroll.view_company") && (
         <FormSection title="Akses Gaji Lintas PT" icon={<CheckCircle2 className="w-3.5 h-3.5" />}>
-          <p className="text-[11px] text-slate-500 leading-relaxed mb-2 pl-1">
+          <p className="text-[11px] text-muted-foreground leading-relaxed mb-2 pl-1">
             Pilih PT yang gajinya boleh dilihat oleh role ini. Jika tidak ada yang dipilih, defaultnya hanya PT role ini sendiri.
           </p>
           <div className="grid gap-2">
@@ -290,11 +291,11 @@ export function RoleSheet({ role, trigger, currentCompanyId, companies = [] }: P
                     "flex items-center gap-3 p-3 rounded-2xl border transition-all cursor-pointer group",
                     isSelected
                       ? "bg-primary/5 border-primary/30 ring-1 ring-primary/20"
-                      : "bg-white/50 border-slate-200/60 hover:border-primary/20 hover:bg-slate-50"
+                      : "bg-card/50 border-border hover:border-primary/20 hover:bg-muted"
                   )}
                 >
-                  {isSelected ? <CheckCircle2 className="w-4 h-4 text-primary" /> : <Circle className="w-4 h-4 text-slate-300 group-hover:text-slate-400" />}
-                  <span className={cn("text-[13px] font-bold", isSelected ? "text-slate-900" : "text-slate-600")}>
+                  {isSelected ? <CheckCircle2 className="w-4 h-4 text-primary" /> : <Circle className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground" />}
+                  <span className={cn("text-[13px] font-bold", isSelected ? "text-foreground" : "text-muted-foreground")}>
                     {c.name} ({c.code})
                   </span>
                 </div>

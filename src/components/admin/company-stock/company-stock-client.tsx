@@ -8,10 +8,8 @@ import {
   IconDiamond,
   IconBox,
   IconPlus,
-  IconSearch,
 } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -21,6 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SectionCard, EmptyState } from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
+import { SegmentedFilter } from "@/components/admin/segmented-filter";
 import { CompanyStockSheet } from "./company-stock-sheet";
 import { CompanyStockActions } from "./company-stock-actions";
 
@@ -58,46 +59,23 @@ export function CompanyStockClient({ companies, canManage }: Props) {
   );
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <IconBuilding className="size-4" />
-          <span>Perusahaan (PT)</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {companies.map((company) => (
-            <button
-              key={company.id}
-              onClick={() => setActiveCompanyId(company.id)}
-              className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
-                activeCompanyId === company.id
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
-              }`}
-            >
-              <span
-                className={`text-xs uppercase tracking-widest font-bold ${
-                  activeCompanyId === company.id ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                Perusahaan
-              </span>
-              <span
-                className={`text-lg font-bold tracking-tight ${
-                  activeCompanyId === company.id ? "text-foreground" : "text-foreground/70"
-                }`}
-              >
-                {company.name}
-              </span>
-            </button>
-          ))}
-          {companies.length === 0 && (
-            <div className="px-4 py-2 text-sm text-muted-foreground italic">
-              Belum ada PT aktif
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="flex flex-col gap-4">
+      {companies.length === 0 ? (
+        <SectionCard padded={false}>
+          <EmptyState
+            icon={<IconBuilding className="size-5" />}
+            title="Belum ada PT aktif"
+            description="Aktifkan perusahaan terlebih dahulu untuk mengelola stok tingkat PT."
+          />
+        </SectionCard>
+      ) : (
+        <SegmentedFilter
+          aria-label="Pilih perusahaan"
+          value={activeCompanyId}
+          onChange={setActiveCompanyId}
+          options={companies.map((c) => ({ value: c.id, label: c.name }))}
+        />
+      )}
 
       <AnimatePresence mode="wait">
         {activeCompanyId && (
@@ -108,25 +86,19 @@ export function CompanyStockClient({ companies, canManage }: Props) {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-6"
           >
-            <div className="bg-card border rounded-2xl shadow-sm overflow-hidden min-h-[400px] flex flex-col">
-              <div className="p-6 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-muted/20">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-full md:w-80 group">
-                    <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                    <Input
-                      placeholder="Cari item, kode, atau tipe..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 rounded-xl border-border/50"
-                    />
-                  </div>
-                </div>
+            <div className="bg-card flex min-h-[400px] flex-col overflow-hidden rounded-xl border shadow-sm">
+              <div className="bg-muted/30 flex flex-col justify-between gap-3 border-b px-5 py-3 md:flex-row md:items-center">
+                <SearchInput
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  placeholder="Cari item, kode, atau tipe..."
+                />
 
                 {canManage && (
                   <CompanyStockSheet
                     companyId={activeCompanyId}
                     trigger={
-                      <Button className="rounded-xl gap-2">
+                      <Button size="sm" className="gap-2">
                         <IconPlus className="size-4" />
                         <span>Tambah Stok</span>
                       </Button>
@@ -137,13 +109,11 @@ export function CompanyStockClient({ companies, canManage }: Props) {
 
               <div className="flex-1 overflow-x-auto">
                 {filteredItems.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-                    <IconBox className="size-12 mb-4 opacity-20" />
-                    <p className="font-medium">Tidak ada item ditemukan</p>
-                    <p className="text-xs uppercase tracking-widest mt-1">
-                      Coba sesuaikan pencarian atau tambahkan item baru
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={<IconBox className="size-5" />}
+                    title="Tidak ada item ditemukan"
+                    description="Coba sesuaikan pencarian atau tambahkan item baru."
+                  />
                 ) : (
                   <Table>
                     <TableHeader className="bg-muted/30">
@@ -162,38 +132,33 @@ export function CompanyStockClient({ companies, canManage }: Props) {
                           key={item.id}
                           className={`group hover:bg-muted/20 transition-colors ${!item.isActive && "opacity-50"}`}
                         >
-                          <TableCell className="text-xs font-mono text-muted-foreground">{idx + 1}</TableCell>
+                          <TableCell className="tabular text-muted-foreground">{idx + 1}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <div
-                                className={`p-2 rounded-lg bg-muted border border-border/50 group-hover:scale-110 transition-transform ${getTypeColor(item.type)}`}
+                                className={`flex size-8 items-center justify-center rounded-lg border ${getTypeColor(item.type)}`}
                               >
                                 {getTypeIcon(item.type)}
                               </div>
-                              <span className="font-bold text-foreground tracking-tight">{item.name}</span>
+                              <span className="font-medium">{item.name}</span>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="font-semibold uppercase text-[10px] tracking-widest py-0.5">
-                              {getTypeLabel(item.type)}
-                            </Badge>
+                            <Badge variant="soft">{getTypeLabel(item.type)}</Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-sm text-muted-foreground uppercase tracking-wider">
+                          <TableCell className="text-muted-foreground font-mono">
                             {item.code || "—"}
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-center">
-                              <Badge
-                                variant={item.isActive ? "default" : "outline"}
-                                className={item.isActive ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : ""}
-                              >
+                              <Badge variant={item.isActive ? "success" : "soft"}>
                                 {item.isActive ? "Aktif" : "Nonaktif"}
                               </Badge>
                             </div>
                           </TableCell>
                           {canManage && (
                             <TableCell>
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
+                              <div className="flex justify-end">
                                 <CompanyStockActions item={item} companyId={activeCompanyId} />
                               </div>
                             </TableCell>
@@ -237,10 +202,10 @@ function getTypeLabel(type: string) {
 function getTypeColor(type: string) {
   switch (type) {
     case "CURRENCY":
-      return "text-blue-600 bg-blue-50";
+      return "text-info bg-info-muted border-info/20";
     case "LOGAM_MULIA":
-      return "text-amber-600 bg-amber-50";
+      return "text-warning-foreground bg-warning-muted border-warning/25";
     default:
-      return "";
+      return "text-muted-foreground bg-muted";
   }
 }

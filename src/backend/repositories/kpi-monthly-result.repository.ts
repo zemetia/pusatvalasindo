@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { BonusResultType } from "@src/generated/prisma/client";
 
 const select = {
   id: true,
@@ -7,8 +6,7 @@ const select = {
   month: true,
   year: true,
   totalScore: true,
-  bonusAmount: true,
-  bonusResult: true,
+  grade: true,
   breakdownJson: true,
   calculatedAt: true,
 };
@@ -27,13 +25,20 @@ export const kpiMonthlyResultRepository = {
       orderBy: [{ year: "desc" }, { month: "desc" }],
     }),
 
+  /** Seluruh hasil satu periode — dipakai payroll untuk memeringkat top performer. */
+  findByPeriod: (month: number, year: number, employeeIds?: string[]) =>
+    prisma.kpiMonthlyResult.findMany({
+      where: { month, year, ...(employeeIds ? { employeeId: { in: employeeIds } } : {}) },
+      select,
+      orderBy: { totalScore: "desc" },
+    }),
+
   upsert: (data: {
     employeeId: string;
     month: number;
     year: number;
     totalScore: number;
-    bonusAmount?: number;
-    bonusResult?: BonusResultType;
+    grade: string;
     breakdownJson: object;
   }) =>
     prisma.kpiMonthlyResult.upsert({
@@ -49,15 +54,13 @@ export const kpiMonthlyResultRepository = {
         month: data.month,
         year: data.year,
         totalScore: data.totalScore,
-        bonusAmount: data.bonusAmount,
-        bonusResult: data.bonusResult,
+        grade: data.grade,
         breakdownJson: data.breakdownJson,
         calculatedAt: new Date(),
       },
       update: {
         totalScore: data.totalScore,
-        bonusAmount: data.bonusAmount,
-        bonusResult: data.bonusResult,
+        grade: data.grade,
         breakdownJson: data.breakdownJson,
         calculatedAt: new Date(),
       },

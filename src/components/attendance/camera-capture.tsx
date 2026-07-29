@@ -171,7 +171,7 @@ export function CameraCapture({
 
   return (
     <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
-      <div className="relative aspect-square w-full bg-slate-100 rounded-3xl overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200">
+      <div className="relative aspect-square w-full bg-muted rounded-3xl overflow-hidden border-4 border-white shadow-2xl ring-1 ring-border">
         {/* Hidden canvas — used only for capturing frames */}
         <canvas ref={canvasRef} className="hidden" />
 
@@ -199,10 +199,10 @@ export function CameraCapture({
 
             {cameraState === "idle" && (
               <div className="flex flex-col items-center justify-center h-full space-y-4 p-8 text-center">
-                <div className="p-4 bg-slate-200 rounded-full">
-                  <IconCamera size={48} className="text-slate-400" />
+                <div className="p-4 bg-muted rounded-full">
+                  <IconCamera size={48} className="text-muted-foreground" />
                 </div>
-                <p className="text-sm text-slate-500 font-medium">
+                <p className="text-sm text-muted-foreground font-medium">
                   Ambil foto diri untuk memulai presensi
                 </p>
                 <Button onClick={startCamera} className="rounded-full px-8">
@@ -212,7 +212,7 @@ export function CameraCapture({
             )}
 
             {cameraState === "requesting" && (
-              <div className="flex flex-col items-center justify-center h-full space-y-3 text-slate-400">
+              <div className="flex flex-col items-center justify-center h-full space-y-3 text-muted-foreground">
                 <IconLoader2 size={40} className="animate-spin" />
                 <p className="text-sm font-medium">Membuka kamera...</p>
               </div>
@@ -220,10 +220,10 @@ export function CameraCapture({
 
             {cameraState === "error" && (
               <div className="flex flex-col items-center justify-center h-full space-y-4 p-8 text-center">
-                <div className="p-4 bg-red-100 rounded-full">
-                  <IconAlertCircle size={40} className="text-red-500" />
+                <div className="p-4 bg-destructive/10 rounded-full">
+                  <IconAlertCircle size={40} className="text-destructive" />
                 </div>
-                <p className="text-sm text-red-600 font-medium leading-snug">
+                <p className="text-sm text-destructive font-medium leading-snug">
                   {errorMessage}
                 </p>
                 <Button
@@ -249,7 +249,7 @@ export function CameraCapture({
               {isCapturing ? (
                 <IconLoader2 className="h-8 w-8 animate-spin text-primary" />
               ) : (
-                <div className="h-12 w-12 rounded-full border-2 border-slate-900 transition-colors group-hover:bg-slate-100" />
+                <div className="h-12 w-12 rounded-full border-2 border-foreground transition-colors group-hover:bg-muted" />
               )}
             </button>
           </div>
@@ -271,7 +271,7 @@ export function CameraCapture({
       </div>
 
       {capturedImage && (
-        <div className="flex items-center gap-2 text-emerald-600 font-semibold bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100 animate-in fade-in zoom-in duration-300">
+        <div className="flex items-center gap-2 text-success font-semibold bg-success-muted px-4 py-2 rounded-full border border-success/25 animate-in fade-in zoom-in duration-300">
           <IconCheck size={18} />
           <span>Foto berhasil diambil</span>
         </div>

@@ -1,10 +1,34 @@
+import { PageShell } from "@/components/admin/page-shell";
+
+/**
+ * Skeleton yang meniru bentuk halaman admin (header + kartu tabel) supaya
+ * transisi antar halaman tidak "berkedip" dari spinner ke layout penuh.
+ */
 export default function Loading() {
   return (
-    <div className="flex min-h-[400px] flex-1 items-center justify-center">
-      <div className="flex flex-col items-center gap-2">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-        <p className="text-sm text-muted-foreground animate-pulse">Loading dashboard...</p>
+    <PageShell>
+      <div className="flex items-center gap-3 border-b pb-5">
+        <div className="bg-muted size-10 animate-pulse rounded-lg" />
+        <div className="space-y-2">
+          <div className="bg-muted h-5 w-48 animate-pulse rounded" />
+          <div className="bg-muted h-3.5 w-72 animate-pulse rounded" />
+        </div>
       </div>
-    </div>
-  )
+
+      <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+        <div className="bg-muted/30 border-b px-5 py-3">
+          <div className="bg-muted h-9 w-full max-w-xs animate-pulse rounded-md" />
+        </div>
+        <div className="divide-border divide-y">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 px-5 py-3.5">
+              <div className="bg-muted h-4 w-1/4 animate-pulse rounded" />
+              <div className="bg-muted h-4 w-1/3 animate-pulse rounded" />
+              <div className="bg-muted ml-auto h-4 w-20 animate-pulse rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </PageShell>
+  );
 }

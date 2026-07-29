@@ -27,11 +27,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
-import { KPI_TYPE_LABELS } from "@/components/admin/kpi-definition-sheet";
+import { MetricBlock } from "@/components/admin/page-shell";
 import {
   MONTH_NAMES,
+  SCORING_TYPE_LABELS,
   getGrade,
   formatCurrency,
+  formatAmount,
+  formatPercent,
   type PayrollResult,
 } from "@/lib/kpi-utils";
 
@@ -48,13 +51,12 @@ export type UserRow = {
   isActive: boolean;
 };
 
-const BONUS_RESULT_LABELS: Record<string, string> = {
-  BONUS_CASH: "Bonus Tunai",
-  TOP_PERFORMER: "Top Performer",
-  SAFE_ZONE: "Zona Aman",
-  PENALTY_SATURDAY: "Penalty Masuk Sabtu",
-  PENALTY_DEDUCTION: "Potongan KPI",
-};
+/** Warna badge rincian KPI: penalti = peringatan, reward = positif. */
+function scoringTone(scoringType: string) {
+  if (scoringType.startsWith("PENALTY") || scoringType === "TOLERANCE_LIMIT") return "warning";
+  if (scoringType === "REWARD_POINT") return "success";
+  return "info";
+}
 
 export function PayrollPageClient({ users }: { users: UserRow[] }) {
   const now = new Date();
@@ -102,14 +104,15 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
 
   const kpiScore = result ? result.kpi.score : 0;
   const grade = getGrade(kpiScore);
-  const resultType = result?.kpi.resultType ?? null;
-  const bonusAmount = result?.kpi.bonusAmount ?? 0;
-  const bonusKpi = result?.kpi.bonusKpi ?? 0;
+  // Bonus/potongan berasal dari matriks insentif payroll — modul KPI hanya
+  // memberi skornya (lihat payroll-incentive.service.ts).
+  const incentive = result?.incentive ?? null;
+  const netIncentive = incentive?.netAmount ?? 0;
 
   return (
     <div className="flex flex-col gap-6">
       {/* Selection form */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 border rounded-lg">
+      <div className="bg-card grid grid-cols-1 gap-4 rounded-xl border p-4 shadow-sm sm:grid-cols-4">
         <div className="sm:col-span-2 grid gap-1.5">
           <Label>Karyawan *</Label>
           <Select
@@ -188,46 +191,45 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
 
       {result && selectedUser && !calculateMutation.isPending && (
         <>
-          {/* KPI + employee summary */}
-          <div className="flex flex-wrap gap-6 p-4 border rounded-lg bg-muted/30">
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Karyawan</p>
-              <p className="font-medium">{result.employee.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {selectedUser.role} · {selectedUser.branchName}
-              </p>
+          {/* Sorotan hasil perhitungan — blok data editorial, bukan kartu */}
+          <section className="border-border border-y py-8">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+              <MetricBlock
+                label="Total Gaji Diterima"
+                size="hero"
+                prefix="Rp"
+                value={formatAmount(result.final.takeHomePay)}
+                meta={
+                  <>
+                    {result.employee.name} · {selectedUser.role} ·{" "}
+                    {selectedUser.branchName} — {MONTH_NAMES[result.period.month]}{" "}
+                    {result.period.year}
+                  </>
+                }
+              />
+              <MetricBlock
+                label="Skor KPI"
+                size="secondary"
+                value={(kpiScore * 100).toFixed(1).replace(".", ",")}
+                suffix="%"
+                meta={grade.label}
+              />
+              <MetricBlock
+                label="Nilai"
+                size="secondary"
+                tone={grade.tone}
+                value={grade.letter}
+                meta={incentive?.outcomeLabel ?? "Belum ada hasil"}
+              />
+              <MetricBlock
+                label="Hari Tercatat"
+                size="secondary"
+                value={result.attendanceDetail.totalDaysLogged}
+                suffix="hari"
+                meta={`Dihitung ${new Date(result.kpi.calculatedAt).toLocaleString("id-ID")}`}
+              />
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Periode</p>
-              <p className="font-medium">
-                {MONTH_NAMES[result.period.month]} {result.period.year}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Skor KPI</p>
-              <p className="text-2xl font-mono font-semibold">
-                {(kpiScore * 100).toFixed(1)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Nilai</p>
-              <p className={`text-2xl font-bold ${grade.className}`}>
-                {grade.letter}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Keterangan KPI</p>
-              <p className="font-medium">{grade.label}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-0.5">Hari Tercatat</p>
-              <p className="font-medium">{result.attendanceDetail.totalDaysLogged} hari</p>
-            </div>
-            <div className="ml-auto self-end text-xs text-muted-foreground">
-              Dihitung:{" "}
-              {new Date(result.kpi.calculatedAt).toLocaleString("id-ID")}
-            </div>
-          </div>
+          </section>
 
           {/* Warning: no salary set */}
           {result.components.baseSalary === 0 && (
@@ -240,13 +242,12 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
             </Alert>
           )}
 
-          {/* PENALTY_SATURDAY notice */}
-          {resultType === "PENALTY_SATURDAY" && bonusAmount > 0 && (
+          {/* Sanksi non-uang yang menyertai tier */}
+          {incentive?.mandatorySaturday && (
             <Alert>
               <IconInfoCircle className="size-4" />
               <AlertDescription>
-                Karyawan wajib masuk kerja hari Sabtu sebagai konsekuensi KPI
-                bulan ini.
+                Karyawan wajib masuk kerja hari Sabtu sebagai konsekuensi KPI bulan ini.
               </AlertDescription>
             </Alert>
           )}
@@ -263,7 +264,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               {/* Fixed income */}
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Gaji Pokok</span>
-                <span className="font-mono font-medium">
+                <span className="tabular font-medium">
                   {formatCurrency(result.components.baseSalary)}
                 </span>
               </div>
@@ -271,7 +272,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               {result.components.mealAllowance > 0 && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Uang Makan</span>
-                  <span className="font-mono">
+                  <span className="tabular">
                     {formatCurrency(result.components.mealAllowance)}
                   </span>
                 </div>
@@ -280,7 +281,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               {result.components.transportAllowance > 0 && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Uang Transport</span>
-                  <span className="font-mono">
+                  <span className="tabular">
                     {formatCurrency(result.components.transportAllowance)}
                   </span>
                 </div>
@@ -289,7 +290,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               {result.components.positionAllowance > 0 && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Uang Jabatan</span>
-                  <span className="font-mono">
+                  <span className="tabular">
                     {formatCurrency(result.components.positionAllowance)}
                   </span>
                 </div>
@@ -298,7 +299,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               {result.components.bpjsKesehatan > 0 && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">BPJS Kesehatan</span>
-                  <span className="font-mono">
+                  <span className="tabular">
                     {formatCurrency(result.components.bpjsKesehatan)}
                   </span>
                 </div>
@@ -306,7 +307,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
 
               <div className="flex justify-between items-center font-medium pt-1 border-t">
                 <span>Gaji Kotor</span>
-                <span className="font-mono">
+                <span className="tabular">
                   {formatCurrency(result.components.totalGrossFixed)}
                 </span>
               </div>
@@ -323,7 +324,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                       <span className="text-muted-foreground">
                         Potongan Terlambat
                       </span>
-                      <span className="font-mono text-red-600">
+                      <span className="tabular text-destructive">
                         −{formatCurrency(result.deductions.late)}
                       </span>
                     </div>
@@ -333,7 +334,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                       <span className="text-muted-foreground">
                         Potongan Absen / Izin
                       </span>
-                      <span className="font-mono text-red-600">
+                      <span className="tabular text-destructive">
                         −{formatCurrency(result.deductions.absence)}
                       </span>
                     </div>
@@ -341,45 +342,56 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                 </>
               )}
 
-              {/* KPI adjustment */}
-              {resultType && resultType !== "SAFE_ZONE" && bonusAmount > 0 && (
+              {/* Insentif KPI — hasil pemetaan skor ke matriks payroll */}
+              {incentive && (
                 <>
                   <Separator />
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">
-                        {BONUS_RESULT_LABELS[resultType] ?? resultType}
-                      </span>
-                      <Badge
-                        variant={bonusKpi >= 0 ? "default" : "destructive"}
-                        className="text-xs"
+                  {incentive.tierAmount !== 0 && (
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">{incentive.outcomeLabel}</span>
+                        <Badge
+                          variant={incentive.tierAmount >= 0 ? "success" : "danger"}
+                          className="text-xs"
+                        >
+                          {incentive.tierAmount >= 0 ? "Bonus" : "Potongan"}
+                        </Badge>
+                      </div>
+                      <span
+                        className={`tabular font-medium ${
+                          incentive.tierAmount >= 0 ? "text-success" : "text-destructive"
+                        }`}
                       >
-                        {bonusKpi >= 0 ? "Bonus" : "Potongan"}
-                      </Badge>
+                        {incentive.tierAmount >= 0 ? "+" : "−"}
+                        {formatCurrency(Math.abs(incentive.tierAmount))}
+                      </span>
                     </div>
-                    <span
-                      className={`font-mono font-medium ${
-                        bonusKpi >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {bonusKpi >= 0 ? "+" : "−"}
-                      {formatCurrency(Math.abs(bonusKpi))}
-                    </span>
-                  </div>
-                </>
-              )}
+                  )}
 
-              {resultType === "SAFE_ZONE" && (
-                <>
-                  <Separator />
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">
-                      KPI — Zona Aman
-                    </span>
-                    <span className="font-mono text-muted-foreground">
-                      ± Rp 0
-                    </span>
-                  </div>
+                  {incentive.topPerformerBonus > 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">
+                        Bonus Top Performer
+                        {incentive.rank && (
+                          <span className="ml-1 text-xs">
+                            (peringkat {incentive.rank} dari {incentive.peerCount})
+                          </span>
+                        )}
+                      </span>
+                      <span className="tabular text-success font-medium">
+                        +{formatCurrency(incentive.topPerformerBonus)}
+                      </span>
+                    </div>
+                  )}
+
+                  {netIncentive === 0 && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">KPI — {incentive.outcomeLabel}</span>
+                      <span className="tabular text-muted-foreground">± Rp 0</span>
+                    </div>
+                  )}
+
+                  <p className="text-muted-foreground text-xs">{incentive.reason}</p>
                 </>
               )}
 
@@ -387,7 +399,7 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
 
               <div className="flex justify-between items-center font-semibold text-lg pt-1">
                 <span>Total Gaji Diterima</span>
-                <span className="font-mono">
+                <span className="tabular">
                   {formatCurrency(result.final.takeHomePay)}
                 </span>
               </div>
@@ -399,44 +411,41 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
             <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Detail KPI
             </h3>
-            <div className="rounded-md border">
+            <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>KPI</TableHead>
-                    <TableHead>Tipe</TableHead>
+                    <TableHead>Cara Penilaian</TableHead>
                     <TableHead className="text-right">Bobot</TableHead>
+                    <TableHead>Perhitungan</TableHead>
                     <TableHead className="text-right">Pencapaian</TableHead>
-                    <TableHead className="text-right">Skor</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {(result.kpi.breakdownJson.items ?? []).map((item) => (
-                    <TableRow key={item.kpiId}>
+                    <TableRow key={item.roleKpiId}>
                       <TableCell className="font-medium">
                         {item.kpiName}
+                        {item.noData && (
+                          <span className="text-muted-foreground ml-1 text-[11px] font-normal">
+                            · belum ada data
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            item.type === "EVENT" ? "destructive" : "default"
-                          }
-                        >
-                          {KPI_TYPE_LABELS[item.type] ?? item.type}
+                        <Badge variant={scoringTone(item.scoringType)}>
+                          {SCORING_TYPE_LABELS[item.scoringType] ?? item.scoringType}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {(Number(item.maxScore) * 100).toFixed(0)}%
+                      <TableCell className="tabular text-right">
+                        {(item.weight * 100).toFixed(0)}%
                       </TableCell>
-                      <TableCell className="text-right text-sm text-muted-foreground">
-                        {item.type === "EVENT"
-                          ? `${item.totalPenalty} / ${item.threshold} poin`
-                          : `${(Number(item.achievement ?? 0) * 100).toFixed(
-                              1
-                            )}% dari target`}
+                      <TableCell className="text-muted-foreground text-xs">
+                        {item.explanation}
                       </TableCell>
-                      <TableCell className="text-right font-mono font-medium">
-                        {(Number(item.score) * 100).toFixed(2)}%
+                      <TableCell className="text-right tabular font-medium">
+                        {formatPercent(item.achievement)}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
+import { ErrorPanel } from "@/components/admin/page-shell";
 import { UsersPageClient } from "@/components/admin/users-page-client";
 import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { isAdminRole, isGlobalRole } from "@/lib/permissions";
+import { can, isAdminRole, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 
 export default async function UsersPage() {
@@ -54,11 +55,7 @@ export default async function UsersPage() {
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[users/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="users/page" message={msg} />
     )
   }
   const [users, branches, companies, roles] = result;
@@ -83,12 +80,18 @@ export default async function UsersPage() {
     branch: u.branch,
   }));
 
+  // Nama karyawan baru jadi tautan bila caller memang boleh membuka detailnya —
+  // gerbangnya sama persis dengan yang dijaga halaman detail.
+  const canOpenDetail =
+    isGlobalRole(caller.roleName) || can(caller.permissions, PERMISSIONS.USERS_VIEW_DETAIL);
+
   return (
     <UsersPageClient
       users={serialized}
       branches={branches}
       companies={companies}
       roles={roles}
+      canOpenDetail={canOpenDetail}
     />
   );
 }

@@ -8,14 +8,32 @@ import { requirePermission } from "@/backend/helpers/get-admin-caller";
 import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { PERMISSIONS } from "@/lib/permissions";
 
+/**
+ * Parameter penilaian. Mana yang wajib diisi tergantung scoringType definisinya
+ * — validasinya ada di UI karena admin bisa menyimpan konfigurasi bertahap;
+ * engine memperlakukan parameter yang belum disetel sebagai "belum bisa dinilai"
+ * dan bukan sebagai nol diam-diam (lihat src/lib/kpi-scoring.ts).
+ */
+export const roleKpiScoringSchema = {
+  weight: z.number().min(0).max(1),
+  targetValue: z.number().nullish(),
+  basePoint: z.number().positive().nullish(),
+  pointPerUnit: z.number().nullish(),
+  toleranceLimit: z.number().nullish(),
+  toleranceScope: z.enum(["DAILY", "WEEKLY", "MONTHLY"]).nullish(),
+  maxAchievement: z.number().min(1).max(3).optional(),
+  minAchievement: z.number().min(0).max(1).optional(),
+  inputSource: z.enum(["SELF", "SUPERVISOR", "SYSTEM"]).nullish(),
+  requiresApproval: z.boolean().nullish(),
+  requiresEvidence: z.boolean().nullish(),
+  isActive: z.boolean().optional(),
+};
+
 const createSchema = z.object({
   companyId: z.string().min(1),
   customRoleId: z.string().min(1),
   kpiId: z.string().min(1),
-  maxScore: z.number().positive().max(1),
-  targetValue: z.number().positive().optional(),
-  threshold: z.number().positive().optional(),
-  weight: z.number().min(0).max(1),
+  ...roleKpiScoringSchema,
 });
 
 type CreateBody = z.infer<typeof createSchema>;
@@ -34,9 +52,7 @@ export async function GET(req: NextRequest) {
     if (companyId) assertCompanyAccess(caller, companyId);
 
     if (companyId && customRoleId) {
-      return NextResponse.json(
-        ok(await kpiService.getByCompanyRole(companyId, customRoleId))
-      );
+      return NextResponse.json(ok(await kpiService.getByCompanyRole(companyId, customRoleId)));
     }
 
     const all = await kpiService.getAllRoleKpis();
@@ -55,10 +71,9 @@ export const POST = withValidation(createSchema)(
     try {
       assertCompanyAccess(caller, ctx.body.companyId);
       const roleKpi = await kpiService.createRoleKpi(ctx.body);
-      return NextResponse.json(
-        ok(roleKpi, "Konfigurasi KPI jabatan berhasil ditambahkan"),
-        { status: 201 }
-      );
+      return NextResponse.json(ok(roleKpi, "Konfigurasi KPI jabatan berhasil ditambahkan"), {
+        status: 201,
+      });
     } catch (e) {
       return handleError(e);
     }

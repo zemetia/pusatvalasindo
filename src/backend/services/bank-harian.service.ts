@@ -26,11 +26,12 @@ export async function buildBankHarianPayload(
     throw new ForbiddenError("Tidak punya akses ke PT ini");
   }
 
-  const [accounts, todayEntries, previousEntries, pendingCorrections] = await Promise.all([
+  const [accounts, todayEntries, previousEntries, pendingCorrections, approvedCorrections] = await Promise.all([
     bankAccountRepository.findActiveForDaily(companyId),
     dailyBankEntryRepository.findByCompanyAndDate(companyId, date),
     dailyBankEntryRepository.findLatestBeforeDate(companyId, date),
     correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["BANK"]),
+    correctionRequestRepository.findApprovedByCompanyDateTargets(companyId, date, ["BANK"]),
   ]);
 
   return {
@@ -63,6 +64,21 @@ export async function buildBankHarianPayload(
         .map((c) => [
           c.bankAccountId as string,
           { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
+        ])
+    ),
+    // Sel yang pernah salah dan sudah dikoreksi (disetujui) ditandai supaya kelihatan
+    // riwayatnya, beda dari pendingCorrections yang masih menunggu ACC.
+    approvedCorrections: Object.fromEntries(
+      approvedCorrections
+        .filter((c) => c.bankAccountId)
+        .map((c) => [
+          c.bankAccountId as string,
+          {
+            id: c.id,
+            currentValue: c.currentValue.toString(),
+            proposedValue: c.proposedValue.toString(),
+            reason: c.reason,
+          },
         ])
     ),
     previous: Object.fromEntries(

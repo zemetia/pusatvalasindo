@@ -55,6 +55,30 @@ export const correctionRequestRepository = {
       },
     }),
 
+  // Dipakai untuk menandai sel yang pernah salah dan sudah dikoreksi (APPROVED)
+  // pada tanggal tsb — beda dari findPendingByCompanyDateTargets yang menandai
+  // pengajuan yang masih menunggu ACC.
+  findApprovedByCompanyDateTargets: (
+    companyId: string,
+    date: Date,
+    targets: CorrectionTargetType[]
+  ) =>
+    prisma.correctionRequest.findMany({
+      where: { companyId, date, status: "APPROVED", target: { in: targets } },
+      select: {
+        id: true,
+        target: true,
+        pocketId: true,
+        companyStockItemId: true,
+        kasPocketId: true,
+        bankAccountId: true,
+        currentValue: true,
+        proposedValue: true,
+        reason: true,
+        decidedAt: true,
+      },
+    }),
+
   create: (input: {
     companyId: string;
     target: CorrectionTargetType;

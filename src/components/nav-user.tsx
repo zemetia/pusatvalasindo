@@ -106,7 +106,10 @@ export function NavUser({ user }: { user: NavUserData }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="my-2" />
             <DropdownMenuGroup className="gap-1 flex flex-col">
-              <DropdownMenuItem className="rounded-lg transition-colors focus:bg-primary/5 focus:text-primary">
+              <DropdownMenuItem
+                onSelect={() => router.push(`/${locale}/dashboard/account`)}
+                className="rounded-lg transition-colors focus:bg-primary/5 focus:text-primary"
+              >
                 <IconUserCircle className="size-4 opacity-70" />
                 <span className="font-medium">Account Settings</span>
               </DropdownMenuItem>
@@ -115,7 +118,7 @@ export function NavUser({ user }: { user: NavUserData }) {
             <DropdownMenuItem
               onSelect={handleLogOut}
               disabled={loggingOut}
-              className="rounded-lg text-red-600 focus:bg-red-50 focus:text-red-700 transition-colors"
+              className="rounded-lg text-destructive focus:bg-destructive/10 focus:text-destructive transition-colors"
             >
               {loggingOut ? (
                 <IconLoader2 className="size-4 animate-spin" />

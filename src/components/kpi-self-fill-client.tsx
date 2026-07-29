@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -25,30 +24,38 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { IconTrash } from "@tabler/icons-react";
-import { MONTH_NAMES } from "@/lib/kpi-utils";
+import { IconTrash, IconLock } from "@tabler/icons-react";
+import { MONTH_NAMES, SCORING_TYPE_LABELS } from "@/lib/kpi-utils";
 
-type RoleKpiItem = {
-  kpiId: string;
+type FillableKpi = {
+  roleKpiId: string;
   name: string;
-  type: string;
+  description: string | null;
+  scoringType: string;
+  unit: string;
+  requiresApproval: boolean;
+  requiresEvidence: boolean;
+  targetValue: string | null;
+  pointPerUnit: string | null;
+  toleranceLimit: string | null;
 };
 
-type LogEntry = {
+type EntryRow = {
   id: string;
-  kpiId: string;
-  value: string;
+  roleKpiId: string;
+  occurredAt: string;
+  weekOfMonth: number;
+  quantity: string;
   note: string | null;
-  createdAt: string;
-  definition: { name: string; type: string };
+  evidenceUrl: string | null;
+  source: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewNote: string | null;
+  reviewedBy: { name: string } | null;
+  roleKpi: { definition: { name: string; scoringType: string; unit: string } };
 };
 
-type RevenueEntry = {
-  id: string;
-  amount: string;
-  date: string;
-  note: string | null;
-};
+type PeriodRow = { status: "OPEN" | "LOCKED" } | null;
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -74,7 +81,9 @@ function TableSkeletonRows({ cols, rows = 3 }: { cols: number; rows?: number }) 
       {Array.from({ length: rows }).map((_, i) => (
         <TableRow key={i}>
           {Array.from({ length: cols }).map((_, j) => (
-            <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+            <TableCell key={j}>
+              <Skeleton className="h-4 w-full" />
+            </TableCell>
           ))}
         </TableRow>
       ))}
@@ -82,20 +91,75 @@ function TableSkeletonRows({ cols, rows = 3 }: { cols: number; rows?: number }) 
   );
 }
 
+const STATUS_META = {
+  PENDING: { label: "Menunggu persetujuan", variant: "warning" },
+  APPROVED: { label: "Disetujui", variant: "success" },
+  REJECTED: { label: "Ditolak", variant: "destructive" },
+} as const satisfies Record<EntryRow["status"], { label: string; variant: BadgeVariant }>;
+
+/** Label kolom jumlah menyesuaikan cara penilaian KPI yang dipilih. */
+function quantityLabel(kpi: FillableKpi | undefined) {
+  if (!kpi) return "Jumlah";
+  if (kpi.unit === "CURRENCY") return "Nilai (Rp)";
+  switch (kpi.scoringType) {
+    case "TARGET_VALUE":
+      return "Realisasi";
+    case "REWARD_POINT":
+    case "PENALTY_POINT":
+    case "PENALTY_PERCENT":
+      return "Jumlah Kejadian";
+    case "BOOLEAN_DAILY":
+      return "Patuh? (1 = ya, 0 = tidak)";
+    default:
+      return "Jumlah";
+  }
+}
+
+/** Penjelasan singkat efek entri ini terhadap skor, dibaca sebelum menyimpan. */
+function effectHint(kpi: FillableKpi | undefined, quantity: number) {
+  if (!kpi || !Number.isFinite(quantity) || quantity === 0) return null;
+  const perUnit = kpi.pointPerUnit ? Number(kpi.pointPerUnit) : null;
+
+  switch (kpi.scoringType) {
+    case "REWARD_POINT":
+      return perUnit
+        ? `Menambah ${(quantity * perUnit).toLocaleString("id-ID")} poin${
+            kpi.targetValue ? ` dari target ${Number(kpi.targetValue).toLocaleString("id-ID")}` : ""
+          }.`
+        : null;
+    case "PENALTY_POINT":
+      return perUnit
+        ? `Mengurangi ${(quantity * perUnit).toLocaleString("id-ID")} poin dari nilai KPI ini.`
+        : null;
+    case "PENALTY_PERCENT":
+      return perUnit ? `Mengurangi ${(quantity * perUnit).toFixed(0)}% dari nilai KPI ini.` : null;
+    case "TARGET_VALUE":
+      return kpi.targetValue
+        ? `Menambah realisasi menuju target ${Number(kpi.targetValue).toLocaleString("id-ID")}.`
+        : null;
+    case "TOLERANCE_LIMIT":
+      return kpi.toleranceLimit
+        ? `Batas yang ditoleransi ${Number(kpi.toleranceLimit).toLocaleString("id-ID")} per hari.`
+        : null;
+    default:
+      return null;
+  }
+}
+
 export function KpiSelfFillClient({
   userId,
   userName,
   roleName,
-  roleKpis,
-  companyId,
-  customRoleId,
+  companyName,
+  fillableKpis,
+  supervisorOnlyCount,
 }: {
   userId: string;
   userName: string;
   roleName: string;
-  roleKpis: RoleKpiItem[];
-  companyId: string;
-  customRoleId: string;
+  companyName: string;
+  fillableKpis: FillableKpi[];
+  supervisorOnlyCount: number;
 }) {
   const now = new Date();
   const queryClient = useQueryClient();
@@ -103,137 +167,97 @@ export function KpiSelfFillClient({
   const [month, setMonth] = useState(String(now.getMonth() + 1));
   const [year, setYear] = useState(String(now.getFullYear()));
 
-  // Event log state
-  const [newKpiId, setNewKpiId] = useState("");
-  const [newValue, setNewValue] = useState("1");
-  const [newNote, setNewNote] = useState("");
+  const todayIso = now.toISOString().slice(0, 10);
+  const [roleKpiId, setRoleKpiId] = useState("");
+  const [occurredAt, setOccurredAt] = useState(todayIso);
+  const [quantity, setQuantity] = useState("1");
+  const [note, setNote] = useState("");
+  const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Revenue state
-  const [newAmount, setNewAmount] = useState("");
-  const [newRevenueNote, setNewRevenueNote] = useState("");
+  const selectedKpi = fillableKpis.find((k) => k.roleKpiId === roleKpiId);
+  const dataKey = ["kpi-entries-self", userId, month, year] as const;
 
-  const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
-  const [deletingRevenueId, setDeletingRevenueId] = useState<string | null>(null);
-
-  const eventKpis = roleKpis.filter((k) => k.type === "EVENT");
-
-  const logsKey = ["kpi-logs-self", userId, month, year] as const;
-  const revenuesKey = ["revenues-self", userId, month, year] as const;
-
-  const { data: logs = [], isLoading: logsLoading } = useQuery({
-    queryKey: logsKey,
+  const { data, isLoading } = useQuery({
+    queryKey: dataKey,
     queryFn: () =>
-      fetchJson<LogEntry[]>(
-        `/api/kpi-logs?employeeId=${userId}&month=${month}&year=${year}`
+      fetchJson<{ entries: EntryRow[]; period: PeriodRow }>(
+        `/api/kpi-entries?employeeId=${userId}&month=${month}&year=${year}`
       ),
   });
 
-  const { data: revenues = [], isLoading: revenuesLoading } = useQuery({
-    queryKey: revenuesKey,
-    queryFn: () =>
-      fetchJson<RevenueEntry[]>(
-        `/api/revenues?employeeId=${userId}&month=${month}&year=${year}`
-      ),
-  });
+  const entries = useMemo(() => data?.entries ?? [], [data]);
+  const isLocked = data?.period?.status === "LOCKED";
 
-  const addLogMutation = useMutation({
-    mutationFn: (body: { kpiId: string; value: number; note?: string }) =>
-      mutateJson("/api/kpi-logs/self", "POST", body),
-    onSuccess: () => {
-      toast.success("KPI berhasil dicatat");
-      setNewKpiId("");
-      setNewValue("1");
-      setNewNote("");
-      queryClient.invalidateQueries({ queryKey: logsKey });
+  const addMutation = useMutation({
+    mutationFn: (body: Record<string, unknown>) => mutateJson("/api/kpi-entries", "POST", body),
+    onSuccess: (_res, _vars) => {
+      toast.success(
+        selectedKpi?.requiresApproval
+          ? "Tercatat — menunggu persetujuan atasan"
+          : "KPI berhasil dicatat"
+      );
+      setQuantity("1");
+      setNote("");
+      setEvidenceUrl("");
+      queryClient.invalidateQueries({ queryKey: dataKey });
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const deleteLogMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: (id: string) => {
-      setDeletingLogId(id);
-      return mutateJson(`/api/kpi-logs/self/${id}`, "DELETE");
-    },
-    onSuccess: () => {
-      toast.success("Log dihapus");
-      queryClient.invalidateQueries({ queryKey: logsKey });
-    },
-    onError: (err: Error) => toast.error(err.message),
-    onSettled: () => setDeletingLogId(null),
-  });
-
-  const addRevenueMutation = useMutation({
-    mutationFn: (body: { amount: number; note?: string }) =>
-      mutateJson("/api/revenues/self", "POST", body),
-    onSuccess: () => {
-      toast.success("Target / omset berhasil dicatat");
-      setNewAmount("");
-      setNewRevenueNote("");
-      queryClient.invalidateQueries({ queryKey: revenuesKey });
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const deleteRevenueMutation = useMutation({
-    mutationFn: (id: string) => {
-      setDeletingRevenueId(id);
-      return mutateJson(`/api/revenues/self/${id}`, "DELETE");
+      setDeletingId(id);
+      return mutateJson(`/api/kpi-entries/${id}`, "DELETE");
     },
     onSuccess: () => {
       toast.success("Entri dihapus");
-      queryClient.invalidateQueries({ queryKey: revenuesKey });
+      queryClient.invalidateQueries({ queryKey: dataKey });
     },
     onError: (err: Error) => toast.error(err.message),
-    onSettled: () => setDeletingRevenueId(null),
+    onSettled: () => setDeletingId(null),
   });
 
-  const handleAddLog = () => {
-    if (!newKpiId) {
-      toast.error("Pilih jenis pelanggaran terlebih dahulu");
+  const handleAdd = () => {
+    if (!roleKpiId) {
+      toast.error("Pilih KPI terlebih dahulu");
       return;
     }
-    addLogMutation.mutate({
-      kpiId: newKpiId,
-      value: Number(newValue) || 1,
-      note: newNote.trim() || undefined,
+    const qty = Number(quantity);
+    if (!Number.isFinite(qty)) {
+      toast.error("Jumlah harus berupa angka");
+      return;
+    }
+    if (selectedKpi?.requiresEvidence && !evidenceUrl.trim()) {
+      toast.error("KPI ini wajib disertai tautan bukti");
+      return;
+    }
+
+    addMutation.mutate({
+      employeeId: userId,
+      roleKpiId,
+      occurredAt,
+      quantity: qty,
+      note: note.trim() || null,
+      evidenceUrl: evidenceUrl.trim() || null,
     });
   };
 
-  const handleDeleteLog = (id: string) => {
-    if (!confirm("Hapus catatan ini?")) return;
-    deleteLogMutation.mutate(id);
-  };
-
-  const handleAddRevenue = () => {
-    if (!newAmount) {
-      toast.error("Isi jumlah omset / target");
-      return;
-    }
-    addRevenueMutation.mutate({
-      amount: Number(newAmount),
-      note: newRevenueNote.trim() || undefined,
-    });
-  };
-
-  const handleDeleteRevenue = (id: string) => {
-    if (!confirm("Hapus entri ini?")) return;
-    deleteRevenueMutation.mutate(id);
-  };
-
-  const totalRevenue = revenues.reduce((s, r) => s + Number(r.amount), 0);
+  const hint = effectHint(selectedKpi, Number(quantity));
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Info user */}
-      <div className="flex items-center gap-3 px-4 py-3 border rounded-lg bg-muted/40">
+      <div className="bg-muted/40 flex items-center gap-3 rounded-lg border px-4 py-3">
         <div>
           <p className="font-semibold">{userName}</p>
-          <p className="text-sm text-muted-foreground">{roleName}</p>
+          <p className="text-muted-foreground text-sm">
+            {roleName}
+            {companyName ? ` · ${companyName}` : ""}
+          </p>
         </div>
       </div>
 
-      {/* Pilih periode */}
-      <div className="grid grid-cols-2 gap-4 p-4 border rounded-lg">
+      <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
         <div className="grid gap-1.5">
           <Label>Bulan</Label>
           <Select value={month} onValueChange={setMonth}>
@@ -261,232 +285,208 @@ export function KpiSelfFillClient({
         </div>
       </div>
 
-      {/* Tabs: Pelanggaran + Target/Omset */}
-      <Tabs defaultValue="events" className="flex flex-col gap-4">
-        <TabsList className="w-fit">
-          <TabsTrigger value="events">
-            Log Pelanggaran ({logs.length})
-          </TabsTrigger>
-          <TabsTrigger value="revenue">
-            Target / Omset ({revenues.length})
-          </TabsTrigger>
-        </TabsList>
+      {isLocked && (
+        <div className="border-warning/40 bg-warning/10 flex items-center gap-2 rounded-lg border px-4 py-3 text-sm">
+          <IconLock className="size-4 shrink-0" />
+          <span>
+            Periode {MONTH_NAMES[Number(month)]} {year} sudah dikunci. Catatan tidak bisa
+            ditambah atau dihapus lagi.
+          </span>
+        </div>
+      )}
 
-        {/* ── Tab: Log Pelanggaran ─────────────────────────────── */}
-        <TabsContent value="events" className="mt-0 flex flex-col gap-4">
-          {eventKpis.length > 0 ? (
-            <div className="flex flex-col gap-4 p-4 border rounded-lg bg-muted/30">
-              <h3 className="font-medium text-sm">Catat Kejadian / Pelanggaran</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="grid gap-1.5">
-                  <Label>Jenis Kejadian *</Label>
-                  <Select value={newKpiId} onValueChange={setNewKpiId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih jenis..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {eventKpis.map((k) => (
-                        <SelectItem key={k.kpiId} value={k.kpiId}>
-                          {k.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-1.5">
-                  <Label>Jumlah Kejadian</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={newValue}
-                    onChange={(e) => setNewValue(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Keterangan / Alasan</Label>
-                <Textarea
-                  placeholder="Contoh: Terlambat 15 menit karena macet di tol Cengkareng..."
-                  rows={2}
-                  value={newNote}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewNote(e.target.value)}
-                />
-              </div>
-              <Button
-                onClick={handleAddLog}
-                disabled={addLogMutation.isPending}
-                className="w-fit"
-              >
-                {addLogMutation.isPending ? "Menyimpan..." : "+ Catat"}
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2 px-4 py-3 border rounded-lg bg-muted/30">
-              <p className="text-sm font-medium">Belum ada KPI pelanggaran untuk jabatan ini</p>
-              <p className="text-sm text-muted-foreground">
-                Jabatan <span className="font-medium">{roleName}</span> belum memiliki KPI bertipe EVENT.
-                Admin perlu menambahkan minimal satu KPI event di halaman konfigurasi KPI jabatan.
+      {fillableKpis.length === 0 ? (
+        <div className="bg-muted/30 flex flex-col gap-2 rounded-lg border px-4 py-3">
+          <p className="text-sm font-medium">Tidak ada KPI yang bisa Anda isi sendiri</p>
+          <p className="text-muted-foreground text-sm">
+            Seluruh KPI jabatan <span className="font-medium">{roleName}</span> dicatat oleh atasan
+            atau diambil otomatis oleh sistem. Anda tetap bisa melihat hasilnya di halaman KPI.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-muted/30 flex flex-col gap-4 rounded-lg border p-4">
+          <div>
+            <h3 className="text-sm font-medium">Catat KPI</h3>
+            {supervisorOnlyCount > 0 && (
+              <p className="text-muted-foreground mt-0.5 text-xs">
+                {supervisorOnlyCount} KPI lain pada jabatan Anda dicatat oleh atasan/sistem dan
+                tidak muncul di sini.
               </p>
-              {companyId && customRoleId && (
-                <Button asChild size="sm" variant="outline" className="w-fit mt-1">
-                  <Link href={`/dashboard/kpi/${companyId}/custom_${customRoleId}`}>
-                    Buka Konfigurasi KPI Jabatan →
-                  </Link>
-                </Button>
-              )}
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label>KPI *</Label>
+              <Select value={roleKpiId} onValueChange={setRoleKpiId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih KPI..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {fillableKpis.map((k) => (
+                    <SelectItem key={k.roleKpiId} value={k.roleKpiId}>
+                      {k.name}
+                      <span className="text-muted-foreground ml-1">
+                        — {SCORING_TYPE_LABELS[k.scoringType] ?? k.scoringType}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            <div className="grid gap-1.5">
+              <Label>Tanggal Kejadian *</Label>
+              <Input
+                type="date"
+                value={occurredAt}
+                onChange={(e) => setOccurredAt(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {selectedKpi?.description && (
+            <p className="text-muted-foreground border-border border-l-2 pl-2 text-xs">
+              {selectedKpi.description}
+            </p>
           )}
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Kejadian</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead>Keterangan</TableHead>
-                  <TableHead>Waktu</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logsLoading ? (
-                  <TableSkeletonRows cols={5} />
-                ) : logs.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center text-muted-foreground py-6"
-                    >
-                      Belum ada catatan untuk periode ini.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  logs.map((l) => (
-                    <TableRow key={l.id}>
-                      <TableCell className="font-medium">
-                        {l.definition.name}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {Number(l.value)}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {l.note ?? "—"}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(l.createdAt).toLocaleString("id-ID")}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="text-destructive hover:text-destructive"
-                          disabled={deletingLogId === l.id}
-                          onClick={() => handleDeleteLog(l.id)}
-                        >
-                          <IconTrash className="size-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        {/* ── Tab: Target / Omset ──────────────────────────────── */}
-        <TabsContent value="revenue" className="mt-0 flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border rounded-lg bg-muted/30">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
-              <Label>Jumlah (IDR) *</Label>
+              <Label>{quantityLabel(selectedKpi)} *</Label>
               <Input
                 type="number"
-                min="1"
-                placeholder="Contoh: 5000000"
-                value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
+                step="any"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
               />
+              {hint && <p className="text-muted-foreground text-xs">{hint}</p>}
             </div>
+
             <div className="grid gap-1.5">
-              <Label>Catatan</Label>
+              <Label>
+                Tautan Bukti {selectedKpi?.requiresEvidence ? "*" : "(opsional)"}
+              </Label>
               <Input
-                placeholder="Opsional"
-                value={newRevenueNote}
-                onChange={(e) => setNewRevenueNote(e.target.value)}
+                type="url"
+                placeholder="https://..."
+                value={evidenceUrl}
+                onChange={(e) => setEvidenceUrl(e.target.value)}
               />
-            </div>
-            <div className="flex items-end">
-              <Button
-                onClick={handleAddRevenue}
-                disabled={addRevenueMutation.isPending}
-              >
-                {addRevenueMutation.isPending ? "Menyimpan..." : "+ Catat Omset"}
-              </Button>
             </div>
           </div>
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead>Catatan</TableHead>
-                  <TableHead />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {revenuesLoading ? (
-                  <TableSkeletonRows cols={4} />
-                ) : revenues.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-muted-foreground py-6"
-                    >
-                      Belum ada entri omset untuk periode ini.
+          <div className="grid gap-1.5">
+            <Label>Keterangan</Label>
+            <Textarea
+              placeholder="Contoh: 3 ulasan Google dari nasabah transfer Singapura."
+              rows={2}
+              value={note}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button onClick={handleAdd} disabled={addMutation.isPending || isLocked}>
+              {addMutation.isPending ? "Menyimpan..." : "+ Catat"}
+            </Button>
+            {selectedKpi?.requiresApproval && (
+              <span className="text-muted-foreground text-xs">
+                Entri ini menunggu persetujuan atasan sebelum ikut dihitung.
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>KPI</TableHead>
+              <TableHead className="text-right">Jumlah</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Keterangan</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableSkeletonRows cols={6} />
+            ) : entries.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-muted-foreground py-6 text-center">
+                  Belum ada catatan untuk periode ini.
+                </TableCell>
+              </TableRow>
+            ) : (
+              entries.map((e) => {
+                const meta = STATUS_META[e.status];
+                return (
+                  <TableRow key={e.id}>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                      <span className="ml-1 text-[11px]">· mgg {e.weekOfMonth}</span>
                     </TableCell>
-                  </TableRow>
-                ) : (
-                  revenues.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {new Date(r.date).toLocaleDateString("id-ID")}
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        Rp {Number(r.amount).toLocaleString("id-ID")}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {r.note ?? "—"}
-                      </TableCell>
-                      <TableCell>
+                    <TableCell className="font-medium">
+                      {e.roleKpi.definition.name}
+                      {e.source !== "SELF" && (
+                        <span className="text-muted-foreground ml-1 text-[11px] font-normal">
+                          (dicatat atasan)
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="tabular text-right">
+                      {Number(e.quantity).toLocaleString("id-ID")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={meta.variant}>{meta.label}</Badge>
+                      {e.status === "REJECTED" && e.reviewNote && (
+                        <p className="text-muted-foreground mt-0.5 text-[11px]">{e.reviewNote}</p>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {e.note ?? "—"}
+                      {e.evidenceUrl && (
+                        <>
+                          {" "}
+                          <a
+                            href={e.evidenceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline"
+                          >
+                            bukti
+                          </a>
+                        </>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {/* Entri yang sudah disetujui hanya bisa dibatalkan atasan —
+                          supaya karyawan tidak menghapus penilaian atas dirinya. */}
+                      {e.source === "SELF" && e.status !== "APPROVED" && !isLocked && (
                         <Button
                           size="icon"
                           variant="ghost"
                           className="text-destructive hover:text-destructive"
-                          disabled={deletingRevenueId === r.id}
-                          onClick={() => handleDeleteRevenue(r.id)}
+                          disabled={deletingId === e.id}
+                          onClick={() => {
+                            if (!confirm("Hapus catatan ini?")) return;
+                            deleteMutation.mutate(e.id);
+                          }}
                         >
                           <IconTrash className="size-4" />
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {revenues.length > 0 && (
-            <div className="text-sm text-muted-foreground text-right">
-              Total:{" "}
-              <span className="font-mono font-medium text-foreground">
-                Rp {totalRevenue.toLocaleString("id-ID")}
-              </span>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

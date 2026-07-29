@@ -10,6 +10,11 @@ export const PERMISSIONS = {
   KPI_FILL_OWN: "kpi.fill_own",
   KPI_VIEW_OWN: "kpi.view_own",
   KPI_VIEW_ALL: "kpi.view_all",
+  // Menyetujui/menolak entri KPI yang diisi sendiri oleh karyawan, dan mencatat
+  // KPI yang tidak boleh diisi sendiri (mis. komplain nasabah, temuan SOP).
+  // Sengaja dipisah dari KPI_MANAGE: atasan langsung berhak menilai timnya,
+  // tapi tidak berhak mengubah definisi & bobot KPI-nya.
+  KPI_APPROVE: "kpi.approve",
   KPI_MANAGE: "kpi.manage",
 
   PAYROLL_VIEW_OWN: "payroll.view_own",
@@ -44,6 +49,12 @@ export const PERMISSIONS = {
 
   USERS_VIEW: "users.view",
   USERS_MANAGE: "users.manage",
+  // Halaman detail karyawan (KPI + gaji + kalender kehadiran satu orang).
+  // Sengaja terpisah dari USERS_VIEW: melihat daftar pengguna tidak sama dengan
+  // boleh membuka rapor lengkap seseorang. Untuk sekarang hanya Owner & Super
+  // Admin (lewat ALL); role lain — mis. HR — bisa diberi izin ini dari halaman
+  // Jabatan tanpa mengubah kode.
+  USERS_VIEW_DETAIL: "users.view_detail",
 
   BRANCHES_VIEW: "branches.view",
   BRANCHES_MANAGE: "branches.manage",
@@ -71,6 +82,7 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.KPI_FILL_OWN,
   PERMISSIONS.KPI_VIEW_OWN,
   PERMISSIONS.KPI_VIEW_ALL,
+  PERMISSIONS.KPI_APPROVE,
   PERMISSIONS.KPI_MANAGE,
   PERMISSIONS.PAYROLL_VIEW_OWN,
   PERMISSIONS.PAYROLL_VIEW_COMPANY,
@@ -109,6 +121,7 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.KPI_FILL_OWN,
   PERMISSIONS.KPI_VIEW_OWN,
   PERMISSIONS.KPI_VIEW_ALL,
+  PERMISSIONS.KPI_APPROVE,
   PERMISSIONS.KPI_MANAGE,
   PERMISSIONS.PAYROLL_VIEW_OWN,
   PERMISSIONS.PAYROLL_MANAGE,
@@ -133,6 +146,7 @@ const HR_PERMISSIONS: Permission[] = [
   PERMISSIONS.KPI_FILL_OWN,
   PERMISSIONS.KPI_VIEW_OWN,
   PERMISSIONS.KPI_VIEW_ALL,
+  PERMISSIONS.KPI_APPROVE,
   PERMISSIONS.KPI_MANAGE,
   PERMISSIONS.PAYROLL_VIEW_OWN,
   PERMISSIONS.PAYROLL_VIEW_ALL,

@@ -4,8 +4,8 @@ import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { getCaller, requirePermission } from "@/backend/helpers/get-admin-caller";
+import { can, PERMISSIONS } from "@/lib/permissions";
 
 const calculateSchema = z.object({
   employeeId: z.string().min(1),
@@ -17,22 +17,26 @@ type CalculateBody = z.infer<typeof calculateSchema>;
 
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
-    if (caller instanceof NextResponse) return caller;
+    const caller = await getCaller();
+    if (!caller) {
+      return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+    }
 
-    const employeeId = req.nextUrl.searchParams.get("employeeId");
+    const employeeId = req.nextUrl.searchParams.get("employeeId") ?? caller.id;
     const month = Number(req.nextUrl.searchParams.get("month"));
     const year = Number(req.nextUrl.searchParams.get("year"));
 
-    if (!employeeId || !month || !year) {
-      return NextResponse.json(
-        fail("VALIDATION", "employeeId, month, dan year diperlukan"),
-        { status: 400 }
-      );
+    if (!month || !year) {
+      return NextResponse.json(fail("VALIDATION", "month dan year diperlukan"), { status: 400 });
     }
 
-    const result = await kpiService.getMonthlyResult(employeeId, month, year);
-    return NextResponse.json(ok(result));
+    if (employeeId !== caller.id && !can(caller.permissions, PERMISSIONS.KPI_VIEW_ALL)) {
+      return NextResponse.json(fail("FORBIDDEN", "Tidak memiliki izin melihat KPI karyawan lain"), {
+        status: 403,
+      });
+    }
+
+    return NextResponse.json(ok(await kpiService.getMonthlyResult(employeeId, month, year)));
   } catch (e) {
     return handleError(e);
   }
@@ -41,18 +45,12 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(calculateSchema)(
   async (_req: NextRequest, ctx: { body: CalculateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
       if (caller instanceof NextResponse) return caller;
 
       const { employeeId, month, year } = ctx.body;
-      const result = await kpiService.calculateMonthlyResult(
-        employeeId,
-        month,
-        year
-      );
-      return NextResponse.json(ok(result, "KPI bulan ini berhasil dihitung"), {
-        status: 201,
-      });
+      const result = await kpiService.calculateMonthlyResult(employeeId, month, year);
+      return NextResponse.json(ok(result, "Skor KPI berhasil dihitung ulang"), { status: 201 });
     } catch (e) {
       return handleError(e);
     }

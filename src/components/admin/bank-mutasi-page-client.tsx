@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -14,7 +12,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BankMutationSheet } from "@/components/admin/bank-mutation-sheet";
-import { IconSearch } from "@tabler/icons-react";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+  MetricBlock,
+  MetricInline,
+} from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 type Mutation = {
   id: string;
@@ -57,136 +64,142 @@ export function BankMutasiPageClient({ account }: BankMutasiPageClientProps) {
   }, [account.mutations, search]);
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-            <Link href="/dashboard/bank-accounts" className="hover:text-foreground transition-colors">Rekening Bank</Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">Riwayat Mutasi</span>
-          </div>
-          <h1 className="text-2xl font-semibold">Riwayat Mutasi</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {account.bankName} — {account.accountNumber}
-          </p>
-        </div>
-        {account.isActive && (
-          <BankMutationSheet
-            bankAccountId={account.id}
-            bankName={account.bankName}
-            accountNumber={account.accountNumber ?? ""}
-            currencyCode={currencyCode}
-          />
-        )}
-      </div>
+    <PageShell>
+      <PageHeader
+        eyebrow="Rekening Bank"
+        title="Riwayat Mutasi"
+        description={`${account.bankName} — ${account.accountNumber ?? "tanpa nomor"}`}
+        icon={
+          <Link
+            href="/dashboard/bank-accounts"
+            aria-label="Kembali ke daftar rekening"
+            className="hover:text-foreground flex size-full items-center justify-center"
+          >
+            <IconArrowLeft className="size-5" />
+          </Link>
+        }
+        action={
+          account.isActive && (
+            <BankMutationSheet
+              bankAccountId={account.id}
+              bankName={account.bankName}
+              accountNumber={account.accountNumber ?? ""}
+              currencyCode={currencyCode}
+            />
+          )
+        }
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">PT</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{account.company.name}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pemilik Rekening</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{account.accountName}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Saldo Saat Ini</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold font-mono">
-              {currencyCode}{" "}
-              {balance.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <section className="border-border grid gap-8 border-y py-8 sm:grid-cols-3">
+        <div className="sm:col-span-2">
+          <MetricBlock
+            label="Saldo Saat Ini"
+            size="hero"
+            prefix={currencyCode}
+            value={balance.toLocaleString("id-ID", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            meta={
+              account.isActive ? "Rekening aktif" : "Rekening nonaktif"
+            }
+          />
+        </div>
+        <div className="space-y-2.5 sm:border-l sm:pl-8">
+          <MetricInline label="PT" value={account.company.name} />
+          <MetricInline label="Pemilik Rekening" value={account.accountName} />
+          <MetricInline
+            label="Jumlah Mutasi"
+            value={account.mutations.length.toLocaleString("id-ID")}
+          />
+        </div>
+      </section>
 
       {account.mutations.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg font-medium">Belum ada riwayat mutasi</p>
-          <p className="text-sm mt-1">Gunakan tombol &ldquo;+ Tambah Mutasi&rdquo; untuk mencatat transaksi.</p>
-        </div>
+        <SectionCard padded={false}>
+          <EmptyState
+            title="Belum ada riwayat mutasi"
+            description="Gunakan tombol “Tambah Mutasi” untuk mencatat transaksi pertama."
+          />
+        </SectionCard>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="relative max-w-xs">
-            <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              placeholder="Cari keterangan, tipe..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Tipe</TableHead>
-                  <TableHead className="text-right">Nominal</TableHead>
-                  <TableHead className="text-right">Saldo Setelah</TableHead>
-                  <TableHead>Keterangan</TableHead>
+        <SectionCard
+          padded={false}
+          toolbar={
+            <>
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari keterangan, tipe..."
+              />
+              <span className="text-muted-foreground ml-auto text-xs">
+                {filtered.length} dari {account.mutations.length} mutasi
+              </span>
+            </>
+          }
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tanggal</TableHead>
+                <TableHead>Tipe</TableHead>
+                <TableHead className="text-right">Nominal</TableHead>
+                <TableHead className="text-right">Saldo Setelah</TableHead>
+                <TableHead>Keterangan</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={5} className="p-0">
+                    <EmptyState
+                      title="Tidak ada hasil"
+                      description={`Tidak ada mutasi yang cocok dengan "${search}".`}
+                    />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      Tidak ada hasil untuk &ldquo;{search}&rdquo;
+              ) : (
+                filtered.map((m) => (
+                  <TableRow key={m.id}>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(m.createdAt).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </TableCell>
-                  </TableRow>
-                ) : (
-                  filtered.map((m) => (
-                    <TableRow key={m.id}>
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                        {new Date(m.createdAt).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={m.type === "CREDIT" ? "default" : "destructive"}>
-                          {m.type === "CREDIT" ? "Masuk" : "Keluar"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        <span className={m.type === "CREDIT" ? "text-green-600" : "text-destructive"}>
-                          {m.type === "CREDIT" ? "+" : "-"}
-                          {Number(m.amount).toLocaleString("id-ID", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right font-mono">
-                        {Number(m.balanceAfter).toLocaleString("id-ID", {
+                    <TableCell>
+                      <Badge variant={m.type === "CREDIT" ? "success" : "danger"}>
+                        {m.type === "CREDIT" ? "Masuk" : "Keluar"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="tabular text-right font-medium">
+                      <span
+                        className={m.type === "CREDIT" ? "text-success" : "text-destructive"}
+                      >
+                        {m.type === "CREDIT" ? "+" : "-"}
+                        {Number(m.amount).toLocaleString("id-ID", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
-                        {m.description ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+                      </span>
+                    </TableCell>
+                    <TableCell className="tabular text-right">
+                      {Number(m.balanceAfter).toLocaleString("id-ID", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground max-w-[240px] truncate">
+                      {m.description ?? "—"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </SectionCard>
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -26,7 +26,7 @@ model Company {
   isActive                  Boolean                         @default(true)
   createdAt                 DateTime                        @default(now())
   updatedAt                 DateTime                        @updatedAt
-  bonusMatrices             BonusMatrix[]
+  incentiveMatrices         PayrollIncentiveMatrix[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
   custom_roles              custom_role[]
@@ -69,4 +69,23 @@ model PriceBenchmark {
   updatedBy      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+// Cache of SmartDeal's live counter rates, refreshed by an external
+// scheduler hitting src/app/api/scrape/smartdeal/route.ts (see also
+// src/lib/smartdeal-scraper.ts). Pages read from here instead of scraping
+// smartdeal.co.id on every request — keeps page loads fast and gives a
+// last-known-good fallback if the scrape fails.
+model SmartdealRate {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  buy       Float
+  sell      Float
+  // Value this row held immediately before the current write — lets the UI
+  // show which currencies moved since the last cron fetch. Null until the
+  // second cron run for a code (nothing to compare against on the first).
+  prevBuy   Float?
+  prevSell  Float?
+  fetchedAt DateTime @default(now())
 }

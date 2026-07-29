@@ -74,35 +74,35 @@ export function LocationStatus({ onLocationChange, geofence }: LocationStatusPro
   const showGeofence = geofence && status === "success" && distanceM != null;
 
   return (
-    <div className="flex flex-col space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+    <div className="flex flex-col space-y-3 p-4 rounded-2xl bg-muted border border-border">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-xl ${
-          status === "success" ? "bg-emerald-100 text-emerald-600" :
-          status === "error" ? "bg-rose-100 text-rose-600" :
-          "bg-blue-100 text-blue-600 animate-pulse"
+          status === "success" ? "bg-success-muted text-success" :
+          status === "error" ? "bg-destructive/10 text-destructive" :
+          "bg-info-muted text-info animate-pulse"
         }`}>
           <IconMapPin size={20} />
         </div>
         <div className="flex-1">
-          <h4 className="text-sm font-bold text-slate-800">Status Lokasi</h4>
-          <p className="text-xs text-slate-500 leading-tight">
+          <h4 className="text-sm font-bold text-foreground">Status Lokasi</h4>
+          <p className="text-xs text-muted-foreground leading-tight">
             {status === "loading" && "Mencari koordinat GPS..."}
             {status === "success" && "Lokasi terdeteksi secara akurat"}
             {status === "error" && errorMsg}
           </p>
         </div>
         {status === "success" && (
-          <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+          <div className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
         )}
       </div>
 
       {showGeofence && (
         <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border ${
           isInsideRadius
-            ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-            : "bg-rose-50 border-rose-200 text-rose-700"
+            ? "bg-success-muted border-success/25 text-success"
+            : "bg-destructive/10 border-destructive/25 text-destructive"
         }`}>
-          <div className={`p-1.5 rounded-lg ${isInsideRadius ? "bg-emerald-100" : "bg-rose-100"}`}>
+          <div className={`p-1.5 rounded-lg ${isInsideRadius ? "bg-success-muted" : "bg-destructive/10"}`}>
             {isInsideRadius ? <IconCheck size={16} /> : <IconAlertCircle size={16} />}
           </div>
           <div className="flex-1">

@@ -1,7 +1,7 @@
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
 import { CorrectionApprovalClient } from "@/components/admin/stockist/correction-approval-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { IconGavel } from "@tabler/icons-react";
 
 export default async function CorrectionApprovalPage({
@@ -18,7 +18,7 @@ export default async function CorrectionApprovalPage({
   const { companies, defaultCompanyId, canSelectCompany } = await getScopedCompanies(caller);
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Persetujuan Koreksi"
         description="Pengajuan penggantian angka stock, kas, & bank harian dari hasil konfirmasi H+1 — berlaku setelah disetujui Owner / Super Admin."
@@ -30,6 +30,6 @@ export default async function CorrectionApprovalPage({
         canSelectCompany={canSelectCompany}
         canApprove={canApprove}
       />
-    </div>
+    </PageShell>
   );
 }

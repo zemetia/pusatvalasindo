@@ -17,7 +17,7 @@ const CANONICAL_ROLES = [
 export async function seedRoles(prisma: PrismaClient, companyIds: Record<string, string>) {
   console.log('  🗑️ Cleaning up old roles and matrices...')
   await prisma.roleKpi.deleteMany()
-  await prisma.bonusMatrix.deleteMany()
+  await prisma.payrollIncentiveMatrix.deleteMany()
   await prisma.custom_role.deleteMany()
 
   // ── 1. Baca roles dari Excel (bonus matrix per sheet) ──────────────────────

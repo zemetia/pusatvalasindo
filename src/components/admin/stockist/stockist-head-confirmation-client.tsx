@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { MetricBlock } from "@/components/admin/page-shell"
 import {
   IconAlertTriangle,
   IconCheck,
@@ -282,25 +282,25 @@ export function StockistHeadConfirmationClient({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="bg-card flex flex-wrap items-end gap-3 rounded-xl border p-4 shadow-sm">
         <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+          <label className="text-muted-foreground text-xs font-medium">
             Tanggal
           </label>
           <Input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-44 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+            className="h-9 w-44"
           />
         </div>
         {canSelectCompany && (
           <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+            <label className="text-muted-foreground text-xs font-medium">
               Pilih PT
             </label>
             <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="w-52 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
+              <SelectTrigger className="h-9 w-52">
                 <SelectValue placeholder="Pilih PT" />
               </SelectTrigger>
               <SelectContent>
@@ -314,13 +314,7 @@ export function StockistHeadConfirmationClient({
           </div>
         )}
         {companyId && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-10 rounded-xl"
-            disabled={exporting}
-            onClick={handleExport}
-          >
+          <Button size="sm" variant="outline" disabled={exporting} onClick={handleExport}>
             {exporting ? (
               <IconLoader2 className="size-4 animate-spin" />
             ) : (
@@ -343,12 +337,35 @@ export function StockistHeadConfirmationClient({
 
       {companyId && (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryCard label={`Total Stock Kepala Cabang — ${date}`} value={stockIdr?.confirmedIdrValue ?? 0} />
-            <SummaryCard label={`Total Kas Kepala Cabang — ${date}`} value={kas?.confirmedIdrValue ?? 0} />
-            <SummaryCard label={`Total Bank Kepala Cabang — ${date}`} value={bank?.confirmedIdrValue ?? 0} />
-            <SummaryCard label={`Total Keseluruhan IDR PT — ${date}`} value={companyTotal} highlight />
-          </div>
+          <section className="border-border border-y py-8">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+              <MetricBlock
+                label="Total Keseluruhan IDR PT"
+                size="hero"
+                prefix="Rp"
+                value={fmt(companyTotal)}
+                meta={`Konfirmasi kepala cabang — ${date}`}
+              />
+              <MetricBlock
+                label="Total Stock"
+                size="secondary"
+                prefix="Rp"
+                value={fmt(stockIdr?.confirmedIdrValue ?? 0)}
+              />
+              <MetricBlock
+                label="Total Kas"
+                size="secondary"
+                prefix="Rp"
+                value={fmt(kas?.confirmedIdrValue ?? 0)}
+              />
+              <MetricBlock
+                label="Total Bank"
+                size="secondary"
+                prefix="Rp"
+                value={fmt(bank?.confirmedIdrValue ?? 0)}
+              />
+            </div>
+          </section>
 
           {fetching && stockRows.length === 0 ? (
             <p className="text-sm text-muted-foreground">Memuat data...</p>
@@ -490,29 +507,8 @@ function selisihClass(selisih: number | null) {
   return cn(
     "text-right font-mono text-sm font-medium",
     selisih === null && "text-muted-foreground",
-    selisih !== null && selisih === 0 && "text-emerald-600 dark:text-emerald-500",
+    selisih !== null && selisih === 0 && "text-success",
     selisih !== null && selisih !== 0 && "text-destructive"
-  )
-}
-
-function SummaryCard({
-  label,
-  value,
-  highlight,
-}: {
-  label: string
-  value: number
-  highlight?: boolean
-}) {
-  return (
-    <Card className={cn(highlight && "border-emerald-500/40")}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm text-muted-foreground font-medium">{label}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-bold font-mono">Rp {fmt(value)}</p>
-      </CardContent>
-    </Card>
   )
 }
 
@@ -539,7 +535,7 @@ function IdrCrossCheckSection({
     <div>
       <h3 className="text-sm font-semibold mb-2">{title}</h3>
       {description && <p className="text-xs text-muted-foreground mb-2">{description}</p>}
-      <div className="rounded-md border">
+      <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -581,7 +577,7 @@ function IdrCrossCheckSection({
 
 function SaveIndicator({ state }: { state: SaveState }) {
   if (state === "saving") return <IconLoader2 className="size-4 animate-spin text-muted-foreground" />
-  if (state === "saved") return <IconCheck className="size-4 text-emerald-600 dark:text-emerald-500" />
+  if (state === "saved") return <IconCheck className="size-4 text-success" />
   if (state === "error") return <IconAlertTriangle className="size-4 text-destructive" />
   return <IconMinus className="size-4 text-muted-foreground/30" />
 }

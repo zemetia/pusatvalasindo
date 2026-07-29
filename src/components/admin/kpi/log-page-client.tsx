@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
-import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
+import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -26,10 +26,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IconTrash, IconAlertCircle } from "@tabler/icons-react";
+import {
+  IconTrash,
+  IconAlertCircle,
+  IconCheck,
+  IconX,
+  IconLock,
+  IconLockOpen,
+  IconRefresh,
+  IconDownload,
+} from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { RoleKpiDetailRow as RoleKpiRow } from "./role-kpi-detail-sheet";
-import { MONTH_NAMES, getGrade, type MonthlyResult } from "@/lib/kpi-utils";
+import { MetricBlock } from "@/components/admin/page-shell";
+import {
+  MONTH_NAMES,
+  SCORING_TYPE_LABELS,
+  INPUT_SOURCE_LABELS,
+  getGrade,
+  formatPercent,
+  type KpiBreakdown,
+} from "@/lib/kpi-utils";
 
 export type UserRow = {
   id: string;
@@ -40,23 +56,50 @@ export type UserRow = {
   isActive: boolean;
 };
 
-type LogEntry = {
+type RoleKpiForEmployee = {
   id: string;
-  kpiId: string;
-  value: string;
-  note: string | null;
-  createdAt: string;
-  definition: { name: string; type: string };
+  weight: string;
+  targetValue: string | null;
+  pointPerUnit: string | null;
+  toleranceLimit: string | null;
+  definition: {
+    id: string;
+    name: string;
+    description: string | null;
+    scoringType: string;
+    unit: string;
+  };
+  policy: { inputSource: string; requiresApproval: boolean; requiresEvidence: boolean };
 };
 
-type TargetEntry = {
+type EntryRow = {
   id: string;
-  amount: string;
-  date: string;
+  employeeId: string;
+  occurredAt: string;
+  weekOfMonth: number;
+  quantity: string;
   note: string | null;
+  evidenceUrl: string | null;
+  source: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewNote: string | null;
+  createdBy: { name: string } | null;
+  reviewedBy: { name: string } | null;
+  employee: { id: string; name: string };
+  roleKpi: { definition: { name: string; scoringType: string; unit: string } };
 };
 
-// ── Query & mutation helpers ─────────────────────────────────────────────────
+type PeriodRow = { status: "OPEN" | "LOCKED"; lockedBy: { name: string } | null } | null;
+
+type MonthlyResultRow = {
+  totalScore: string;
+  grade: string;
+  breakdownJson: KpiBreakdown;
+  calculatedAt: string;
+} | null;
+
+/** Bentuk balasan /api/kpi-entries/collect — berbeda untuk satu vs semua karyawan. */
+type CollectResponse = { locked?: boolean } | { employeeCount: number; totalEntries: number };
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -65,11 +108,7 @@ async function fetchJson<T>(url: string): Promise<T> {
   return data.data as T;
 }
 
-async function mutateJson<T>(
-  url: string,
-  method: string,
-  body?: unknown
-): Promise<T> {
+async function mutateJson<T>(url: string, method: string, body?: unknown): Promise<T> {
   const res = await fetch(url, {
     method,
     headers: body ? { "Content-Type": "application/json" } : undefined,
@@ -79,8 +118,6 @@ async function mutateJson<T>(
   if (!res.ok) throw new Error(data.message || "Gagal");
   return data.data as T;
 }
-
-// ── Skeleton rows ────────────────────────────────────────────────────────────
 
 function TableSkeletonRows({ cols, rows = 3 }: { cols: number; rows?: number }) {
   return (
@@ -98,15 +135,13 @@ function TableSkeletonRows({ cols, rows = 3 }: { cols: number; rows?: number }) 
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+const STATUS_META = {
+  PENDING: { label: "Menunggu", variant: "warning" },
+  APPROVED: { label: "Disetujui", variant: "success" },
+  REJECTED: { label: "Ditolak", variant: "destructive" },
+} as const satisfies Record<EntryRow["status"], { label: string; variant: BadgeVariant }>;
 
-export function LogPageClient({
-  users,
-  roleKpis,
-}: {
-  users: UserRow[];
-  roleKpis: RoleKpiRow[];
-}) {
+export function LogPageClient({ users }: { users: UserRow[] }) {
   const now = new Date();
   const queryClient = useQueryClient();
 
@@ -114,468 +149,570 @@ export function LogPageClient({
   const [month, setMonth] = useState(String(now.getMonth() + 1));
   const [year, setYear] = useState(String(now.getFullYear()));
 
-  const [newKpiId, setNewKpiId] = useState("");
-  const [newValue, setNewValue] = useState("");
-  const [newNote, setNewNote] = useState("");
-
-  const [newAmount, setNewAmount] = useState("");
-  const [newTargetNote, setNewTargetNote] = useState("");
+  const [roleKpiId, setRoleKpiId] = useState("");
+  const [occurredAt, setOccurredAt] = useState(now.toISOString().slice(0, 10));
+  const [quantity, setQuantity] = useState("1");
+  const [note, setNote] = useState("");
 
   const selectedUser = users.find((u) => u.id === userId);
 
-  const eventKpisForRole = useMemo(() => {
-    if (!selectedUser) return [];
-    return roleKpis.filter(
-      (rk) =>
-        rk.customRoleId === selectedUser.customRoleId &&
-        rk.definition.type === "EVENT"
-    );
-  }, [selectedUser, roleKpis]);
+  const entriesKey = ["kpi-entries", userId, month, year] as const;
+  const resultKey = ["kpi-result", userId, month, year] as const;
+  const pendingKey = ["kpi-pending"] as const;
 
-  // ── Queries ────────────────────────────────────────────────────────────────
-
-  const logsKey = ["kpi-logs", userId, month, year] as const;
-  const targetsKey = ["revenues", userId, month, year] as const;
-  const kpiResultKey = ["kpi-monthly-results", userId, month, year] as const;
-
-  const { data: logs = [], isLoading: logsLoading } = useQuery({
-    queryKey: logsKey,
+  const { data: roleKpiData } = useQuery({
+    queryKey: ["role-kpis-for", userId],
     queryFn: () =>
-      fetchJson<LogEntry[]>(
-        `/api/kpi-logs?employeeId=${userId}&month=${month}&year=${year}`
+      fetchJson<{ roleKpis: RoleKpiForEmployee[] }>(
+        `/api/role-kpis/for-employee?employeeId=${userId}`
       ),
     enabled: !!userId,
   });
 
-  const { data: targets = [], isLoading: targetsLoading } = useQuery({
-    queryKey: targetsKey,
+  const { data: entryData, isLoading: entriesLoading } = useQuery({
+    queryKey: entriesKey,
     queryFn: () =>
-      fetchJson<TargetEntry[]>(
-        `/api/revenues?employeeId=${userId}&month=${month}&year=${year}`
+      fetchJson<{ entries: EntryRow[]; period: PeriodRow }>(
+        `/api/kpi-entries?employeeId=${userId}&month=${month}&year=${year}`
       ),
     enabled: !!userId,
   });
 
-  const { data: kpiResult = null } = useQuery({
-    queryKey: kpiResultKey,
+  const { data: result } = useQuery({
+    queryKey: resultKey,
     queryFn: () =>
-      fetchJson<MonthlyResult | null>(
+      fetchJson<MonthlyResultRow>(
         `/api/kpi-monthly-results?employeeId=${userId}&month=${month}&year=${year}`
       ),
     enabled: !!userId,
   });
 
-  // ── Mutations ──────────────────────────────────────────────────────────────
+  const { data: pending = [], isLoading: pendingLoading } = useQuery({
+    queryKey: pendingKey,
+    queryFn: () => fetchJson<EntryRow[]>("/api/kpi-entries/pending"),
+  });
 
-  const addLogMutation = useMutation({
-    mutationFn: (body: { kpiId: string; value: number; note?: string }) =>
-      mutateJson("/api/kpi-logs", "POST", { employeeId: userId, ...body }),
+  const roleKpis = useMemo(() => roleKpiData?.roleKpis ?? [], [roleKpiData]);
+  // KPI bersumber SYSTEM tidak bisa dicatat manual oleh siapa pun.
+  const recordable = roleKpis.filter((rk) => rk.policy.inputSource !== "SYSTEM");
+  const entries = entryData?.entries ?? [];
+  const period = entryData?.period ?? null;
+  const isLocked = period?.status === "LOCKED";
+
+  const selectedKpi = recordable.find((rk) => rk.id === roleKpiId);
+
+  // Jabatan berbeda punya KPI berbeda — pilihan lama tidak boleh ikut terbawa.
+  useEffect(() => setRoleKpiId(""), [userId]);
+
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: entriesKey });
+    queryClient.invalidateQueries({ queryKey: resultKey });
+    queryClient.invalidateQueries({ queryKey: pendingKey });
+  };
+
+  const addMutation = useMutation({
+    mutationFn: (body: Record<string, unknown>) => mutateJson("/api/kpi-entries", "POST", body),
     onSuccess: () => {
-      toast.success("Log pelanggaran dicatat");
-      setNewKpiId("");
-      setNewValue("");
-      setNewNote("");
-      queryClient.invalidateQueries({ queryKey: logsKey });
+      toast.success("KPI berhasil dicatat");
+      setQuantity("1");
+      setNote("");
+      invalidateAll();
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const deleteLogMutation = useMutation({
-    mutationFn: (id: string) => mutateJson(`/api/kpi-logs/${id}`, "DELETE"),
-    onSuccess: () => {
-      toast.success("Log dihapus");
-      queryClient.invalidateQueries({ queryKey: logsKey });
+  const reviewMutation = useMutation({
+    mutationFn: ({ id, decision, reviewNote }: { id: string; decision: string; reviewNote?: string }) =>
+      mutateJson(`/api/kpi-entries/${id}/review`, "POST", { decision, reviewNote }),
+    onSuccess: (_d, vars) => {
+      toast.success(vars.decision === "APPROVED" ? "Entri disetujui" : "Entri ditolak");
+      invalidateAll();
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const addTargetMutation = useMutation({
-    mutationFn: (body: { amount: number; note?: string }) =>
-      mutateJson("/api/revenues", "POST", { employeeId: userId, ...body }),
-    onSuccess: () => {
-      toast.success("Target / omset dicatat");
-      setNewAmount("");
-      setNewTargetNote("");
-      queryClient.invalidateQueries({ queryKey: targetsKey });
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
-  const deleteTargetMutation = useMutation({
-    mutationFn: (id: string) => mutateJson(`/api/revenues/${id}`, "DELETE"),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => mutateJson(`/api/kpi-entries/${id}`, "DELETE"),
     onSuccess: () => {
       toast.success("Entri dihapus");
-      queryClient.invalidateQueries({ queryKey: targetsKey });
+      invalidateAll();
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
+  const recalcMutation = useMutation({
+    mutationFn: () =>
+      mutateJson("/api/kpi-monthly-results", "POST", {
+        employeeId: userId,
+        month: Number(month),
+        year: Number(year),
+      }),
+    onSuccess: () => {
+      toast.success("Skor KPI dihitung ulang");
+      queryClient.invalidateQueries({ queryKey: resultKey });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
 
-  const handleAddLog = () => {
-    if (!newKpiId || !newValue) {
-      toast.error("Pilih KPI dan isi nilai pelanggaran");
-      return;
-    }
-    addLogMutation.mutate({
-      kpiId: newKpiId,
-      value: Number(newValue),
-      note: newNote || undefined,
+  const collectMutation = useMutation({
+    mutationFn: (scope: "employee" | "all") =>
+      mutateJson<CollectResponse>("/api/kpi-entries/collect", "POST", {
+        ...(scope === "employee" ? { employeeId: userId } : {}),
+        month: Number(month),
+        year: Number(year),
+      }),
+    onSuccess: (_data, scope) => {
+      toast.success(
+        scope === "employee"
+          ? "Data absensi berhasil ditarik"
+          : "Data absensi seluruh karyawan berhasil ditarik"
+      );
+      invalidateAll();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const periodMutation = useMutation({
+    mutationFn: (action: "LOCK" | "UNLOCK") =>
+      mutateJson("/api/kpi-periods", "POST", {
+        employeeId: userId,
+        month: Number(month),
+        year: Number(year),
+        action,
+      }),
+    onSuccess: (_d, action) => {
+      toast.success(action === "LOCK" ? "Periode dikunci" : "Periode dibuka kembali");
+      invalidateAll();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleAdd = () => {
+    if (!userId) return toast.error("Pilih karyawan terlebih dahulu");
+    if (!roleKpiId) return toast.error("Pilih KPI terlebih dahulu");
+    const qty = Number(quantity);
+    if (!Number.isFinite(qty)) return toast.error("Jumlah harus berupa angka");
+
+    addMutation.mutate({
+      employeeId: userId,
+      roleKpiId,
+      occurredAt,
+      quantity: qty,
+      note: note.trim() || null,
     });
   };
 
-  const handleDeleteLog = (id: string) => {
-    deleteLogMutation.mutate(id);
-  };
-
-  const handleAddTarget = () => {
-    if (!newAmount) {
-      toast.error("Isi jumlah omset/target");
-      return;
-    }
-    addTargetMutation.mutate({
-      amount: Number(newAmount),
-      note: newTargetNote || undefined,
-    });
-  };
-
-  const handleDeleteTarget = (id: string) => {
-    deleteTargetMutation.mutate(id);
-  };
-
-  const totalTarget = targets.reduce((s, r) => s + Number(r.amount), 0);
-  const isLoading = logsLoading || targetsLoading;
-
-  // ── Render ─────────────────────────────────────────────────────────────────
+  const score = result ? Number(result.totalScore) : null;
+  const grade = score === null ? null : getGrade(score);
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Selector karyawan + periode */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 border rounded-lg">
-        <div className="col-span-2 grid gap-1.5">
-          <Label>Karyawan *</Label>
-          <Select value={userId} onValueChange={setUserId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih karyawan" />
-            </SelectTrigger>
-            <SelectContent>
-              {users
-                .filter((u) => u.isActive)
-                .map((u) => (
+    <Tabs defaultValue="record" className="flex flex-col gap-4">
+      <TabsList className="w-fit">
+        <TabsTrigger value="record">Penilaian Karyawan</TabsTrigger>
+        <TabsTrigger value="approvals">
+          Persetujuan{pending.length > 0 ? ` (${pending.length})` : ""}
+        </TabsTrigger>
+      </TabsList>
+
+      {/* ── Tab: catat & lihat penilaian satu karyawan ───────────────────── */}
+      <TabsContent value="record" className="mt-0 flex flex-col gap-6">
+        <div className="grid grid-cols-1 gap-4 rounded-lg border p-4 sm:grid-cols-3">
+          <div className="grid gap-1.5">
+            <Label>Karyawan</Label>
+            <Select value={userId} onValueChange={setUserId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih karyawan..." />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
-                    {u.name} — {u.role} ({u.branchName})
+                    {u.name}
+                    <span className="text-muted-foreground ml-1">
+                      — {u.role} · {u.branchName}
+                    </span>
                   </SelectItem>
                 ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-1.5">
-          <Label>Bulan</Label>
-          <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTH_NAMES.slice(1).map((name, i) => (
-                <SelectItem key={i + 1} value={String(i + 1)}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-1.5">
-          <Label>Tahun</Label>
-          <Input
-            type="number"
-            min="2020"
-            max="2100"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Info karyawan terpilih */}
-      {userId && selectedUser && (
-        <div className="flex items-center gap-3 px-4 py-3 border rounded-lg bg-muted/40">
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">{selectedUser.name}</p>
-            <p className="text-sm text-muted-foreground">
-              {selectedUser.role} &mdash; {selectedUser.branchName}
-              <span className="ml-2 text-xs">
-                · {MONTH_NAMES[Number(month)]} {year}
-              </span>
-            </p>
+              </SelectContent>
+            </Select>
           </div>
-          {isLoading && (
-            <span className="text-xs text-muted-foreground animate-pulse">
-              Memuat...
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Mini KPI score preview */}
-      {userId && !isLoading && kpiResult && (
-        <div className="flex items-center justify-between gap-4 px-4 py-3 border rounded-lg bg-muted/20">
-          <div className="flex items-center gap-6">
-            <div>
-              <p className="text-xs text-muted-foreground">Skor KPI</p>
-              <p className="text-xl font-mono font-semibold">
-                {(Number(kpiResult.totalScore) * 100).toFixed(1)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Nilai</p>
-              <p className={`text-xl font-bold ${getGrade(Number(kpiResult.totalScore)).className}`}>
-                {getGrade(Number(kpiResult.totalScore)).letter}
-                <span className="ml-1.5 text-sm font-normal text-muted-foreground">
-                  {getGrade(Number(kpiResult.totalScore)).label}
-                </span>
-              </p>
-            </div>
+          <div className="grid gap-1.5">
+            <Label>Bulan</Label>
+            <Select value={month} onValueChange={setMonth}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTH_NAMES.slice(1).map((name, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/dashboard/payroll">Hitung Gaji →</Link>
-          </Button>
+          <div className="grid gap-1.5">
+            <Label>Tahun</Label>
+            <Input
+              type="number"
+              min="2020"
+              max="2100"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+            />
+          </div>
         </div>
-      )}
 
-      {/* Nudge: ada log tapi KPI belum dihitung */}
-      {userId && !isLoading && !kpiResult && logs.length + targets.length > 0 && (
-        <Alert>
-          <IconAlertCircle className="size-4" />
-          <AlertDescription>
-            <div className="flex items-center justify-between gap-4">
-              <span>KPI belum dihitung untuk periode ini.</span>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/dashboard/payroll">Hitung KPI & Gaji →</Link>
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Tab content */}
-      {userId && (
-        <Tabs defaultValue="events" className="flex flex-col gap-4">
-          <TabsList className="w-fit">
-            <TabsTrigger value="events">
-              Log Pelanggaran ({logs.length})
-            </TabsTrigger>
-            <TabsTrigger value="target">
-              Target / Omset ({targets.length})
-            </TabsTrigger>
-          </TabsList>
-
-          {/* ── Tab: Log Pelanggaran ───────────────────────────── */}
-          <TabsContent value="events" className="mt-0 flex flex-col gap-4">
-            {eventKpisForRole.length === 0 && selectedUser ? (
-              <div className="flex flex-col gap-2 p-4 border rounded-lg bg-muted/30">
-                <p className="text-sm font-medium">Belum ada KPI pelanggaran untuk jabatan ini</p>
-                <p className="text-sm text-muted-foreground">
-                  Jabatan <span className="font-medium">{selectedUser.role}</span> belum memiliki KPI bertipe EVENT.
-                  Tambahkan KPI event terlebih dahulu di halaman konfigurasi KPI jabatan.
-                </p>
-                <Button asChild size="sm" variant="outline" className="w-fit mt-1">
-                  <Link href={`/dashboard/kpi`}>
-                    Buka Konfigurasi KPI →
-                  </Link>
+        {!userId ? (
+          <Alert>
+            <IconAlertCircle className="size-4" />
+            <AlertDescription>
+              Pilih karyawan untuk melihat dan mencatat penilaian KPI-nya.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <>
+            {/* Ringkasan skor */}
+            <section className="border-border flex flex-wrap items-end justify-between gap-4 border-y py-6">
+              <MetricBlock
+                label={`Skor KPI ${MONTH_NAMES[Number(month)]} ${year}`}
+                size="primary"
+                tone={grade?.tone ?? "default"}
+                value={score === null ? "—" : formatPercent(score)}
+                meta={
+                  result
+                    ? `Grade ${result.grade} · dihitung ${new Date(result.calculatedAt).toLocaleString("id-ID")}`
+                    : "Belum pernah dihitung untuk periode ini"
+                }
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => collectMutation.mutate("employee")}
+                  disabled={collectMutation.isPending || isLocked}
+                >
+                  <IconDownload className="size-4" />
+                  {collectMutation.isPending ? "Menarik..." : "Tarik dari Absensi"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => recalcMutation.mutate()}
+                  disabled={recalcMutation.isPending}
+                >
+                  <IconRefresh className="size-4" />
+                  {recalcMutation.isPending ? "Menghitung..." : "Hitung Ulang"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant={isLocked ? "outline" : "default"}
+                  onClick={() => periodMutation.mutate(isLocked ? "UNLOCK" : "LOCK")}
+                  disabled={periodMutation.isPending}
+                >
+                  {isLocked ? <IconLockOpen className="size-4" /> : <IconLock className="size-4" />}
+                  {isLocked ? "Buka Periode" : "Kunci Periode"}
                 </Button>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 border rounded-lg bg-muted/30">
-                <div className="sm:col-span-2 grid gap-1.5">
-                  <Label>KPI Pelanggaran</Label>
-                  <Select value={newKpiId} onValueChange={setNewKpiId}>
+            </section>
+
+            {isLocked && (
+              <Alert>
+                <IconLock className="size-4" />
+                <AlertDescription>
+                  Periode ini terkunci{period?.lockedBy ? ` oleh ${period.lockedBy.name}` : ""}.
+                  Entri tidak bisa ditambah, disetujui, atau dihapus sampai dibuka kembali.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Hasil penarikan otomatis + hari yang perlu diperiksa manual */}
+            {result?.breakdownJson?.autoCollected?.length ? (
+              <div className="flex flex-col gap-3 rounded-lg border p-4">
+                <div className="flex items-center gap-2">
+                  <IconDownload className="text-muted-foreground size-4" />
+                  <h3 className="text-sm font-medium">Data yang ditarik otomatis</h3>
+                </div>
+
+                {result.breakdownJson.autoCollected.map((c) => (
+                  <div key={c.roleKpiId} className="flex flex-col gap-1.5">
+                    <p className="text-sm">
+                      <span className="font-medium">{c.kpiName}</span>
+                      <span className="text-muted-foreground"> · {c.collectorLabel} · </span>
+                      <span className="tabular">{c.entryCount}</span>
+                      <span className="text-muted-foreground"> hari tercatat</span>
+                    </p>
+
+                    {c.skipped.length > 0 && (
+                      <div className="border-warning/40 bg-warning/5 rounded-md border px-3 py-2">
+                        <p className="text-xs font-medium">
+                          {c.skipped.length} hari dilewati — perlu diperiksa manual
+                        </p>
+                        <ul className="text-muted-foreground mt-1 flex flex-col gap-0.5 text-xs">
+                          {c.skipped.slice(0, 6).map((s) => (
+                            <li key={`${c.roleKpiId}-${s.date}`}>
+                              {new Date(s.date).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "short",
+                              })}
+                              {" — "}
+                              {s.reason}
+                            </li>
+                          ))}
+                          {c.skipped.length > 6 && (
+                            <li>…dan {c.skipped.length - 6} hari lainnya</li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {result.breakdownJson.autoUnsupported?.length ? (
+                  <Alert variant="destructive">
+                    <IconAlertCircle className="size-4" />
+                    <AlertDescription>
+                      KPI berikut disetel diisi otomatis tapi belum ada kolektornya, sehingga
+                      nilainya akan selalu kosong:{" "}
+                      {result.breakdownJson.autoUnsupported.map((u) => u.kpiName).join(", ")}.
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+              </div>
+            ) : null}
+
+            {/* Rincian per KPI */}
+            {result && result.breakdownJson?.items?.length > 0 && (
+              <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>KPI</TableHead>
+                      <TableHead className="text-right">Bobot</TableHead>
+                      <TableHead>Perhitungan</TableHead>
+                      <TableHead className="text-right">Mgg 1–4</TableHead>
+                      <TableHead className="text-right">Pencapaian</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {result.breakdownJson.items.map((item) => (
+                      <TableRow key={item.roleKpiId}>
+                        <TableCell className="font-medium">
+                          {item.kpiName}
+                          {item.noData && (
+                            <span className="text-muted-foreground ml-1 text-[11px] font-normal">
+                              · belum ada data
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="tabular text-right">
+                          {(item.weight * 100).toFixed(0)}%
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {item.explanation}
+                        </TableCell>
+                        <TableCell className="tabular text-muted-foreground text-right text-xs">
+                          {item.weeklyTotals
+                            .slice(0, 4)
+                            .map((w) => w.toLocaleString("id-ID"))
+                            .join(" · ")}
+                        </TableCell>
+                        <TableCell className="tabular text-right font-medium">
+                          {formatPercent(item.achievement)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {/* Form pencatatan */}
+            <div className="bg-muted/30 flex flex-col gap-4 rounded-lg border p-4">
+              <h3 className="text-sm font-medium">
+                Catat KPI untuk {selectedUser?.name ?? "karyawan"}
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="grid gap-1.5">
+                  <Label>KPI *</Label>
+                  <Select value={roleKpiId} onValueChange={setRoleKpiId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih KPI event" />
+                      <SelectValue placeholder="Pilih KPI..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {eventKpisForRole.map((rk) => (
-                        <SelectItem key={rk.kpiId} value={rk.kpiId}>
+                      {recordable.map((rk) => (
+                        <SelectItem key={rk.id} value={rk.id}>
                           {rk.definition.name}
+                          <span className="text-muted-foreground ml-1">
+                            — {SCORING_TYPE_LABELS[rk.definition.scoringType] ??
+                              rk.definition.scoringType}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-1.5">
-                  <Label>Nilai Poin</Label>
+                  <Label>Tanggal Kejadian *</Label>
                   <Input
-                    type="number"
-                    min="1"
-                    placeholder="Contoh: 4"
-                    value={newValue}
-                    onChange={(e) => setNewValue(e.target.value)}
+                    type="date"
+                    value={occurredAt}
+                    onChange={(e) => setOccurredAt(e.target.value)}
                   />
                 </div>
                 <div className="grid gap-1.5">
-                  <Label>Catatan</Label>
+                  <Label>
+                    {selectedKpi?.definition.unit === "CURRENCY" ? "Nilai (Rp)" : "Jumlah"} *
+                  </Label>
                   <Input
-                    placeholder="Opsional"
-                    value={newNote}
-                    onChange={(e) => setNewNote(e.target.value)}
+                    type="number"
+                    step="any"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
                   />
                 </div>
-                <div className="sm:col-span-4">
-                  <Button
-                    onClick={handleAddLog}
-                    disabled={addLogMutation.isPending}
-                  >
-                    {addLogMutation.isPending ? "Menyimpan..." : "+ Catat Pelanggaran"}
-                  </Button>
-                </div>
               </div>
-            )}
 
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>KPI</TableHead>
-                    <TableHead className="text-right">Nilai Poin</TableHead>
-                    <TableHead>Catatan</TableHead>
-                    <TableHead>Waktu</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {logsLoading ? (
-                    <TableSkeletonRows cols={5} />
-                  ) : logs.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="text-center text-muted-foreground py-6"
-                      >
-                        Tidak ada log pelanggaran untuk periode ini.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    logs.map((l) => (
-                      <TableRow key={l.id}>
-                        <TableCell className="font-medium">
-                          {l.definition.name}
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {Number(l.value)}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {l.note ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(l.createdAt).toLocaleString("id-ID")}
-                        </TableCell>
-                        <TableCell>
-                          <DeleteConfirmDialog
-                            trigger={
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="text-destructive hover:text-destructive"
-                                disabled={deleteLogMutation.isPending}
-                              >
-                                <IconTrash className="size-4" />
-                              </Button>
-                            }
-                            title="Hapus log KPI ini?"
-                            description="Tindakan ini tidak dapat dibatalkan."
-                            onConfirm={() => handleDeleteLog(l.id)}
-                            loading={deleteLogMutation.isPending}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
+              {selectedKpi?.definition.description && (
+                <p className="text-muted-foreground border-border border-l-2 pl-2 text-xs">
+                  {selectedKpi.definition.description}
+                </p>
+              )}
 
-          {/* ── Tab: Target / Omset ───────────────────────────── */}
-          <TabsContent value="target" className="mt-0 flex flex-col gap-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 border rounded-lg bg-muted/30">
               <div className="grid gap-1.5">
-                <Label>Jumlah (IDR)</Label>
-                <NumberInput
-                  placeholder="Contoh: 5000000"
-                  value={newAmount}
-                  onValueChange={(val) => setNewAmount(val === undefined ? "" : String(val))}
+                <Label>Keterangan</Label>
+                <Textarea
+                  rows={2}
+                  placeholder="Contoh: Komplain nasabah atas nama Budi, transfer tertunda 2 hari."
+                  value={note}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
                 />
               </div>
-              <div className="grid gap-1.5">
-                <Label>Catatan</Label>
-                <Input
-                  placeholder="Opsional"
-                  value={newTargetNote}
-                  onChange={(e) => setNewTargetNote(e.target.value)}
-                />
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleAddTarget}
-                  disabled={addTargetMutation.isPending}
-                >
-                  {addTargetMutation.isPending
-                    ? "Menyimpan..."
-                    : "+ Catat Target / Omset"}
-                </Button>
-              </div>
+
+              <Button onClick={handleAdd} disabled={addMutation.isPending || isLocked} className="w-fit">
+                {addMutation.isPending ? "Menyimpan..." : "+ Catat"}
+              </Button>
             </div>
 
-            <div className="rounded-md border">
+            {/* Daftar entri periode ini */}
+            <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tanggal</TableHead>
+                    <TableHead>KPI</TableHead>
                     <TableHead className="text-right">Jumlah</TableHead>
-                    <TableHead>Catatan</TableHead>
+                    <TableHead>Sumber</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Keterangan</TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {targetsLoading ? (
-                    <TableSkeletonRows cols={4} />
-                  ) : targets.length === 0 ? (
+                  {entriesLoading ? (
+                    <TableSkeletonRows cols={7} />
+                  ) : entries.length === 0 ? (
                     <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="text-center text-muted-foreground py-6"
-                      >
-                        Tidak ada entri target / omset untuk periode ini.
+                      <TableCell colSpan={7} className="text-muted-foreground py-6 text-center">
+                        Belum ada catatan KPI untuk periode ini.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    targets.map((r) => (
-                      <TableRow key={r.id}>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(r.date).toLocaleDateString("id-ID")}
+                    entries.map((e) => (
+                      <TableRow key={e.id}>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                          <span className="ml-1 text-[11px]">· mgg {e.weekOfMonth}</span>
                         </TableCell>
-                        <TableCell className="text-right font-mono">
-                          Rp {Number(r.amount).toLocaleString("id-ID")}
+                        <TableCell className="font-medium">{e.roleKpi.definition.name}</TableCell>
+                        <TableCell className="tabular text-right">
+                          {Number(e.quantity).toLocaleString("id-ID")}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {r.note ?? "—"}
+                        <TableCell className="text-muted-foreground text-xs">
+                          {INPUT_SOURCE_LABELS[e.source] ?? e.source}
+                          {e.createdBy ? (
+                            <div>oleh {e.createdBy.name}</div>
+                          ) : e.source === "SYSTEM" ? (
+                            <div>dari absensi</div>
+                          ) : null}
                         </TableCell>
                         <TableCell>
-                          <DeleteConfirmDialog
-                            trigger={
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="text-destructive hover:text-destructive"
-                                disabled={deleteTargetMutation.isPending}
+                          <Badge variant={STATUS_META[e.status].variant}>
+                            {STATUS_META[e.status].label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {e.note ?? "—"}
+                          {e.evidenceUrl && (
+                            <>
+                              {" "}
+                              <a
+                                href={e.evidenceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary underline"
                               >
-                                <IconTrash className="size-4" />
-                              </Button>
-                            }
-                            title="Hapus entri target ini?"
-                            description="Tindakan ini tidak dapat dibatalkan."
-                            onConfirm={() => handleDeleteTarget(r.id)}
-                            loading={deleteTargetMutation.isPending}
-                          />
+                                bukti
+                              </a>
+                            </>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-end gap-1">
+                            {e.status === "PENDING" && !isLocked && (
+                              <>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="text-success hover:text-success"
+                                  disabled={reviewMutation.isPending}
+                                  onClick={() =>
+                                    reviewMutation.mutate({ id: e.id, decision: "APPROVED" })
+                                  }
+                                >
+                                  <IconCheck className="size-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="text-destructive hover:text-destructive"
+                                  disabled={reviewMutation.isPending}
+                                  onClick={() => {
+                                    const reason = prompt("Alasan penolakan (opsional):");
+                                    if (reason === null) return;
+                                    reviewMutation.mutate({
+                                      id: e.id,
+                                      decision: "REJECTED",
+                                      reviewNote: reason || undefined,
+                                    });
+                                  }}
+                                >
+                                  <IconX className="size-4" />
+                                </Button>
+                              </>
+                            )}
+                            {/* Entri hasil kolektor tidak bisa dihapus manual —
+                                penarikan berikutnya akan menuliskannya lagi.
+                                Kalau datanya salah, absensinya yang diperbaiki. */}
+                            {!isLocked && e.source !== "SYSTEM" && (
+                              <DeleteConfirmDialog
+                                trigger={
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="text-destructive hover:text-destructive"
+                                    disabled={deleteMutation.isPending}
+                                  >
+                                    <IconTrash className="size-4" />
+                                  </Button>
+                                }
+                                title="Hapus entri KPI ini?"
+                                description="Entri hilang permanen dan skor perlu dihitung ulang."
+                                onConfirm={() => deleteMutation.mutate(e.id)}
+                                loading={deleteMutation.isPending}
+                              />
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -583,18 +720,103 @@ export function LogPageClient({
                 </TableBody>
               </Table>
             </div>
+          </>
+        )}
+      </TabsContent>
 
-            {targets.length > 0 && (
-              <div className="text-sm text-muted-foreground text-right">
-                Total:{" "}
-                <span className="font-mono font-medium text-foreground">
-                  Rp {totalTarget.toLocaleString("id-ID")}
-                </span>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      )}
-    </div>
+      {/* ── Tab: antrian persetujuan lintas karyawan ─────────────────────── */}
+      <TabsContent value="approvals" className="mt-0 flex flex-col gap-4">
+        <p className="text-muted-foreground text-sm">
+          Entri yang diisi sendiri oleh karyawan dan menunggu keputusan Anda. Selama masih
+          menunggu, entri ini belum ikut dihitung ke skor.
+        </p>
+
+        <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Karyawan</TableHead>
+                <TableHead>KPI</TableHead>
+                <TableHead>Tanggal</TableHead>
+                <TableHead className="text-right">Jumlah</TableHead>
+                <TableHead>Keterangan</TableHead>
+                <TableHead />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pendingLoading ? (
+                <TableSkeletonRows cols={6} />
+              ) : pending.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-muted-foreground py-6 text-center">
+                    Tidak ada entri yang menunggu persetujuan.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                pending.map((e) => (
+                  <TableRow key={e.id}>
+                    <TableCell className="font-medium">{e.employee.name}</TableCell>
+                    <TableCell>{e.roleKpi.definition.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                    </TableCell>
+                    <TableCell className="tabular text-right">
+                      {Number(e.quantity).toLocaleString("id-ID")}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {e.note ?? "—"}
+                      {e.evidenceUrl && (
+                        <>
+                          {" "}
+                          <a
+                            href={e.evidenceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary underline"
+                          >
+                            bukti
+                          </a>
+                        </>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={reviewMutation.isPending}
+                          onClick={() => reviewMutation.mutate({ id: e.id, decision: "APPROVED" })}
+                        >
+                          <IconCheck className="size-4" />
+                          Setujui
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                          disabled={reviewMutation.isPending}
+                          onClick={() => {
+                            const reason = prompt("Alasan penolakan (opsional):");
+                            if (reason === null) return;
+                            reviewMutation.mutate({
+                              id: e.id,
+                              decision: "REJECTED",
+                              reviewNote: reason || undefined,
+                            });
+                          }}
+                        >
+                          <IconX className="size-4" />
+                          Tolak
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }

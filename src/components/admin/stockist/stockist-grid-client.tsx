@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { NumberInput } from "@/components/ui/number-input"
@@ -24,10 +24,11 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useGridKeyboardNav } from "@/hooks/use-grid-keyboard-nav"
 import { IconAlertTriangle, IconCheck, IconChecks, IconLoader2, IconSearch, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
-import type { PendingCorrection } from "@/components/admin/stockist/daily-verify-cell"
+import type { PendingCorrection, ApprovedCorrection } from "@/components/admin/stockist/daily-verify-cell"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean; isDefault: boolean }
 type StockItem = { id: string; code: string | null; name: string; type: "CURRENCY" | "LOGAM_MULIA" }
@@ -63,6 +64,7 @@ type GridPayload = {
   serverDate?: string | null
   checks?: (Omit<Check, "enteredQuantity"> & { enteredQuantity: string | number | null })[]
   pendingCorrections?: Record<string, PendingCorrection>
+  approvedCorrections?: Record<string, ApprovedCorrection>
   alerts?: { beda: number; belumReview: number; belumIsi: number; totalCells: number }
 }
 
@@ -96,17 +98,17 @@ function cellState(check: Check | undefined, isToday: boolean): CellState {
 // `silver` marks Logam Mulia rows so they're visually distinct from currency rows — only
 // applied to neutral states, since review-status colors (Benar/Beda/Belum Review) matter more.
 function stateBg(state: CellState, silver?: boolean) {
-  if (state === "BENAR") return "bg-emerald-50 dark:bg-emerald-950/40"
-  if (state === "BEDA") return "bg-red-50 dark:bg-red-950/40"
-  if (state === "BELUM_REVIEW") return "bg-amber-50 dark:bg-amber-950/30"
-  if (state === "filled_today") return silver ? "bg-slate-200 dark:bg-slate-700/50" : "bg-muted/50"
-  return silver ? "bg-slate-100 dark:bg-slate-800/40" : "bg-background"
+  if (state === "BENAR") return "bg-success-muted"
+  if (state === "BEDA") return "bg-destructive/10"
+  if (state === "BELUM_REVIEW") return "bg-warning-muted"
+  if (state === "filled_today") return silver ? "bg-muted" : "bg-muted/50"
+  return silver ? "bg-muted/60" : "bg-background"
 }
 
 function stateText(state: CellState) {
-  if (state === "BENAR") return "text-emerald-700 dark:text-emerald-400"
-  if (state === "BEDA") return "text-red-700 dark:text-red-400"
-  if (state === "BELUM_REVIEW") return "text-amber-700 dark:text-amber-400"
+  if (state === "BENAR") return "text-success"
+  if (state === "BEDA") return "text-destructive"
+  if (state === "BELUM_REVIEW") return "text-warning"
   return "text-muted-foreground"
 }
 
@@ -148,6 +150,11 @@ export function StockistGridClient({
   const [pendingCorrections, setPendingCorrections] = useState<Record<string, PendingCorrection>>(
     () => seed?.pendingCorrections ?? {}
   )
+  // key sama, tapi untuk koreksi yang sudah disetujui — dipakai untuk menandai sel yang
+  // pernah salah dan sudah diperbaiki.
+  const [approvedCorrections, setApprovedCorrections] = useState<Record<string, ApprovedCorrection>>(
+    () => seed?.approvedCorrections ?? {}
+  )
   const [serverDate, setServerDate] = useState<string | null>(() => seed?.serverDate ?? null)
   const [alerts, setAlerts] = useState(() => seed?.alerts ?? EMPTY_ALERTS)
   const [loading, setLoading] = useState(false)
@@ -185,6 +192,7 @@ export function StockistGridClient({
       setServerDate(g.serverDate ?? null)
       setChecks(toCheckMap(g.checks))
       setPendingCorrections(g.pendingCorrections ?? {})
+      setApprovedCorrections(g.approvedCorrections ?? {})
       setAlerts(g.alerts ?? EMPTY_ALERTS)
     } catch {
       toast.error("Gagal memuat data")
@@ -310,6 +318,15 @@ export function StockistGridClient({
     )
   }, [currencies, currencyFilter])
 
+  // Navigasi panah antar sel opname: baris = mata uang yang tampil, kolom = pocket sesuai
+  // urutan header. Kolom "Total" tidak punya input jadi otomatis dilewati saat lompat.
+  const navColumns = useMemo(() => pockets.map((p) => p.id), [pockets])
+  const { registerCell, handleCellKeyDown } = useGridKeyboardNav({
+    columns: navColumns,
+    rowCount: filteredCurrencies.length,
+    selectOnFocus: true,
+  })
+
   const markAllBenar = useCallback(async () => {
     const pending: { pocketId: string; companyStockItemId: string }[] = []
     for (const p of managePockets) {
@@ -382,7 +399,7 @@ export function StockistGridClient({
       <div className="flex flex-wrap items-center justify-between gap-2">
         {isToday ? (
           alerts.belumIsi > 0 ? (
-            <p className="flex items-center gap-1.5 text-sm text-amber-700 dark:text-amber-400">
+            <p className="flex items-center gap-1.5 text-sm text-warning">
               <IconAlertTriangle className="size-4" />
               {alerts.belumIsi} sel belum diisi hari ini.
             </p>
@@ -462,14 +479,14 @@ export function StockistGridClient({
                 </TableCell>
               </TableRow>
             )}
-            {filteredCurrencies.map((cur) => {
+            {filteredCurrencies.map((cur, rowIndex) => {
               const isLogam = cur.type === "LOGAM_MULIA"
               return (
               <TableRow key={cur.id}>
                 <TableCell
                   className={cn(
                     "sticky left-0 z-10 border-r font-medium whitespace-nowrap",
-                    isLogam ? "bg-slate-100 dark:bg-slate-800/40" : "bg-background"
+                    isLogam ? "bg-muted/60" : "bg-background"
                   )}
                 >
                   <div>{cur.name}</div>
@@ -488,7 +505,7 @@ export function StockistGridClient({
                         key={p.id}
                         className={cn(
                           "p-0 min-w-[104px]",
-                          isLogam ? "bg-slate-200 dark:bg-slate-700/50" : "bg-muted/40"
+                          isLogam ? "bg-muted" : "bg-muted/40"
                         )}
                       >
                         <div className="w-full h-full px-2 py-2 text-right font-mono text-sm font-semibold">
@@ -514,11 +531,15 @@ export function StockistGridClient({
                           quantity={qty}
                           silver={isLogam}
                           state={state}
+                          inputRef={registerCell(rowIndex, p.id)}
+                          onNavKeyDown={handleCellKeyDown(rowIndex, p.id, { horizontal: true })}
                           onSave={(quantity) => fillCell(p.id, cur.id, quantity)}
                         />
                       </TableCell>
                     )
                   }
+
+                  const approvedCorrection = approvedCorrections[key]
 
                   const cellInner = (
                     <button
@@ -527,9 +548,16 @@ export function StockistGridClient({
                       onClick={() =>
                         clickable && setActiveCell({ pocketId: p.id, companyStockItemId: cur.id })
                       }
+                      title={
+                        approvedCorrection
+                          ? `Sebelumnya ${fmt(Number(approvedCorrection.currentValue))} — dikoreksi jadi ${fmt(
+                              Number(approvedCorrection.proposedValue)
+                            )}. Alasan: ${approvedCorrection.reason}`
+                          : undefined
+                      }
                       className={cn(
                         "w-full h-full px-2 py-2 text-right font-mono text-sm transition-colors",
-                        stateBg(state, isLogam),
+                        approvedCorrection ? "bg-destructive/8" : stateBg(state, isLogam),
                         clickable && "cursor-pointer hover:brightness-95 dark:hover:brightness-110",
                         !clickable && "cursor-default"
                       )}
@@ -539,8 +567,13 @@ export function StockistGridClient({
                         {stateLabel(state)}
                       </div>
                       {pendingCorrections[key] && (
-                        <div className="text-[10px] font-sans font-normal text-amber-700 dark:text-amber-400">
+                        <div className="text-[10px] font-sans font-normal text-warning">
                           usul {fmt(Number(pendingCorrections[key].proposedValue))} · menunggu ACC
+                        </div>
+                      )}
+                      {approvedCorrection && (
+                        <div className="text-[10px] font-sans font-normal text-destructive">
+                          pernah dikoreksi
                         </div>
                       )}
                     </button>
@@ -620,17 +653,22 @@ export function StockistGridClient({
 }
 
 // Sel opname yang bisa diisi langsung diedit di tempat (bukan lewat popover/tombol Simpan) —
-// autosave saat blur atau Enter. `skipBlurRef` mencegah Escape ikut memicu commit karena blur()
-// terpanggil sinkron sebelum React sempat merender ulang `draft` yang sudah direvert.
+// autosave saat blur, jadi pindah sel pakai panah pun ikut tersimpan tanpa perlu Enter.
+// `skipBlurRef` mencegah Escape ikut memicu commit karena blur() terpanggil sinkron sebelum
+// React sempat merender ulang `draft` yang sudah direvert.
 function InlineFillCell({
   quantity,
   silver,
   state,
+  inputRef,
+  onNavKeyDown,
   onSave,
 }: {
   quantity: number | null
   silver?: boolean
   state: CellState
+  inputRef?: (el: HTMLInputElement | null) => void
+  onNavKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => boolean
   onSave: (quantity: number) => Promise<unknown>
 }) {
   const [draft, setDraft] = useState<number | undefined>(quantity ?? undefined)
@@ -665,19 +703,22 @@ function InlineFillCell({
   return (
     <div className={cn("w-full h-full", stateBg(state, silver))}>
       <NumberInput
+        ref={inputRef}
         value={draft}
         onValueChange={setDraft}
         onBlur={commit}
         disabled={saving}
         placeholder="—"
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.currentTarget.blur()
-          } else if (e.key === "Escape") {
+          if (e.key === "Escape") {
             skipBlurRef.current = true
             setDraft(committedRef.current ?? undefined)
             e.currentTarget.blur()
+            return
           }
+          // Panah/Enter memindah fokus ke sel tetangga; blur-nya yang memicu autosave.
+          if (onNavKeyDown?.(e)) return
+          if (e.key === "Enter") e.currentTarget.blur()
         }}
         className="h-auto border-0 rounded-none bg-transparent shadow-none px-2 py-2 text-right font-mono text-sm focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
       />

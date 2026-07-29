@@ -42,11 +42,12 @@ export async function GET(req: NextRequest) {
     assertCompanyAccess(caller, companyId);
 
     const date = new Date(dateStr);
-    const [pockets, todayEntries, previousEntries, pendingCorrections] = await Promise.all([
+    const [pockets, todayEntries, previousEntries, pendingCorrections, approvedCorrections] = await Promise.all([
       kasPocketRepository.findAllByCompany(companyId, true),
       kasDailyEntryRepository.findByCompanyAndDate(companyId, date),
       kasDailyEntryRepository.findLatestBeforeDate(companyId, date),
       correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["KAS"]),
+      correctionRequestRepository.findApprovedByCompanyDateTargets(companyId, date, ["KAS"]),
     ]);
 
     const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
@@ -74,6 +75,21 @@ export async function GET(req: NextRequest) {
             .map((c) => [
               c.kasPocketId as string,
               { id: c.id, proposedValue: c.proposedValue.toString(), reason: c.reason },
+            ])
+        ),
+        // Sel yang pernah salah dan sudah dikoreksi (disetujui) ditandai supaya kelihatan
+        // riwayatnya, beda dari pendingCorrections yang masih menunggu ACC.
+        approvedCorrections: Object.fromEntries(
+          approvedCorrections
+            .filter((c) => c.kasPocketId)
+            .map((c) => [
+              c.kasPocketId as string,
+              {
+                id: c.id,
+                currentValue: c.currentValue.toString(),
+                proposedValue: c.proposedValue.toString(),
+                reason: c.reason,
+              },
             ])
         ),
         previous: Object.fromEntries(

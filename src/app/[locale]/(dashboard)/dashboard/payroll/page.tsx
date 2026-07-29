@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { PayrollPageClient } from "@/components/admin/payroll/payroll-page-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconCoin } from "@tabler/icons-react";
 import { getCaller } from "@/backend/helpers/get-admin-caller";
 import { can, PERMISSIONS } from "@/lib/permissions";
@@ -37,11 +37,7 @@ export default async function PayrollPage() {
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[payroll/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="payroll/page" message={msg} />
     )
   }
 
@@ -59,13 +55,13 @@ export default async function PayrollPage() {
   }));
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Hitung Gaji"
         description="Hitung gaji bulanan karyawan berdasarkan gaji pokok dan hasil KPI."
         icon={<IconCoin className="size-5" />}
       />
       <PayrollPageClient users={serializedUsers} />
-    </div>
+    </PageShell>
   );
 }

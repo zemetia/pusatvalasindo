@@ -48,7 +48,14 @@ export async function middleware(request: NextRequest) {
   // /api/auth       — Better Auth's own endpoints
   // /api/mcp        — the MCP endpoint authenticates via Bearer key (withMcpAuth),
   //                   not a session cookie, so it must bypass the session gate here.
-  if (isApi && !targetPathname.startsWith("/api/auth") && !targetPathname.startsWith("/api/mcp")) {
+  // /api/scrape     — triggered by an external scheduler with no session cookie;
+  //                   checks `Authorization: Bearer $CRON_SECRET` itself (see route.ts).
+  if (
+    isApi &&
+    !targetPathname.startsWith("/api/auth") &&
+    !targetPathname.startsWith("/api/mcp") &&
+    !targetPathname.startsWith("/api/scrape")
+  ) {
     if (!sessionCookie) {
       return applySecurityHeaders(
         NextResponse.json(fail("Unauthorized", "You must be logged in"), { status: 401 })

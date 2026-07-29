@@ -376,9 +376,10 @@ export async function buildStockistGridPayload(
   assertCompanyAccess(caller, companyId);
 
   const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
-  const [grid, pending] = await Promise.all([
+  const [grid, pending, approved] = await Promise.all([
     stockistService.getOrCreateGridForDate(companyId, date),
     correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["STOCKIST"]),
+    correctionRequestRepository.findApprovedByCompanyDateTargets(companyId, date, ["STOCKIST"]),
   ]);
   const alerts = stockistService.computeAlerts(grid.pockets, grid.currencies, grid.checks, date);
 
@@ -391,5 +392,19 @@ export async function buildStockistGridPayload(
       ])
   );
 
-  return { ...grid, alerts, canManage, pendingCorrections };
+  const approvedCorrections = Object.fromEntries(
+    approved
+      .filter((c) => c.pocketId && c.companyStockItemId)
+      .map((c) => [
+        `${c.pocketId}:${c.companyStockItemId}`,
+        {
+          id: c.id,
+          currentValue: c.currentValue.toString(),
+          proposedValue: c.proposedValue.toString(),
+          reason: c.reason,
+        },
+      ])
+  );
+
+  return { ...grid, alerts, canManage, pendingCorrections, approvedCorrections };
 }

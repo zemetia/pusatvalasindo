@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -13,8 +13,14 @@ import {
 } from "@/components/ui/table";
 import { UserActions } from "@/components/admin/user-actions";
 import { CreateUserSheet } from "@/components/admin/create-user-sheet";
-import { PageHeader } from "@/components/admin/page-header";
-import { IconUsers, IconSearch } from "@tabler/icons-react";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+} from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
+import { IconUsers } from "@tabler/icons-react";
 
 type Branch = { id: string; name: string; companyId: string | null };
 type Company = { id: string; name: string };
@@ -54,9 +60,17 @@ interface UsersPageClientProps {
   branches: Branch[];
   companies: Company[];
   roles: Role[];
+  /** Izin `users.view_detail` — menentukan nama jadi tautan ke rapor karyawan. */
+  canOpenDetail?: boolean;
 }
 
-export function UsersPageClient({ users, branches, companies, roles }: UsersPageClientProps) {
+export function UsersPageClient({
+  users,
+  branches,
+  companies,
+  roles,
+  canOpenDetail = false,
+}: UsersPageClientProps) {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -69,7 +83,7 @@ export function UsersPageClient({ users, branches, companies, roles }: UsersPage
   }, [users, search]);
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Pengguna"
         description="Daftar seluruh pengguna sistem per cabang"
@@ -78,103 +92,124 @@ export function UsersPageClient({ users, branches, companies, roles }: UsersPage
       />
 
       {users.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg font-medium">Belum ada pengguna</p>
-          <p className="text-sm mt-1">Buat pengguna pertama untuk memulai.</p>
-        </div>
+        <SectionCard padded={false}>
+          <EmptyState
+            icon={<IconUsers className="size-5" />}
+            title="Belum ada pengguna"
+            description="Buat pengguna pertama untuk mulai mengatur akses cabang."
+            action={<CreateUserSheet branches={branches} companies={companies} roles={roles} />}
+          />
+        </SectionCard>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="relative max-w-xs">
-            <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              placeholder="Cari nama, email, cabang..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Cabang</TableHead>
-                  <TableHead>Jabatan</TableHead>
-                  <TableHead>Telepon</TableHead>
-                  <TableHead className="text-right">Gaji Pokok</TableHead>
-                  <TableHead>Bergabung</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead />
+        <SectionCard
+          padded={false}
+          toolbar={
+            <>
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari nama, email, cabang..."
+              />
+              <span className="text-muted-foreground ml-auto text-xs">
+                {filtered.length} dari {users.length} pengguna
+              </span>
+            </>
+          }
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nama</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Cabang</TableHead>
+                <TableHead>Jabatan</TableHead>
+                <TableHead>Telepon</TableHead>
+                <TableHead className="text-right">Gaji Pokok</TableHead>
+                <TableHead>Bergabung</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-10" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={9} className="p-0">
+                    <EmptyState
+                      title="Tidak ada hasil"
+                      description={`Tidak ada pengguna yang cocok dengan "${search}".`}
+                    />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                      Tidak ada hasil untuk &ldquo;{search}&rdquo;
+              ) : (
+                filtered.map((u) => (
+                  <TableRow key={u.id} className={!u.isActive ? "opacity-60" : ""}>
+                    <TableCell className="font-medium">
+                      {canOpenDetail ? (
+                        <Link
+                          href={`/dashboard/users/${u.id}`}
+                          className="hover:text-primary underline-offset-4 hover:underline"
+                        >
+                          {u.name}
+                        </Link>
+                      ) : (
+                        u.name
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {u.email}
+                      {!u.emailVerified && (
+                        <Badge variant="warning" className="ml-1.5">
+                          belum verif
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {u.branch ? (
+                        <div className="flex items-center gap-1.5">
+                          <span>{u.branch.name}</span>
+                          {u.branch.company?.code && (
+                            <Badge variant="outline">{u.branch.company.code}</Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {u.roleName ? (
+                        <Badge variant="soft">{u.roleName}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{u.phone ?? "—"}</TableCell>
+                    <TableCell className="tabular text-right">
+                      {fmtSalary(u.baseSalary)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {u.joinDate
+                        ? new Date(u.joinDate).toLocaleDateString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={u.isActive ? "success" : "soft"}>
+                        {u.isActive ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <UserActions user={u} branches={branches} companies={companies} roles={roles} />
                     </TableCell>
                   </TableRow>
-                ) : (
-                  filtered.map((u) => (
-                    <TableRow key={u.id} className={!u.isActive ? "opacity-50" : ""}>
-                      <TableCell className="font-medium">{u.name}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {u.email}
-                        {!u.emailVerified && (
-                          <Badge variant="outline" className="ml-1.5 text-xs">belum verif</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {u.branch ? (
-                          <div className="flex items-center gap-1.5">
-                            <span>{u.branch.name}</span>
-                            {u.branch.company?.code && (
-                              <Badge variant="outline" className="text-xs">
-                                {u.branch.company.code}
-                              </Badge>
-                            )}
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {u.roleName ? (
-                          <Badge variant="secondary">{u.roleName}</Badge>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{u.phone ?? "—"}</TableCell>
-                      <TableCell className="text-right font-mono">{fmtSalary(u.baseSalary)}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {u.joinDate
-                          ? new Date(u.joinDate).toLocaleDateString("id-ID", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={u.isActive ? "default" : "outline"}>
-                          {u.isActive ? "Aktif" : "Nonaktif"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <UserActions user={u} branches={branches} companies={companies} roles={roles} />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </SectionCard>
       )}
-    </div>
+    </PageShell>
   );
 }

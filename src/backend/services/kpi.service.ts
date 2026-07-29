@@ -8,21 +8,63 @@ import {
   CreateRoleKpiInput,
   UpdateRoleKpiInput,
 } from "@/backend/repositories/role-kpi.repository";
-import {
-  kpiLogRepository,
-  CreateKpiLogInput,
-} from "@/backend/repositories/kpi-log.repository";
-import {
-  revenueRepository,
-  CreateRevenueInput,
-} from "@/backend/repositories/revenue.repository";
+import { resolveInputPolicy as resolvePolicy } from "@/lib/kpi-policy";
+import { kpiCollectorService } from "@/backend/services/kpi-collector.service";
+import { kpiEntryRepository } from "@/backend/repositories/kpi-entry.repository";
+import { kpiPeriodRepository } from "@/backend/repositories/kpi-period.repository";
 import { kpiMonthlyResultRepository } from "@/backend/repositories/kpi-monthly-result.repository";
-import { NotFoundError } from "@/backend/errors/app-error";
+import { NotFoundError, ForbiddenError, ValidationError } from "@/backend/errors/app-error";
+import { can, PERMISSIONS } from "@/lib/permissions";
+import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
+import {
+  scoreKpiItem,
+  computeTotalScore,
+  weekOfMonthFor,
+  type ScoringEntry,
+  type ScoredKpiItem,
+} from "@/lib/kpi-scoring";
 import prisma from "@/lib/prisma";
+import type { KpiInputSource } from "@src/generated/prisma/client";
+
+// Definisinya ada di lib/kpi-policy agar service kolektor bisa memakainya
+// tanpa membuat kedua service saling impor. Di-ekspor ulang di sini supaya
+// pemanggil lama tidak perlu berubah.
+export { resolveInputPolicy } from "@/lib/kpi-policy";
+
+function toNumber(value: unknown): number {
+  return value === null || value === undefined ? 0 : Number(value);
+}
+
+function toNullableNumber(value: unknown): number | null {
+  return value === null || value === undefined ? null : Number(value);
+}
+
+/**
+ * YYYY-MM-DD dari kolom `@db.Date`, dibaca di UTC mengikuti konvensi tanggal
+ * proyek (src/lib/finance-period.ts) supaya pengelompokan harian pada KPI
+ * bertipe TOLERANCE_LIMIT tidak bergeser saat server berpindah zona waktu.
+ */
+function dateKey(date: Date): string {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export type CreateEntryInput = {
+  employeeId: string;
+  roleKpiId: string;
+  occurredAt: Date;
+  quantity: number;
+  note?: string | null;
+  evidenceUrl?: string | null;
+};
 
 export const kpiService = {
-  // ── Definitions ──────────────────────────────────────────────────────────────
+  // ── Definisi KPI ─────────────────────────────────────────────────────────
   getAllDefinitions: () => kpiDefinitionRepository.findAll(),
+
+  getActiveDefinitions: () => kpiDefinitionRepository.findActive(),
 
   getDefinitionById: async (id: string) => {
     const d = await kpiDefinitionRepository.findById(id);
@@ -30,8 +72,7 @@ export const kpiService = {
     return d;
   },
 
-  createDefinition: (data: CreateKpiDefinitionInput) =>
-    kpiDefinitionRepository.create(data),
+  createDefinition: (data: CreateKpiDefinitionInput) => kpiDefinitionRepository.create(data),
 
   updateDefinition: async (id: string, data: UpdateKpiDefinitionInput) => {
     await kpiService.getDefinitionById(id);
@@ -43,7 +84,7 @@ export const kpiService = {
     await kpiDefinitionRepository.delete(id);
   },
 
-  // ── Role KPIs ────────────────────────────────────────────────────────────────
+  // ── KPI per jabatan ──────────────────────────────────────────────────────
   getAllRoleKpis: () => roleKpiRepository.findAll(),
 
   getByCompanyRole: (companyId: string, customRoleId: string) =>
@@ -67,163 +108,352 @@ export const kpiService = {
     await roleKpiRepository.delete(id);
   },
 
-  // ── KPI Logs ─────────────────────────────────────────────────────────────────
-  getLogsByEmployee: (employeeId: string) =>
-    kpiLogRepository.findByEmployee(employeeId),
+  /**
+   * KPI yang berlaku untuk seorang karyawan, lengkap dengan kebijakan
+   * pengisiannya — dipakai halaman input mandiri maupun form atasan.
+   */
+  getRoleKpisForEmployee: async (employeeId: string) => {
+    const employee = await prisma.user.findUnique({
+      where: { id: employeeId },
+      select: {
+        id: true,
+        name: true,
+        customRoleId: true,
+        customRole: { select: { id: true, name: true } },
+        branch: { select: { companyId: true, company: { select: { name: true } } } },
+      },
+    });
 
-  getLogsByEmployeePeriod: (employeeId: string, month: number, year: number) =>
-    kpiLogRepository.findByEmployeePeriod(employeeId, month, year),
+    // PT karyawan diturunkan dari cabangnya (single source of truth).
+    const companyId = employee?.branch?.companyId;
+    if (!employee?.customRoleId || !companyId) {
+      throw new ValidationError("Karyawan belum memiliki jabatan atau cabang (PT)");
+    }
 
-  createLog: (data: CreateKpiLogInput) => kpiLogRepository.create(data),
+    const roleKpis = await roleKpiRepository.findActiveByCompanyRole(
+      companyId,
+      employee.customRoleId
+    );
 
-  deleteLog: (id: string) => kpiLogRepository.delete(id),
+    return {
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        companyId,
+        companyName: employee.branch?.company?.name ?? "",
+        customRoleId: employee.customRoleId,
+        roleName: employee.customRole?.name ?? "",
+      },
+      roleKpis: roleKpis.map((rk) => ({ ...rk, policy: resolvePolicy(rk) })),
+    };
+  },
 
-  // ── Revenues ─────────────────────────────────────────────────────────────────
-  getRevenuesByEmployee: (employeeId: string) =>
-    revenueRepository.findByEmployee(employeeId),
+  // ── Entri KPI ────────────────────────────────────────────────────────────
+  getEntriesByEmployeePeriod: (employeeId: string, year: number, month: number) =>
+    kpiEntryRepository.findByEmployeePeriod(employeeId, year, month),
 
-  getRevenuesByEmployeePeriod: (
-    employeeId: string,
-    month: number,
-    year: number
-  ) => revenueRepository.findByEmployeePeriod(employeeId, month, year),
+  /**
+   * Mencatat entri KPI.
+   *
+   * Dua hal yang ditegakkan di sini dan tidak boleh pindah ke route:
+   *  1. KPI ber-sumber SUPERVISOR/SYSTEM tidak bisa dicatat karyawan untuk
+   *     dirinya sendiri — inilah pemisah "boleh diisi sendiri" vs "tidak".
+   *  2. Periode yang sudah dikunci tidak menerima entri baru, supaya skor yang
+   *     sudah dipakai payroll tidak berubah belakangan.
+   */
+  createEntry: async (caller: AdminCaller, input: CreateEntryInput) => {
+    const roleKpi = await kpiService.getRoleKpiById(input.roleKpiId);
+    const policy = resolvePolicy(roleKpi);
 
-  createRevenue: (data: CreateRevenueInput) => revenueRepository.create(data),
+    if (!roleKpi.isActive) {
+      throw new ValidationError("KPI ini sudah tidak aktif untuk jabatan tersebut");
+    }
 
-  deleteRevenue: (id: string) => revenueRepository.delete(id),
+    if (policy.inputSource === "SYSTEM") {
+      throw new ValidationError(
+        "KPI ini diisi otomatis oleh sistem dan tidak dapat dicatat manual"
+      );
+    }
 
-  // ── Monthly Results ───────────────────────────────────────────────────────────
+    const isSelf = caller.id === input.employeeId;
+    const canRecordOthers =
+      can(caller.permissions, PERMISSIONS.KPI_APPROVE) ||
+      can(caller.permissions, PERMISSIONS.KPI_MANAGE);
+
+    if (isSelf) {
+      if (policy.inputSource !== "SELF" && !canRecordOthers) {
+        throw new ForbiddenError("KPI ini hanya boleh dicatat oleh atasan, bukan diisi sendiri");
+      }
+      if (!can(caller.permissions, PERMISSIONS.KPI_FILL_OWN) && !canRecordOthers) {
+        throw new ForbiddenError("Tidak memiliki izin mengisi KPI");
+      }
+    } else if (!canRecordOthers) {
+      throw new ForbiddenError("Tidak memiliki izin mencatat KPI karyawan lain");
+    }
+
+    // Entri harus cocok dengan jabatan & PT karyawannya, bukan sekadar ada.
+    const employee = await prisma.user.findUnique({
+      where: { id: input.employeeId },
+      select: { customRoleId: true, branch: { select: { companyId: true } } },
+    });
+    if (
+      !employee ||
+      employee.customRoleId !== roleKpi.customRoleId ||
+      employee.branch?.companyId !== roleKpi.companyId
+    ) {
+      throw new ValidationError("KPI ini tidak terdaftar untuk jabatan karyawan tersebut");
+    }
+
+    if (policy.requiresEvidence && !input.evidenceUrl) {
+      throw new ValidationError("KPI ini wajib disertai bukti");
+    }
+
+    // Dibaca di UTC, sejalan dengan cara `occurredAt` disimpan (@db.Date).
+    const year = input.occurredAt.getUTCFullYear();
+    const month = input.occurredAt.getUTCMonth() + 1;
+
+    const period = await kpiPeriodRepository.find(input.employeeId, month, year);
+    if (period?.status === "LOCKED") {
+      throw new ValidationError("Periode ini sudah dikunci dan tidak menerima catatan baru");
+    }
+
+    // Entri untuk orang lain (dari atasan/HR) langsung sah; entri atas diri
+    // sendiri menunggu persetujuan bila KPI-nya diatur begitu — termasuk bila
+    // yang mencatat kebetulan punya izin menyetujui. Tanpa syarat terakhir itu
+    // seorang Kepala Cabang bisa meloloskan penilaian atas dirinya sendiri,
+    // padahal reviewEntry sudah melarang menyetujui entri milik sendiri.
+    const source: KpiInputSource = isSelf ? "SELF" : "SUPERVISOR";
+    const needsApproval = isSelf && policy.requiresApproval;
+
+    return kpiEntryRepository.create({
+      employeeId: input.employeeId,
+      roleKpiId: input.roleKpiId,
+      occurredAt: input.occurredAt,
+      periodYear: year,
+      periodMonth: month,
+      weekOfMonth: weekOfMonthFor(input.occurredAt),
+      quantity: input.quantity,
+      note: input.note ?? null,
+      evidenceUrl: input.evidenceUrl ?? null,
+      source,
+      status: needsApproval ? "PENDING" : "APPROVED",
+      createdById: caller.id,
+    });
+  },
+
+  /**
+   * Menyetujui atau menolak entri. Yang ditolak tetap tersimpan sebagai jejak
+   * audit — hanya entri APPROVED yang ikut dihitung.
+   */
+  reviewEntry: async (
+    caller: AdminCaller,
+    entryId: string,
+    decision: "APPROVED" | "REJECTED",
+    reviewNote?: string
+  ) => {
+    if (!can(caller.permissions, PERMISSIONS.KPI_APPROVE)) {
+      throw new ForbiddenError("Tidak memiliki izin menyetujui entri KPI");
+    }
+
+    const entry = await kpiEntryRepository.findById(entryId);
+    if (!entry) throw new NotFoundError("Entri KPI tidak ditemukan");
+
+    if (entry.employeeId === caller.id) {
+      throw new ForbiddenError("Tidak dapat menyetujui entri KPI milik sendiri");
+    }
+
+    assertKpiCompanyAccess(caller, entry.roleKpi.companyId);
+
+    const period = await kpiPeriodRepository.find(
+      entry.employeeId,
+      entry.periodMonth,
+      entry.periodYear
+    );
+    if (period?.status === "LOCKED") {
+      throw new ValidationError("Periode ini sudah dikunci");
+    }
+
+    return kpiEntryRepository.review(entryId, {
+      status: decision,
+      reviewedById: caller.id,
+      reviewNote: reviewNote ?? null,
+    });
+  },
+
+  getPendingEntries: async (caller: AdminCaller, limit = 200) => {
+    if (!can(caller.permissions, PERMISSIONS.KPI_APPROVE)) {
+      throw new ForbiddenError("Tidak memiliki izin melihat antrian persetujuan KPI");
+    }
+    // Peninjau yang terikat satu PT hanya melihat antrian PT-nya.
+    const scope = isGlobalKpiCaller(caller)
+      ? {}
+      : { roleKpi: { companyId: caller.companyId ?? "__none__" } };
+    return kpiEntryRepository.findPending(scope, limit);
+  },
+
+  /**
+   * Menghapus entri. Karyawan hanya boleh menghapus entri miliknya sendiri yang
+   * belum disetujui — begitu disetujui, penghapusan jadi wewenang atasan.
+   */
+  deleteEntry: async (caller: AdminCaller, entryId: string) => {
+    const entry = await kpiEntryRepository.findById(entryId);
+    if (!entry) throw new NotFoundError("Entri KPI tidak ditemukan");
+
+    const period = await kpiPeriodRepository.find(
+      entry.employeeId,
+      entry.periodMonth,
+      entry.periodYear
+    );
+    if (period?.status === "LOCKED") {
+      throw new ValidationError("Periode ini sudah dikunci");
+    }
+
+    const isReviewer =
+      can(caller.permissions, PERMISSIONS.KPI_APPROVE) ||
+      can(caller.permissions, PERMISSIONS.KPI_MANAGE);
+
+    if (!isReviewer) {
+      if (entry.employeeId !== caller.id) {
+        throw new ForbiddenError("Tidak dapat menghapus entri milik karyawan lain");
+      }
+      if (entry.status === "APPROVED") {
+        throw new ForbiddenError(
+          "Entri yang sudah disetujui hanya dapat dihapus oleh atasan"
+        );
+      }
+    } else {
+      assertKpiCompanyAccess(caller, entry.roleKpi.companyId);
+    }
+
+    await kpiEntryRepository.delete(entryId);
+  },
+
+  // ── Periode ──────────────────────────────────────────────────────────────
+  getPeriod: (employeeId: string, month: number, year: number) =>
+    kpiPeriodRepository.find(employeeId, month, year),
+
+  lockPeriod: async (caller: AdminCaller, employeeId: string, month: number, year: number) => {
+    if (!can(caller.permissions, PERMISSIONS.KPI_MANAGE)) {
+      throw new ForbiddenError("Tidak memiliki izin mengunci periode KPI");
+    }
+    // Kunci setelah skor final dihitung, supaya angka yang dibekukan konsisten
+    // dengan entri yang ada saat itu.
+    await kpiService.calculateMonthlyResult(employeeId, month, year);
+    return kpiPeriodRepository.lock(employeeId, month, year, caller.id);
+  },
+
+  unlockPeriod: async (caller: AdminCaller, employeeId: string, month: number, year: number) => {
+    if (!can(caller.permissions, PERMISSIONS.KPI_MANAGE)) {
+      throw new ForbiddenError("Tidak memiliki izin membuka periode KPI");
+    }
+    return kpiPeriodRepository.unlock(employeeId, month, year);
+  },
+
+  // ── Hasil bulanan ────────────────────────────────────────────────────────
   getMonthlyResult: (employeeId: string, month: number, year: number) =>
     kpiMonthlyResultRepository.findByEmployeePeriod(employeeId, month, year),
 
-    calculateMonthlyResult: async (
-    employeeId: string,
-    month: number,
-    year: number
-  ) => {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 1);
+  getMonthlyResultsByEmployee: (employeeId: string) =>
+    kpiMonthlyResultRepository.findByEmployee(employeeId),
 
-    // Batch 1: employee lookup runs in parallel with logs + revenues
-    // (logs/revenues only need employeeId + dateRange, both already known)
-    const [employee, logs, revenues] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: employeeId },
-        select: { customRoleId: true, branch: { select: { companyId: true } } },
-      }),
-      prisma.kpiLog.findMany({
-        where: { employeeId, createdAt: { gte: startDate, lt: endDate } },
-      }),
-      prisma.revenue.findMany({
-        where: { employeeId, date: { gte: startDate, lt: endDate } },
-      }),
+  /**
+   * Hitung ulang skor sebulan dari entri yang disetujui, lalu simpan.
+   *
+   * Bobot dikalikan tepat sekali (di computeTotalScore) — engine lama
+   * mengalikannya dua kali sehingga skor selalu jatuh jauh di bawah semestinya.
+   */
+  calculateMonthlyResult: async (employeeId: string, month: number, year: number) => {
+    const employee = await prisma.user.findUnique({
+      where: { id: employeeId },
+      select: { customRoleId: true, branch: { select: { companyId: true } } },
+    });
+
+    const companyId = employee?.branch?.companyId;
+    if (!employee?.customRoleId || !companyId) {
+      throw new ValidationError("Karyawan belum memiliki jabatan atau cabang (PT)");
+    }
+
+    // Tarik dulu KPI yang bersumber dari modul lain (absensi), baru baca entri.
+    // Urutannya penting: kalau dibalik, skor akan memakai data absensi periode
+    // sebelumnya. Penarikan bersifat idempoten dan melewati periode terkunci,
+    // jadi aman dipanggil setiap kali skor dihitung.
+    const collection = await kpiCollectorService.collectForEmployee(employeeId, month, year);
+
+    const [roleKpis, entries] = await Promise.all([
+      roleKpiRepository.findActiveByCompanyRole(companyId, employee.customRoleId),
+      kpiEntryRepository.findApprovedForScoring(employeeId, year, month),
     ]);
 
-    // PT karyawan diturunkan dari cabangnya (single source of truth).
-    const employeeCompanyId = employee?.branch?.companyId;
-    if (!employee?.customRoleId || !employeeCompanyId)
-      throw new NotFoundError("Karyawan tidak memiliki jabatan atau perusahaan (PT)");
+    const entriesByRoleKpi = new Map<string, ScoringEntry[]>();
+    for (const entry of entries) {
+      const list = entriesByRoleKpi.get(entry.roleKpiId) ?? [];
+      list.push({
+        occurredAt: dateKey(entry.occurredAt),
+        weekOfMonth: entry.weekOfMonth,
+        quantity: Number(entry.quantity),
+      });
+      entriesByRoleKpi.set(entry.roleKpiId, list);
+    }
 
-    // Batch 2: roleKpis + bonusMatrix both need companyId + customRoleId from batch 1
-    const [roleKpis, matrix] = await Promise.all([
-      prisma.roleKpi.findMany({
-        where: { companyId: employeeCompanyId, customRoleId: employee.customRoleId },
-        include: { definition: true },
-      }),
-      prisma.bonusMatrix.findUnique({
-        where: {
-          companyId_customRoleId: {
-            companyId: employeeCompanyId,
-            customRoleId: employee.customRoleId,
-          },
+    const items: ScoredKpiItem[] = roleKpis.map((rk) => {
+      const score = scoreKpiItem(
+        {
+          scoringType: rk.definition.scoringType,
+          direction: rk.definition.direction,
+          weight: toNumber(rk.weight),
+          targetValue: toNullableNumber(rk.targetValue),
+          basePoint: toNullableNumber(rk.basePoint),
+          pointPerUnit: toNullableNumber(rk.pointPerUnit),
+          toleranceLimit: toNullableNumber(rk.toleranceLimit),
+          toleranceScope: rk.toleranceScope,
+          maxAchievement: toNumber(rk.maxAchievement),
+          minAchievement: toNumber(rk.minAchievement),
         },
-        include: { tiers: true },
-      }),
-    ]);
-
-    // Aggregate logs and revenues
-    const penaltyByKpi: Record<string, number> = {};
-    for (const log of logs) {
-      penaltyByKpi[log.kpiId] =
-        (penaltyByKpi[log.kpiId] ?? 0) + Number(log.value);
-    }
-
-    const totalRevenue = revenues.reduce(
-      (sum, r) => sum + Number(r.amount),
-      0
-    );
-
-    const breakdownItems = [];
-    let weightedTotalScore = 0;
-
-    for (const rk of roleKpis) {
-      const { definition, maxScore, threshold, targetValue, weight } = rk;
-      const ms = Number(maxScore);
-      const w = Number(weight);
-      let achievementScore: number;
-      let item: Record<string, string>;
-
-      if (definition.type === "EVENT") {
-        const totalPenalty = penaltyByKpi[definition.id] ?? 0;
-        const thresh = Number(threshold ?? 100);
-        const ratio = Math.max((thresh - totalPenalty) / thresh, 0);
-        achievementScore = ms * ratio;
-        item = {
-          kpiId: definition.id,
-          kpiName: definition.name,
-          type: "EVENT",
-          maxScore: ms.toString(),
-          weight: w.toString(),
-          threshold: thresh.toString(),
-          totalPenalty: totalPenalty.toString(),
-          score: achievementScore.toString(),
-        };
-      } else {
-        const tv = Number(targetValue ?? 1);
-        const achievementRatio = Math.min(tv > 0 ? totalRevenue / tv : 0, 1.2);
-        achievementScore = ms * achievementRatio;
-        item = {
-          kpiId: definition.id,
-          kpiName: definition.name,
-          type: "TARGET",
-          maxScore: ms.toString(),
-          weight: w.toString(),
-          targetValue: tv.toString(),
-          actual: totalRevenue.toString(),
-          achievement: achievementRatio.toString(),
-          score: achievementScore.toString(),
-        };
-      }
-
-      weightedTotalScore += achievementScore * w;
-      breakdownItems.push(item);
-    }
-
-    let bonusAmount = 0;
-    let bonusResult = undefined;
-
-    if (matrix) {
-      const normalizedScore = weightedTotalScore / 100; // Assuming scores are 0-100
-      const tier = matrix.tiers.find(
-        (t) =>
-          normalizedScore >= Number(t.minScore) &&
-          normalizedScore <= Number(t.maxScore)
+        entriesByRoleKpi.get(rk.id) ?? []
       );
 
-      if (tier) {
-        bonusAmount = Number(tier.amount ?? 0);
-        bonusResult = tier.resultType;
-      }
-    }
+      return {
+        ...score,
+        roleKpiId: rk.id,
+        kpiId: rk.definition.id,
+        kpiCode: rk.definition.code,
+        kpiName: rk.definition.name,
+        scoringType: rk.definition.scoringType,
+        unit: rk.definition.unit,
+        weight: toNumber(rk.weight),
+        inputSource: resolvePolicy(rk).inputSource,
+      };
+    });
+
+    const summary = computeTotalScore(items);
 
     return kpiMonthlyResultRepository.upsert({
       employeeId,
       month,
       year,
-      totalScore: weightedTotalScore,
-      bonusAmount,
-      bonusResult,
-      breakdownJson: { items: breakdownItems },
+      totalScore: summary.totalScore,
+      grade: summary.grade,
+      breakdownJson: {
+        weightSum: summary.weightSum,
+        items: summary.items,
+        // Hasil penarikan otomatis ikut disimpan supaya halaman penilaian bisa
+        // menampilkan hari mana yang dilewati kolektor dan perlu diperiksa
+        // atasan — tanpa ini, hari bermasalah hilang tanpa jejak.
+        autoCollected: collection.collected,
+        autoUnsupported: collection.unsupported,
+      },
     });
   },
 };
+
+/** Peninjau lintas PT (Super Admin/Owner) tidak terikat satu perusahaan. */
+function isGlobalKpiCaller(caller: AdminCaller) {
+  return caller.companyId === null;
+}
+
+function assertKpiCompanyAccess(caller: AdminCaller, companyId: string) {
+  if (isGlobalKpiCaller(caller)) return;
+  if (caller.companyId !== companyId) {
+    throw new ForbiddenError("Tidak memiliki akses ke KPI PT ini");
+  }
+}

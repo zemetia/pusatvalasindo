@@ -1,47 +1,30 @@
 import prisma from "@/lib/prisma";
 import { LogPageClient } from "@/components/admin/kpi/log-page-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconReport } from "@tabler/icons-react";
 
 export default async function KpiLogPage() {
-  let result;
+  let users;
   try {
-    result = await Promise.all([
-      prisma.user.findMany({
-        where: {
-          customRoleId: { not: null },
-        },
-        include: {
-          branch: { select: { name: true } },
-          customRole: { select: { name: true } },
-        },
-        orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
-      }),
-      prisma.roleKpi.findMany({
-        select: {
-          id: true,
-          customRoleId: true,
-          kpiId: true,
-          maxScore: true,
-          targetValue: true,
-          threshold: true,
-          weight: true,
-          definition: { select: { id: true, name: true, type: true } },
-        },
-        orderBy: [{ definition: { name: "asc" } }],
-      }),
-    ]);
+    // KPI per karyawan diambil client-side saat karyawan dipilih — memuat
+    // seluruh konfigurasi setiap jabatan di sini akan sia-sia untuk halaman
+    // yang hanya menilai satu orang dalam satu waktu.
+    users = await prisma.user.findMany({
+      where: { customRoleId: { not: null } },
+      select: {
+        id: true,
+        name: true,
+        customRoleId: true,
+        isActive: true,
+        branch: { select: { name: true } },
+        customRole: { select: { name: true } },
+      },
+      orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
+    });
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
-    return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[kpi/log/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
-    )
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return <ErrorPanel source="kpi/log/page" message={msg} />;
   }
-  const [users, roleKpisRaw] = result;
 
   const serializedUsers = users.map((u) => ({
     id: u.id,
@@ -52,28 +35,14 @@ export default async function KpiLogPage() {
     isActive: u.isActive,
   }));
 
-  const serializedRoleKpis = roleKpisRaw.map((rk) => ({
-    id: rk.id,
-    kpiId: rk.kpiId,
-    customRoleId: rk.customRoleId,
-    maxScore: rk.maxScore.toString(),
-    targetValue: rk.targetValue?.toString() ?? null,
-    threshold: rk.threshold?.toString() ?? null,
-    weight: rk.weight.toString(),
-    definition: rk.definition,
-  }));
-
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
-        title="Log KPI"
-        description="Catat pelanggaran dan target / omset karyawan."
+        title="Penilaian KPI"
+        description="Catat kejadian KPI karyawan, setujui entri yang mereka isi sendiri, lalu kunci periodenya."
         icon={<IconReport className="size-5" />}
       />
-      <LogPageClient
-        users={serializedUsers}
-        roleKpis={serializedRoleKpis}
-      />
-    </div>
+      <LogPageClient users={serializedUsers} />
+    </PageShell>
   );
 }

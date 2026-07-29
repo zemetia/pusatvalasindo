@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { requirePageCaller } from "@/backend/helpers/page-access";
 import { CompanyStockClient } from "@/components/admin/company-stock/company-stock-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { IconDatabase } from "@tabler/icons-react";
 
 export default async function CompanyStockManagementPage({
@@ -32,7 +32,7 @@ export default async function CompanyStockManagementPage({
   });
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Stock Management (PT)"
         description="Kelola stok mata uang & logam mulia per PT — terpisah dari stok per cabang."
@@ -40,6 +40,6 @@ export default async function CompanyStockManagementPage({
       />
 
       <CompanyStockClient companies={companies} canManage={canManage} />
-    </div>
+    </PageShell>
   );
 }

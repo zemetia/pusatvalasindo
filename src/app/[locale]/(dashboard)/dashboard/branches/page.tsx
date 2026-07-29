@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { BranchesPageClient } from "@/components/admin/branches-page-client";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconBuilding } from "@tabler/icons-react";
 import { getCaller } from "@/backend/helpers/get-admin-caller";
 import { can, PERMISSIONS } from "@/lib/permissions";
@@ -30,17 +30,13 @@ export default async function BranchesPage() {
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[branches/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="branches/page" message={msg} />
     )
   }
   const [branches, companies] = result;
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Cabang"
         description="Kelola seluruh cabang bisnis per perusahaan"
@@ -54,6 +50,6 @@ export default async function BranchesPage() {
           companyId: b.companyId ?? undefined,
         }))}
       />
-    </div>
+    </PageShell>
   );
 }

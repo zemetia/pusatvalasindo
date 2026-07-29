@@ -38,7 +38,7 @@ model custom_role {
   payrollCompanyIds String[]      @default([])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
-  bonusMatrices     BonusMatrix[]
+  incentiveMatrices PayrollIncentiveMatrix[]
   roleKpis          RoleKpi[]
   company           Company?      @relation(fields: [companyId], references: [id])
   users             user[]
@@ -64,9 +64,12 @@ model user {
   joinDate           DateTime?
   isActive           Boolean            @default(true)
   customRoleId       String?
-  kpiLogs            KpiLog[]
+  kpiEntries         KpiEntry[]         @relation("KpiEntryEmployee")
+  kpiEntriesCreated  KpiEntry[]         @relation("KpiEntryCreatedBy")
+  kpiEntriesReviewed KpiEntry[]         @relation("KpiEntryReviewedBy")
+  kpiPeriods         KpiPeriod[]        @relation("KpiPeriodEmployee")
+  kpiPeriodsLocked   KpiPeriod[]        @relation("KpiPeriodLockedBy")
   kpiMonthlyResults  KpiMonthlyResult[]
-  revenues           Revenue[]
   attendances        Attendance[]
   samples            Sample[]
   account            account[]

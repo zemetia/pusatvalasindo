@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { ErrorPanel } from "@/components/admin/page-shell";
 import prisma from "@/lib/prisma";
 import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { requirePageCaller } from "@/backend/helpers/page-access";
@@ -21,11 +22,7 @@ export default async function BankMutasiPage({ params }: Params) {
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[bank-accounts/[id]/mutasi/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="bank-accounts/[id]/mutasi/page" message={msg} />
     )
   }
 

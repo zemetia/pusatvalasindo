@@ -1,10 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { PageHeader } from "@/components/admin/page-header";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+} from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
 import { TradingViewMiniChart } from "@/components/admin/tradingview-mini-chart";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -19,7 +24,8 @@ import {
   IconAlertTriangle,
   IconChartCandle,
   IconRefresh,
-  IconSearch,
+  IconTrendingUp,
+  IconTrendingDown,
 } from "@tabler/icons-react";
 
 import type { WatcherValasData } from "@/backend/services/watcher-valas.service";
@@ -35,6 +41,30 @@ function formatUpdatedAt(iso: string) {
     dateStyle: "medium",
     timeStyle: "medium",
   });
+}
+
+// Shows the value plus a change badge vs. the previous cron fetch — `prev`
+// is null on a currency's first-ever fetch, so nothing to compare against yet.
+function RateCell({ value, prev }: { value: number | null; prev: number | null }) {
+  if (value == null) return <>—</>;
+  if (prev == null || prev === value) {
+    return <>{idr.format(value)}</>;
+  }
+  const up = value > prev;
+  return (
+    <span className="inline-flex items-center justify-end gap-1">
+      {idr.format(value)}
+      <span
+        className={`inline-flex items-center gap-0.5 text-xs font-medium ${
+          up ? "text-success" : "text-destructive"
+        }`}
+        title={`Sebelumnya ${idr.format(prev)}`}
+      >
+        {up ? <IconTrendingUp className="size-3.5" /> : <IconTrendingDown className="size-3.5" />}
+        {idr.format(Math.abs(value - prev))}
+      </span>
+    </span>
+  );
 }
 
 export function WatcherValasPageClient({ initialData }: WatcherValasPageClientProps) {
@@ -62,23 +92,40 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
     }
   }
 
+  // SmartDeal rates are DB-cached and refreshed by whatever external
+  // scheduler hits src/app/api/scrape/smartdeal/route.ts, not scraped on
+  // every request — so polling this endpoint every 30s is cheap and just
+  // picks up whatever the last scrape wrote, giving a near-live view
+  // without the user having to click Refresh. Ref avoids recreating the interval on every
+  // render (refresh() closes over loading/data state that changes often).
+  const refreshRef = useRef(refresh);
+  refreshRef.current = refresh;
+
+  useEffect(() => {
+    const id = setInterval(() => refreshRef.current(), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Watcher Valas"
         description="Perbandingan kurs live SmartDeal (money changer) vs Yahoo Finance & ExchangeRate-API."
         icon={<IconChartCandle className="size-5" />}
         action={
-          <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
-            <IconRefresh className={loading ? "size-4 animate-spin" : "size-4"} />
-            Refresh
-          </Button>
+          <>
+            <span className="text-muted-foreground hidden text-xs sm:inline">
+              Kurs SmartDeal per{" "}
+              {data.smartdealFetchedAt ? formatUpdatedAt(data.smartdealFetchedAt) : "—"} · halaman
+              dicek {formatUpdatedAt(data.updatedAt)} (auto tiap 30 detik)
+            </span>
+            <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
+              <IconRefresh className={loading ? "size-4 animate-spin" : "size-4"} />
+              Refresh
+            </Button>
+          </>
         }
       />
-
-      <p className="text-xs text-muted-foreground -mt-4">
-        Terakhir diperbarui: {formatUpdatedAt(data.updatedAt)}
-      </p>
 
       {data.errors.length > 0 && (
         <Alert variant="destructive">
@@ -90,20 +137,22 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
         </Alert>
       )}
 
-      <div className="flex flex-col gap-4">
-        <div className="relative max-w-xs">
-          <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            placeholder="Cari kode atau nama mata uang..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-
-        <div className="rounded-md border">
-          <Table>
+      <SectionCard
+        padded={false}
+        toolbar={
+          <>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari kode atau nama mata uang..."
+            />
+            <span className="text-muted-foreground ml-auto text-xs">
+              Klik baris untuk membuka grafik
+            </span>
+          </>
+        }
+      >
+        <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Mata Uang</TableHead>
@@ -116,9 +165,12 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    Tidak ada hasil untuk &ldquo;{search}&rdquo;
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={6} className="p-0">
+                    <EmptyState
+                      title="Tidak ada hasil"
+                      description={`Tidak ada mata uang yang cocok dengan "${search}".`}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -139,25 +191,27 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
                     >
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="font-mono">{r.code}</Badge>
-                          <span className="text-sm text-muted-foreground truncate">{r.name}</span>
+                          <Badge variant="outline" className="font-mono">
+                            {r.code}
+                          </Badge>
+                          <span className="text-muted-foreground truncate">{r.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        {r.smartdealBuy != null ? idr.format(r.smartdealBuy) : "—"}
+                      <TableCell className="tabular text-right">
+                        <RateCell value={r.smartdealBuy} prev={r.smartdealPrevBuy} />
                       </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        {r.smartdealSell != null ? idr.format(r.smartdealSell) : "—"}
+                      <TableCell className="tabular text-right">
+                        <RateCell value={r.smartdealSell} prev={r.smartdealPrevSell} />
                       </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
+                      <TableCell className="tabular text-right">
                         {r.yahooRate != null ? idr.format(r.yahooRate) : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
+                      <TableCell className="tabular text-right">
                         {r.exchangeRateApiRate != null ? idr.format(r.exchangeRateApiRate) : "—"}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
+                      <TableCell className="tabular text-right font-medium">
                         {spread != null ? (
-                          <span className={spread > 0 ? "text-destructive" : "text-emerald-600"}>
+                          <span className={spread > 0 ? "text-destructive" : "text-success"}>
                             {spread > 0 ? "+" : ""}
                             {idr.format(spread)}
                           </span>
@@ -170,13 +224,14 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
                 })
               )}
             </TableBody>
-          </Table>
-        </div>
+        </Table>
+      </SectionCard>
 
-        {selected && (
+      {selected && (
+        <SectionCard title={`Grafik ${selected}/IDR`} padded={false}>
           <TradingViewMiniChart symbol={`FX_IDC:${selected}IDR`} />
-        )}
-      </div>
-    </div>
+        </SectionCard>
+      )}
+    </PageShell>
   );
 }

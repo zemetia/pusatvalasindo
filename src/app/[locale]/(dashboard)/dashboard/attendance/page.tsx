@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/admin/page-header";
+import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconFingerprint } from "@tabler/icons-react";
 
 export async function generateMetadata({
@@ -77,16 +77,12 @@ export default async function AttendancePage({
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[attendance/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="attendance/page" message={msg} />
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -97,6 +93,6 @@ export default async function AttendancePage({
         initialRecords={JSON.parse(JSON.stringify(initialRecords))}
         branchGeofence={branchGeofence}
       />
-    </div>
+    </PageShell>
   );
 }

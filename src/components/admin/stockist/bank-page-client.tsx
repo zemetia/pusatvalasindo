@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { BankGridClient } from "@/components/admin/stockist/bank-grid-client"
+import { SectionCard, EmptyState } from "@/components/admin/page-shell"
 import { IconDownload, IconLoader2 } from "@tabler/icons-react"
 
 type Company = { id: string; name: string }
@@ -98,26 +99,22 @@ export function BankPageClient({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end gap-4">
+    <div className="flex flex-col gap-4">
+      <div className="bg-card flex flex-wrap items-end gap-3 rounded-xl border p-4 shadow-sm">
         <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-            Tanggal
-          </label>
+          <label className="text-muted-foreground text-xs font-medium">Tanggal</label>
           <Input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-44 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+            className="h-9 w-44"
           />
         </div>
         {canSelectCompany && (
           <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-              Pilih PT
-            </label>
+            <label className="text-muted-foreground text-xs font-medium">Pilih PT</label>
             <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="w-52 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
+              <SelectTrigger className="h-9 w-52">
                 <SelectValue placeholder="Pilih PT" />
               </SelectTrigger>
               <SelectContent>
@@ -132,44 +129,37 @@ export function BankPageClient({
         )}
         {!canSelectCompany && companies.length > 0 && (
           <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
-              PT
-            </label>
-            <div className="h-10 flex items-center px-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-sm font-medium">
+            <label className="text-muted-foreground text-xs font-medium">PT</label>
+            <div className="bg-muted/40 flex h-9 items-center rounded-md border px-3 text-sm font-medium">
               {companies.find((c) => c.id === defaultCompanyId)?.name ?? "-"}
             </div>
           </div>
         )}
-        {!canManage && (
-          <Badge variant="outline" className="h-10 px-3 flex items-center">
-            Read-only
-          </Badge>
-        )}
-        {companyId && bankUnfilled > 0 && (
-          <Badge className="h-10 px-3 flex items-center bg-amber-500">
-            {bankUnfilled} belum diisi
-          </Badge>
-        )}
-        {companyId && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-10 rounded-xl"
-            disabled={exporting}
-            onClick={handleExport}
-          >
-            {exporting ? (
-              <IconLoader2 className="size-4 animate-spin" />
-            ) : (
-              <IconDownload className="size-4" />
-            )}
-            Export Excel
-          </Button>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {!canManage && <Badge variant="soft">Read-only</Badge>}
+          {companyId && bankUnfilled > 0 && (
+            <Badge variant="warning">{bankUnfilled} belum diisi</Badge>
+          )}
+          {companyId && (
+            <Button size="sm" variant="outline" disabled={exporting} onClick={handleExport}>
+              {exporting ? (
+                <IconLoader2 className="size-4 animate-spin" />
+              ) : (
+                <IconDownload className="size-4" />
+              )}
+              Export Excel
+            </Button>
+          )}
+        </div>
       </div>
 
       {!companyId && (
-        <p className="text-sm text-muted-foreground">Pilih PT dan tanggal terlebih dahulu.</p>
+        <SectionCard padded={false}>
+          <EmptyState
+            title="Pilih PT terlebih dahulu"
+            description="Grid saldo bank harian akan muncul setelah PT dan tanggal dipilih."
+          />
+        </SectionCard>
       )}
 
       {companyId && (

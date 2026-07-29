@@ -3,12 +3,8 @@
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { SectionCard, EmptyState } from "@/components/admin/page-shell";
+import { IconChevronRight, IconTargetArrow } from "@tabler/icons-react";
 
 export type CompanyRow = {
   id: string;
@@ -43,15 +39,19 @@ function KonfigurasiTab({
 
   if (companies.length === 0) {
     return (
-      <div className="text-center text-muted-foreground py-10">
-        Belum ada data perusahaan.
-      </div>
+      <SectionCard padded={false}>
+        <EmptyState
+          icon={<IconTargetArrow className="size-5" />}
+          title="Belum ada data perusahaan"
+          description="Tambahkan perusahaan terlebih dahulu sebelum menyusun KPI per jabatan."
+        />
+      </SectionCard>
     );
   }
 
   return (
     <Tabs defaultValue={companies[0].id} className="flex flex-col gap-4">
-      <TabsList className="w-fit">
+      <TabsList>
         {companies.map((c) => (
           <TabsTrigger key={c.id} value={c.id}>
             {c.name}
@@ -60,62 +60,58 @@ function KonfigurasiTab({
       </TabsList>
       {companies.map((c) => {
         const companyRoles = customRoles.filter((r) => r.companyId === c.id);
-        
+
+        if (companyRoles.length === 0) {
+          return (
+            <TabsContent key={c.id} value={c.id} className="mt-0">
+              <SectionCard padded={false}>
+                <EmptyState
+                  icon={<IconTargetArrow className="size-5" />}
+                  title="Belum ada role/jabatan untuk perusahaan ini"
+                  description="Tambahkan role terlebih dahulu di menu Role & Akses."
+                />
+              </SectionCard>
+            </TabsContent>
+          );
+        }
+
         return (
           <TabsContent key={c.id} value={c.id} className="mt-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {/* Custom Roles for this company */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {companyRoles.map((role) => {
                 const summary = roleKpiSummary.find(
                   (s) => s.companyId === c.id && s.customRoleId === role.id
                 );
+                // Bobot KPI satu jabatan harus berjumlah tepat 100%.
                 const isComplete = !!summary && Math.abs(summary.totalWeight - 1) < 0.001;
-                if (!summary) {
-                  return (
-                    <Card
-                      key={role.id}
-                      className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50 border-dashed"
-                      onClick={() => router.push(`/dashboard/kpi/${c.id}/custom_${role.id}`)}
-                    >
-                      <CardContent className="py-6 flex flex-col items-center gap-2 text-center">
-                        <span className="text-2xl">📋</span>
-                        <CardTitle className="text-sm font-semibold">{role.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">Belum ada KPI</p>
-                        <span className="mt-1 inline-flex items-center rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs font-medium text-primary">
-                          + Atur KPI Jabatan Ini
-                        </span>
-                      </CardContent>
-                    </Card>
-                  );
-                }
 
                 return (
-                  <Card
+                  <button
                     key={role.id}
-                    className="cursor-pointer transition-all hover:shadow-md hover:border-primary/50"
+                    type="button"
                     onClick={() => router.push(`/dashboard/kpi/${c.id}/custom_${role.id}`)}
+                    className="bg-card hover:border-primary/40 group flex flex-col gap-3 rounded-xl border p-4 text-left shadow-sm transition-colors"
                   >
-                    <CardHeader className="pb-2 pt-4">
-                      <CardTitle className="text-sm font-semibold">{role.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pb-4 flex flex-wrap gap-2">
-                      <Badge variant="secondary">{summary.kpiCount} KPI</Badge>
-                      <Badge variant={isComplete ? "default" : "destructive"}>
-                        {(summary.totalWeight * 100).toFixed(0)}%
-                        {isComplete ? " ✓" : " — belum 100%"}
-                      </Badge>
-                    </CardContent>
-                  </Card>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium">{role.name}</span>
+                      <IconChevronRight className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {summary ? (
+                        <>
+                          <Badge variant="soft">{summary.kpiCount} KPI</Badge>
+                          <Badge variant={isComplete ? "success" : "warning"}>
+                            Bobot {(summary.totalWeight * 100).toFixed(0)}%
+                            {isComplete ? "" : " — belum 100%"}
+                          </Badge>
+                        </>
+                      ) : (
+                        <Badge variant="outline">Belum ada KPI</Badge>
+                      )}
+                    </div>
+                  </button>
                 );
               })}
-
-
-              {companyRoles.length === 0 && (
-                <div className="col-span-full py-10 text-center border-2 border-dashed rounded-xl text-muted-foreground">
-                  Belum ada role/jabatan untuk perusahaan ini. <br />
-                  <span className="text-xs">Silakan tambahkan di menu Role & Akses.</span>
-                </div>
-              )}
             </div>
           </TabsContent>
         );

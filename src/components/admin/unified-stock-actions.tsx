@@ -48,7 +48,7 @@ export function UnifiedStockActions({ item, branchId, companyId, currencies }: P
         disabled={loading}
         title={item.isActive ? "Nonaktifkan" : "Aktifkan"}
       >
-        <IconPower className={`size-4 ${item.isActive ? "text-emerald-500" : "text-muted-foreground"}`} />
+        <IconPower className={`size-4 ${item.isActive ? "text-success" : "text-muted-foreground"}`} />
       </Button>
 
       <UnifiedStockSheet

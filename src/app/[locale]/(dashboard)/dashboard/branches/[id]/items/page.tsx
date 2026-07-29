@@ -1,4 +1,12 @@
 import { notFound } from "next/navigation";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+  ErrorPanel,
+} from "@/components/admin/page-shell";
+import { IconArrowLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
@@ -45,11 +53,7 @@ export default async function BranchItemsPage({ params }: PageProps) {
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
     return (
-      <div className="flex min-h-[400px] items-center justify-center p-8">
-        <pre className="max-w-2xl whitespace-pre-wrap break-all rounded bg-destructive/10 p-6 text-sm text-destructive font-mono border border-destructive/30">
-          {`[branches/[id]/items/page — fetch error]\n\n${msg}`}
-        </pre>
-      </div>
+      <ErrorPanel source="branches/[id]/items/page" message={msg} />
     )
   }
   const [branch, items, companies] = result;
@@ -59,27 +63,41 @@ export default async function BranchItemsPage({ params }: PageProps) {
   const branches = [{ id: branch.id, name: branch.name, companyId: branch.companyId }];
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
-            <Link href="/dashboard/branches" className="hover:text-foreground transition-colors">Cabang</Link>
-            <span>/</span>
-            <span className="text-foreground font-medium">{branch.name}</span>
-          </div>
-          <h1 className="text-2xl font-semibold">Item Stok — {branch.name}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Kelola item stok untuk cabang ini</p>
-        </div>
-        <StockItemSheet branches={branches} companies={companies} defaultBranchId={branch.id} />
-      </div>
+    <PageShell>
+      <PageHeader
+        eyebrow="Cabang"
+        title={`Item Stok — ${branch.name}`}
+        description="Kelola item stok untuk cabang ini"
+        icon={
+          <Link
+            href="/dashboard/branches"
+            aria-label="Kembali ke daftar cabang"
+            className="hover:text-foreground flex size-full items-center justify-center"
+          >
+            <IconArrowLeft className="size-5" />
+          </Link>
+        }
+        action={
+          <StockItemSheet branches={branches} companies={companies} defaultBranchId={branch.id} />
+        }
+      />
 
       {items.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg font-medium">Belum ada item stok</p>
-          <p className="text-sm mt-1">Tambahkan item pertama untuk cabang ini.</p>
-        </div>
+        <SectionCard padded={false}>
+          <EmptyState
+            title="Belum ada item stok"
+            description="Tambahkan item pertama untuk cabang ini."
+            action={
+              <StockItemSheet
+                branches={branches}
+                companies={companies}
+                defaultBranchId={branch.id}
+              />
+            }
+          />
+        </SectionCard>
       ) : (
-        <div className="rounded-md border">
+        <SectionCard padded={false}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -93,19 +111,17 @@ export default async function BranchItemsPage({ params }: PageProps) {
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <TableRow key={item.id} className={!item.isActive ? "opacity-50" : ""}>
+                <TableRow key={item.id} className={!item.isActive ? "opacity-60" : ""}>
                   <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell className="font-mono text-sm text-muted-foreground">
+                  <TableCell className="text-muted-foreground font-mono">
                     {item.code ?? "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">
-                      {TYPE_LABELS[item.type] ?? item.type}
-                    </Badge>
+                    <Badge variant="soft">{TYPE_LABELS[item.type] ?? item.type}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">{item.sortOrder}</TableCell>
+                  <TableCell className="tabular text-right">{item.sortOrder}</TableCell>
                   <TableCell>
-                    <Badge variant={item.isActive ? "default" : "outline"}>
+                    <Badge variant={item.isActive ? "success" : "soft"}>
                       {item.isActive ? "Aktif" : "Nonaktif"}
                     </Badge>
                   </TableCell>
@@ -128,8 +144,8 @@ export default async function BranchItemsPage({ params }: PageProps) {
               ))}
             </TableBody>
           </Table>
-        </div>
+        </SectionCard>
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -1,20 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { KpiType } from "@src/generated/prisma/client";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { requirePermission } from "@/backend/helpers/get-admin-caller";
 import { PERMISSIONS } from "@/lib/permissions";
+import { kpiDefinitionSchema } from "../route";
 
-const updateSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  type: z.nativeEnum(KpiType).optional(),
-});
+const updateSchema = kpiDefinitionSchema.partial();
 
 type Params = { params: Promise<{ id: string }> };
-type UpdateBody = z.infer<typeof updateSchema>;
+type UpdateBody = ReturnType<typeof updateSchema.parse>;
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -15,9 +14,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BankAccountSheet, BankAccountData } from "@/components/admin/bank-account-sheet";
-import { PageHeader } from "@/components/admin/page-header";
-import { IconBuildingBank, IconSearch, IconTrash, IconBuilding } from "@tabler/icons-react";
+import { BankAccountSheet } from "@/components/admin/bank-account-sheet";
+import type { BankAccountData } from "@/components/admin/bank-account-sheet";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+} from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
+import { SegmentedFilter } from "@/components/admin/segmented-filter";
+import { IconBuildingBank, IconTrash, IconPencil, IconCash } from "@tabler/icons-react";
 
 type SerializedCurrency = { id: string; code: string; name: string };
 type Company = { id: string; name: string };
@@ -92,168 +99,138 @@ export function BankAccountsPageClient({
   };
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Rekening Bank"
         description="Daftar rekening bank per PT"
         icon={<IconBuildingBank className="size-5" />}
-        action={<BankAccountSheet currencies={currencies} companies={companies} />}
+        action={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/stockist/bank">
+                <IconCash className="size-4" />
+                Isi Saldo Bank Hari Ini
+              </Link>
+            </Button>
+            <BankAccountSheet currencies={currencies} companies={companies} />
+          </div>
+        }
       />
 
-      {canSelectCompany && companies.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <IconBuilding className="size-4" />
-            <span>Perusahaan (PT)</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setActiveCompanyId("")}
-              className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
-                activeCompanyId === ""
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
-              }`}
-            >
-              <span
-                className={`text-xs uppercase tracking-widest font-bold ${
-                  activeCompanyId === "" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                Semua
-              </span>
-              <span
-                className={`text-lg font-bold tracking-tight ${
-                  activeCompanyId === "" ? "text-foreground" : "text-foreground/70"
-                }`}
-              >
-                Semua PT
-              </span>
-            </button>
-            {companies.map((company) => (
-              <button
-                key={company.id}
-                onClick={() => setActiveCompanyId(company.id)}
-                className={`px-6 py-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-start gap-1 group ${
-                  activeCompanyId === company.id
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-border/50 bg-card hover:border-border hover:bg-muted/50"
-                }`}
-              >
-                <span
-                  className={`text-xs uppercase tracking-widest font-bold ${
-                    activeCompanyId === company.id ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  Perusahaan
-                </span>
-                <span
-                  className={`text-lg font-bold tracking-tight ${
-                    activeCompanyId === company.id ? "text-foreground" : "text-foreground/70"
-                  }`}
-                >
-                  {company.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {accounts.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg font-medium">Belum ada rekening bank</p>
-          <p className="text-sm mt-1">Tambahkan rekening pertama untuk mulai mencatat saldo.</p>
-        </div>
+        <SectionCard padded={false}>
+          <EmptyState
+            icon={<IconBuildingBank className="size-5" />}
+            title="Belum ada rekening bank"
+            description="Tambahkan rekening pertama untuk mulai mencatat saldo."
+            action={<BankAccountSheet currencies={currencies} companies={companies} />}
+          />
+        </SectionCard>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="relative max-w-xs">
-            <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              placeholder="Cari bank, rekening, PT..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>PT</TableHead>
-                  <TableHead>Bank</TableHead>
-                  <TableHead>No. Rekening</TableHead>
-                  <TableHead>Nama Pemilik</TableHead>
-                  <TableHead>Mata Uang</TableHead>
-                  <TableHead className="text-right">Saldo</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+        <SectionCard
+          padded={false}
+          toolbar={
+            <>
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari bank, rekening, PT..."
+              />
+              {canSelectCompany && companies.length > 0 && (
+                <SegmentedFilter
+                  aria-label="Filter perusahaan"
+                  value={activeCompanyId}
+                  onChange={setActiveCompanyId}
+                  options={[
+                    { value: "", label: "Semua PT" },
+                    ...companies.map((c) => ({ value: c.id, label: c.name })),
+                  ]}
+                />
+              )}
+              <span className="text-muted-foreground ml-auto text-xs">
+                {filtered.length} dari {accounts.length} rekening
+              </span>
+            </>
+          }
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>PT</TableHead>
+                <TableHead>Bank</TableHead>
+                <TableHead>No. Rekening</TableHead>
+                <TableHead>Nama Pemilik</TableHead>
+                <TableHead>Mata Uang</TableHead>
+                <TableHead className="text-right">Saldo</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={7} className="p-0">
+                    <EmptyState
+                      title="Tidak ada hasil"
+                      description="Ubah kata kunci pencarian atau filter PT."
+                    />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                      Tidak ada hasil untuk &ldquo;{search}&rdquo;
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filtered.map((a) => {
-                    const accountData: BankAccountData = {
-                      id: a.id,
-                      companyId: a.companyId,
-                      bankName: a.bankName,
-                      accountNumber: a.accountNumber ?? null,
-                      accountName: a.accountName,
-                      currencyId: a.currencyId,
-                      note: a.note,
-                    };
-                    return (
-                      <TableRow key={a.id}>
-                        <TableCell>{a.company.name}</TableCell>
-                        <TableCell className="font-medium">{a.bankName}</TableCell>
-                        <TableCell className="font-mono text-sm">{a.accountNumber}</TableCell>
-                        <TableCell>{a.accountName}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{a.currency.code}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-mono">
-                          {fmtBalance(a.balance, a.currency.code)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center justify-end gap-1">
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link href={`/dashboard/bank-accounts/${a.id}/mutasi`}>Mutasi</Link>
-                            </Button>
-                            <BankAccountSheet
-                              currencies={currencies}
-                              companies={companies}
-                              account={accountData}
-                              trigger={
-                                <Button variant="ghost" size="sm">Edit</Button>
-                              }
-                            />
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Hapus"
-                              disabled={deletingId === a.id}
-                              onClick={() => handleDelete(a)}
-                            >
-                              <IconTrash className="size-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+              ) : (
+                filtered.map((a) => {
+                  const accountData: BankAccountData = {
+                    id: a.id,
+                    companyId: a.companyId,
+                    bankName: a.bankName,
+                    accountNumber: a.accountNumber ?? null,
+                    accountName: a.accountName,
+                    currencyId: a.currencyId,
+                    note: a.note,
+                  };
+                  return (
+                    <TableRow key={a.id}>
+                      <TableCell className="text-muted-foreground">{a.company.name}</TableCell>
+                      <TableCell className="font-medium">{a.bankName}</TableCell>
+                      <TableCell className="tabular font-mono">{a.accountNumber}</TableCell>
+                      <TableCell>{a.accountName}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono">
+                          {a.currency.code}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="tabular text-right font-medium">
+                        {fmtBalance(a.balance, a.currency.code)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <BankAccountSheet
+                            currencies={currencies}
+                            companies={companies}
+                            account={accountData}
+                            trigger={
+                              <Button variant="ghost" size="icon" title="Edit rekening">
+                                <IconPencil className="size-4" />
+                              </Button>
+                            }
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Hapus"
+                            disabled={deletingId === a.id}
+                            onClick={() => handleDelete(a)}
+                          >
+                            <IconTrash className="text-destructive size-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </SectionCard>
       )}
-    </div>
+    </PageShell>
   );
 }

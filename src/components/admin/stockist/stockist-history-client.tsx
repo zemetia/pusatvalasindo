@@ -109,14 +109,14 @@ export function StockistHistoryClient({ companies, defaultCompanyId }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="bg-card flex flex-wrap items-end gap-3 rounded-xl border p-4 shadow-sm">
         {!defaultCompanyId && (
           <div className="grid gap-1.5">
-            <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+            <label className="text-muted-foreground text-xs font-medium">
               PT
             </label>
             <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="w-52 h-10 rounded-xl">
+              <SelectTrigger className="h-9 w-52">
                 <SelectValue placeholder="Pilih PT" />
               </SelectTrigger>
               <SelectContent>
@@ -130,11 +130,11 @@ export function StockistHistoryClient({ companies, defaultCompanyId }: Props) {
           </div>
         )}
         <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+          <label className="text-muted-foreground text-xs font-medium">
             Pocket
           </label>
           <Select value={pocketId} onValueChange={setPocketId}>
-            <SelectTrigger className="w-48 h-10 rounded-xl">
+            <SelectTrigger className="h-9 w-48">
               <SelectValue placeholder="Semua pocket" />
             </SelectTrigger>
             <SelectContent>
@@ -148,16 +148,16 @@ export function StockistHistoryClient({ companies, defaultCompanyId }: Props) {
           </Select>
         </div>
         <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+          <label className="text-muted-foreground text-xs font-medium">
             Dari
           </label>
-          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40 h-10 rounded-xl" />
+          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-9 w-40" />
         </div>
         <div className="grid gap-1.5">
-          <label className="text-sm font-medium text-zinc-500 uppercase text-[10px] font-bold tracking-wider">
+          <label className="text-muted-foreground text-xs font-medium">
             Sampai
           </label>
-          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40 h-10 rounded-xl" />
+          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-9 w-40" />
         </div>
       </div>
 

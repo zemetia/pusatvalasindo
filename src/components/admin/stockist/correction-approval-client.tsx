@@ -138,12 +138,12 @@ export function CorrectionApprovalClient({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="bg-card flex flex-wrap items-end gap-3 rounded-xl border p-4 shadow-sm">
         {canSelectCompany && (
           <div className="grid gap-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">PT</label>
+            <label className="text-muted-foreground text-xs font-medium">PT</label>
             <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="h-10 w-52 rounded-xl">
+              <SelectTrigger className="h-9 w-52">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -159,16 +159,16 @@ export function CorrectionApprovalClient({
         )}
         {!canSelectCompany && (
           <div className="grid gap-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">PT</label>
-            <div className="flex h-10 items-center rounded-xl border px-3 text-sm font-medium">
+            <label className="text-muted-foreground text-xs font-medium">PT</label>
+            <div className="bg-muted/40 flex h-9 items-center rounded-md border px-3 text-sm font-medium">
               {companies.find((c) => c.id === defaultCompanyId)?.name ?? "-"}
             </div>
           </div>
         )}
         <div className="grid gap-1.5">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Status</label>
+          <label className="text-muted-foreground text-xs font-medium">Status</label>
           <Select value={status} onValueChange={(v) => setStatus(v as Status | typeof ALL)}>
-            <SelectTrigger className="h-10 w-44 rounded-xl">
+            <SelectTrigger className="h-9 w-44">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -180,9 +180,9 @@ export function CorrectionApprovalClient({
           </Select>
         </div>
         <div className="grid gap-1.5">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Jenis</label>
+          <label className="text-muted-foreground text-xs font-medium">Jenis</label>
           <Select value={target} onValueChange={(v) => setTarget(v as Target | typeof ALL)}>
-            <SelectTrigger className="h-10 w-44 rounded-xl">
+            <SelectTrigger className="h-9 w-44">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -194,12 +194,12 @@ export function CorrectionApprovalClient({
           </Select>
         </div>
         {status === "PENDING" && pendingCount > 0 && (
-          <Badge className="flex h-10 items-center bg-amber-500 px-3">
+          <Badge variant="warning">
             {pendingCount} menunggu persetujuan
           </Badge>
         )}
         {!canApprove && (
-          <Badge variant="outline" className="flex h-10 items-center px-3">
+          <Badge variant="outline">
             Read-only — hanya Owner / Super Admin yang bisa memutuskan
           </Badge>
         )}
@@ -256,7 +256,7 @@ export function CorrectionApprovalClient({
                     <div
                       className={cn(
                         "text-[10px]",
-                        delta > 0 && "text-emerald-600 dark:text-emerald-500",
+                        delta > 0 && "text-success",
                         delta < 0 && "text-destructive"
                       )}
                     >
@@ -280,7 +280,7 @@ export function CorrectionApprovalClient({
                           onReject={(note) => decide(r.id, "REJECT", note)}
                         />
                       ) : (
-                        <Badge variant="outline" className="border-amber-500/50 text-amber-700 dark:text-amber-400">
+                        <Badge variant="outline" className="border-warning/50 text-warning">
                           Menunggu
                         </Badge>
                       )
@@ -291,7 +291,7 @@ export function CorrectionApprovalClient({
                           className={cn(
                             "w-fit",
                             r.status === "APPROVED" &&
-                              "border-emerald-500/50 text-emerald-700 dark:text-emerald-400"
+                              "border-success/50 text-success"
                           )}
                         >
                           {r.status === "APPROVED" ? "Disetujui" : "Ditolak"}

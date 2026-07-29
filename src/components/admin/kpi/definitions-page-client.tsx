@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -15,19 +14,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IconTrash, IconPencil, IconSearch } from "@tabler/icons-react";
+import { SectionCard, EmptyState } from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
+import { IconTrash, IconPencil, IconListDetails } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import {
-  KpiDefinitionSheet,
-  KpiDefinitionRow,
-  KPI_TYPE_LABELS,
-} from "../kpi-definition-sheet";
+import { KpiDefinitionSheet, KpiDefinitionRow } from "../kpi-definition-sheet";
+import { SCORING_TYPE_LABELS, INPUT_SOURCE_LABELS } from "@/lib/kpi-utils";
 
-export function DefinitionsPageClient({
-  definitions,
-}: {
-  definitions: KpiDefinitionRow[];
-}) {
+/** Warna badge mengikuti arti: penalti = peringatan, reward/target = positif. */
+function scoringTone(scoringType: string) {
+  if (scoringType.startsWith("PENALTY") || scoringType === "TOLERANCE_LIMIT") return "warning";
+  if (scoringType === "REWARD_POINT") return "success";
+  return "info";
+}
+
+function sourceTone(source: string) {
+  if (source === "SELF") return "success";
+  if (source === "SYSTEM") return "secondary";
+  return "outline";
+}
+
+export function DefinitionsPageClient({ definitions }: { definitions: KpiDefinitionRow[] }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
 
@@ -35,17 +42,19 @@ export function DefinitionsPageClient({
     const q = search.toLowerCase();
     if (!q) return definitions;
     return definitions.filter((d) =>
-      [d.name, KPI_TYPE_LABELS[d.type] ?? d.type].some((v) =>
-        v?.toLowerCase().includes(q)
-      )
+      [
+        d.name,
+        d.code,
+        d.description ?? "",
+        SCORING_TYPE_LABELS[d.scoringType] ?? d.scoringType,
+        INPUT_SOURCE_LABELS[d.defaultInputSource] ?? d.defaultInputSource,
+      ].some((v) => v?.toLowerCase().includes(q))
     );
   }, [definitions, search]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/kpi-definitions/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/kpi-definitions/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal menghapus");
     },
@@ -56,107 +65,131 @@ export function DefinitionsPageClient({
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
-  };
-
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Daftarkan nama KPI dan tipenya. Setiap KPI dapat dipakai oleh banyak
-          jabatan.
-        </p>
-        <KpiDefinitionSheet trigger={<Button size="sm">+ Tambah</Button>} />
-      </div>
-
-      {definitions.length > 0 && (
-        <div className="relative max-w-xs">
-          <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-          <Input
-            type="search"
-            placeholder="Cari nama atau tipe KPI..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-      )}
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama KPI</TableHead>
-              <TableHead>Tipe</TableHead>
-              <TableHead className="text-right">Konfigurasi Jabatan</TableHead>
-              <TableHead />
+    <SectionCard
+      padded={false}
+      toolbar={
+        <>
+          {definitions.length > 0 && (
+            <>
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari nama, aturan, atau cara penilaian..."
+              />
+              <span className="text-muted-foreground text-xs">
+                {filtered.length} dari {definitions.length} KPI
+              </span>
+            </>
+          )}
+          <div className="ml-auto">
+            <KpiDefinitionSheet trigger={<Button size="sm">+ Tambah</Button>} />
+          </div>
+        </>
+      }
+    >
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>KPI</TableHead>
+            <TableHead>Cara Penilaian</TableHead>
+            <TableHead>Diisi Oleh</TableHead>
+            <TableHead className="text-right">Jabatan</TableHead>
+            <TableHead className="w-10" />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {definitions.length === 0 ? (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={5} className="p-0">
+                <EmptyState
+                  icon={<IconListDetails className="size-5" />}
+                  title="Belum ada definisi KPI"
+                  description="Tambahkan definisi pertama sebelum menyusun KPI per jabatan."
+                  action={<KpiDefinitionSheet trigger={<Button size="sm">+ Tambah</Button>} />}
+                />
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {definitions.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center text-muted-foreground py-10"
-                >
-                  Belum ada definisi KPI.
+          ) : filtered.length === 0 ? (
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={5} className="p-0">
+                <EmptyState
+                  title="Tidak ada hasil"
+                  description={`Tidak ada KPI yang cocok dengan "${search}".`}
+                />
+              </TableCell>
+            </TableRow>
+          ) : (
+            filtered.map((d) => (
+              <TableRow key={d.id} className={d.isActive ? undefined : "opacity-55"}>
+                <TableCell>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-medium">
+                      {d.name}
+                      {!d.isActive && (
+                        <span className="text-muted-foreground text-xs font-normal"> · nonaktif</span>
+                      )}
+                    </span>
+                    {d.description && (
+                      <span className="text-muted-foreground text-xs">{d.description}</span>
+                    )}
+                  </div>
                 </TableCell>
-              </TableRow>
-            ) : filtered.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                  Tidak ada hasil untuk &ldquo;{search}&rdquo;
+                <TableCell>
+                  <Badge variant={scoringTone(d.scoringType)}>
+                    {SCORING_TYPE_LABELS[d.scoringType] ?? d.scoringType}
+                  </Badge>
                 </TableCell>
-              </TableRow>
-            ) : (
-              filtered.map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell className="font-medium">{d.name}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={d.type === "EVENT" ? "destructive" : "default"}
-                    >
-                      {KPI_TYPE_LABELS[d.type] ?? d.type}
+                <TableCell>
+                  <div className="flex flex-col items-start gap-1">
+                    <Badge variant={sourceTone(d.defaultInputSource)}>
+                      {INPUT_SOURCE_LABELS[d.defaultInputSource] ?? d.defaultInputSource}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-sm">
-                    {d._count.roleKpis}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 justify-end">
-                      <KpiDefinitionSheet
-                        definition={d}
-                        trigger={
-                          <Button size="icon" variant="ghost">
-                            <IconPencil className="size-4" />
-                          </Button>
-                        }
-                      />
-                      <DeleteConfirmDialog
-                        trigger={
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            disabled={deleteMutation.isPending}
-                          >
-                            <IconTrash className="size-4" />
-                          </Button>
-                        }
-                        title={`Hapus definisi KPI "${d.name}"?`}
-                        description="Tindakan ini tidak dapat dibatalkan."
-                        onConfirm={() => handleDelete(d.id)}
-                        loading={deleteMutation.isPending}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+                    {d.defaultRequiresApproval && d.defaultInputSource === "SELF" && (
+                      <span className="text-muted-foreground text-[11px]">
+                        perlu persetujuan{d.defaultRequiresEvidence ? " + bukti" : ""}
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="tabular text-right">{d._count.roleKpis}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1 justify-end">
+                    <KpiDefinitionSheet
+                      definition={d}
+                      trigger={
+                        <Button size="icon" variant="ghost">
+                          <IconPencil className="size-4" />
+                        </Button>
+                      }
+                    />
+                    <DeleteConfirmDialog
+                      trigger={
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                          disabled={deleteMutation.isPending}
+                        >
+                          <IconTrash className="size-4" />
+                        </Button>
+                      }
+                      title={`Hapus definisi KPI "${d.name}"?`}
+                      description={
+                        d._count.roleKpis > 0
+                          ? `KPI ini dipakai ${d._count.roleKpis} jabatan. Menghapusnya ikut menghapus seluruh entri KPI yang tercatat di bawahnya.`
+                          : "Tindakan ini tidak dapat dibatalkan."
+                      }
+                      onConfirm={() => deleteMutation.mutate(d.id)}
+                      loading={deleteMutation.isPending}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </SectionCard>
   );
 }

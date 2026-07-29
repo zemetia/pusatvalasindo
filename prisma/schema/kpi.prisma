@@ -1,107 +1,256 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// KPI — penilaian kinerja karyawan.
+//
+// Modul ini SENGAJA independen dari payroll: keluarannya hanya SKOR (rasio
+// pencapaian tertimbang, 0..maxAchievement). Konversi skor menjadi bonus,
+// potongan, atau kewajiban masuk Sabtu ada di payroll.prisma
+// (PayrollIncentiveMatrix) dan dihitung oleh payroll.service.
+//
+// Struktur mengikuti sheet KPI perusahaan (docs/PVI Data/PUSAT KPI SEMUA_.xlsx):
+//   KpiDefinition  = katalog "Key Results" beserta cara menilainya
+//   RoleKpi        = penerapan satu KPI ke satu jabatan di satu PT + bobotnya
+//   KpiEntry       = catatan kejadian HARIAN, digulung ke minggu 1-4 lalu bulan
+//   KpiMonthlyResult = hasil akhir bulan yang sudah dibekukan
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Katalog KPI. Satu definisi bisa dipakai banyak jabatan/PT dengan bobot dan
+/// parameter berbeda — parameter angkanya ada di RoleKpi, bukan di sini.
 model KpiDefinition {
-  id        String    @id @default(cuid())
-  name      String
-  type      KpiType
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  logs      KpiLog[]
-  roleKpis  RoleKpi[]
+  id          String  @id @default(cuid())
+  /// Slug stabil (mis. "omzet", "complain-nasabah"). Dipakai seed & integrasi
+  /// modul lain supaya tidak bergantung pada nama yang bisa berubah.
+  code        String  @unique
+  name        String
+  /// Kolom "Objective" pada sheet KPI, mis. "Meningkatkan Pelayanan Kepada Customer".
+  objective   String?
+  /// Penjelasan aturan mainnya untuk karyawan, mis. "-3 poin setiap kesalahan hitung".
+  description String?
+
+  scoringType KpiScoringType
+  unit        KpiUnit        @default(OCCURRENCE)
+  direction   KpiDirection   @default(HIGHER_BETTER)
+
+  // ── Kebijakan pengisian (default; bisa ditimpa per jabatan di RoleKpi) ──
+  /// Siapa yang boleh mencatat. SELF = karyawan sendiri, SUPERVISOR = hanya
+  /// atasan/HR, SYSTEM = diisi otomatis modul lain (tidak bisa diinput manual).
+  defaultInputSource      KpiInputSource @default(SUPERVISOR)
+  /// Entri berstatus PENDING dulu dan baru dihitung setelah atasan menyetujui.
+  defaultRequiresApproval Boolean        @default(true)
+  /// Wajib melampirkan bukti (foto/tautan) saat mencatat.
+  defaultRequiresEvidence Boolean        @default(false)
+
+  /// Kunci kolektor otomatis untuk defaultInputSource = SYSTEM
+  /// (mis. "OMZET_BRANCH", "ATTENDANCE_LATE"). Null untuk KPI manual.
+  systemSourceKey String?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roleKpis RoleKpi[]
+
+  @@index([isActive])
 }
 
+/// Penerapan satu KpiDefinition ke satu jabatan di satu PT: bobot + seluruh
+/// angka penilaiannya. Semua entri KPI menunjuk ke baris ini (bukan ke
+/// definisi), sehingga dua KPI bertipe target pada jabatan yang sama punya
+/// kolam data masing-masing.
 model RoleKpi {
-  id           String        @id @default(cuid())
+  id           String  @id @default(cuid())
   companyId    String
-  kpiId        String
-  maxScore     Decimal
-  targetValue  Decimal?
-  threshold    Decimal?
-  weight       Decimal       @default(0)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
   customRoleId String?
-  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customRole   custom_role?  @relation(fields: [customRoleId], references: [id])
-  definition   KpiDefinition @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+  kpiId        String
+
+  /// Bobot 0..1. Total seluruh KPI aktif satu jabatan idealnya = 1.
+  weight Decimal @default(0)
+
+  // ── Parameter penilaian (yang dipakai tergantung scoringType) ──
+  /// TARGET_VALUE & REWARD_POINT: nilai/poin yang harus dicapai sebulan.
+  targetValue     Decimal?
+  /// PENALTY_POINT & TOLERANCE_LIMIT: poin awal sebelum dikurangi (default 100).
+  basePoint       Decimal?           @default(100)
+  /// Poin (atau persen untuk PENALTY_PERCENT) per satu kejadian.
+  pointPerUnit    Decimal?
+  /// TOLERANCE_LIMIT: ambang yang masih ditoleransi, mis. selisih kas 100.000.
+  toleranceLimit  Decimal?
+  /// Cakupan perhitungan toleransi.
+  toleranceScope  KpiToleranceScope? @default(DAILY)
+  /// Plafon pencapaian, 1.2 = maksimal 120%. Menahan satu KPI menutupi KPI lain.
+  maxAchievement  Decimal            @default(1.2)
+  /// Lantai pencapaian; 0 = nilai tidak pernah negatif.
+  minAchievement  Decimal            @default(0)
+
+  // ── Override kebijakan pengisian (null = ikut KpiDefinition) ──
+  inputSource      KpiInputSource?
+  requiresApproval Boolean?
+  requiresEvidence Boolean?
+
+  /// Parameter kolektor otomatis, dipakai hanya bila definisinya bersumber
+  /// SYSTEM. Bentuknya berbeda tiap systemSourceKey — lihat
+  /// src/lib/kpi-collectors.ts. Contoh untuk ATTENDANCE_CLOSING:
+  /// `{ "deadline": "05:15", "graceMinutes": 60 }`. Disimpan per jabatan
+  /// karena batas jam closing berbeda antar PT (PVI 05.15, PTU 05.00).
+  systemConfig Json?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole custom_role?  @relation(fields: [customRoleId], references: [id])
+  definition KpiDefinition @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+  entries    KpiEntry[]
 
   @@unique([companyId, customRoleId, kpiId])
   @@index([companyId, customRoleId])
 }
 
-model KpiLog {
-  id         String        @id @default(cuid())
+/// Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai
+/// tabel ini: `quantity` berarti jumlah kejadian (penalti/reward), nilai rupiah
+/// (omzet), atau besaran selisih (toleransi kas) sesuai unit definisinya.
+/// Menggantikan KpiLog + Revenue yang lama.
+model KpiEntry {
+  id         String @id @default(cuid())
   employeeId String
-  kpiId      String
-  value      Decimal
-  note       String?
-  createdAt  DateTime      @default(now())
-  employee   user          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  definition KpiDefinition @relation(fields: [kpiId], references: [id])
+  roleKpiId  String
 
-  @@index([employeeId, createdAt])
-  @@index([kpiId])
+  /// Tanggal kejadian sebenarnya — bukan tanggal input. Periode & minggu
+  /// diturunkan darinya saat menyimpan agar bisa difilter tanpa hitung ulang.
+  occurredAt  DateTime @db.Date
+  periodYear  Int
+  periodMonth Int
+  /// Minggu ke-1..5 dalam bulan (mengikuti kolom "week 1-4" di sheet KPI).
+  weekOfMonth Int
+
+  quantity    Decimal
+  note        String?
+  evidenceUrl String?
+
+  source KpiInputSource
+  /// PENDING hanya terjadi bila KPI-nya menuntut persetujuan; entri dari
+  /// atasan/sistem langsung APPROVED. Hanya APPROVED yang masuk perhitungan.
+  status KpiEntryStatus @default(APPROVED)
+
+  /// Null berarti entri dihasilkan kolektor otomatis — tidak ada manusia yang
+  /// mencatatnya, dan mengarang penulis akan merusak jejak audit.
+  createdById  String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNote   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee   user    @relation("KpiEntryEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+  createdBy  user?   @relation("KpiEntryCreatedBy", fields: [createdById], references: [id])
+  reviewedBy user?   @relation("KpiEntryReviewedBy", fields: [reviewedById], references: [id])
+  roleKpi    RoleKpi @relation(fields: [roleKpiId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, periodYear, periodMonth])
+  @@index([roleKpiId, periodYear, periodMonth])
+  @@index([status, employeeId])
+  @@index([occurredAt])
 }
 
-model Revenue {
-  id         String   @id @default(cuid())
+/// Status periode penilaian per karyawan. Setelah LOCKED, entri periode itu
+/// tidak bisa ditambah/diubah/dihapus sehingga skor yang sudah dipakai payroll
+/// tidak berubah di belakang layar.
+model KpiPeriod {
+  id         String          @id @default(cuid())
   employeeId String
-  amount     Decimal
-  date       DateTime @db.Date
+  month      Int
+  year       Int
+  status     KpiPeriodStatus @default(OPEN)
+  lockedAt   DateTime?
+  lockedById String?
   note       String?
-  createdAt  DateTime @default(now())
-  employee   user     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  @@index([employeeId, date])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee user  @relation("KpiPeriodEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+  lockedBy user? @relation("KpiPeriodLockedBy", fields: [lockedById], references: [id])
+
+  @@unique([employeeId, month, year])
+  @@index([year, month, status])
 }
 
-model BonusMatrix {
-  id           String       @id @default(cuid())
-  companyId    String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  customRoleId String?
-  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customRole   custom_role? @relation(fields: [customRoleId], references: [id])
-  tiers        BonusTier[]
-
-  @@unique([companyId, customRoleId])
-}
-
-model BonusTier {
-  id             String          @id @default(cuid())
-  matrixId       String
-  minScore       Decimal
-  maxScore       Decimal
-  resultType     BonusResultType
-  amount         Decimal?
-  isTopPerformer Boolean         @default(false)
-  matrix         BonusMatrix     @relation(fields: [matrixId], references: [id], onDelete: Cascade)
-}
-
+/// Hasil perhitungan sebulan. Tidak menyimpan nominal bonus/denda — itu urusan
+/// payroll. `totalScore` adalah rasio tertimbang (1 = 100% target tercapai).
 model KpiMonthlyResult {
-  id            String           @id @default(cuid())
+  id            String   @id @default(cuid())
   employeeId    String
   month         Int
   year          Int
   totalScore    Decimal
-  bonusAmount   Decimal?
-  bonusResult   BonusResultType?
+  /// A/B/C/D hasil pemetaan totalScore, disimpan agar riwayat tidak berubah
+  /// kalau ambang grade suatu saat disetel ulang.
+  grade         String   @default("D")
   breakdownJson Json
-  calculatedAt  DateTime         @default(now())
-  employee      user             @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  calculatedAt  DateTime @default(now())
+
+  employee user @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   @@unique([employeeId, month, year])
   @@index([employeeId, year, month])
 }
 
-enum KpiType {
-  EVENT
-  TARGET
+/// Cara sebuah KPI dinilai. Setiap varian punya rumusnya sendiri di
+/// src/lib/kpi-scoring.ts.
+enum KpiScoringType {
+  /// Realisasi dibagi target. Untuk omzet, net profit margin, jumlah briefing.
+  TARGET_VALUE
+  /// Mulai dari basePoint, tiap kejadian mengurangi pointPerUnit.
+  /// Mis. "-3 poin setiap kesalahan hitung".
+  PENALTY_POINT
+  /// Mulai dari 0, tiap kejadian menambah pointPerUnit, dibagi targetValue.
+  /// Mis. "1 Google review = +2 poin, target 50 poin".
+  REWARD_POINT
+  /// Mulai 100%, tiap kejadian memotong pointPerUnit persen.
+  /// Mis. "-5% setiap kali telat update kurs".
+  PENALTY_PERCENT
+  /// Ada ambang yang ditoleransi per hari/minggu/bulan; yang melampaui kena
+  /// pointPerUnit. Mis. "selisih kas maks 100rb/hari, lebih dari itu -4 poin".
+  TOLERANCE_LIMIT
+  /// Rasio hari patuh terhadap hari tercatat. Untuk checklist harian
+  /// (quantity 1 = patuh, 0 = tidak).
+  BOOLEAN_DAILY
 }
 
-enum BonusResultType {
-  BONUS_CASH
-  SAFE_ZONE
-  PENALTY_SATURDAY
-  PENALTY_DEDUCTION
-  TOP_PERFORMER
+enum KpiUnit {
+  OCCURRENCE
+  CURRENCY
+  POINT
+  PERCENT
+  DAY
+  PERSON
+}
+
+enum KpiDirection {
+  HIGHER_BETTER
+  LOWER_BETTER
+}
+
+enum KpiInputSource {
+  SELF
+  SUPERVISOR
+  SYSTEM
+}
+
+enum KpiEntryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum KpiPeriodStatus {
+  OPEN
+  LOCKED
+}
+
+enum KpiToleranceScope {
+  DAILY
+  WEEKLY
+  MONTHLY
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PageHeader } from "@/components/admin/page-header";
+import {
+  PageShell,
+  PageHeader,
+  SectionCard,
+  EmptyState,
+} from "@/components/admin/page-shell";
+import { SearchInput } from "@/components/admin/search-input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -114,7 +120,7 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
   }
 
   return (
-    <div className="flex flex-col gap-6 px-4 lg:px-6">
+    <PageShell>
       <PageHeader
         title="Patokan Harga"
         description="Aturan penyesuaian harga jual & beli Pusat Valas Indo di atas kurs SmartDeal."
@@ -132,17 +138,22 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
         </AlertDescription>
       </Alert>
 
-      <div className="flex flex-col gap-4">
-        <Input
-          type="search"
-          placeholder="Cari kode atau nama mata uang..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
-        />
-
-        <div className="rounded-md border">
-          <Table>
+      <SectionCard
+        padded={false}
+        toolbar={
+          <>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari kode atau nama mata uang..."
+            />
+            <span className="text-muted-foreground ml-auto text-xs">
+              {filtered.length} dari {initialRows.length} mata uang
+            </span>
+          </>
+        }
+      >
+        <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Mata Uang</TableHead>
@@ -153,9 +164,12 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={canManage ? 4 : 3} className="text-center py-8 text-muted-foreground">
-                    Tidak ada hasil untuk &ldquo;{search}&rdquo;
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={canManage ? 4 : 3} className="p-0">
+                    <EmptyState
+                      title="Tidak ada hasil"
+                      description={`Tidak ada mata uang yang cocok dengan "${search}".`}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -166,8 +180,10 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
                     <TableRow key={r.code}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="font-mono">{r.code}</Badge>
-                          <span className="text-sm text-muted-foreground truncate">{r.name}</span>
+                          <Badge variant="outline" className="font-mono">
+                            {r.code}
+                          </Badge>
+                          <span className="text-muted-foreground truncate">{r.name}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -176,7 +192,7 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
                           onChange={(e) => updateField(r.code, "sellAdjustment", e.target.value)}
                           placeholder="mis. +5"
                           disabled={!canManage}
-                          className="max-w-32 font-mono"
+                          className="h-8 max-w-32 font-mono"
                         />
                       </TableCell>
                       <TableCell>
@@ -185,7 +201,7 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
                           onChange={(e) => updateField(r.code, "buyAdjustment", e.target.value)}
                           placeholder="mis. c5"
                           disabled={!canManage}
-                          className="max-w-32 font-mono"
+                          className="h-8 max-w-32 font-mono"
                         />
                       </TableCell>
                       {canManage && (
@@ -196,18 +212,19 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
                               variant={dirty ? "default" : "ghost"}
                               disabled={!dirty || state?.saving}
                               onClick={() => saveRow(r.code)}
+                              title={dirty ? "Simpan perubahan" : "Tersimpan"}
                             >
                               {state?.saving ? (
                                 "..."
                               ) : dirty ? (
                                 <IconDeviceFloppy className="size-4" />
                               ) : (
-                                <IconCheck className="size-4 text-emerald-600" />
+                                <IconCheck className="text-success size-4" />
                               )}
                             </Button>
                           </div>
                           {state?.error && (
-                            <p className="text-xs text-destructive mt-1">{state.error}</p>
+                            <p className="text-destructive mt-1 text-xs">{state.error}</p>
                           )}
                         </TableCell>
                       )}
@@ -216,9 +233,8 @@ export function PatokanHargaPageClient({ initialRows, canManage }: PatokanHargaP
                 })
               )}
             </TableBody>
-          </Table>
-        </div>
-      </div>
-    </div>
+        </Table>
+      </SectionCard>
+    </PageShell>
   );
 }

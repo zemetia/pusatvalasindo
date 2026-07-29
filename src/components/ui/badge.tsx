@@ -17,6 +17,18 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        // Varian tonal (latar lembut + teks pekat) — lebih terbaca daripada badge
+        // solid saat muncul berulang di dalam tabel.
+        soft:
+          "border-transparent bg-muted text-muted-foreground [a&]:hover:bg-muted/70",
+        success:
+          "border-success/20 bg-success-muted text-success [a&]:hover:bg-success-muted/70 dark:bg-success/15 dark:text-success",
+        warning:
+          "border-warning/25 bg-warning-muted text-warning-foreground [a&]:hover:bg-warning-muted/70 dark:bg-warning/15 dark:text-warning",
+        info:
+          "border-info/20 bg-info-muted text-info [a&]:hover:bg-info-muted/70 dark:bg-info/15 dark:text-info",
+        danger:
+          "border-destructive/20 bg-destructive/10 text-destructive [a&]:hover:bg-destructive/15",
       },
     },
     defaultVariants: {
@@ -42,5 +54,7 @@ function Badge({
     />
   )
 }
+
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
 
 export { Badge, badgeVariants }
