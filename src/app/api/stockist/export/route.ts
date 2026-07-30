@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess, stockistService } from "@/backend/services/stockist.service";
+import { authorize } from "@/backend/helpers/authz";
+import { stockistService } from "@/backend/services/stockist.service";
 import { kasPocketRepository } from "@/backend/repositories/kas-pocket.repository";
 import { kasDailyEntryRepository } from "@/backend/repositories/kas-daily-entry.repository";
 
@@ -28,7 +27,7 @@ const THIN_BORDER = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
 // Bank di-export terpisah lewat /api/bank-harian/export (halaman Bank berdiri sendiri).
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_VIEW);
+    const caller = await authorize("stockist.daily", "view");
     if (caller instanceof NextResponse) return caller;
 
     const companyId = req.nextUrl.searchParams.get("companyId");
@@ -39,7 +38,7 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    assertCompanyAccess(caller, companyId);
+    caller.assertCompany(companyId);
 
     const date = new Date(dateStr);
     const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });

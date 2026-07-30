@@ -3,8 +3,7 @@ import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -16,9 +15,6 @@ const THIN_BORDER = { style: "thin" as const, color: { argb: "FFD1D5DB" } };
 // Export saldo bank harian (1 sheet) untuk 1 PT pada tanggal terpilih.
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.BANK_VIEW);
-    if (caller instanceof NextResponse) return caller;
-
     const companyId = req.nextUrl.searchParams.get("companyId");
     const dateStr = req.nextUrl.searchParams.get("date");
     if (!companyId || !dateStr || !DATE_RE.test(dateStr)) {
@@ -27,9 +23,10 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (caller.companyId && caller.companyId !== companyId) {
-      return NextResponse.json({ error: "Tidak punya akses ke PT ini" }, { status: 403 });
-    }
+    // PT yang diminta diuji terhadap scope baca — sama seperti GET /api/bank-harian,
+    // supaya export tidak jadi pintu belakang untuk PT di luar wewenang.
+    const authz = await authorize("bank.daily", "view", { companyId });
+    if (authz instanceof NextResponse) return authz;
 
     const date = new Date(dateStr);
     const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });

@@ -1,44 +1,51 @@
 import prisma from "@/lib/prisma";
 import { kpiService } from "./kpi.service";
 import { payrollIncentiveService } from "./payroll-incentive.service";
+import { salaryComponentService } from "./salary-component.service";
 import { NotFoundError, ForbiddenError } from "@/backend/errors/app-error";
 import type { KpiBreakdown } from "@/lib/kpi-utils";
-import { can, PERMISSIONS } from "@/lib/permissions";
-import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
-
-const WORK_START_HOUR = 17;
-const WORK_START_MINUTE = 40;
+import { allows, allowsCompany, type AuthzSubject } from "@/lib/authz/resolve";
+import {
+  WORK_START_HOUR,
+  WORK_START_MINUTE,
+  jakartaMinutesOfDay,
+} from "@/lib/attendance-rules";
 
 /**
- * Payroll visibility per caller's permission tier:
- * - PAYROLL_VIEW_ALL: any employee.
- * - PAYROLL_VIEW_COMPANY: only employees in payrollCompanyIds (falls back to
- *   the caller's own company if that list is empty).
- * - PAYROLL_VIEW_OWN: only the caller's own record.
+ * Boleh melihat gaji seorang karyawan? Predikat, bukan guard — supaya halaman
+ * bisa menyembunyikan bagian gaji tanpa menangkap exception, dengan aturan yang
+ * tetap tinggal di satu tempat.
  *
- * Predikat (bukan guard) supaya halaman bisa memutuskan menyembunyikan bagian
- * gaji tanpa menangkap exception — aturannya tetap satu tempat.
+ * Dua jalur, sesuai matriks izin:
+ *   • `payroll.manage` di PT karyawan itu — wewenang mengelola gaji orang lain,
+ *     di-scope per PT.
+ *   • `payroll.self` — gaji sendiri.
+ *
+ * Daftar `custom_role.payrollCompanyIds` yang lama tidak dipakai lagi: scope
+ * per-PT sekarang berasal dari matriks izin, bukan kolom terpisah.
  */
 export function canViewPayrollOf(
-  caller: AdminCaller,
+  subject: AuthzSubject,
+  callerId: string,
   targetUserId: string,
   targetCompanyId: string | null
 ): boolean {
-  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL)) return true;
-
-  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
-    const allowedCompanyIds = caller.payrollCompanyIds.length > 0 ? caller.payrollCompanyIds : [caller.companyId];
-    return Boolean(targetCompanyId && allowedCompanyIds.includes(targetCompanyId));
-  }
-
-  return can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN) && caller.id === targetUserId;
+  if (allowsCompany(subject, "payroll.manage", "view", targetCompanyId)) return true;
+  return callerId === targetUserId && allows(subject, "payroll.self", "view");
 }
 
 /** Versi guard dari `canViewPayrollOf` — dipakai route & service. */
-export function assertPayrollAccess(caller: AdminCaller, targetUserId: string, targetCompanyId: string | null) {
-  if (canViewPayrollOf(caller, targetUserId, targetCompanyId)) return;
+export function assertPayrollAccess(
+  subject: AuthzSubject,
+  callerId: string,
+  targetUserId: string,
+  targetCompanyId: string | null
+) {
+  if (canViewPayrollOf(subject, callerId, targetUserId, targetCompanyId)) return;
 
-  if (can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY)) {
+  // Pesan dibedakan supaya admin PT tahu bahwa masalahnya PT-nya, bukan
+  // haknya atas modul gaji secara keseluruhan.
+  if (allows(subject, "payroll.manage", "view")) {
     throw new ForbiddenError("Tidak punya akses ke gaji PT ini");
   }
   throw new ForbiddenError("Tidak punya akses ke data gaji ini");
@@ -53,9 +60,10 @@ export const payrollService = {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 1);
 
-    // employee, KPI result, and attendances only depend on employeeId/date range,
-    // not on each other — fetch them concurrently instead of round-tripping serially
-    const [employee, kpiResult, attendances] = await Promise.all([
+    // employee, KPI result, attendances, and salary components only depend on
+    // employeeId/date range, not on each other — fetch them concurrently
+    // instead of round-tripping serially
+    const [employee, kpiResult, attendances, extraComponents] = await Promise.all([
       prisma.user.findUnique({
         where: { id: employeeId },
         select: {
@@ -73,6 +81,7 @@ export const payrollService = {
       prisma.attendance.findMany({
         where: { userId: employeeId, date: { gte: startDate, lt: endDate } },
       }),
+      salaryComponentService.listForUser(employeeId),
     ]);
 
     if (!employee) throw new NotFoundError("Karyawan tidak ditemukan");
@@ -81,8 +90,25 @@ export const payrollService = {
     const meal = Number(employee.mealAllowance ?? 0);
     const transport = Number(employee.transportAllowance ?? 0);
     const position = Number(employee.positionAllowance ?? 0);
+    // BPJS di sini adalah alokasi perusahaan untuk karyawan, jadi MENAMBAH gaji
+    // — bukan potongan iuran karyawan.
     const bpjs = Number(employee.bpjsKesehatan ?? 0);
-    const totalGrossFixed = base + meal + transport + position + bpjs;
+
+    // Komponen tambahan (tunjangan pulsa, potongan koperasi, dst.). Semuanya
+    // nominal tetap per bulan, sama seperti kolom tetap di atas. Komponen yang
+    // induknya sudah dinonaktifkan tidak ikut dihitung, tapi nilainya tetap
+    // tersimpan supaya aktif kembali tanpa harus diisi ulang.
+    const activeComponents = extraComponents.filter((c) => c.isActive);
+    const extraAllowances = activeComponents.filter((c) => c.kind === "ALLOWANCE");
+    const extraDeductionItems = activeComponents.filter((c) => c.kind === "DEDUCTION");
+    const totalExtraAllowance = extraAllowances.reduce((sum, c) => sum + c.amount, 0);
+    const totalExtraDeduction = extraDeductionItems.reduce((sum, c) => sum + c.amount, 0);
+
+    // Tunjangan tambahan ikut masuk gaji kotor, jadi ikut mengangkat `dailyRate`
+    // — potongan absen/izin memang dihitung dari gaji kotor per hari, bukan dari
+    // gaji pokok saja. Potongan komponen TIDAK ikut, ia langsung mengurangi THP.
+    const totalGrossFixed =
+      base + meal + transport + position + bpjs + totalExtraAllowance;
     const dailyRate = totalGrossFixed / 24;
 
     let totalLateDeduction = 0;
@@ -90,8 +116,8 @@ export const payrollService = {
 
     for (const att of attendances) {
       if (att.status === "LATE" && att.checkIn) {
-        const checkIn = new Date(att.checkIn);
-        const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+        // Menit dihitung menurut WIB, sama seperti saat status LATE ditetapkan.
+        const checkInMinutes = jakartaMinutesOfDay(new Date(att.checkIn));
         const targetMinutes = WORK_START_HOUR * 60 + WORK_START_MINUTE;
         if (checkInMinutes > targetMinutes) {
           totalLateDeduction += (checkInMinutes - targetMinutes) * 1_000;
@@ -113,7 +139,8 @@ export const payrollService = {
     // membandingkan karyawan ini dengan rekan sejabatannya.
     const incentive = await payrollIncentiveService.resolveForEmployee(employeeId, month, year);
 
-    const totalDeductions = totalLateDeduction + totalAbsenceDeduction;
+    const totalDeductions =
+      totalLateDeduction + totalAbsenceDeduction + totalExtraDeduction;
     const takeHomePay = totalGrossFixed - totalDeductions + incentive.netAmount;
 
     return {
@@ -128,6 +155,8 @@ export const payrollService = {
         transportAllowance: transport,
         positionAllowance: position,
         bpjsKesehatan: bpjs,
+        extraAllowances: extraAllowances.map((c) => ({ name: c.name, amount: c.amount })),
+        totalExtraAllowance,
         totalGrossFixed,
         dailyRate,
       },
@@ -141,6 +170,8 @@ export const payrollService = {
       deductions: {
         late: totalLateDeduction,
         absence: totalAbsenceDeduction,
+        components: extraDeductionItems.map((c) => ({ name: c.name, amount: c.amount })),
+        totalComponents: totalExtraDeduction,
         total: totalDeductions,
       },
       final: {

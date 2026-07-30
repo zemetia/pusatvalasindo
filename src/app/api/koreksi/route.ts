@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
+import { isGlobalRole } from "@/lib/permissions";
 import { correctionService } from "@/backend/services/correction.service";
 import type { CorrectionStatus, CorrectionTargetType } from "@src/generated/prisma/client";
 
@@ -18,7 +18,7 @@ const PAGE_SIZE = 50;
 // companyId yang dikirim.
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.CORRECTION_VIEW);
+    const caller = await authorize("correction", "view");
     if (caller instanceof NextResponse) return caller;
 
     const sp = req.nextUrl.searchParams;
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
           decisionNote: r.decisionNote,
         })),
         nextCursor: hasMore ? items[items.length - 1].id : null,
-        canApprove: caller.permissions.includes(PERMISSIONS.CORRECTION_APPROVE),
+        canApprove: caller.can("correction", "write"),
       })
     );
   } catch (e) {

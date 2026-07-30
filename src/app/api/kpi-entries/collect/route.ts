@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { kpiCollectorService } from "@/backend/services/kpi-collector.service";
-import { ok } from "@/backend/helpers/api-response";
+import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
-import { PERMISSIONS } from "@/lib/permissions";
+import { getAuthzCaller } from "@/backend/helpers/authz";
+import { kpiService } from "@/backend/services/kpi.service";
 
 /**
  * Tarik ulang KPI yang bersumber dari modul lain (absensi) menjadi entri KPI.
@@ -28,12 +28,17 @@ type Body = z.infer<typeof schema>;
 export const POST = withValidation(schema)(
   async (_req: NextRequest, ctx: { body: Body }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
-      if (caller instanceof NextResponse) return caller;
+      // Menarik ulang entri = menulis data KPI orang lain, jadi gerbangnya
+      // scope TULIS `kpi.review`, bukan sekadar "boleh melihat KPI semua orang".
+      const caller = await getAuthzCaller();
+      if (!caller) {
+        return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+      }
 
       const { employeeId, month, year } = ctx.body;
 
       if (employeeId) {
+        await kpiService.assertCanReview(caller, employeeId);
         const result = await kpiCollectorService.collectForEmployee(employeeId, month, year);
         const total = result.collected.reduce((sum, c) => sum + c.entryCount, 0);
         return NextResponse.json(
@@ -46,11 +51,13 @@ export const POST = withValidation(schema)(
         );
       }
 
-      // Pemanggil yang terikat satu PT hanya boleh menarik karyawan PT-nya.
-      const companyId = caller.companyId;
-      if (companyId) assertCompanyAccess(caller, companyId);
+      // Yang ditarik adalah karyawan PT-PT dalam scope TULIS si pemanggil —
+      // bukan PT-nya sendiri. Dengan begitu jabatan yang diberi wewenang atas
+      // PT A dan PT B menarik keduanya, dan yang hanya PT A tidak menyentuh B.
+      // `null` berarti seluruh PT (Owner/Super Admin).
+      const companyIds = kpiService.reviewableCompanyIds(caller);
 
-      const results = await kpiCollectorService.collectForPeriod(month, year, { companyId });
+      const results = await kpiCollectorService.collectForPeriod(month, year, { companyIds });
       const totalEntries = results.reduce(
         (sum, r) => sum + r.collected.reduce((s, c) => s + c.entryCount, 0),
         0

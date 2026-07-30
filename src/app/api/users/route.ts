@@ -1,41 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import { userService } from "@/backend/services/user.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
-import { ForbiddenError } from "@/backend/errors/app-error";
+import { authorize } from "@/backend/helpers/authz";
+import { ForbiddenError, NotFoundError } from "@/backend/errors/app-error";
 
 export async function GET(req: NextRequest) {
-  const caller = await requirePermission(PERMISSIONS.USERS_VIEW);
-  if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("users", "view");
+  if (authz instanceof NextResponse) return authz;
 
   try {
     const onlyActive = req.nextUrl.searchParams.get("active") === "true";
     const requestedBranchId = req.nextUrl.searchParams.get("branchId");
 
-    // Branch/company-scoped callers can't widen their view via the query
-    // string — only globally-scoped roles (no branchId/companyId on their
-    // own user record) may request any branch or omit the filter entirely.
-    if (caller.branchId) {
-      if (requestedBranchId && requestedBranchId !== caller.branchId) {
-        throw new ForbiddenError("Tidak punya akses ke cabang lain");
-      }
-      const users = await userService.getByBranch(caller.branchId, onlyActive);
-      return NextResponse.json(ok(users));
-    }
-
+    // Filter cabang lewat query string tidak boleh dipakai untuk melebarkan
+    // jangkauan: cabang yang diminta harus berada di dalam scope PT si
+    // pemanggil. Tanpa parameter ini, daftarnya sudah otomatis tersaring scope.
     if (requestedBranchId) {
-      const users = await userService.getByBranch(requestedBranchId, onlyActive);
-      return NextResponse.json(ok(users));
+      const branch = await prisma.branch.findUnique({
+        where: { id: requestedBranchId },
+        select: { companyId: true },
+      });
+      if (!branch) throw new NotFoundError("Cabang tidak ditemukan");
+      if (!authz.canView(branch.companyId)) {
+        throw new ForbiddenError("Tidak punya akses ke cabang ini");
+      }
     }
 
-    if (caller.companyId) {
-      const users = await userService.getByCompany(caller.companyId, onlyActive);
-      return NextResponse.json(ok(users));
-    }
-
-    const users = await userService.getAll(onlyActive);
+    const users = await userService.getScoped({
+      companyIds: authz.companyIds,
+      branchId: requestedBranchId,
+      onlyActive,
+    });
     return NextResponse.json(ok(users));
   } catch (e) {
     return handleError(e);

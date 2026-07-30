@@ -71,14 +71,19 @@ function toDate(d: Date) {
 interface Props {
   companies: Company[]
   defaultCompanyId: string | null
-  canEditPastDate: boolean
+  /**
+   * PT yang boleh diubah angka tanggal lampaunya; `null` berarti semua PT.
+   * Sengaja daftar, bukan satu boolean: kemampuannya di-scope per PT dan
+   * halaman ini bisa berpindah PT.
+   */
+  backdateCompanyIds: string[] | null
   canSelectCompany: boolean
 }
 
 export function StockistHeadConfirmationClient({
   companies,
   defaultCompanyId,
-  canEditPastDate,
+  backdateCompanyIds,
   canSelectCompany,
 }: Props) {
   const [companyId, setCompanyId] = useState(defaultCompanyId ?? companies[0]?.id ?? "")
@@ -90,6 +95,11 @@ export function StockistHeadConfirmationClient({
   const [bank, setBank] = useState<IdrState | null>(null)
   const [companyTotal, setCompanyTotal] = useState(0)
   const [exporting, setExporting] = useState(false)
+
+  // Hak ubah tanggal lampau mengikuti PT yang sedang dipilih. Server tetap
+  // menegakkan hal yang sama di API — ini hanya agar UI-nya jujur.
+  const canEditPastDate =
+    !!companyId && (backdateCompanyIds === null || backdateCompanyIds.includes(companyId))
 
   const isPastDate = date < toDate(new Date())
   const locked = isPastDate && !canEditPastDate

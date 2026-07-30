@@ -2,13 +2,17 @@ import { notFound } from "next/navigation";
 import { PageShell, ErrorPanel } from "@/components/admin/page-shell";
 import prisma from "@/lib/prisma";
 import { RoleKpiDetailClient } from "@/components/admin/kpi/role-kpi-detail-client";
+import { requireResource } from "@/backend/helpers/authz";
 
 interface PageProps {
-  params: Promise<{ companyId: string; roleName: string }>;
+  params: Promise<{ locale: string; companyId: string; roleName: string }>;
 }
 
 export default async function KpiDetailPage({ params }: PageProps) {
-  const { companyId, roleName } = await params;
+  const { locale, companyId, roleName } = await params;
+  // Halaman detail bobot KPI satu jabatan — bagian dari Konfigurasi KPI, dan
+  // sebelumnya sama sekali tidak dijaga di server.
+  await requireResource("kpi.config", "view", locale);
 
   if (!roleName.startsWith("custom_")) {
     notFound();

@@ -27,6 +27,7 @@ model Company {
   createdAt                 DateTime                        @default(now())
   updatedAt                 DateTime                        @updatedAt
   incentiveMatrices         PayrollIncentiveMatrix[]
+  salaryComponents          SalaryComponent[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
   custom_roles              custom_role[]
@@ -53,6 +54,54 @@ model Currency {
   bankAccounts   BankAccount[]
   stocks         CurrencyStock[]
   stockMutations StockMutation[]
+  price          CurrencyPrice?
+}
+
+// Harga Valas: harga beli & jual yang benar-benar dipakai Pusat Valas Indo hari
+// ini, diisi manual per mata uang. Beda dengan PriceBenchmark yang menyimpan
+// *aturan* penyesuaian di atas kurs SmartDeal — di sini yang disimpan adalah
+// angka rupiahnya langsung, jadi harga tetap ada meski scraper SmartDeal mati.
+// Global (bukan per cabang/PT), sama seperti PriceBenchmark: satu daftar harga
+// yang berlaku untuk seluruh perusahaan.
+model CurrencyPrice {
+  id           String      @id @default(cuid())
+  currencyId   String      @unique
+  // Harga kita MEMBELI valas dari nasabah, dalam IDR per 1 unit mata uang.
+  buyPrice     Decimal     @db.Decimal(18, 4)
+  // Harga kita MENJUAL valas ke nasabah, dalam IDR per 1 unit mata uang.
+  sellPrice    Decimal     @db.Decimal(18, 4)
+  // Dari mana angka yang sekarang berasal. Dipakai UI untuk menandai baris dan
+  // untuk menyusun ringkasan hasil sync.
+  source       PriceSource @default(MANUAL)
+  // Gembok baris. SATU-SATUNYA hal yang melindungi harga dari ditimpa sync —
+  // mengedit manual saja tidak melindungi (lihat currency-price-sync.service).
+  isLocked     Boolean     @default(false)
+  lastSyncedAt DateTime?
+  note         String?
+  updatedBy    String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  currency     Currency    @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+}
+
+enum PriceSource {
+  MANUAL
+  SYNCED
+}
+
+// Saklar auto-sync Harga Valas. Tabel satu baris (`id` selalu "singleton"):
+// konsumennya cuma satu dan field-nya jelas, jadi tidak dibuat tabel key-value
+// generik yang nilainya tak bertipe.
+model CurrencyPriceSyncSetting {
+  id             String   @id @default("singleton")
+  // Saat true, setiap kurs SmartDeal baru yang masuk langsung disalurkan ke
+  // Harga Valas lewat aturan Patokan Harga.
+  autoSync       Boolean  @default(false)
+  lastRunAt      DateTime?
+  /// Ringkasan sekali jalan, mis. "24 diperbarui · 3 terkunci · 1 dilewati".
+  lastRunSummary String?
+  updatedBy      String?
+  updatedAt      DateTime @updatedAt
 }
 
 // Patokan Harga: manual sell/buy adjustment rules layered on top of the live

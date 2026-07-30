@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { UnauthorizedError } from "@/backend/errors/app-error";
 

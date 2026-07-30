@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
-import { ZodSchema } from "zod";
+import type { NextRequest } from "next/server";
+import type { ZodSchema } from "zod";
 import { ValidationError } from "@/backend/errors/app-error";
 
 type HandlerWithBody<C, T> = (

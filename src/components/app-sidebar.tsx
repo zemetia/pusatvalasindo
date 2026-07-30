@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   IconBuilding,
   IconBuildingBank,
+  IconBuildingSkyscraper,
   IconCoin,
   IconDashboard,
   IconDatabase,
@@ -24,6 +25,8 @@ import {
   IconChartHistogram,
   IconAdjustmentsHorizontal,
   IconReportMoney,
+  IconCurrencyDollar,
+  IconCoins,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -39,7 +42,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { PERMISSIONS, can, isAdminRole, isGlobalRole } from "@/lib/permissions";
+import { allows, type AuthzSubject } from "@/lib/authz/resolve";
 
 interface NavItem {
   title: string;
@@ -52,14 +55,22 @@ type SidebarUser = { name: string; email: string };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: SidebarUser;
-  permissions: string[];
-  roleName: string;
+  /**
+   * Subjek izin pemanggil. Sidebar memakai resource registry yang SAMA dengan
+   * page guard dan API guard, jadi menu yang tampil tidak bisa melenceng dari
+   * halaman yang benar-benar boleh dibuka.
+   */
+  subject: AuthzSubject;
 }
 
-export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, subject, ...props }: AppSidebarProps) {
   if (!user) {
     throw new Error("AppSidebar requires a user but received undefined.");
   }
+
+  /** Tampil kalau jabatan ini boleh membuka resource-nya, apa pun PT-nya. */
+  const show = (resource: string, action: "view" | "write" = "view") =>
+    allows(subject, resource, action);
 
   const navMain: NavItem[] = [
     {
@@ -72,7 +83,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   // ── Aktivitas Saya ────────────────────────────────────────────────────────
   const navSelf: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.ATTENDANCE_VIEW_OWN)) {
+  if (show("attendance.self")) {
     navSelf.push({
       title: "Presensi",
       url: "/dashboard/attendance",
@@ -80,7 +91,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.KPI_FILL_OWN)) {
+  if (show("kpi.self")) {
     navSelf.push({
       title: "Input KPI Saya",
       url: "/dashboard/kpi/self",
@@ -91,13 +102,28 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   // ── KPI ────────────────────────────────────────────────────────────────────
   const navKPI: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.KPI_MANAGE)) {
+  // Presensi karyawan duduk di section KPI karena kedisiplinan kehadiran adalah
+  // salah satu sumber skor KPI — koreksinya dilakukan orang yang sama.
+  if (show("attendance.all") || show("attendance.all", "write")) {
+    navKPI.push({
+      title: "Presensi Karyawan",
+      url: "/dashboard/kpi/presensi",
+      icon: IconFingerprint,
+    });
+  }
+
+  if (show("kpi.config")) {
     navKPI.push({
       title: "Konfigurasi",
       url: "/dashboard/kpi",
       icon: IconTargetArrow,
       exact: true,
     });
+  }
+
+  // Resource tersendiri: Definisi KPI adalah daftar induk indikator, bisa
+  // didelegasikan tanpa ikut memberi akses ke bobot per jabatan.
+  if (show("kpi.definitions")) {
     navKPI.push({
       title: "Definisi KPI",
       url: "/dashboard/kpi/definitions",
@@ -107,7 +133,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
 
   // Halaman ini juga tempat menyetujui entri yang diisi sendiri karyawan, jadi
   // atasan dengan KPI_APPROVE harus bisa masuk meski tidak punya KPI_VIEW_ALL.
-  if (can(permissions, PERMISSIONS.KPI_VIEW_ALL) || can(permissions, PERMISSIONS.KPI_APPROVE)) {
+  if (show("kpi.review") || show("kpi.review", "write")) {
     navKPI.push({
       title: "Penilaian & Persetujuan",
       url: "/dashboard/kpi/log",
@@ -118,7 +144,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   // ── Payroll ────────────────────────────────────────────────────────────────
   const navPayroll: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.PAYROLL_MANAGE)) {
+  if (show("payroll.manage", "write")) {
     navPayroll.push({
       title: "Hitung Gaji",
       url: "/dashboard/payroll",
@@ -126,13 +152,22 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
+  if (show("payroll.components", "view")) {
+    navPayroll.push({
+      title: "Komponen Gaji",
+      url: "/dashboard/payroll/komponen",
+      icon: IconListDetails,
+    });
+  }
+
   // ── Laporan (dashboard laporan/analisis untuk Karyawan/KPI, Finance, Watcher Valas) ──
   const navLaporan: NavItem[] = [];
 
-  // Analisis Kinerja memeringkat karyawan lintas PT, jadi gerbangnya peran
-  // global (Owner & Super Admin) — bukan permission KPI yang terikat satu PT.
-  // Halaman ini menegakkan aturan yang sama lewat isGlobalRole.
-  if (isGlobalRole(roleName)) {
+  // Seluruh item di section ini adalah resource `scoping: "global"`: isinya
+  // laporan lintas PT, jadi izinnya tidak punya dimensi PT — hanya boleh atau
+  // tidak. Default-nya Owner & Super Admin, dan hanya mereka yang boleh
+  // mendelegasikannya lewat matriks izin.
+  if (show("kpi.analytics")) {
     navLaporan.push({
       title: "Analisis Kinerja",
       url: "/dashboard/kpi/analisis",
@@ -140,10 +175,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  // Laporan Finance menyatukan posisi keuangan seluruh PT dalam satu layar,
-  // jadi gerbangnya peran global (Owner & Super Admin) — sama seperti guard
-  // requireGlobalPageCaller di halamannya. Kepala Cabang hanya berhak atas PT-nya.
-  if (isGlobalRole(roleName)) {
+  if (show("finance.report")) {
     navLaporan.push({
       title: "Laporan Finance",
       url: "/dashboard/laporan-finance",
@@ -151,7 +183,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
+  if (show("watcher.valas")) {
     navLaporan.push({
       title: "Watcher Valas",
       url: "/dashboard/watcher-valas",
@@ -162,7 +194,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   // ── Finance Management ──────────────────────────────────────────────────
   const navFinanceManagement: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+  if (show("bank.accounts")) {
     navFinanceManagement.push({
       title: "Rekening Bank",
       url: "/dashboard/bank-accounts",
@@ -170,7 +202,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.COMPANY_STOCK_VIEW)) {
+  if (show("stock.pt")) {
     navFinanceManagement.push({
       title: "Stock Management (PT)",
       url: "/dashboard/stock-management-pt",
@@ -178,7 +210,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.CURRENCY_VIEW)) {
+  if (show("price.benchmark")) {
     navFinanceManagement.push({
       title: "Patokan Harga",
       url: "/dashboard/patokan-harga",
@@ -186,10 +218,28 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
+  // Harga Valas adalah harga final yang benar-benar dipakai (diisi manual),
+  // sedangkan Patokan Harga di atas hanya menyimpan aturan penyesuaiannya.
+  if (show("currency.price")) {
+    navFinanceManagement.push({
+      title: "Harga Valas",
+      url: "/dashboard/harga-valas",
+      icon: IconCurrencyDollar,
+    });
+  }
+
+  if (show("currency")) {
+    navFinanceManagement.push({
+      title: "Mata Uang",
+      url: "/dashboard/mata-uang",
+      icon: IconCoins,
+    });
+  }
+
   // ── Finance Daily Input ──────────────────────────────────────────────────
   const navFinanceDailyInput: NavItem[] = [];
 
-  if (can(permissions, PERMISSIONS.STOCKIST_VIEW)) {
+  if (show("stockist.daily")) {
     navFinanceDailyInput.push({
       title: "Stock & Kas",
       url: "/dashboard/stockist",
@@ -197,7 +247,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.BANK_VIEW)) {
+  if (show("bank.daily")) {
     navFinanceDailyInput.push({
       title: "Saldo Bank Harian",
       url: "/dashboard/stockist/bank",
@@ -205,7 +255,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.STOCKIST_VERIFY)) {
+  if (show("stockist.verify")) {
     navFinanceDailyInput.push({
       title: "Cross-Check Stock",
       url: "/dashboard/stockist/konfirmasi",
@@ -213,7 +263,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.CORRECTION_VIEW)) {
+  if (show("correction")) {
     navFinanceDailyInput.push({
       title: "Persetujuan Koreksi",
       url: "/dashboard/persetujuan-koreksi",
@@ -224,9 +274,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
   // ── Management ─────────────────────────────────────────────────────────────
   const navManagement: NavItem[] = [];
 
-  // Pengguna hanya untuk Super Admin, Owner, dan Kepala Cabang (role-gated,
-  // sejalan dengan guard di halaman /dashboard/users).
-  if (isAdminRole(roleName)) {
+  if (show("users")) {
     navManagement.push({
       title: "Pengguna",
       url: "/dashboard/users",
@@ -234,7 +282,15 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.BRANCHES_VIEW)) {
+  if (show("companies")) {
+    navManagement.push({
+      title: "PT",
+      url: "/dashboard/pt",
+      icon: IconBuildingSkyscraper,
+    });
+  }
+
+  if (show("branches")) {
     navManagement.push({
       title: "Cabang",
       url: "/dashboard/branches",
@@ -242,7 +298,7 @@ export function AppSidebar({ user, permissions, roleName, ...props }: AppSidebar
     });
   }
 
-  if (can(permissions, PERMISSIONS.ROLES_VIEW)) {
+  if (show("roles")) {
     navManagement.push({
       title: "Role & Akses",
       url: "/dashboard/roles",

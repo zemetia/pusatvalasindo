@@ -42,6 +42,9 @@ function CorrectedTag({ approved }: { approved: ApprovedCorrection }) {
  * Sel verifikasi H+1 untuk baris harian Kas & Bank — dipakai bersama oleh kedua grid.
  * "Sesuai" langsung menyimpan; "Tidak sesuai" mewajibkan catatan dan angka penggantinya
  * hanya DIAJUKAN (menunggu persetujuan Owner/Super Admin), tidak langsung mengubah saldo.
+ *
+ * Kecuali untuk pemegang izin "Koreksi Langsung Tanpa Persetujuan" pada PT ini
+ * (`canDirectCorrect`): angkanya berlaku saat itu juga, dan kalimatnya menyesuaikan.
  */
 export function DailyVerifyCell({
   status,
@@ -50,6 +53,7 @@ export function DailyVerifyCell({
   pending,
   approved,
   canVerify,
+  canDirectCorrect,
   onVerify,
 }: {
   status: DailyVerifyStatus
@@ -58,6 +62,7 @@ export function DailyVerifyCell({
   pending?: PendingCorrection
   approved?: ApprovedCorrection
   canVerify: boolean
+  canDirectCorrect?: boolean
   onVerify: (
     status: "BENAR" | "BEDA",
     note?: string,
@@ -142,10 +147,14 @@ export function DailyVerifyCell({
         <PopoverContent align="end" className="w-72">
           <div className="flex flex-col gap-3">
             <div>
-              <p className="text-sm font-medium">Ajukan koreksi</p>
+              <p className="text-sm font-medium">
+                {canDirectCorrect ? "Koreksi saldo" : "Ajukan koreksi"}
+              </p>
               <p className="text-xs text-muted-foreground">
-                Tersimpan: Rp {fmt(balance)}. Angka pengganti baru berlaku setelah disetujui
-                Owner / Super Admin.
+                Tersimpan: Rp {fmt(balance)}.{" "}
+                {canDirectCorrect
+                  ? "Angka pengganti langsung berlaku — tetap tercatat di riwayat koreksi."
+                  : "Angka pengganti baru berlaku setelah disetujui Owner / Super Admin."}
               </p>
             </div>
             <Textarea
@@ -181,7 +190,13 @@ export function DailyVerifyCell({
                 disabled={submitting}
                 onClick={() => submit("BEDA")}
               >
-                {submitting ? <IconLoader2 className="size-4 animate-spin" /> : "Ajukan"}
+                {submitting ? (
+                  <IconLoader2 className="size-4 animate-spin" />
+                ) : canDirectCorrect ? (
+                  "Simpan koreksi"
+                ) : (
+                  "Ajukan"
+                )}
               </Button>
             </div>
           </div>

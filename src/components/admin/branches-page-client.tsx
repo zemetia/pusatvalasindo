@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/table";
 import { SectionCard, EmptyState } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
-import { BranchSheet, BranchRow } from "./branch-sheet";
+import type { BranchRow } from "./branch-sheet";
+import { BranchSheet } from "./branch-sheet";
 import { BranchActions } from "./branch-actions";
 
 type Company = {
@@ -43,13 +44,28 @@ type BranchWithCount = BranchRow & {
 interface Props {
   companies: Company[];
   branches: BranchWithCount[];
+  /**
+   * PT yang boleh diubah (sumbu tulis resource `branches`). `null` = seluruh PT.
+   * Daftar PT, bukan satu boolean: sebuah jabatan bisa berhak melihat cabang
+   * PT A+B tapi hanya boleh mengubah PT A.
+   */
+  writableCompanyIds?: string[] | null;
 }
 
-export function BranchesPageClient({ companies, branches }: Props) {
+export function BranchesPageClient({
+  companies,
+  branches,
+  writableCompanyIds = [],
+}: Props) {
   const [activeTab, setActiveTab] = useState(
     companies.length > 0 ? companies[0].id : "unassigned"
   );
   const unassignedBranches = branches.filter((b) => !b.companyId);
+
+  // Cabang tanpa PT hanya bisa disentuh pemegang scope seluruh PT — sama
+  // seperti gerbang di sisi server.
+  const canWrite = (companyId: string | null | undefined) =>
+    writableCompanyIds === null || (!!companyId && writableCompanyIds.includes(companyId));
 
   if (companies.length === 0 && unassignedBranches.length === 0) {
     return (
@@ -76,10 +92,12 @@ export function BranchesPageClient({ companies, branches }: Props) {
             <TabsTrigger value="unassigned">Lainnya</TabsTrigger>
           )}
         </TabsList>
-        <BranchSheet
-          companies={companies}
-          currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined}
-        />
+        {canWrite(activeTab !== "unassigned" ? activeTab : null) && (
+          <BranchSheet
+            companies={companies}
+            currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined}
+          />
+        )}
       </div>
 
       {companies.map((c) => {
@@ -91,6 +109,7 @@ export function BranchesPageClient({ companies, branches }: Props) {
               branches={companyBranches}
               companies={companies}
               currentCompanyId={c.id}
+              canWrite={canWrite(c.id)}
               emptyText={`Belum ada cabang di ${c.name}`}
             />
           </TabsContent>
@@ -102,6 +121,7 @@ export function BranchesPageClient({ companies, branches }: Props) {
           <BranchTable
             branches={unassignedBranches}
             companies={companies}
+            canWrite={canWrite(null)}
             emptyText="Belum ada cabang tanpa perusahaan"
           />
         </TabsContent>
@@ -114,11 +134,14 @@ function BranchTable({
   branches,
   companies,
   currentCompanyId,
+  canWrite,
   emptyText,
 }: {
   branches: BranchWithCount[];
   companies: Company[];
   currentCompanyId?: string;
+  /** Sumbu tulis untuk PT tab ini — menentukan tombol tambah/ubah/hapus muncul. */
+  canWrite: boolean;
   emptyText: string;
 }) {
   const [search, setSearch] = useState("");
@@ -136,7 +159,11 @@ function BranchTable({
           icon={<IconBuilding className="size-5" />}
           title={emptyText}
           description="Tambahkan cabang baru atau pindahkan cabang dari perusahaan lain ke sini."
-          action={<BranchSheet companies={companies} currentCompanyId={currentCompanyId} />}
+          action={
+            canWrite ? (
+              <BranchSheet companies={companies} currentCompanyId={currentCompanyId} />
+            ) : undefined
+          }
         />
       </SectionCard>
     );
@@ -237,20 +264,22 @@ function BranchTable({
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <BranchActions
-                    companies={companies}
-                    branch={{
-                      id: branch.id,
-                      name: branch.name,
-                      address: branch.address,
-                      phone: branch.phone,
-                      isActive: branch.isActive,
-                      companyId: branch.companyId,
-                      latitude: branch.latitude,
-                      longitude: branch.longitude,
-                      attendanceRadiusM: branch.attendanceRadiusM,
-                    }}
-                  />
+                  {canWrite && (
+                    <BranchActions
+                      companies={companies}
+                      branch={{
+                        id: branch.id,
+                        name: branch.name,
+                        address: branch.address,
+                        phone: branch.phone,
+                        isActive: branch.isActive,
+                        companyId: branch.companyId,
+                        latitude: branch.latitude,
+                        longitude: branch.longitude,
+                        attendanceRadiusM: branch.attendanceRadiusM,
+                      }}
+                    />
+                  )}
                 </TableCell>
               </TableRow>
             ))

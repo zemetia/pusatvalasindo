@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { ForbiddenError } from "@/backend/errors/app-error";
-import { AuthContext } from "./with-auth";
+import type { AuthContext } from "./with-auth";
 
 type UserWithRole = AuthContext["user"] & { role?: string };
 type HandlerWithRole<C> = (

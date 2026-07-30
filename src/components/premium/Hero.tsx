@@ -10,7 +10,7 @@ import {
   Landmark,
   Plus
 } from "lucide-react"
-import { RateResult } from "@/lib/rates"
+import type { RateResult } from "@/lib/rates"
 import { useTranslations } from 'next-intl'
 
 interface HeroProps {

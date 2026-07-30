@@ -36,7 +36,19 @@ function readLastSelection(): string | null {
 interface Props {
   companies: Company[]
   defaultCompanyId: string | null
-  canManage: boolean
+  /**
+   * PT yang boleh DIINPUT oleh jabatan ini; `null` berarti semua PT.
+   * Sengaja daftar, bukan satu boolean: scope lihat dan scope ubah bisa berbeda,
+   * jadi hak input harus mengikuti PT yang sedang dipilih — bukan dikunci sekali
+   * dari PT bawaan.
+   */
+  writableCompanyIds: string[] | null
+  /**
+   * PT yang boleh dikoreksi tanpa antre persetujuan (izin `correction.direct`);
+   * `null` berarti semua PT. Hanya mengubah kalimat & badge di UI — server tetap
+   * yang memutuskan apakah koreksinya langsung berlaku.
+   */
+  directCorrectionCompanyIds?: string[] | null
   canSelectCompany: boolean
   /** Grid hari ini yang sudah dirender server, kalau PT-nya sudah pasti. */
   initialGrid?: unknown
@@ -47,7 +59,8 @@ interface Props {
 export function BankPageClient({
   companies,
   defaultCompanyId,
-  canManage,
+  writableCompanyIds,
+  directCorrectionCompanyIds = [],
   canSelectCompany,
   initialGrid,
   initialGridKey,
@@ -56,6 +69,15 @@ export function BankPageClient({
   const [date, setDate] = useState(toDate(new Date()))
   const [bankUnfilled, setBankUnfilled] = useState(0)
   const [exporting, setExporting] = useState(false)
+
+  // Hak input mengikuti PT yang sedang dipilih. Server tetap menegakkan hal yang
+  // sama di POST /api/bank-harian — ini hanya agar UI-nya jujur.
+  const canManage =
+    !!companyId && (writableCompanyIds === null || writableCompanyIds.includes(companyId))
+
+  const canDirectCorrect =
+    canManage &&
+    (directCorrectionCompanyIds === null || directCorrectionCompanyIds.includes(companyId))
 
   // Remember the last PT a Super Admin/Owner picked, so they don't have to
   // reselect every time they open this page.
@@ -167,6 +189,7 @@ export function BankPageClient({
           companyId={companyId}
           date={date}
           canManage={canManage}
+          canDirectCorrect={canDirectCorrect}
           onUnfilledChange={setBankUnfilled}
           initialGrid={initialGrid}
           initialGridKey={initialGridKey}

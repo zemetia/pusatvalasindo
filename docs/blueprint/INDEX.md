@@ -13,6 +13,7 @@ Cross-linked reference for AI agents. Every path is a backlink. Read this file f
 | [COMPONENTS.md](./COMPONENTS.md) | CVA pattern, four-file rule, shadcn, Storybook, tests | Building or modifying UI |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | `@theme {}` tokens, oklch palette, typography, radius | Applying styles, adding tokens |
 | [DATA_PRESENTATION.md](./DATA_PRESENTATION.md) | Editorial data paradigm — metrics, KPI blocks, delta pills, number formatting, tables, charts | **Mandatory** before rendering any metric, KPI, total, or analytics view |
+| [AUTHORIZATION.md](./AUTHORIZATION.md) | Izin per-resource + scope PT (baca/tulis terpisah), guard page & API, rollout bertahap | **Mandatory** sebelum menambah/mengubah halaman, API, atau gerbang akses apa pun |
 | [BEST_PRACTICE.md](./BEST_PRACTICE.md) | TypeScript constraints, ESLint rules, naming, anti-patterns | All code changes |
 | [I18N.md](./I18N.md) | next-intl routing, translations, navigation, static gen | Any page or text work |
 | [SERVICES.md](./SERVICES.md) | ApiClient, interceptors, domain services, Zod schemas | API calls, validation, error handling |

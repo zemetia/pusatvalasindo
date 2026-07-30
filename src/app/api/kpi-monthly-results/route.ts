@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { getCaller, requirePermission } from "@/backend/helpers/get-admin-caller";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { getAuthzCaller } from "@/backend/helpers/authz";
 
 const calculateSchema = z.object({
   employeeId: z.string().min(1),
@@ -17,7 +17,7 @@ type CalculateBody = z.infer<typeof calculateSchema>;
 
 export async function GET(req: NextRequest) {
   try {
-    const caller = await getCaller();
+    const caller = await getAuthzCaller();
     if (!caller) {
       return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
     }
@@ -30,11 +30,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(fail("VALIDATION", "month dan year diperlukan"), { status: 400 });
     }
 
-    if (employeeId !== caller.id && !can(caller.permissions, PERMISSIONS.KPI_VIEW_ALL)) {
-      return NextResponse.json(fail("FORBIDDEN", "Tidak memiliki izin melihat KPI karyawan lain"), {
-        status: 403,
-      });
-    }
+    // Skor sendiri selalu boleh dilihat; skor orang lain butuh scope BACA
+    // `kpi.review` yang mencakup PT karyawan itu — gerbang yang sama dengan
+    // /api/kpi-entries, jadi keduanya tidak bisa berbeda pendapat.
+    await kpiService.assertCanViewEntriesOf(caller, employeeId);
 
     return NextResponse.json(ok(await kpiService.getMonthlyResult(employeeId, month, year)));
   } catch (e) {
@@ -45,10 +44,15 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(calculateSchema)(
   async (_req: NextRequest, ctx: { body: CalculateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
-      if (caller instanceof NextResponse) return caller;
+      // Menghitung ulang skor menulis KPI karyawan lain → scope TULIS, dan
+      // scope itu diuji terhadap PT karyawannya, bukan sekadar "punya izin".
+      const caller = await getAuthzCaller();
+      if (!caller) {
+        return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+      }
 
       const { employeeId, month, year } = ctx.body;
+      await kpiService.assertCanReview(caller, employeeId);
       const result = await kpiService.calculateMonthlyResult(employeeId, month, year);
       return NextResponse.json(ok(result, "Skor KPI berhasil dihitung ulang"), { status: 201 });
     } catch (e) {

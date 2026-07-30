@@ -3,10 +3,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
+import { allowsCompany } from "@/lib/authz/resolve";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { kasPocketRepository } from "@/backend/repositories/kas-pocket.repository";
 import { kasDailyEntryRepository } from "@/backend/repositories/kas-daily-entry.repository";
 import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
@@ -28,7 +27,7 @@ type UpsertBody = z.infer<typeof upsertEntrySchema>;
 // List KasPocket aktif PT + entry hari itu (kalau ada) + entry sebelumnya (referensi delta).
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_VIEW);
+    const caller = await authorize("stockist.daily", "view");
     if (caller instanceof NextResponse) return caller;
 
     const companyId = req.nextUrl.searchParams.get("companyId");
@@ -39,7 +38,7 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    assertCompanyAccess(caller, companyId);
+    caller.assertCompany(companyId);
 
     const date = new Date(dateStr);
     const [pockets, todayEntries, previousEntries, pendingCorrections, approvedCorrections] = await Promise.all([
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
       correctionRequestRepository.findApprovedByCompanyDateTargets(companyId, date, ["KAS"]),
     ]);
 
-    const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
+    const canManage = caller.can("stockist.daily", "write");
 
     return NextResponse.json(
       ok({
@@ -110,17 +109,19 @@ export async function GET(req: NextRequest) {
 export const PATCH = withValidation(upsertEntrySchema)(
   async (_req: NextRequest, ctx: { body: UpsertBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+      const caller = await authorize("stockist.daily", "write");
       if (caller instanceof NextResponse) return caller;
 
       const pocket = await kasPocketRepository.findById(ctx.body.kasPocketId);
       if (!pocket) throw new NotFoundError("Kas pocket tidak ditemukan");
-      assertCompanyAccess(caller, pocket.companyId);
+      caller.assertCompany(pocket.companyId);
 
-      // Saldo tanggal lampau sudah masuk alur verifikasi H+1 — mengubahnya wajib lewat
-      // pengajuan koreksi yang disetujui, kecuali Super Admin/Owner yang memang boleh
-      // menyunting langsung (sejalan dengan aturan di /api/bank-harian).
-      if (isPastDate(new Date(ctx.body.date)) && !isGlobalRole(caller.roleName)) {
+      // Saldo tanggal lampau sudah masuk alur verifikasi H+1 — mengubahnya wajib
+      // lewat pengajuan koreksi yang disetujui, kecuali pemegang izin ubah
+      // tanggal lampau untuk PT ini (sejalan dengan /api/bank-harian).
+      // PT-nya diambil dari pocket, karena body tidak membawa companyId.
+      const canBackdate = allowsCompany(caller.subject, "daily.backdate", "write", pocket.companyId);
+      if (isPastDate(new Date(ctx.body.date)) && !canBackdate) {
         throw new ForbiddenError(
           "Tanggal sudah lewat — ubah lewat pengajuan koreksi atau minta Super Admin"
         );
@@ -131,7 +132,7 @@ export const PATCH = withValidation(upsertEntrySchema)(
         date: new Date(ctx.body.date),
         balance: ctx.body.balance,
         note: ctx.body.note,
-        createdBy: caller.id,
+        createdBy: caller.userId,
       });
 
       return NextResponse.json(ok(entry, "Saldo kas tersimpan"));

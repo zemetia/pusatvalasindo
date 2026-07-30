@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { getAdminCaller } from "@/backend/helpers/get-admin-caller";
-import { isGlobalRole } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
+import { ForbiddenError } from "@/backend/errors/app-error";
 
 const createUserSchema = z.object({
   name: z.string().min(1).max(100),
@@ -28,20 +29,31 @@ type CreateBody = z.infer<typeof createUserSchema>;
 export const POST = withValidation(createUserSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await getAdminCaller();
-      if (caller instanceof NextResponse) return caller;
+      const authz = await authorize("users", "write");
+      if (authz instanceof NextResponse) return authz;
 
       let { name, email, password, customRoleId, branchId, phone, baseSalary, mealAllowance, transportAllowance, positionAllowance, bpjsKesehatan, joinDate } = ctx.body;
 
-      // Kepala Cabang hanya boleh membuat user pada cabang yang PT-nya sama
-      // dengan miliknya. Super Admin / Owner tidak dibatasi.
-      if (!isGlobalRole(caller.roleName)) {
-        const branch = await prisma.branch.findUnique({
-          where: { id: branchId },
+      // Pengguna baru lahir di sebuah cabang, dan cabang itulah yang menentukan
+      // PT-nya — jadi PT tujuan harus berada dalam scope tulis si pemanggil.
+      const branch = await prisma.branch.findUnique({
+        where: { id: branchId },
+        select: { companyId: true },
+      });
+      if (!branch || !authz.canWrite(branch.companyId)) {
+        throw new ForbiddenError("Cabang berada di luar wewenang Anda");
+      }
+
+      // Jabatan yang diberikan juga harus dalam scope: tanpa ini, pemegang
+      // wewenang satu PT bisa langsung membuat akun berjabatan sistem
+      // (companyId null, mis. Super Admin).
+      if (customRoleId) {
+        const role = await prisma.custom_role.findUnique({
+          where: { id: customRoleId },
           select: { companyId: true },
         });
-        if (!branch || branch.companyId !== caller.companyId) {
-          return NextResponse.json({ error: "Cabang berada di luar PT Anda" }, { status: 403 });
+        if (!role || !authz.canWrite(role.companyId)) {
+          throw new ForbiddenError("Jabatan berada di luar wewenang Anda");
         }
       }
 

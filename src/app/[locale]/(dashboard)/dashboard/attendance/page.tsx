@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { AttendanceClient } from "./attendance-client";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getTranslations } from "next-intl/server";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
+import { requireResource } from "@/backend/helpers/authz";
 import { IconFingerprint } from "@tabler/icons-react";
 
 export async function generateMetadata({
@@ -27,6 +28,10 @@ export default async function AttendancePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  // Halamannya ikut gerbang yang sama dengan menunya di sidebar. Sebelumnya
+  // hanya sesi yang diperiksa, jadi mencabut Presensi cuma menyembunyikan menu
+  // sementara URL-nya tetap bisa dibuka langsung.
+  await requireResource("attendance.self", "view", locale);
   const session = await auth.api.getSession({
     headers: await headers(),
   });

@@ -42,11 +42,22 @@ type CompanyWithItems = {
 
 interface Props {
   companies: CompanyWithItems[];
-  canManage: boolean;
+  /**
+   * PT yang boleh diubah; `null` berarti semua PT. Sengaja daftar, bukan satu
+   * boolean: hak ubah bisa lebih sempit daripada hak lihat, dan tab PT di
+   * halaman ini bisa berpindah.
+   */
+  writableCompanyIds: string[] | null;
 }
 
-export function CompanyStockClient({ companies, canManage }: Props) {
+export function CompanyStockClient({ companies, writableCompanyIds }: Props) {
   const [activeCompanyId, setActiveCompanyId] = useState(companies.length > 0 ? companies[0].id : "");
+
+  // Hak ubah mengikuti PT yang sedang aktif. Server tetap menegakkan hal yang
+  // sama di API — ini hanya agar UI-nya jujur.
+  const canManage =
+    !!activeCompanyId &&
+    (writableCompanyIds === null || writableCompanyIds.includes(activeCompanyId));
   const [searchQuery, setSearchQuery] = useState("");
 
   const activeCompany = companies.find((c) => c.id === activeCompanyId);

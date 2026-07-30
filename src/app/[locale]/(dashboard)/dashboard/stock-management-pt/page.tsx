@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
-import { requirePageCaller } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
+import { resolve } from "@/lib/authz/resolve";
 import { CompanyStockClient } from "@/components/admin/company-stock/company-stock-client";
 import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { IconDatabase } from "@tabler/icons-react";
@@ -11,18 +11,12 @@ export default async function CompanyStockManagementPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await requirePageCaller(PERMISSIONS.COMPANY_STOCK_VIEW, locale);
-  const canManage = can(caller.permissions, PERMISSIONS.COMPANY_STOCK_MANAGE);
+  const authz = await requireResource("stock.pt", "view", locale);
 
-  // Global role (Super Admin/Owner) melihat semua PT; role lain di-scope ke PT
-  // sendiri. Non-global tanpa cabang tidak melihat PT mana pun. Query pakai
-  // `include` (butuh companyStockItems), jadi tidak lewat getScopedCompanies.
-  const canSelectCompany = isGlobalRole(caller.roleName);
+  // PT yang terlihat berasal dari scope izin. Query pakai `include` (butuh
+  // companyStockItems), jadi tidak lewat getScopedCompaniesFor.
   const companies = await prisma.company.findMany({
-    where: {
-      isActive: true,
-      ...(canSelectCompany ? {} : { id: caller.companyId ?? "" }),
-    },
+    where: { isActive: true, ...authz.where("id") },
     orderBy: { name: "asc" },
     include: {
       companyStockItems: {
@@ -30,6 +24,11 @@ export default async function CompanyStockManagementPage({
       },
     },
   });
+
+  // Daftar PT yang boleh diubah — bukan satu boolean — karena hak ubah bisa
+  // lebih sempit daripada hak lihat, dan klien berpindah antar PT.
+  const write = resolve(authz.subject, "stock.pt", "write");
+  const writableCompanyIds = write.allowed ? write.companyIds : [];
 
   return (
     <PageShell>
@@ -39,7 +38,7 @@ export default async function CompanyStockManagementPage({
         icon={<IconDatabase className="size-5" />}
       />
 
-      <CompanyStockClient companies={companies} canManage={canManage} />
+      <CompanyStockClient companies={companies} writableCompanyIds={writableCompanyIds} />
     </PageShell>
   );
 }

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { branchService } from "@/backend/services/branch.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 const updateBranchSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -22,12 +22,13 @@ type Params = { params: Promise<{ id: string }> };
 type UpdateBody = z.infer<typeof updateBranchSchema>;
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  try {
-    const caller = await requirePermission(PERMISSIONS.BRANCHES_VIEW);
-    if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("branches", "view");
+  if (authz instanceof NextResponse) return authz;
 
+  try {
     const { id } = await params;
     const branch = await branchService.getById(id);
+    authz.assertCompany(branch.companyId);
     return NextResponse.json(ok(branch));
   } catch (e) {
     return handleError(e);
@@ -36,13 +37,21 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
 export const PUT = withValidation(updateBranchSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
-    try {
-      const caller = await requirePermission(PERMISSIONS.BRANCHES_MANAGE);
-      if (caller instanceof NextResponse) return caller;
+    const authz = await authorize("branches", "write");
+    if (authz instanceof NextResponse) return authz;
 
+    try {
       const { id } = await ctx.params;
-      const branch = await branchService.update(id, ctx.body);
-      return NextResponse.json(ok(branch, "Branch updated"));
+      const branch = await branchService.getById(id);
+      // PT asal DAN PT tujuan sama-sama diuji — memindahkan cabang ke PT lain
+      // sama saja dengan mengeluarkannya dari wewenang si pemanggil.
+      authz.assertCompany(branch.companyId);
+      if (ctx.body.companyId !== undefined) {
+        authz.assertCompany(ctx.body.companyId ?? null);
+      }
+
+      const updated = await branchService.update(id, ctx.body);
+      return NextResponse.json(ok(updated, "Branch updated"));
     } catch (e) {
       return handleError(e);
     }
@@ -50,11 +59,14 @@ export const PUT = withValidation(updateBranchSchema)(
 );
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
-  try {
-    const caller = await requirePermission(PERMISSIONS.BRANCHES_MANAGE);
-    if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("branches", "write");
+  if (authz instanceof NextResponse) return authz;
 
+  try {
     const { id } = await params;
+    const branch = await branchService.getById(id);
+    authz.assertCompany(branch.companyId);
+
     await branchService.delete(id);
     return NextResponse.json(ok(null, "Branch deleted"));
   } catch (e) {

@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import prisma from "@/lib/prisma";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
+import { authorize } from "@/backend/helpers/authz";
 import { stockistHeadConfirmationService } from "@/backend/services/stockist-head-confirmation.service";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -22,9 +20,6 @@ const MISMATCH_FONT = "FFB42318";
 // Export lengkap hasil cross-check kepala cabang: Ringkasan, Stock Harian, Kas, Bank — 1 file, 4 sheet.
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_VERIFY);
-    if (caller instanceof NextResponse) return caller;
-
     const companyId = req.nextUrl.searchParams.get("companyId");
     const dateStr = req.nextUrl.searchParams.get("date");
     if (!companyId || !dateStr || !DATE_RE.test(dateStr)) {
@@ -33,7 +28,10 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    assertCompanyAccess(caller, companyId);
+    // Scope BACA resource cross-check untuk PT yang diminta — export tidak boleh
+    // lebih longgar dari halamannya.
+    const authz = await authorize("stockist.verify", "view", { companyId });
+    if (authz instanceof NextResponse) return authz;
 
     const date = new Date(dateStr);
     const company = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true } });

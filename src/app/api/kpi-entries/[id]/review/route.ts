@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { getAuthzCaller } from "@/backend/helpers/authz";
 
 const reviewSchema = z.object({
   decision: z.enum(["APPROVED", "REJECTED"]),
@@ -17,7 +18,7 @@ type ReviewBody = z.infer<typeof reviewSchema>;
 export const POST = withValidation(reviewSchema)(
   async (_req: NextRequest, ctx: Params & { body: ReviewBody }) => {
     try {
-      const caller = await getCaller();
+      const caller = await getAuthzCaller();
       if (!caller) {
         return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
       }

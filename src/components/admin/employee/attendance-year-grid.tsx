@@ -34,8 +34,10 @@ export const ATTENDANCE_STATUS_META: Record<
 > = {
   PRESENT: { label: "Hadir", cell: "bg-success" },
   LATE: { label: "Terlambat", cell: "bg-warning" },
+  WFH: { label: "WFH", cell: "bg-success/50" },
   PERMISSION: { label: "Izin", cell: "bg-info" },
   SICK: { label: "Sakit", cell: "bg-info/50" },
+  LEAVE: { label: "Cuti", cell: "bg-primary/40" },
   ABSENT: { label: "Alpa", cell: "bg-destructive" },
   HOLIDAY: { label: "Libur", cell: "bg-muted-foreground/25" },
 };

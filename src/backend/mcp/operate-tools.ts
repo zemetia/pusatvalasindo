@@ -1,7 +1,7 @@
 import { z, type ZodRawShape } from "zod";
 import { PERMISSIONS, type Permission } from "@/lib/permissions";
 import { ForbiddenError, NotFoundError, ValidationError } from "@/backend/errors/app-error";
-import { currencyStockService, assertBranchAccess } from "@/backend/services/currency-stock.service";
+import { currencyStockService, companyIdOfBranch } from "@/backend/services/currency-stock.service";
 import { bankAccountService } from "@/backend/services/bank-account.service";
 import { bankMutationService } from "@/backend/services/bank-mutation.service";
 import { stockistHeadConfirmationService } from "@/backend/services/stockist-head-confirmation.service";
@@ -66,9 +66,9 @@ function assertCompanyScope(caller: McpCaller, companyId: string) {
 
 export const OPERATE_TOOLS: OperateTool[] = [
   {
-    name: "get_price_benchmark",
+    name: "get_patokan_harga",
     description:
-      "List Patokan Harga: every SmartDeal-quoted currency with its sell/buy adjustment rule (e.g. \"+5\", \"c5\", \"f0.05\", \"c0.1+5\", or empty for none). Global — not PT-scoped.",
+      "List Patokan Harga: every SmartDeal-quoted currency with its saved sell/buy adjustment rule (e.g. \"+5\", \"-10\", \"c5\", \"f0.05\", \"c0.1+5\", or empty for none). Returns the RULES, not prices — use get_harga_final for the resulting harga jual/beli. Global — not PT-scoped.",
     permission: [PERMISSIONS.CURRENCY_VIEW],
     inputSchema: {
       code: z.string().optional().describe("Filter to a single currency code, e.g. USD"),
@@ -80,14 +80,14 @@ export const OPERATE_TOOLS: OperateTool[] = [
     },
   },
   {
-    name: "set_price_benchmark",
+    name: "set_patokan_harga",
     description:
-      "Set (upsert) the sell and/or buy price adjustment rule for one currency in Patokan Harga. Syntax: \"+5\"/\"-10\" adds/subtracts a flat amount, \"c5\" ceils to the nearest multiple of 5, \"f0.05\" floors to the nearest multiple of 0.05, \"c0.1+5\" chains a rounding step then an offset. Pass an empty string to clear a rule. Unset fields keep their current saved value.",
+      "Set (upsert) the sell and/or buy price adjustment rule for one currency in Patokan Harga. Syntax: \"+5\"/\"-10\" adds/subtracts a flat amount, \"c5\" ceils to the nearest multiple of 5, \"f5\" floors to the nearest multiple of 5, \"f0.05\"/\"c0.05\" round to the nearest 0.05, \"c0.1+5\" chains a rounding step then an offset. Pass an empty string to clear a rule. Unset fields keep their current saved value.",
     permission: [PERMISSIONS.CURRENCY_MANAGE],
     inputSchema: {
       code: z.string().describe("Currency code, e.g. USD"),
-      sell_adjustment: z.string().optional().describe('e.g. "+5", "c5", "f0.05", "c0.1+5", or "" to clear'),
-      buy_adjustment: z.string().optional().describe('e.g. "+5", "c5", "f0.05", "c0.1+5", or "" to clear'),
+      sell_adjustment: z.string().optional().describe('e.g. "+5", "-10", "c5", "f0.05", "c0.1+5", or "" to clear'),
+      buy_adjustment: z.string().optional().describe('e.g. "+5", "-10", "c5", "f0.05", "c0.1+5", or "" to clear'),
     },
     handler: async (args, caller) => {
       const code = str(args, "code").toUpperCase();
@@ -102,6 +102,16 @@ export const OPERATE_TOOLS: OperateTool[] = [
         updatedBy: caller.id,
       });
     },
+  },
+  {
+    name: "get_harga_final",
+    description:
+      "Harga jual/beli akhir per currency: the latest SmartDeal rate with the saved Patokan Harga rule already applied. Returns base_sell/base_buy (SmartDeal), the rule used, the resulting sell/buy, the spread, and when the base was scraped. Use this for \"berapa harga jual/beli USD kita\"; use get_patokan_harga when you only need the adjustment rules. Global — not PT-scoped.",
+    permission: [PERMISSIONS.CURRENCY_VIEW],
+    inputSchema: {
+      code: z.string().optional().describe("Filter to a single currency code, e.g. USD"),
+    },
+    handler: async (args) => priceBenchmarkService.getQuotes(str(args, "code", false) || undefined),
   },
   {
     name: "update_currency_rate",
@@ -120,9 +130,14 @@ export const OPERATE_TOOLS: OperateTool[] = [
       if (buyRate === undefined && sellRate === undefined) {
         throw new ValidationError("Provide at least one of buy_rate / sell_rate");
       }
-      // Enforce PT/branch scope via the same guard the web route uses.
+      // MCP callers are resolved from a key, not a session, so they can't carry
+      // an Authz — the PT of the stock's branch is checked with the same
+      // company-scope guard the other MCP tools use.
       const stock = await currencyStockService.getById(id);
-      if (stock.branchId) await assertBranchAccess(caller, stock.branchId);
+      if (stock.branchId) {
+        const companyId = await companyIdOfBranch(stock.branchId);
+        if (companyId) assertCompanyAccess(caller, companyId);
+      }
       return currencyStockService.updateRates(id, buyRate, sellRate);
     },
   },
@@ -177,7 +192,9 @@ export const OPERATE_TOOLS: OperateTool[] = [
         date: parseDateOnly(str(args, "date")),
         confirmedQuantity: num(args, "confirmed_quantity"),
         note: str(args, "note", false) || undefined,
-        caller,
+        // Pemanggil MCP selalu role global (lihat mcp/auth.ts), jadi kemampuan
+        // ubah tanggal lampau memang melekat padanya.
+        caller: { id: caller.id, canBackdate: true },
       });
     },
   },
@@ -200,7 +217,9 @@ export const OPERATE_TOOLS: OperateTool[] = [
         date: parseDateOnly(str(args, "date")),
         confirmedIdrValue: num(args, "confirmed_idr_value"),
         note: str(args, "note", false) || undefined,
-        caller,
+        // Pemanggil MCP selalu role global (lihat mcp/auth.ts), jadi kemampuan
+        // ubah tanggal lampau memang melekat padanya.
+        caller: { id: caller.id, canBackdate: true },
       });
     },
   },
@@ -223,7 +242,9 @@ export const OPERATE_TOOLS: OperateTool[] = [
         date: parseDateOnly(str(args, "date")),
         confirmedIdrValue: num(args, "confirmed_idr_value"),
         note: str(args, "note", false) || undefined,
-        caller,
+        // Pemanggil MCP selalu role global (lihat mcp/auth.ts), jadi kemampuan
+        // ubah tanggal lampau memang melekat padanya.
+        caller: { id: caller.id, canBackdate: true },
       });
     },
   },
@@ -246,7 +267,9 @@ export const OPERATE_TOOLS: OperateTool[] = [
         date: parseDateOnly(str(args, "date")),
         confirmedIdrValue: num(args, "confirmed_idr_value"),
         note: str(args, "note", false) || undefined,
-        caller,
+        // Pemanggil MCP selalu role global (lihat mcp/auth.ts), jadi kemampuan
+        // ubah tanggal lampau memang melekat padanya.
+        caller: { id: caller.id, canBackdate: true },
       });
     },
   },

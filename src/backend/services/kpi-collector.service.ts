@@ -183,16 +183,24 @@ export const kpiCollectorService = {
    * transaksi paralel lebih mudah menghabiskan pool koneksi daripada
    * mempercepat apa pun.
    */
+  /**
+   * `companyIds: null` berarti seluruh PT; array berarti hanya PT itu, dan array
+   * KOSONG berarti tidak ada satu pun — bukan "semua". Bentuknya mengikuti
+   * `AuthzDecision.companyIds` supaya scope izin bisa diteruskan apa adanya
+   * tanpa penerjemahan yang bisa salah arah.
+   */
   collectForPeriod: async (
     month: number,
     year: number,
-    options: { companyId?: string | null } = {}
+    options: { companyIds?: string[] | null } = {}
   ): Promise<CollectResult[]> => {
     const employees = await prisma.user.findMany({
       where: {
         isActive: true,
         customRoleId: { not: null },
-        ...(options.companyId ? { branch: { companyId: options.companyId } } : {}),
+        ...(options.companyIds == null
+          ? {}
+          : { branch: { companyId: { in: options.companyIds } } }),
       },
       select: { id: true },
     });

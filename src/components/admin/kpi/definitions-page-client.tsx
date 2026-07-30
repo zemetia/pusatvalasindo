@@ -18,7 +18,8 @@ import { SectionCard, EmptyState } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
 import { IconTrash, IconPencil, IconListDetails } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { KpiDefinitionSheet, KpiDefinitionRow } from "../kpi-definition-sheet";
+import type { KpiDefinitionRow } from "../kpi-definition-sheet";
+import { KpiDefinitionSheet } from "../kpi-definition-sheet";
 import { SCORING_TYPE_LABELS, INPUT_SOURCE_LABELS } from "@/lib/kpi-utils";
 
 /** Warna badge mengikuti arti: penalti = peringatan, reward/target = positif. */

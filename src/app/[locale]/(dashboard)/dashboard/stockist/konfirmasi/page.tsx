@@ -1,5 +1,6 @@
-import { PERMISSIONS } from "@/lib/permissions";
-import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
+import { resolve } from "@/lib/authz/resolve";
+import { getScopedCompaniesFor } from "@/backend/helpers/page-access";
 import { StockistHeadConfirmationClient } from "@/components/admin/stockist/stockist-head-confirmation-client";
 import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -11,18 +12,21 @@ export default async function StockistHeadConfirmationPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await requirePageCaller(PERMISSIONS.STOCKIST_VERIFY, locale);
+  const authz = await requireResource("stockist.verify", "view", locale);
 
-  // Cross-check dimiliki 1 PT, dipakai bersama semua cabangnya. Global role
-  // (Super Admin/Owner) memilih PT bebas & boleh edit tanggal lampau; role lain
-  // di-scope ke PT sendiri (diturunkan dari cabangnya).
+  // Cross-check dimiliki 1 PT, dipakai bersama semua cabangnya. PT yang boleh
+  // dilihat datang dari scope izin.
   const { companies, defaultCompanyId, canSelectCompany, effectiveCompanyId } =
-    await getScopedCompanies(caller);
-  const canEditPastDate = canSelectCompany;
+    await getScopedCompaniesFor(authz);
 
-  // Role non-global wajib terikat ke sebuah PT (lewat cabang). Kalau tidak, akunnya
-  // belum dikonfigurasi — tampilkan pesan jelas, bukan pemilih semua PT.
-  const isUnassigned = !canSelectCompany && !effectiveCompanyId;
+  // Kemampuan tersendiri, di-scope per PT lewat matriks izin. Dulu menumpang
+  // variabel "boleh memilih PT", yang tidak ada kaitannya sama sekali.
+  const backdate = resolve(authz.subject, "daily.backdate", "write");
+  const backdateCompanyIds = backdate.allowed ? backdate.companyIds : [];
+
+  // Pemanggil yang tidak terjangkau PT mana pun berarti akunnya belum
+  // dikonfigurasi — tampilkan pesan jelas, bukan pemilih kosong.
+  const isUnassigned = companies.length === 0 && !effectiveCompanyId;
 
   return (
     <PageShell>
@@ -44,7 +48,7 @@ export default async function StockistHeadConfirmationPage({
         <StockistHeadConfirmationClient
           companies={companies}
           defaultCompanyId={defaultCompanyId}
-          canEditPastDate={canEditPastDate}
+          backdateCompanyIds={backdateCompanyIds}
           canSelectCompany={canSelectCompany}
         />
       )}

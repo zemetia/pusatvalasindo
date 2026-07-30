@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { CurrencySheet, CurrencyRow } from "./currency-sheet";
+import type { CurrencyRow } from "./currency-sheet";
+import { CurrencySheet } from "./currency-sheet";
 
 interface Props {
   currency: CurrencyRow;

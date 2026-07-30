@@ -10,12 +10,18 @@
  *   formData.append("photo", compressed);
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getSupabaseAdmin, ATTENDANCE_BUCKET } from "@/lib/supabase";
+import { authorize } from "@/backend/helpers/authz";
 
 export async function POST(req: NextRequest) {
+  // Gerbangnya sama dengan clock-in itu sendiri — kalau tidak, foto masih bisa
+  // diunggah ke bucket oleh siapa pun yang login meski Presensi-nya dicabut.
+  const authz = await authorize("attendance.self", "write");
+  if (authz instanceof NextResponse) return authz;
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

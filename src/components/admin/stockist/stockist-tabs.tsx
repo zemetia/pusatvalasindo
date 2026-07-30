@@ -38,7 +38,18 @@ function readLastSelection(): string | null {
 interface Props {
   companies: Company[]
   defaultCompanyId: string | null
-  canManage: boolean
+  /**
+   * PT yang boleh diisi; `null` berarti semua PT. Sengaja daftar, bukan satu
+   * boolean: scope lihat dan scope isi bisa berbeda, jadi hak isi harus
+   * mengikuti PT yang sedang dipilih.
+   */
+  writableCompanyIds: string[] | null
+  /**
+   * PT yang boleh dikoreksi tanpa antre persetujuan (izin `correction.direct`);
+   * `null` berarti semua PT. Hanya mengubah kalimat & badge di UI — server tetap
+   * yang memutuskan apakah koreksinya langsung berlaku.
+   */
+  directCorrectionCompanyIds?: string[] | null
   canSelectCompany: boolean
   /** Grid hari ini yang sudah dirender server, kalau PT-nya sudah pasti. */
   initialGrid?: unknown
@@ -49,7 +60,8 @@ interface Props {
 export function StockistTabs({
   companies,
   defaultCompanyId,
-  canManage,
+  writableCompanyIds,
+  directCorrectionCompanyIds = [],
   canSelectCompany,
   initialGrid,
   initialGridKey,
@@ -59,6 +71,15 @@ export function StockistTabs({
   const [mataUangAlert, setMataUangAlert] = useState({ beda: 0, belumReview: 0, belumIsi: 0 })
   const [kasUnfilled, setKasUnfilled] = useState(0)
   const [exporting, setExporting] = useState(false)
+
+  // Hak isi mengikuti PT yang sedang dipilih. Server tetap menegakkan hal yang
+  // sama di API stockist — ini hanya agar UI-nya jujur.
+  const canManage =
+    !!companyId && (writableCompanyIds === null || writableCompanyIds.includes(companyId))
+
+  const canDirectCorrect =
+    canManage &&
+    (directCorrectionCompanyIds === null || directCorrectionCompanyIds.includes(companyId))
 
   // Remember the last PT a Super Admin/Owner picked, so they don't have to
   // reselect every time they open this page.
@@ -192,6 +213,7 @@ export function StockistTabs({
               companyId={companyId}
               date={date}
               canManage={canManage}
+              canDirectCorrect={canDirectCorrect}
               onAlertsChange={setMataUangAlert}
               initialGrid={initialGrid}
               initialGridKey={initialGridKey}
@@ -202,6 +224,7 @@ export function StockistTabs({
               companyId={companyId}
               date={date}
               canManage={canManage}
+              canDirectCorrect={canDirectCorrect}
               onUnfilledChange={setKasUnfilled}
             />
           </TabsContent>

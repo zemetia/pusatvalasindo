@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/table";
 import { IconTrash, IconPencil, IconArrowLeft } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { KpiDefinitionRow } from "../kpi-definition-sheet";
-import { RoleKpiDetailSheet, RoleKpiDetailRow } from "./role-kpi-detail-sheet";
+import type { KpiDefinitionRow } from "../kpi-definition-sheet";
+import type { RoleKpiDetailRow } from "./role-kpi-detail-sheet";
+import { RoleKpiDetailSheet } from "./role-kpi-detail-sheet";
 import { MetricBlock } from "@/components/admin/page-shell";
 import { SCORING_TYPE_LABELS, INPUT_SOURCE_LABELS } from "@/lib/kpi-utils";
 

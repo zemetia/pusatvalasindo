@@ -3,10 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
 import { stockistBalanceRepository } from "@/backend/repositories/stockist-balance.repository";
 
@@ -22,14 +20,14 @@ type CreateBody = z.infer<typeof createPocketSchema>;
 // GET /api/stockist/pockets?companyId=X — list pocket + saldo per currency
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_VIEW);
+    const caller = await authorize("stockist.daily", "view");
     if (caller instanceof NextResponse) return caller;
 
     const companyId = req.nextUrl.searchParams.get("companyId");
     if (!companyId) {
       return NextResponse.json({ error: "companyId wajib diisi" }, { status: 400 });
     }
-    assertCompanyAccess(caller, companyId);
+    caller.assertCompany(companyId);
 
     const allPockets = await stockistPocketRepository.findAllByCompany(companyId);
     // Pocket "Total" dihitung otomatis (lihat stockist.service.ts) — tidak muncul di sini karena
@@ -49,10 +47,10 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createPocketSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+      const caller = await authorize("stockist.daily", "write");
       if (caller instanceof NextResponse) return caller;
 
-      assertCompanyAccess(caller, ctx.body.companyId);
+      caller.assertCompany(ctx.body.companyId);
 
       const pocket = await stockistPocketRepository.create(ctx.body);
       return NextResponse.json(ok(pocket, "Pocket berhasil dibuat"), { status: 201 });

@@ -2,9 +2,7 @@ import type { NextRequest} from "next/server";
 import { NextResponse } from "next/server";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
+import { authorize } from "@/backend/helpers/authz";
 import { stockistMutationRepository } from "@/backend/repositories/stockist-mutation.repository";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -12,14 +10,14 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 // GET /api/stockist/history?companyId=&pocketId=&from=&to=&take=&cursor=
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_VIEW);
+    const caller = await authorize("stockist.daily", "view");
     if (caller instanceof NextResponse) return caller;
 
     const companyId = req.nextUrl.searchParams.get("companyId");
     if (!companyId) {
       return NextResponse.json({ error: "companyId wajib diisi" }, { status: 400 });
     }
-    assertCompanyAccess(caller, companyId);
+    caller.assertCompany(companyId);
 
     const pocketId = req.nextUrl.searchParams.get("pocketId") ?? undefined;
     const fromStr = req.nextUrl.searchParams.get("from");

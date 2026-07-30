@@ -8,6 +8,10 @@ import { applyMutationInTx } from "@/backend/services/stockist.service";
 
 // Persetujuan koreksi: satu-satunya jalan angka hasil verifikasi H+1 benar-benar mengubah
 // data. Sebelum di-approve, pengajuan cuma catatan — saldo stock/kas/bank tidak tersentuh.
+//
+// Ada dua pintu ke fungsi approve yang sama: keputusan manual di halaman Persetujuan
+// Koreksi, dan `applyDirect` untuk pemegang izin `correction.direct` pada PT tsb (angka
+// langsung berlaku, tapi tetap melewati CorrectionRequest supaya jejaknya sama).
 
 /** Stock: saldo berjalan digeser lewat mutasi ADJUSTMENT, bukan di-set langsung, supaya jejaknya ada di riwayat mutasi. */
 async function applyStockistCorrection(req: {
@@ -44,6 +48,43 @@ async function applyStockistCorrection(req: {
   });
 }
 
+async function approveRequest(id: string, decidedBy: string, decisionNote?: string) {
+  const req = await correctionRequestRepository.findById(id);
+  if (!req) throw new NotFoundError("Pengajuan koreksi tidak ditemukan");
+  if (req.status !== "PENDING") {
+    throw new ConflictError("Pengajuan ini sudah diputuskan sebelumnya");
+  }
+
+  const appliedNote = `Koreksi disetujui: ${req.reason}`;
+
+  if (req.target === "STOCKIST") {
+    await applyStockistCorrection({ ...req, decidedBy });
+  } else if (req.target === "KAS") {
+    if (!req.kasPocketId) throw new ValidationError("Pengajuan kas tidak lengkap");
+    const entry = await kasDailyEntryRepository.findByPocketAndDate(req.kasPocketId, req.date);
+    if (!entry) throw new NotFoundError("Entri kas yang dikoreksi sudah tidak ada");
+    await kasDailyEntryRepository.applyApprovedCorrection(
+      entry.id,
+      Number(req.proposedValue),
+      appliedNote
+    );
+  } else {
+    if (!req.bankAccountId) throw new ValidationError("Pengajuan bank tidak lengkap");
+    const entry = await dailyBankEntryRepository.findByAccountAndDate(req.bankAccountId, req.date);
+    if (!entry) throw new NotFoundError("Entri bank yang dikoreksi sudah tidak ada");
+    await dailyBankEntryRepository.applyApprovedCorrection(
+      entry.id,
+      Number(req.proposedValue),
+      appliedNote
+    );
+  }
+
+  return prisma.correctionRequest.update({
+    where: { id },
+    data: { status: "APPROVED", decidedBy, decidedAt: new Date(), decisionNote },
+  });
+}
+
 export const correctionService = {
   list: correctionRequestRepository.findPage,
   countPending: correctionRequestRepository.countPending,
@@ -54,42 +95,19 @@ export const correctionService = {
     return req;
   },
 
-  approve: async (id: string, decidedBy: string, decisionNote?: string) => {
-    const req = await correctionRequestRepository.findById(id);
-    if (!req) throw new NotFoundError("Pengajuan koreksi tidak ditemukan");
-    if (req.status !== "PENDING") {
-      throw new ConflictError("Pengajuan ini sudah diputuskan sebelumnya");
-    }
+  approve: approveRequest,
 
-    const appliedNote = `Koreksi disetujui: ${req.reason}`;
-
-    if (req.target === "STOCKIST") {
-      await applyStockistCorrection({ ...req, decidedBy });
-    } else if (req.target === "KAS") {
-      if (!req.kasPocketId) throw new ValidationError("Pengajuan kas tidak lengkap");
-      const entry = await kasDailyEntryRepository.findByPocketAndDate(req.kasPocketId, req.date);
-      if (!entry) throw new NotFoundError("Entri kas yang dikoreksi sudah tidak ada");
-      await kasDailyEntryRepository.applyApprovedCorrection(
-        entry.id,
-        Number(req.proposedValue),
-        appliedNote
-      );
-    } else {
-      if (!req.bankAccountId) throw new ValidationError("Pengajuan bank tidak lengkap");
-      const entry = await dailyBankEntryRepository.findByAccountAndDate(req.bankAccountId, req.date);
-      if (!entry) throw new NotFoundError("Entri bank yang dikoreksi sudah tidak ada");
-      await dailyBankEntryRepository.applyApprovedCorrection(
-        entry.id,
-        Number(req.proposedValue),
-        appliedNote
-      );
-    }
-
-    return prisma.correctionRequest.update({
-      where: { id },
-      data: { status: "APPROVED", decidedBy, decidedAt: new Date(), decisionNote },
-    });
-  },
+  /**
+   * Jalur pemegang izin `correction.direct` (per PT): pengajuan yang baru saja
+   * dibuat langsung disetujui atas nama pengubahnya sendiri, tanpa mampir ke
+   * antrean Persetujuan Koreksi.
+   *
+   * Sengaja tetap lewat CorrectionRequest, bukan menulis saldo langsung: angka
+   * lama, angka baru, alasan, dan siapa yang mengubah tetap tercatat persis
+   * seperti koreksi yang di-ACC — yang hilang cuma antreannya, bukan jejaknya.
+   */
+  applyDirect: (id: string, userId: string) =>
+    approveRequest(id, userId, "Koreksi langsung tanpa persetujuan (izin correction.direct)"),
 
   // Ditolak: data tetap seperti semula dan status verifikasi entri dibiarkan "Beda",
   // jadi selisihnya masih kelihatan dan bisa diajukan ulang dengan angka lain.

@@ -1,7 +1,8 @@
-import {
-  currencyRepository,
+import type {
   CreateCurrencyInput,
-  UpdateCurrencyInput,
+  UpdateCurrencyInput} from "@/backend/repositories/currency.repository";
+import {
+  currencyRepository
 } from "@/backend/repositories/currency.repository";
 import { NotFoundError, ConflictError } from "@/backend/errors/app-error";
 

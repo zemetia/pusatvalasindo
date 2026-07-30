@@ -1,0 +1,46 @@
+// ─── Authorization: per-resource, per-PT scope ───────────────────────────────
+// Menggantikan `custom_role.permissions: String[]` yang flat (satu izin = satu
+// string, tanpa dimensi PT). Model ini memisahkan dua hal yang dulu tercampur:
+//
+//   1. RESOURCE  — apa yang boleh diakses (satu halaman + service/API di baliknya)
+//   2. SCOPE     — PT mana saja yang berlaku, terpisah untuk baca dan tulis
+//
+// Karena `custom_role` sudah unique([name, companyId]), "Role A di PT A" dan
+// "Role A di PT B" adalah dua baris role berbeda — jadi izin per-PT-per-role
+// jatuh keluar dari model ini tanpa kolom tambahan.
+
+enum ScopeMode {
+  /// Tidak punya akses sama sekali. Halaman disembunyikan dari sidebar,
+  /// API mengembalikan 403. Ini juga arti dari "tidak ada baris sama sekali".
+  NONE
+  /// Hanya PT milik role itu sendiri (custom_role.companyId).
+  OWN
+  /// Daftar PT eksplisit di kolom *CompanyIds.
+  SELECTED
+  /// Semua PT aktif.
+  ALL
+}
+
+model RoleResourcePermission {
+  id       String @id @default(cuid())
+  roleId   String
+  /// Kunci resource dari registry di src/lib/authz/resources.ts.
+  /// Sengaja String, bukan enum DB: menambah halaman baru tidak boleh butuh migrasi.
+  resource String
+
+  viewScope      ScopeMode @default(NONE)
+  /// Hanya dibaca saat viewScope = SELECTED.
+  viewCompanyIds String[]  @default([])
+
+  writeScope      ScopeMode @default(NONE)
+  /// Hanya dibaca saat writeScope = SELECTED.
+  writeCompanyIds String[]  @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role custom_role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, resource])
+  @@index([roleId])
+}

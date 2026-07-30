@@ -1,12 +1,14 @@
-import {
-  kpiDefinitionRepository,
+import type {
   CreateKpiDefinitionInput,
-  UpdateKpiDefinitionInput,
-} from "@/backend/repositories/kpi-definition.repository";
+  UpdateKpiDefinitionInput} from "@/backend/repositories/kpi-definition.repository";
 import {
-  roleKpiRepository,
+  kpiDefinitionRepository
+} from "@/backend/repositories/kpi-definition.repository";
+import type {
   CreateRoleKpiInput,
-  UpdateRoleKpiInput,
+  UpdateRoleKpiInput} from "@/backend/repositories/role-kpi.repository";
+import {
+  roleKpiRepository
 } from "@/backend/repositories/role-kpi.repository";
 import { resolveInputPolicy as resolvePolicy } from "@/lib/kpi-policy";
 import { kpiCollectorService } from "@/backend/services/kpi-collector.service";
@@ -14,8 +16,8 @@ import { kpiEntryRepository } from "@/backend/repositories/kpi-entry.repository"
 import { kpiPeriodRepository } from "@/backend/repositories/kpi-period.repository";
 import { kpiMonthlyResultRepository } from "@/backend/repositories/kpi-monthly-result.repository";
 import { NotFoundError, ForbiddenError, ValidationError } from "@/backend/errors/app-error";
-import { can, PERMISSIONS } from "@/lib/permissions";
-import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
+import { allows, allowsCompany, resolve } from "@/lib/authz/resolve";
+import type { AuthzCaller } from "@/backend/helpers/authz";
 import {
   scoreKpiItem,
   computeTotalScore,
@@ -161,7 +163,7 @@ export const kpiService = {
    *  2. Periode yang sudah dikunci tidak menerima entri baru, supaya skor yang
    *     sudah dipakai payroll tidak berubah belakangan.
    */
-  createEntry: async (caller: AdminCaller, input: CreateEntryInput) => {
+  createEntry: async (caller: AuthzCaller, input: CreateEntryInput) => {
     const roleKpi = await kpiService.getRoleKpiById(input.roleKpiId);
     const policy = resolvePolicy(roleKpi);
 
@@ -176,15 +178,15 @@ export const kpiService = {
     }
 
     const isSelf = caller.id === input.employeeId;
-    const canRecordOthers =
-      can(caller.permissions, PERMISSIONS.KPI_APPROVE) ||
-      can(caller.permissions, PERMISSIONS.KPI_MANAGE);
+    // Mencatat KPI orang lain = hak TULIS penilaian, dan di-scope ke PT si KPI —
+    // bukan lagi "punya KPI_APPROVE di PT mana pun".
+    const canRecordOthers = canReviewCompany(caller, roleKpi.companyId);
 
     if (isSelf) {
       if (policy.inputSource !== "SELF" && !canRecordOthers) {
         throw new ForbiddenError("KPI ini hanya boleh dicatat oleh atasan, bukan diisi sendiri");
       }
-      if (!can(caller.permissions, PERMISSIONS.KPI_FILL_OWN) && !canRecordOthers) {
+      if (!allows(caller.subject, "kpi.self", "write") && !canRecordOthers) {
         throw new ForbiddenError("Tidak memiliki izin mengisi KPI");
       }
     } else if (!canRecordOthers) {
@@ -246,15 +248,11 @@ export const kpiService = {
    * audit — hanya entri APPROVED yang ikut dihitung.
    */
   reviewEntry: async (
-    caller: AdminCaller,
+    caller: AuthzCaller,
     entryId: string,
     decision: "APPROVED" | "REJECTED",
     reviewNote?: string
   ) => {
-    if (!can(caller.permissions, PERMISSIONS.KPI_APPROVE)) {
-      throw new ForbiddenError("Tidak memiliki izin menyetujui entri KPI");
-    }
-
     const entry = await kpiEntryRepository.findById(entryId);
     if (!entry) throw new NotFoundError("Entri KPI tidak ditemukan");
 
@@ -262,7 +260,13 @@ export const kpiService = {
       throw new ForbiddenError("Tidak dapat menyetujui entri KPI milik sendiri");
     }
 
-    assertKpiCompanyAccess(caller, entry.roleKpi.companyId);
+    // Satu gerbang, dua hal sekaligus: punya hak menilai DAN PT entri itu ada
+    // dalam scope tulisnya. Dulu keduanya terpisah (KPI_APPROVE lalu
+    // assertKpiCompanyAccess), dan yang kedua membandingkan langsung dengan PT
+    // si pemanggil sehingga wewenang lintas PT mustahil dinyatakan.
+    if (!canReviewCompany(caller, entry.roleKpi.companyId)) {
+      throw new ForbiddenError("Tidak memiliki izin menyetujui entri KPI PT ini");
+    }
 
     const period = await kpiPeriodRepository.find(
       entry.employeeId,
@@ -280,14 +284,17 @@ export const kpiService = {
     });
   },
 
-  getPendingEntries: async (caller: AdminCaller, limit = 200) => {
-    if (!can(caller.permissions, PERMISSIONS.KPI_APPROVE)) {
+  getPendingEntries: async (caller: AuthzCaller, limit = 200) => {
+    const decision = resolve(caller.subject, "kpi.review", "view");
+    if (!decision.allowed) {
       throw new ForbiddenError("Tidak memiliki izin melihat antrian persetujuan KPI");
     }
-    // Peninjau yang terikat satu PT hanya melihat antrian PT-nya.
-    const scope = isGlobalKpiCaller(caller)
-      ? {}
-      : { roleKpi: { companyId: caller.companyId ?? "__none__" } };
+    // `companyIds === null` berarti seluruh PT — jangan disamakan dengan array
+    // kosong, yang justru harus menghasilkan antrian kosong.
+    const scope =
+      decision.companyIds === null
+        ? {}
+        : { roleKpi: { companyId: { in: decision.companyIds } } };
     return kpiEntryRepository.findPending(scope, limit);
   },
 
@@ -295,7 +302,7 @@ export const kpiService = {
    * Menghapus entri. Karyawan hanya boleh menghapus entri miliknya sendiri yang
    * belum disetujui — begitu disetujui, penghapusan jadi wewenang atasan.
    */
-  deleteEntry: async (caller: AdminCaller, entryId: string) => {
+  deleteEntry: async (caller: AuthzCaller, entryId: string) => {
     const entry = await kpiEntryRepository.findById(entryId);
     if (!entry) throw new NotFoundError("Entri KPI tidak ditemukan");
 
@@ -308,9 +315,9 @@ export const kpiService = {
       throw new ValidationError("Periode ini sudah dikunci");
     }
 
-    const isReviewer =
-      can(caller.permissions, PERMISSIONS.KPI_APPROVE) ||
-      can(caller.permissions, PERMISSIONS.KPI_MANAGE);
+    // Hak atasan sudah mencakup PT-nya, jadi tidak ada lagi cek PT terpisah
+    // setelahnya: yang bukan atasan untuk PT ini jatuh ke aturan "entri sendiri".
+    const isReviewer = canReviewCompany(caller, entry.roleKpi.companyId);
 
     if (!isReviewer) {
       if (entry.employeeId !== caller.id) {
@@ -321,8 +328,6 @@ export const kpiService = {
           "Entri yang sudah disetujui hanya dapat dihapus oleh atasan"
         );
       }
-    } else {
-      assertKpiCompanyAccess(caller, entry.roleKpi.companyId);
     }
 
     await kpiEntryRepository.delete(entryId);
@@ -332,21 +337,45 @@ export const kpiService = {
   getPeriod: (employeeId: string, month: number, year: number) =>
     kpiPeriodRepository.find(employeeId, month, year),
 
-  lockPeriod: async (caller: AdminCaller, employeeId: string, month: number, year: number) => {
-    if (!can(caller.permissions, PERMISSIONS.KPI_MANAGE)) {
-      throw new ForbiddenError("Tidak memiliki izin mengunci periode KPI");
-    }
+  lockPeriod: async (caller: AuthzCaller, employeeId: string, month: number, year: number) => {
+    await assertCanReviewEmployee(caller, employeeId, "mengunci periode KPI");
     // Kunci setelah skor final dihitung, supaya angka yang dibekukan konsisten
     // dengan entri yang ada saat itu.
     await kpiService.calculateMonthlyResult(employeeId, month, year);
     return kpiPeriodRepository.lock(employeeId, month, year, caller.id);
   },
 
-  unlockPeriod: async (caller: AdminCaller, employeeId: string, month: number, year: number) => {
-    if (!can(caller.permissions, PERMISSIONS.KPI_MANAGE)) {
-      throw new ForbiddenError("Tidak memiliki izin membuka periode KPI");
-    }
+  unlockPeriod: async (caller: AuthzCaller, employeeId: string, month: number, year: number) => {
+    await assertCanReviewEmployee(caller, employeeId, "membuka periode KPI");
     return kpiPeriodRepository.unlock(employeeId, month, year);
+  },
+
+  /**
+   * Gerbang untuk route yang menyentuh KPI seorang karyawan tanpa membaca
+   * entrinya lebih dulu (hitung ulang skor, kunci/buka periode). Diekspor supaya
+   * route tidak menyusun ulang aturan yang sama dengan versinya sendiri.
+   */
+  assertCanReview: (caller: AuthzCaller, employeeId: string) =>
+    assertCanReviewEmployee(caller, employeeId, "mengubah KPI karyawan ini"),
+
+  /**
+   * Boleh melihat KPI karyawan lain? Entri sendiri selalu boleh. Sengaja di
+   * service, bukan di route: PT karyawannya harus dibaca dulu, dan aturan yang
+   * sama dipakai oleh /api/kpi-entries maupun /api/kpi-monthly-results.
+   */
+  assertCanViewEntriesOf: async (caller: AuthzCaller, employeeId: string) => {
+    if (caller.id === employeeId) return;
+    const companyId = await companyIdOfEmployee(employeeId);
+    if (!allowsCompany(caller.subject, "kpi.review", "view", companyId)) {
+      throw new ForbiddenError("Tidak memiliki izin melihat KPI karyawan lain");
+    }
+  },
+
+  /** PT yang boleh dinilai — untuk penarikan massal. `null` = seluruh PT. */
+  reviewableCompanyIds: (caller: AuthzCaller): string[] | null => {
+    const decision = resolve(caller.subject, "kpi.review", "write");
+    if (!decision.allowed) throw new ForbiddenError("Tidak memiliki izin menilai KPI");
+    return decision.companyIds;
   },
 
   // ── Hasil bulanan ────────────────────────────────────────────────────────
@@ -446,14 +475,35 @@ export const kpiService = {
   },
 };
 
-/** Peninjau lintas PT (Super Admin/Owner) tidak terikat satu perusahaan. */
-function isGlobalKpiCaller(caller: AdminCaller) {
-  return caller.companyId === null;
+// Dulu di sini ada `isGlobalKpiCaller` — "pemanggil tanpa companyId berarti
+// peninjau lintas PT". Sudah dibuang: yang tidak punya PT bukan hanya Super
+// Admin/Owner, tapi juga pengguna biasa yang belum ditempatkan di cabang, dan
+// mereka justru mendapat akses SELURUH PT dari aturan itu. `allowsCompany`
+// menolak `companyId: null` kecuali scope-nya memang seluruh PT (ALL), jadi
+// arah gagalnya sekarang aman — sejalan dengan mode OWN di resolve.ts.
+
+/** Boleh menilai/mengubah KPI milik PT ini? Gerbang tunggal modul penilaian. */
+function canReviewCompany(caller: AuthzCaller, companyId: string | null) {
+  return allowsCompany(caller.subject, "kpi.review", "write", companyId);
 }
 
-function assertKpiCompanyAccess(caller: AdminCaller, companyId: string) {
-  if (isGlobalKpiCaller(caller)) return;
-  if (caller.companyId !== companyId) {
-    throw new ForbiddenError("Tidak memiliki akses ke KPI PT ini");
+/** PT karyawan diturunkan dari cabangnya — sumber tunggal, sama seperti modul lain. */
+async function companyIdOfEmployee(employeeId: string): Promise<string | null> {
+  const employee = await prisma.user.findUnique({
+    where: { id: employeeId },
+    select: { branch: { select: { companyId: true } } },
+  });
+  if (!employee) throw new NotFoundError("Karyawan tidak ditemukan");
+  return employee.branch?.companyId ?? null;
+}
+
+async function assertCanReviewEmployee(
+  caller: AuthzCaller,
+  employeeId: string,
+  action: string
+) {
+  const companyId = await companyIdOfEmployee(employeeId);
+  if (!canReviewCompany(caller, companyId)) {
+    throw new ForbiddenError(`Tidak memiliki izin ${action}`);
   }
 }

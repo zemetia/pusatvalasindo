@@ -4,9 +4,9 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
+import { allowsCompany } from "@/lib/authz/resolve";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { isGlobalRole, PERMISSIONS } from "@/lib/permissions";
 import { ForbiddenError } from "@/backend/errors/app-error";
 import { dailyBankEntryRepository } from "@/backend/repositories/daily-bank-entry.repository";
 import { todayDateOnly } from "@/backend/helpers/date-only";
@@ -28,11 +28,15 @@ const saveSchema = z.object({
 
 type SaveBody = z.infer<typeof saveSchema>;
 
-/** Anyone with BANK_DAILY_INPUT can edit today's entry; editing a past date requires Super Admin/Owner. */
-function assertEditableDate(roleName: string, date: Date) {
+/**
+ * Hari berjalan boleh diisi siapa pun yang berhak menulis; tanggal yang sudah
+ * lewat butuh kemampuan `daily.backdate` untuk PT itu — izin tersendiri yang
+ * bisa didelegasikan, bukan lagi terkunci ke Super Admin/Owner.
+ */
+function assertEditableDate(canBackdate: boolean, date: Date) {
   const isPast = date.getTime() < todayDateOnly().getTime();
-  if (isPast && !isGlobalRole(roleName)) {
-    throw new ForbiddenError("Tanggal sudah lewat — edit perlu otorisasi Super Admin");
+  if (isPast && !canBackdate) {
+    throw new ForbiddenError("Tanggal sudah lewat — edit perlu izin ubah tanggal lampau");
   }
 }
 
@@ -40,9 +44,6 @@ function assertEditableDate(roleName: string, date: Date) {
 // List rekening bank aktif PT + entry hari itu (kalau ada) + entry sebelumnya (referensi delta).
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.BANK_VIEW);
-    if (caller instanceof NextResponse) return caller;
-
     const companyId = req.nextUrl.searchParams.get("companyId");
     const dateStr = req.nextUrl.searchParams.get("date");
     if (!companyId || !dateStr || !DATE_RE.test(dateStr)) {
@@ -51,9 +52,12 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
+    // PT yang diminta ikut diperiksa terhadap scope baca — bukan cuma "punya izin bank".
+    const authz = await authorize("bank.daily", "view", { companyId });
+    if (authz instanceof NextResponse) return authz;
     // Payload dibangun di service supaya identik dengan yang dirender server di halaman
     // Bank Harian (initialGrid) — satu sumber kebenaran, tidak bisa beda bentuk.
-    const payload = await buildBankHarianPayload(caller, companyId, new Date(dateStr));
+    const payload = await buildBankHarianPayload(authz, companyId, new Date(dateStr));
 
     return NextResponse.json(ok(payload));
   } catch (e) {
@@ -66,11 +70,10 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(saveSchema)(
   async (_req: NextRequest, ctx: { body: SaveBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.BANK_DAILY_INPUT);
+      // Scope TULIS untuk PT yang dikirim. Inilah gerbang yang membuat sebuah
+      // jabatan bisa memantau beberapa PT tapi hanya menginput di sebagian.
+      const caller = await authorize("bank.daily", "write", { companyId: ctx.body.companyId });
       if (caller instanceof NextResponse) return caller;
-      if (caller.companyId && caller.companyId !== ctx.body.companyId) {
-        throw new ForbiddenError("Tidak punya akses ke PT ini");
-      }
 
       const accountIds = ctx.body.entries.map((e) => e.bankAccountId);
       const ownedCount = await prisma.bankAccount.count({
@@ -81,10 +84,13 @@ export const POST = withValidation(saveSchema)(
       }
 
       const date = new Date(ctx.body.date);
-      assertEditableDate(caller.roleName, date);
+      assertEditableDate(
+        allowsCompany(caller.subject, "daily.backdate", "write", ctx.body.companyId),
+        date
+      );
 
       const saved = await dailyBankEntryRepository.upsertMany(
-        ctx.body.entries.map((e) => ({ ...e, date, createdBy: caller.id }))
+        ctx.body.entries.map((e) => ({ ...e, date, createdBy: caller.userId }))
       );
 
       return NextResponse.json(ok(saved, "Saldo bank harian tersimpan"));

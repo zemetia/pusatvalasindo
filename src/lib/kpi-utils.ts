@@ -139,6 +139,9 @@ export type MonthlyResult = {
   calculatedAt: string;
 };
 
+/** Satu baris tunjangan/potongan bernama di slip gaji. */
+export type SalaryLineItem = { name: string; amount: number };
+
 export type PayrollResult = {
   employee: { id: string; name: string };
   period: { month: number; year: number };
@@ -148,6 +151,9 @@ export type PayrollResult = {
     transportAllowance: number;
     positionAllowance: number;
     bpjsKesehatan: number;
+    /** Tunjangan tambahan dari komponen gaji custom (nominal tetap per bulan). */
+    extraAllowances: SalaryLineItem[];
+    totalExtraAllowance: number;
     totalGrossFixed: number;
     dailyRate: number;
   };
@@ -159,7 +165,14 @@ export type PayrollResult = {
   };
   /** Hasil konversi skor KPI → rupiah (bonus, potongan, top performer). */
   incentive: IncentiveResult;
-  deductions: { late: number; absence: number; total: number };
+  deductions: {
+    late: number;
+    absence: number;
+    /** Potongan dari komponen gaji custom (koperasi, cicilan, dst.). */
+    components: SalaryLineItem[];
+    totalComponents: number;
+    total: number;
+  };
   final: { takeHomePay: number };
   attendanceDetail: { totalDaysLogged: number };
 };

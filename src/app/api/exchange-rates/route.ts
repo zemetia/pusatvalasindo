@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server'
 import { requireAuth } from '@/backend/helpers/get-admin-caller'
 
 // GET /api/exchange-rates?codes=USD,EUR,SGD

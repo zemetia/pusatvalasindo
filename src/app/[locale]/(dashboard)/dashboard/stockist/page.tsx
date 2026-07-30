@@ -1,5 +1,6 @@
-import { can, PERMISSIONS } from "@/lib/permissions";
-import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
+import { resolve } from "@/lib/authz/resolve";
+import { getScopedCompaniesFor } from "@/backend/helpers/page-access";
 import { buildStockistGridPayload } from "@/backend/services/stockist.service";
 import { todayDateOnly } from "@/backend/helpers/date-only";
 import Link from "next/link";
@@ -14,12 +15,20 @@ export default async function StockistPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await requirePageCaller(PERMISSIONS.STOCKIST_VIEW, locale);
-  const canManage = can(caller.permissions, PERMISSIONS.STOCKIST_MANAGE);
+  const authz = await requireResource("stockist.daily", "view", locale);
 
-  // Stockist & Kas dimiliki 1 PT, dipakai bersama semua cabangnya. Global role
-  // (Super Admin/Owner) boleh memilih PT lain; role lain di-scope ke PT sendiri.
-  const { companies, defaultCompanyId, canSelectCompany } = await getScopedCompanies(caller);
+  // Stockist & Kas dimiliki 1 PT, dipakai bersama semua cabangnya. PT yang boleh
+  // dilihat — dan mana yang boleh diisi — datang dari matriks izin, jadi sebuah
+  // jabatan bisa memantau beberapa PT tapi hanya menginput di sebagian.
+  const { companies, defaultCompanyId, canSelectCompany } = await getScopedCompaniesFor(authz);
+
+  const write = resolve(authz.subject, "stockist.daily", "write");
+  const writableCompanyIds = write.allowed ? write.companyIds : [];
+
+  // PT yang boleh dikoreksi tanpa antre persetujuan. Daftar, bukan boolean:
+  // izinnya bisa diberikan ke sebagian PT saja (mis. kepala cabang satu PT).
+  const direct = resolve(authz.subject, "correction.direct", "write");
+  const directCorrectionCompanyIds = direct.allowed ? direct.companyIds : [];
 
   // Kalau PT-nya sudah pasti (role non-global), grid hari ini ikut dirender di server dan
   // dikirim bersama HTML. Tanpa ini klien baru mulai fetch SETELAH hydrate — satu perjalanan
@@ -34,7 +43,7 @@ export default async function StockistPage({
   if (defaultCompanyId) {
     const today = todayDateOnly();
     try {
-      const payload = await buildStockistGridPayload(caller, defaultCompanyId, today);
+      const payload = await buildStockistGridPayload(authz, defaultCompanyId, today);
       // Lewat JSON supaya Decimal/Date jadi bentuk yang sama persis dengan respons
       // NextResponse.json() — sekaligus membuatnya bisa diserialisasi ke client component.
       initialGrid = JSON.parse(JSON.stringify(payload));
@@ -64,7 +73,8 @@ export default async function StockistPage({
       <StockistTabs
         companies={companies}
         defaultCompanyId={defaultCompanyId}
-        canManage={canManage}
+        writableCompanyIds={writableCompanyIds}
+        directCorrectionCompanyIds={directCorrectionCompanyIds}
         canSelectCompany={canSelectCompany}
         initialGrid={initialGrid}
         initialGridKey={initialGridKey}

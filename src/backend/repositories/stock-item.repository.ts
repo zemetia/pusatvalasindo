@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma'
-import { StockItemType } from '@src/generated/prisma/client'
+import type { StockItemType } from '@src/generated/prisma/client'
 
 export const stockItemRepository = {
   findByBranch(branchId: string, onlyActive = true) {

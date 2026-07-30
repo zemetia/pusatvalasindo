@@ -43,6 +43,8 @@ export type UserRow = {
   name: string;
   role: string;
   branchName: string;
+  /** PT karyawan, diturunkan dari cabangnya. Dipakai filter PT di bawah. */
+  companyId: string | null;
   baseSalary: number | null;
   mealAllowance: number | null;
   transportAllowance: number | null;
@@ -58,8 +60,23 @@ function scoringTone(scoringType: string) {
   return "info";
 }
 
-export function PayrollPageClient({ users }: { users: UserRow[] }) {
+type CompanyOption = { id: string; name: string; code: string };
+
+export function PayrollPageClient({
+  users,
+  companies,
+}: {
+  users: UserRow[];
+  /**
+   * PT yang boleh dikelola gajinya. Kosong berarti pemanggil hanya melihat slip
+   * gajinya sendiri, sehingga filter PT tidak ditampilkan.
+   */
+  companies: CompanyOption[];
+}) {
   const now = new Date();
+  // Filter PT dulu, baru pilih orangnya — daftar karyawan lintas PT terlalu
+  // panjang untuk dipilih langsung. "all" = semua PT dalam jangkauan.
+  const [companyId, setCompanyId] = useState("all");
   const [userId, setUserId] = useState("");
   const [month, setMonth] = useState(String(now.getMonth() + 1));
   const [year, setYear] = useState(String(now.getFullYear()));
@@ -102,6 +119,12 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
     });
   };
 
+  // Server sudah menyaring `users` ke PT yang boleh dilihat; filter ini murni
+  // untuk mempersempit tampilan, bukan gerbang keamanan.
+  const visibleUsers = users.filter(
+    (u) => u.isActive && (companyId === "all" || u.companyId === companyId)
+  );
+
   const kpiScore = result ? result.kpi.score : 0;
   const grade = getGrade(kpiScore);
   // Bonus/potongan berasal dari matriks insentif payroll — modul KPI hanya
@@ -113,6 +136,32 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
     <div className="flex flex-col gap-6">
       {/* Selection form */}
       <div className="bg-card grid grid-cols-1 gap-4 rounded-xl border p-4 shadow-sm sm:grid-cols-4">
+        {companies.length > 1 && (
+          <div className="grid gap-1.5">
+            <Label>PT</Label>
+            <Select
+              value={companyId}
+              onValueChange={(v) => {
+                setCompanyId(v);
+                // Karyawan yang sedang dipilih bisa jadi bukan milik PT baru.
+                setUserId("");
+                setResult(null);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Semua PT" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua PT</SelectItem>
+                {companies.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name} ({c.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div className="sm:col-span-2 grid gap-1.5">
           <Label>Karyawan *</Label>
           <Select
@@ -126,13 +175,17 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
               <SelectValue placeholder="Pilih karyawan" />
             </SelectTrigger>
             <SelectContent>
-              {users
-                .filter((u) => u.isActive)
-                .map((u) => (
+              {visibleUsers.length === 0 ? (
+                <div className="text-muted-foreground px-2 py-3 text-center text-xs">
+                  Tidak ada karyawan aktif di PT ini
+                </div>
+              ) : (
+                visibleUsers.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
                     {u.name} — {u.role} ({u.branchName})
                   </SelectItem>
-                ))}
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -305,6 +358,14 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                 </div>
               )}
 
+              {/* Tunjangan tambahan dari komponen gaji custom */}
+              {result.components.extraAllowances.map((c) => (
+                <div key={c.name} className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">{c.name}</span>
+                  <span className="tabular">{formatCurrency(c.amount)}</span>
+                </div>
+              ))}
+
               <div className="flex justify-between items-center font-medium pt-1 border-t">
                 <span>Gaji Kotor</span>
                 <span className="tabular">
@@ -339,6 +400,14 @@ export function PayrollPageClient({ users }: { users: UserRow[] }) {
                       </span>
                     </div>
                   )}
+                  {result.deductions.components.map((c) => (
+                    <div key={c.name} className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">{c.name}</span>
+                      <span className="tabular text-destructive">
+                        −{formatCurrency(c.amount)}
+                      </span>
+                    </div>
+                  ))}
                 </>
               )}
 

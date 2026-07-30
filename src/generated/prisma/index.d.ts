@@ -44,6 +44,11 @@ export type user = $Result.DefaultSelection<Prisma.$userPayload>
  */
 export type verification = $Result.DefaultSelection<Prisma.$verificationPayload>
 /**
+ * Model RoleResourcePermission
+ * 
+ */
+export type RoleResourcePermission = $Result.DefaultSelection<Prisma.$RoleResourcePermissionPayload>
+/**
  * Model BankAccount
  * 
  */
@@ -73,6 +78,16 @@ export type Company = $Result.DefaultSelection<Prisma.$CompanyPayload>
  * 
  */
 export type Currency = $Result.DefaultSelection<Prisma.$CurrencyPayload>
+/**
+ * Model CurrencyPrice
+ * 
+ */
+export type CurrencyPrice = $Result.DefaultSelection<Prisma.$CurrencyPricePayload>
+/**
+ * Model CurrencyPriceSyncSetting
+ * 
+ */
+export type CurrencyPriceSyncSetting = $Result.DefaultSelection<Prisma.$CurrencyPriceSyncSettingPayload>
 /**
  * Model PriceBenchmark
  * 
@@ -134,6 +149,17 @@ export type PayrollIncentiveMatrix = $Result.DefaultSelection<Prisma.$PayrollInc
  * "10%-60% → potong 150.000 + wajib masuk setiap Sabtu".
  */
 export type PayrollIncentiveTier = $Result.DefaultSelection<Prisma.$PayrollIncentiveTierPayload>
+/**
+ * Model SalaryComponent
+ * Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.
+ */
+export type SalaryComponent = $Result.DefaultSelection<Prisma.$SalaryComponentPayload>
+/**
+ * Model UserSalaryComponent
+ * Nilai komponen untuk satu karyawan. Tanpa baris ini komponen tidak ikut
+ * dihitung, jadi daftar induk boleh berisi komponen yang belum dipakai.
+ */
+export type UserSalaryComponent = $Result.DefaultSelection<Prisma.$UserSalaryComponentPayload>
 /**
  * Model RefiningBatch
  * 
@@ -247,13 +273,25 @@ export namespace $Enums {
   export const AttendanceStatus: {
   PRESENT: 'PRESENT',
   LATE: 'LATE',
+  WFH: 'WFH',
   ABSENT: 'ABSENT',
   PERMISSION: 'PERMISSION',
   SICK: 'SICK',
+  LEAVE: 'LEAVE',
   HOLIDAY: 'HOLIDAY'
 };
 
 export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
+
+
+export const ScopeMode: {
+  NONE: 'NONE',
+  OWN: 'OWN',
+  SELECTED: 'SELECTED',
+  ALL: 'ALL'
+};
+
+export type ScopeMode = (typeof ScopeMode)[keyof typeof ScopeMode]
 
 
 export const BankMutationType: {
@@ -262,6 +300,14 @@ export const BankMutationType: {
 };
 
 export type BankMutationType = (typeof BankMutationType)[keyof typeof BankMutationType]
+
+
+export const PriceSource: {
+  MANUAL: 'MANUAL',
+  SYNCED: 'SYNCED'
+};
+
+export type PriceSource = (typeof PriceSource)[keyof typeof PriceSource]
 
 
 export const CompanyStockItemType: {
@@ -347,6 +393,14 @@ export const KpiToleranceScope: {
 };
 
 export type KpiToleranceScope = (typeof KpiToleranceScope)[keyof typeof KpiToleranceScope]
+
+
+export const SalaryComponentKind: {
+  ALLOWANCE: 'ALLOWANCE',
+  DEDUCTION: 'DEDUCTION'
+};
+
+export type SalaryComponentKind = (typeof SalaryComponentKind)[keyof typeof SalaryComponentKind]
 
 
 export const PayrollIncentiveOutcome: {
@@ -487,9 +541,17 @@ export type AttendanceStatus = $Enums.AttendanceStatus
 
 export const AttendanceStatus: typeof $Enums.AttendanceStatus
 
+export type ScopeMode = $Enums.ScopeMode
+
+export const ScopeMode: typeof $Enums.ScopeMode
+
 export type BankMutationType = $Enums.BankMutationType
 
 export const BankMutationType: typeof $Enums.BankMutationType
+
+export type PriceSource = $Enums.PriceSource
+
+export const PriceSource: typeof $Enums.PriceSource
 
 export type CompanyStockItemType = $Enums.CompanyStockItemType
 
@@ -526,6 +588,10 @@ export const KpiPeriodStatus: typeof $Enums.KpiPeriodStatus
 export type KpiToleranceScope = $Enums.KpiToleranceScope
 
 export const KpiToleranceScope: typeof $Enums.KpiToleranceScope
+
+export type SalaryComponentKind = $Enums.SalaryComponentKind
+
+export const SalaryComponentKind: typeof $Enums.SalaryComponentKind
 
 export type PayrollIncentiveOutcome = $Enums.PayrollIncentiveOutcome
 
@@ -761,6 +827,16 @@ export class PrismaClient<
   get verification(): Prisma.verificationDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.roleResourcePermission`: Exposes CRUD operations for the **RoleResourcePermission** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RoleResourcePermissions
+    * const roleResourcePermissions = await prisma.roleResourcePermission.findMany()
+    * ```
+    */
+  get roleResourcePermission(): Prisma.RoleResourcePermissionDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.bankAccount`: Exposes CRUD operations for the **BankAccount** model.
     * Example usage:
     * ```ts
@@ -819,6 +895,26 @@ export class PrismaClient<
     * ```
     */
   get currency(): Prisma.CurrencyDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.currencyPrice`: Exposes CRUD operations for the **CurrencyPrice** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CurrencyPrices
+    * const currencyPrices = await prisma.currencyPrice.findMany()
+    * ```
+    */
+  get currencyPrice(): Prisma.CurrencyPriceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.currencyPriceSyncSetting`: Exposes CRUD operations for the **CurrencyPriceSyncSetting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CurrencyPriceSyncSettings
+    * const currencyPriceSyncSettings = await prisma.currencyPriceSyncSetting.findMany()
+    * ```
+    */
+  get currencyPriceSyncSetting(): Prisma.CurrencyPriceSyncSettingDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.priceBenchmark`: Exposes CRUD operations for the **PriceBenchmark** model.
@@ -919,6 +1015,26 @@ export class PrismaClient<
     * ```
     */
   get payrollIncentiveTier(): Prisma.PayrollIncentiveTierDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.salaryComponent`: Exposes CRUD operations for the **SalaryComponent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SalaryComponents
+    * const salaryComponents = await prisma.salaryComponent.findMany()
+    * ```
+    */
+  get salaryComponent(): Prisma.SalaryComponentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.userSalaryComponent`: Exposes CRUD operations for the **UserSalaryComponent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserSalaryComponents
+    * const userSalaryComponents = await prisma.userSalaryComponent.findMany()
+    * ```
+    */
+  get userSalaryComponent(): Prisma.UserSalaryComponentDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.refiningBatch`: Exposes CRUD operations for the **RefiningBatch** model.
@@ -1569,12 +1685,15 @@ export namespace Prisma {
     custom_role: 'custom_role',
     user: 'user',
     verification: 'verification',
+    RoleResourcePermission: 'RoleResourcePermission',
     BankAccount: 'BankAccount',
     BankMutation: 'BankMutation',
     DailyBankEntry: 'DailyBankEntry',
     Branch: 'Branch',
     Company: 'Company',
     Currency: 'Currency',
+    CurrencyPrice: 'CurrencyPrice',
+    CurrencyPriceSyncSetting: 'CurrencyPriceSyncSetting',
     PriceBenchmark: 'PriceBenchmark',
     SmartdealRate: 'SmartdealRate',
     CompanyStockItem: 'CompanyStockItem',
@@ -1585,6 +1704,8 @@ export namespace Prisma {
     KpiMonthlyResult: 'KpiMonthlyResult',
     PayrollIncentiveMatrix: 'PayrollIncentiveMatrix',
     PayrollIncentiveTier: 'PayrollIncentiveTier',
+    SalaryComponent: 'SalaryComponent',
+    UserSalaryComponent: 'UserSalaryComponent',
     RefiningBatch: 'RefiningBatch',
     Sample: 'Sample',
     ShipmentProvider: 'ShipmentProvider',
@@ -1621,7 +1742,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "priceBenchmark" | "smartdealRate" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollIncentiveMatrix" | "payrollIncentiveTier" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
+      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollIncentiveMatrix" | "payrollIncentiveTier" | "salaryComponent" | "userSalaryComponent" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2069,6 +2190,80 @@ export namespace Prisma {
           }
         }
       }
+      RoleResourcePermission: {
+        payload: Prisma.$RoleResourcePermissionPayload<ExtArgs>
+        fields: Prisma.RoleResourcePermissionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RoleResourcePermissionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RoleResourcePermissionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          findFirst: {
+            args: Prisma.RoleResourcePermissionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RoleResourcePermissionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          findMany: {
+            args: Prisma.RoleResourcePermissionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>[]
+          }
+          create: {
+            args: Prisma.RoleResourcePermissionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          createMany: {
+            args: Prisma.RoleResourcePermissionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RoleResourcePermissionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>[]
+          }
+          delete: {
+            args: Prisma.RoleResourcePermissionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          update: {
+            args: Prisma.RoleResourcePermissionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          deleteMany: {
+            args: Prisma.RoleResourcePermissionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RoleResourcePermissionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RoleResourcePermissionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>[]
+          }
+          upsert: {
+            args: Prisma.RoleResourcePermissionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleResourcePermissionPayload>
+          }
+          aggregate: {
+            args: Prisma.RoleResourcePermissionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRoleResourcePermission>
+          }
+          groupBy: {
+            args: Prisma.RoleResourcePermissionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RoleResourcePermissionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RoleResourcePermissionCountArgs<ExtArgs>
+            result: $Utils.Optional<RoleResourcePermissionCountAggregateOutputType> | number
+          }
+        }
+      }
       BankAccount: {
         payload: Prisma.$BankAccountPayload<ExtArgs>
         fields: Prisma.BankAccountFieldRefs
@@ -2510,6 +2705,154 @@ export namespace Prisma {
           count: {
             args: Prisma.CurrencyCountArgs<ExtArgs>
             result: $Utils.Optional<CurrencyCountAggregateOutputType> | number
+          }
+        }
+      }
+      CurrencyPrice: {
+        payload: Prisma.$CurrencyPricePayload<ExtArgs>
+        fields: Prisma.CurrencyPriceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CurrencyPriceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CurrencyPriceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          findFirst: {
+            args: Prisma.CurrencyPriceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CurrencyPriceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          findMany: {
+            args: Prisma.CurrencyPriceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>[]
+          }
+          create: {
+            args: Prisma.CurrencyPriceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          createMany: {
+            args: Prisma.CurrencyPriceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CurrencyPriceCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>[]
+          }
+          delete: {
+            args: Prisma.CurrencyPriceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          update: {
+            args: Prisma.CurrencyPriceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          deleteMany: {
+            args: Prisma.CurrencyPriceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CurrencyPriceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CurrencyPriceUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>[]
+          }
+          upsert: {
+            args: Prisma.CurrencyPriceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPricePayload>
+          }
+          aggregate: {
+            args: Prisma.CurrencyPriceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCurrencyPrice>
+          }
+          groupBy: {
+            args: Prisma.CurrencyPriceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CurrencyPriceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CurrencyPriceCountArgs<ExtArgs>
+            result: $Utils.Optional<CurrencyPriceCountAggregateOutputType> | number
+          }
+        }
+      }
+      CurrencyPriceSyncSetting: {
+        payload: Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>
+        fields: Prisma.CurrencyPriceSyncSettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CurrencyPriceSyncSettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CurrencyPriceSyncSettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          findFirst: {
+            args: Prisma.CurrencyPriceSyncSettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CurrencyPriceSyncSettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          findMany: {
+            args: Prisma.CurrencyPriceSyncSettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>[]
+          }
+          create: {
+            args: Prisma.CurrencyPriceSyncSettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          createMany: {
+            args: Prisma.CurrencyPriceSyncSettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CurrencyPriceSyncSettingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>[]
+          }
+          delete: {
+            args: Prisma.CurrencyPriceSyncSettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          update: {
+            args: Prisma.CurrencyPriceSyncSettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.CurrencyPriceSyncSettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CurrencyPriceSyncSettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CurrencyPriceSyncSettingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>[]
+          }
+          upsert: {
+            args: Prisma.CurrencyPriceSyncSettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CurrencyPriceSyncSettingPayload>
+          }
+          aggregate: {
+            args: Prisma.CurrencyPriceSyncSettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCurrencyPriceSyncSetting>
+          }
+          groupBy: {
+            args: Prisma.CurrencyPriceSyncSettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CurrencyPriceSyncSettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CurrencyPriceSyncSettingCountArgs<ExtArgs>
+            result: $Utils.Optional<CurrencyPriceSyncSettingCountAggregateOutputType> | number
           }
         }
       }
@@ -3250,6 +3593,154 @@ export namespace Prisma {
           count: {
             args: Prisma.PayrollIncentiveTierCountArgs<ExtArgs>
             result: $Utils.Optional<PayrollIncentiveTierCountAggregateOutputType> | number
+          }
+        }
+      }
+      SalaryComponent: {
+        payload: Prisma.$SalaryComponentPayload<ExtArgs>
+        fields: Prisma.SalaryComponentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SalaryComponentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SalaryComponentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          findFirst: {
+            args: Prisma.SalaryComponentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SalaryComponentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          findMany: {
+            args: Prisma.SalaryComponentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>[]
+          }
+          create: {
+            args: Prisma.SalaryComponentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          createMany: {
+            args: Prisma.SalaryComponentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SalaryComponentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>[]
+          }
+          delete: {
+            args: Prisma.SalaryComponentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          update: {
+            args: Prisma.SalaryComponentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          deleteMany: {
+            args: Prisma.SalaryComponentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SalaryComponentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SalaryComponentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>[]
+          }
+          upsert: {
+            args: Prisma.SalaryComponentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SalaryComponentPayload>
+          }
+          aggregate: {
+            args: Prisma.SalaryComponentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSalaryComponent>
+          }
+          groupBy: {
+            args: Prisma.SalaryComponentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SalaryComponentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SalaryComponentCountArgs<ExtArgs>
+            result: $Utils.Optional<SalaryComponentCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserSalaryComponent: {
+        payload: Prisma.$UserSalaryComponentPayload<ExtArgs>
+        fields: Prisma.UserSalaryComponentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UserSalaryComponentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserSalaryComponentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          findFirst: {
+            args: Prisma.UserSalaryComponentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserSalaryComponentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          findMany: {
+            args: Prisma.UserSalaryComponentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>[]
+          }
+          create: {
+            args: Prisma.UserSalaryComponentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          createMany: {
+            args: Prisma.UserSalaryComponentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.UserSalaryComponentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>[]
+          }
+          delete: {
+            args: Prisma.UserSalaryComponentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          update: {
+            args: Prisma.UserSalaryComponentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          deleteMany: {
+            args: Prisma.UserSalaryComponentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserSalaryComponentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.UserSalaryComponentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>[]
+          }
+          upsert: {
+            args: Prisma.UserSalaryComponentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserSalaryComponentPayload>
+          }
+          aggregate: {
+            args: Prisma.UserSalaryComponentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserSalaryComponent>
+          }
+          groupBy: {
+            args: Prisma.UserSalaryComponentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserSalaryComponentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserSalaryComponentCountArgs<ExtArgs>
+            result: $Utils.Optional<UserSalaryComponentCountAggregateOutputType> | number
           }
         }
       }
@@ -4921,12 +5412,15 @@ export namespace Prisma {
     custom_role?: custom_roleOmit
     user?: userOmit
     verification?: verificationOmit
+    roleResourcePermission?: RoleResourcePermissionOmit
     bankAccount?: BankAccountOmit
     bankMutation?: BankMutationOmit
     dailyBankEntry?: DailyBankEntryOmit
     branch?: BranchOmit
     company?: CompanyOmit
     currency?: CurrencyOmit
+    currencyPrice?: CurrencyPriceOmit
+    currencyPriceSyncSetting?: CurrencyPriceSyncSettingOmit
     priceBenchmark?: PriceBenchmarkOmit
     smartdealRate?: SmartdealRateOmit
     companyStockItem?: CompanyStockItemOmit
@@ -4937,6 +5431,8 @@ export namespace Prisma {
     kpiMonthlyResult?: KpiMonthlyResultOmit
     payrollIncentiveMatrix?: PayrollIncentiveMatrixOmit
     payrollIncentiveTier?: PayrollIncentiveTierOmit
+    salaryComponent?: SalaryComponentOmit
+    userSalaryComponent?: UserSalaryComponentOmit
     refiningBatch?: RefiningBatchOmit
     sample?: SampleOmit
     shipmentProvider?: ShipmentProviderOmit
@@ -5041,12 +5537,14 @@ export namespace Prisma {
     incentiveMatrices: number
     roleKpis: number
     users: number
+    resourcePerms: number
   }
 
   export type Custom_roleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     incentiveMatrices?: boolean | Custom_roleCountOutputTypeCountIncentiveMatricesArgs
     roleKpis?: boolean | Custom_roleCountOutputTypeCountRoleKpisArgs
     users?: boolean | Custom_roleCountOutputTypeCountUsersArgs
+    resourcePerms?: boolean | Custom_roleCountOutputTypeCountResourcePermsArgs
   }
 
   // Custom InputTypes
@@ -5081,6 +5579,13 @@ export namespace Prisma {
     where?: userWhereInput
   }
 
+  /**
+   * Custom_roleCountOutputType without action
+   */
+  export type Custom_roleCountOutputTypeCountResourcePermsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleResourcePermissionWhereInput
+  }
+
 
   /**
    * Count Type UserCountOutputType
@@ -5093,7 +5598,9 @@ export namespace Prisma {
     kpiPeriods: number
     kpiPeriodsLocked: number
     kpiMonthlyResults: number
+    salaryComponents: number
     attendances: number
+    attendancesEdited: number
     samples: number
     account: number
     session: number
@@ -5106,7 +5613,9 @@ export namespace Prisma {
     kpiPeriods?: boolean | UserCountOutputTypeCountKpiPeriodsArgs
     kpiPeriodsLocked?: boolean | UserCountOutputTypeCountKpiPeriodsLockedArgs
     kpiMonthlyResults?: boolean | UserCountOutputTypeCountKpiMonthlyResultsArgs
+    salaryComponents?: boolean | UserCountOutputTypeCountSalaryComponentsArgs
     attendances?: boolean | UserCountOutputTypeCountAttendancesArgs
+    attendancesEdited?: boolean | UserCountOutputTypeCountAttendancesEditedArgs
     samples?: boolean | UserCountOutputTypeCountSamplesArgs
     account?: boolean | UserCountOutputTypeCountAccountArgs
     session?: boolean | UserCountOutputTypeCountSessionArgs
@@ -5168,7 +5677,21 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountSalaryComponentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserSalaryComponentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAttendancesEditedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AttendanceWhereInput
   }
 
@@ -5307,6 +5830,7 @@ export namespace Prisma {
 
   export type CompanyCountOutputType = {
     incentiveMatrices: number
+    salaryComponents: number
     branches: number
     roleKpis: number
     custom_roles: number
@@ -5324,6 +5848,7 @@ export namespace Prisma {
 
   export type CompanyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     incentiveMatrices?: boolean | CompanyCountOutputTypeCountIncentiveMatricesArgs
+    salaryComponents?: boolean | CompanyCountOutputTypeCountSalaryComponentsArgs
     branches?: boolean | CompanyCountOutputTypeCountBranchesArgs
     roleKpis?: boolean | CompanyCountOutputTypeCountRoleKpisArgs
     custom_roles?: boolean | CompanyCountOutputTypeCountCustom_rolesArgs
@@ -5355,6 +5880,13 @@ export namespace Prisma {
    */
   export type CompanyCountOutputTypeCountIncentiveMatricesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PayrollIncentiveMatrixWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountSalaryComponentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SalaryComponentWhereInput
   }
 
   /**
@@ -5650,6 +6182,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type SalaryComponentCountOutputType
+   */
+
+  export type SalaryComponentCountOutputType = {
+    assignments: number
+  }
+
+  export type SalaryComponentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignments?: boolean | SalaryComponentCountOutputTypeCountAssignmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SalaryComponentCountOutputType without action
+   */
+  export type SalaryComponentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponentCountOutputType
+     */
+    select?: SalaryComponentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SalaryComponentCountOutputType without action
+   */
+  export type SalaryComponentCountOutputTypeCountAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserSalaryComponentWhereInput
+  }
+
+
+  /**
    * Count Type SampleCountOutputType
    */
 
@@ -5900,6 +6463,8 @@ export namespace Prisma {
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
+    editedById: string | null
+    editedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5921,6 +6486,8 @@ export namespace Prisma {
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
+    editedById: string | null
+    editedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5942,6 +6509,8 @@ export namespace Prisma {
     isWithDoctorNote: number
     status: number
     notes: number
+    editedById: number
+    editedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -5979,6 +6548,8 @@ export namespace Prisma {
     isWithDoctorNote?: true
     status?: true
     notes?: true
+    editedById?: true
+    editedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6000,6 +6571,8 @@ export namespace Prisma {
     isWithDoctorNote?: true
     status?: true
     notes?: true
+    editedById?: true
+    editedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6021,6 +6594,8 @@ export namespace Prisma {
     isWithDoctorNote?: true
     status?: true
     notes?: true
+    editedById?: true
+    editedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6129,6 +6704,8 @@ export namespace Prisma {
     isWithDoctorNote: boolean
     status: $Enums.AttendanceStatus
     notes: string | null
+    editedById: string | null
+    editedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: AttendanceCountAggregateOutputType | null
@@ -6169,9 +6746,12 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
+    editedById?: boolean
+    editedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
@@ -6192,9 +6772,12 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
+    editedById?: boolean
+    editedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
@@ -6215,9 +6798,12 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
+    editedById?: boolean
+    editedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
@@ -6238,21 +6824,26 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
+    editedById?: boolean
+    editedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "editedById" | "editedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }
   export type AttendanceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }
   export type AttendanceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
   }
 
@@ -6260,6 +6851,7 @@ export namespace Prisma {
     name: "Attendance"
     objects: {
       user: Prisma.$userPayload<ExtArgs>
+      editedBy: Prisma.$userPayload<ExtArgs> | null
       branch: Prisma.$BranchPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6279,6 +6871,8 @@ export namespace Prisma {
       isWithDoctorNote: boolean
       status: $Enums.AttendanceStatus
       notes: string | null
+      editedById: string | null
+      editedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["attendance"]>
@@ -6676,6 +7270,7 @@ export namespace Prisma {
   export interface Prisma__AttendanceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    editedBy<T extends Attendance$editedByArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$editedByArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     branch<T extends Attendance$branchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -6722,6 +7317,8 @@ export namespace Prisma {
     readonly isWithDoctorNote: FieldRef<"Attendance", 'Boolean'>
     readonly status: FieldRef<"Attendance", 'AttendanceStatus'>
     readonly notes: FieldRef<"Attendance", 'String'>
+    readonly editedById: FieldRef<"Attendance", 'String'>
+    readonly editedAt: FieldRef<"Attendance", 'DateTime'>
     readonly createdAt: FieldRef<"Attendance", 'DateTime'>
     readonly updatedAt: FieldRef<"Attendance", 'DateTime'>
   }
@@ -7122,6 +7719,25 @@ export namespace Prisma {
      * Limit how many Attendances to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Attendance.editedBy
+   */
+  export type Attendance$editedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the user
+     */
+    select?: userSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the user
+     */
+    omit?: userOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: userInclude<ExtArgs> | null
+    where?: userWhereInput
   }
 
   /**
@@ -9446,6 +10062,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     companyId: string | null
+    usesResourcePerms: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9455,6 +10072,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     companyId: string | null
+    usesResourcePerms: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -9466,6 +10084,7 @@ export namespace Prisma {
     companyId: number
     permissions: number
     payrollCompanyIds: number
+    usesResourcePerms: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -9477,6 +10096,7 @@ export namespace Prisma {
     name?: true
     description?: true
     companyId?: true
+    usesResourcePerms?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9486,6 +10106,7 @@ export namespace Prisma {
     name?: true
     description?: true
     companyId?: true
+    usesResourcePerms?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -9497,6 +10118,7 @@ export namespace Prisma {
     companyId?: true
     permissions?: true
     payrollCompanyIds?: true
+    usesResourcePerms?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -9581,6 +10203,7 @@ export namespace Prisma {
     companyId: string | null
     permissions: string[]
     payrollCompanyIds: string[]
+    usesResourcePerms: boolean
     createdAt: Date
     updatedAt: Date
     _count: Custom_roleCountAggregateOutputType | null
@@ -9609,12 +10232,14 @@ export namespace Prisma {
     companyId?: boolean
     permissions?: boolean
     payrollCompanyIds?: boolean
+    usesResourcePerms?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     incentiveMatrices?: boolean | custom_role$incentiveMatricesArgs<ExtArgs>
     roleKpis?: boolean | custom_role$roleKpisArgs<ExtArgs>
     company?: boolean | custom_role$companyArgs<ExtArgs>
     users?: boolean | custom_role$usersArgs<ExtArgs>
+    resourcePerms?: boolean | custom_role$resourcePermsArgs<ExtArgs>
     _count?: boolean | Custom_roleCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["custom_role"]>
 
@@ -9625,6 +10250,7 @@ export namespace Prisma {
     companyId?: boolean
     permissions?: boolean
     payrollCompanyIds?: boolean
+    usesResourcePerms?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | custom_role$companyArgs<ExtArgs>
@@ -9637,6 +10263,7 @@ export namespace Prisma {
     companyId?: boolean
     permissions?: boolean
     payrollCompanyIds?: boolean
+    usesResourcePerms?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | custom_role$companyArgs<ExtArgs>
@@ -9649,16 +10276,18 @@ export namespace Prisma {
     companyId?: boolean
     permissions?: boolean
     payrollCompanyIds?: boolean
+    usesResourcePerms?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type custom_roleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "companyId" | "permissions" | "payrollCompanyIds" | "createdAt" | "updatedAt", ExtArgs["result"]["custom_role"]>
+  export type custom_roleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "companyId" | "permissions" | "payrollCompanyIds" | "usesResourcePerms" | "createdAt" | "updatedAt", ExtArgs["result"]["custom_role"]>
   export type custom_roleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     incentiveMatrices?: boolean | custom_role$incentiveMatricesArgs<ExtArgs>
     roleKpis?: boolean | custom_role$roleKpisArgs<ExtArgs>
     company?: boolean | custom_role$companyArgs<ExtArgs>
     users?: boolean | custom_role$usersArgs<ExtArgs>
+    resourcePerms?: boolean | custom_role$resourcePermsArgs<ExtArgs>
     _count?: boolean | Custom_roleCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type custom_roleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9675,6 +10304,7 @@ export namespace Prisma {
       roleKpis: Prisma.$RoleKpiPayload<ExtArgs>[]
       company: Prisma.$CompanyPayload<ExtArgs> | null
       users: Prisma.$userPayload<ExtArgs>[]
+      resourcePerms: Prisma.$RoleResourcePermissionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9683,6 +10313,13 @@ export namespace Prisma {
       companyId: string | null
       permissions: string[]
       payrollCompanyIds: string[]
+      /**
+       * True setelah jabatan ini dipindahkan ke matriks izin per-resource.
+       * Penanda ini WAJIB eksplisit, tidak boleh disimpulkan dari "punya baris
+       * RoleResourcePermission atau tidak": mencabut seluruh izin sebuah jabatan
+       * menyisakan nol baris, dan tanpa penanda ini akses lamanya akan hidup lagi.
+       */
+      usesResourcePerms: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["custom_role"]>
@@ -10083,6 +10720,7 @@ export namespace Prisma {
     roleKpis<T extends custom_role$roleKpisArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$roleKpisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     company<T extends custom_role$companyArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$companyArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     users<T extends custom_role$usersArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    resourcePerms<T extends custom_role$resourcePermsArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$resourcePermsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10118,6 +10756,7 @@ export namespace Prisma {
     readonly companyId: FieldRef<"custom_role", 'String'>
     readonly permissions: FieldRef<"custom_role", 'String[]'>
     readonly payrollCompanyIds: FieldRef<"custom_role", 'String[]'>
+    readonly usesResourcePerms: FieldRef<"custom_role", 'Boolean'>
     readonly createdAt: FieldRef<"custom_role", 'DateTime'>
     readonly updatedAt: FieldRef<"custom_role", 'DateTime'>
   }
@@ -10612,6 +11251,30 @@ export namespace Prisma {
   }
 
   /**
+   * custom_role.resourcePerms
+   */
+  export type custom_role$resourcePermsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    where?: RoleResourcePermissionWhereInput
+    orderBy?: RoleResourcePermissionOrderByWithRelationInput | RoleResourcePermissionOrderByWithRelationInput[]
+    cursor?: RoleResourcePermissionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RoleResourcePermissionScalarFieldEnum | RoleResourcePermissionScalarFieldEnum[]
+  }
+
+  /**
    * custom_role without action
    */
   export type custom_roleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10946,7 +11609,9 @@ export namespace Prisma {
     kpiPeriods?: boolean | user$kpiPeriodsArgs<ExtArgs>
     kpiPeriodsLocked?: boolean | user$kpiPeriodsLockedArgs<ExtArgs>
     kpiMonthlyResults?: boolean | user$kpiMonthlyResultsArgs<ExtArgs>
+    salaryComponents?: boolean | user$salaryComponentsArgs<ExtArgs>
     attendances?: boolean | user$attendancesArgs<ExtArgs>
+    attendancesEdited?: boolean | user$attendancesEditedArgs<ExtArgs>
     samples?: boolean | user$samplesArgs<ExtArgs>
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
@@ -11027,7 +11692,9 @@ export namespace Prisma {
     kpiPeriods?: boolean | user$kpiPeriodsArgs<ExtArgs>
     kpiPeriodsLocked?: boolean | user$kpiPeriodsLockedArgs<ExtArgs>
     kpiMonthlyResults?: boolean | user$kpiMonthlyResultsArgs<ExtArgs>
+    salaryComponents?: boolean | user$salaryComponentsArgs<ExtArgs>
     attendances?: boolean | user$attendancesArgs<ExtArgs>
+    attendancesEdited?: boolean | user$attendancesEditedArgs<ExtArgs>
     samples?: boolean | user$samplesArgs<ExtArgs>
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
@@ -11053,7 +11720,9 @@ export namespace Prisma {
       kpiPeriods: Prisma.$KpiPeriodPayload<ExtArgs>[]
       kpiPeriodsLocked: Prisma.$KpiPeriodPayload<ExtArgs>[]
       kpiMonthlyResults: Prisma.$KpiMonthlyResultPayload<ExtArgs>[]
+      salaryComponents: Prisma.$UserSalaryComponentPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
+      attendancesEdited: Prisma.$AttendancePayload<ExtArgs>[]
       samples: Prisma.$SamplePayload<ExtArgs>[]
       account: Prisma.$accountPayload<ExtArgs>[]
       session: Prisma.$sessionPayload<ExtArgs>[]
@@ -11478,7 +12147,9 @@ export namespace Prisma {
     kpiPeriods<T extends user$kpiPeriodsArgs<ExtArgs> = {}>(args?: Subset<T, user$kpiPeriodsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiPeriodPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kpiPeriodsLocked<T extends user$kpiPeriodsLockedArgs<ExtArgs> = {}>(args?: Subset<T, user$kpiPeriodsLockedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiPeriodPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kpiMonthlyResults<T extends user$kpiMonthlyResultsArgs<ExtArgs> = {}>(args?: Subset<T, user$kpiMonthlyResultsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiMonthlyResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    salaryComponents<T extends user$salaryComponentsArgs<ExtArgs> = {}>(args?: Subset<T, user$salaryComponentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendances<T extends user$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, user$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    attendancesEdited<T extends user$attendancesEditedArgs<ExtArgs> = {}>(args?: Subset<T, user$attendancesEditedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     samples<T extends user$samplesArgs<ExtArgs> = {}>(args?: Subset<T, user$samplesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SamplePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     account<T extends user$accountArgs<ExtArgs> = {}>(args?: Subset<T, user$accountArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$accountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     session<T extends user$sessionArgs<ExtArgs> = {}>(args?: Subset<T, user$sessionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$sessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12075,9 +12746,57 @@ export namespace Prisma {
   }
 
   /**
+   * user.salaryComponents
+   */
+  export type user$salaryComponentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    where?: UserSalaryComponentWhereInput
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    cursor?: UserSalaryComponentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserSalaryComponentScalarFieldEnum | UserSalaryComponentScalarFieldEnum[]
+  }
+
+  /**
    * user.attendances
    */
   export type user$attendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Attendance
+     */
+    select?: AttendanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Attendance
+     */
+    omit?: AttendanceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceInclude<ExtArgs> | null
+    where?: AttendanceWhereInput
+    orderBy?: AttendanceOrderByWithRelationInput | AttendanceOrderByWithRelationInput[]
+    cursor?: AttendanceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
+  }
+
+  /**
+   * user.attendancesEdited
+   */
+  export type user$attendancesEditedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Attendance
      */
@@ -13237,6 +13956,1123 @@ export namespace Prisma {
      * Omit specific fields from the verification
      */
     omit?: verificationOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RoleResourcePermission
+   */
+
+  export type AggregateRoleResourcePermission = {
+    _count: RoleResourcePermissionCountAggregateOutputType | null
+    _min: RoleResourcePermissionMinAggregateOutputType | null
+    _max: RoleResourcePermissionMaxAggregateOutputType | null
+  }
+
+  export type RoleResourcePermissionMinAggregateOutputType = {
+    id: string | null
+    roleId: string | null
+    resource: string | null
+    viewScope: $Enums.ScopeMode | null
+    writeScope: $Enums.ScopeMode | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleResourcePermissionMaxAggregateOutputType = {
+    id: string | null
+    roleId: string | null
+    resource: string | null
+    viewScope: $Enums.ScopeMode | null
+    writeScope: $Enums.ScopeMode | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleResourcePermissionCountAggregateOutputType = {
+    id: number
+    roleId: number
+    resource: number
+    viewScope: number
+    viewCompanyIds: number
+    writeScope: number
+    writeCompanyIds: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RoleResourcePermissionMinAggregateInputType = {
+    id?: true
+    roleId?: true
+    resource?: true
+    viewScope?: true
+    writeScope?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleResourcePermissionMaxAggregateInputType = {
+    id?: true
+    roleId?: true
+    resource?: true
+    viewScope?: true
+    writeScope?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleResourcePermissionCountAggregateInputType = {
+    id?: true
+    roleId?: true
+    resource?: true
+    viewScope?: true
+    viewCompanyIds?: true
+    writeScope?: true
+    writeCompanyIds?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RoleResourcePermissionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleResourcePermission to aggregate.
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleResourcePermissions to fetch.
+     */
+    orderBy?: RoleResourcePermissionOrderByWithRelationInput | RoleResourcePermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RoleResourcePermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleResourcePermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleResourcePermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RoleResourcePermissions
+    **/
+    _count?: true | RoleResourcePermissionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RoleResourcePermissionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RoleResourcePermissionMaxAggregateInputType
+  }
+
+  export type GetRoleResourcePermissionAggregateType<T extends RoleResourcePermissionAggregateArgs> = {
+        [P in keyof T & keyof AggregateRoleResourcePermission]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRoleResourcePermission[P]>
+      : GetScalarType<T[P], AggregateRoleResourcePermission[P]>
+  }
+
+
+
+
+  export type RoleResourcePermissionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleResourcePermissionWhereInput
+    orderBy?: RoleResourcePermissionOrderByWithAggregationInput | RoleResourcePermissionOrderByWithAggregationInput[]
+    by: RoleResourcePermissionScalarFieldEnum[] | RoleResourcePermissionScalarFieldEnum
+    having?: RoleResourcePermissionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RoleResourcePermissionCountAggregateInputType | true
+    _min?: RoleResourcePermissionMinAggregateInputType
+    _max?: RoleResourcePermissionMaxAggregateInputType
+  }
+
+  export type RoleResourcePermissionGroupByOutputType = {
+    id: string
+    roleId: string
+    resource: string
+    viewScope: $Enums.ScopeMode
+    viewCompanyIds: string[]
+    writeScope: $Enums.ScopeMode
+    writeCompanyIds: string[]
+    createdAt: Date
+    updatedAt: Date
+    _count: RoleResourcePermissionCountAggregateOutputType | null
+    _min: RoleResourcePermissionMinAggregateOutputType | null
+    _max: RoleResourcePermissionMaxAggregateOutputType | null
+  }
+
+  type GetRoleResourcePermissionGroupByPayload<T extends RoleResourcePermissionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RoleResourcePermissionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RoleResourcePermissionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RoleResourcePermissionGroupByOutputType[P]>
+            : GetScalarType<T[P], RoleResourcePermissionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RoleResourcePermissionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    roleId?: boolean
+    resource?: boolean
+    viewScope?: boolean
+    viewCompanyIds?: boolean
+    writeScope?: boolean
+    writeCompanyIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleResourcePermission"]>
+
+  export type RoleResourcePermissionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    roleId?: boolean
+    resource?: boolean
+    viewScope?: boolean
+    viewCompanyIds?: boolean
+    writeScope?: boolean
+    writeCompanyIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleResourcePermission"]>
+
+  export type RoleResourcePermissionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    roleId?: boolean
+    resource?: boolean
+    viewScope?: boolean
+    viewCompanyIds?: boolean
+    writeScope?: boolean
+    writeCompanyIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleResourcePermission"]>
+
+  export type RoleResourcePermissionSelectScalar = {
+    id?: boolean
+    roleId?: boolean
+    resource?: boolean
+    viewScope?: boolean
+    viewCompanyIds?: boolean
+    writeScope?: boolean
+    writeCompanyIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RoleResourcePermissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "roleId" | "resource" | "viewScope" | "viewCompanyIds" | "writeScope" | "writeCompanyIds" | "createdAt" | "updatedAt", ExtArgs["result"]["roleResourcePermission"]>
+  export type RoleResourcePermissionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+  export type RoleResourcePermissionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+  export type RoleResourcePermissionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    role?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+
+  export type $RoleResourcePermissionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RoleResourcePermission"
+    objects: {
+      role: Prisma.$custom_rolePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      roleId: string
+      /**
+       * Kunci resource dari registry di src/lib/authz/resources.ts.
+       * Sengaja String, bukan enum DB: menambah halaman baru tidak boleh butuh migrasi.
+       */
+      resource: string
+      viewScope: $Enums.ScopeMode
+      /**
+       * Hanya dibaca saat viewScope = SELECTED.
+       */
+      viewCompanyIds: string[]
+      writeScope: $Enums.ScopeMode
+      /**
+       * Hanya dibaca saat writeScope = SELECTED.
+       */
+      writeCompanyIds: string[]
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["roleResourcePermission"]>
+    composites: {}
+  }
+
+  type RoleResourcePermissionGetPayload<S extends boolean | null | undefined | RoleResourcePermissionDefaultArgs> = $Result.GetResult<Prisma.$RoleResourcePermissionPayload, S>
+
+  type RoleResourcePermissionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RoleResourcePermissionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RoleResourcePermissionCountAggregateInputType | true
+    }
+
+  export interface RoleResourcePermissionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RoleResourcePermission'], meta: { name: 'RoleResourcePermission' } }
+    /**
+     * Find zero or one RoleResourcePermission that matches the filter.
+     * @param {RoleResourcePermissionFindUniqueArgs} args - Arguments to find a RoleResourcePermission
+     * @example
+     * // Get one RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RoleResourcePermissionFindUniqueArgs>(args: SelectSubset<T, RoleResourcePermissionFindUniqueArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RoleResourcePermission that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RoleResourcePermissionFindUniqueOrThrowArgs} args - Arguments to find a RoleResourcePermission
+     * @example
+     * // Get one RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RoleResourcePermissionFindUniqueOrThrowArgs>(args: SelectSubset<T, RoleResourcePermissionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleResourcePermission that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionFindFirstArgs} args - Arguments to find a RoleResourcePermission
+     * @example
+     * // Get one RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RoleResourcePermissionFindFirstArgs>(args?: SelectSubset<T, RoleResourcePermissionFindFirstArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleResourcePermission that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionFindFirstOrThrowArgs} args - Arguments to find a RoleResourcePermission
+     * @example
+     * // Get one RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RoleResourcePermissionFindFirstOrThrowArgs>(args?: SelectSubset<T, RoleResourcePermissionFindFirstOrThrowArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RoleResourcePermissions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RoleResourcePermissions
+     * const roleResourcePermissions = await prisma.roleResourcePermission.findMany()
+     * 
+     * // Get first 10 RoleResourcePermissions
+     * const roleResourcePermissions = await prisma.roleResourcePermission.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const roleResourcePermissionWithIdOnly = await prisma.roleResourcePermission.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RoleResourcePermissionFindManyArgs>(args?: SelectSubset<T, RoleResourcePermissionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RoleResourcePermission.
+     * @param {RoleResourcePermissionCreateArgs} args - Arguments to create a RoleResourcePermission.
+     * @example
+     * // Create one RoleResourcePermission
+     * const RoleResourcePermission = await prisma.roleResourcePermission.create({
+     *   data: {
+     *     // ... data to create a RoleResourcePermission
+     *   }
+     * })
+     * 
+     */
+    create<T extends RoleResourcePermissionCreateArgs>(args: SelectSubset<T, RoleResourcePermissionCreateArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RoleResourcePermissions.
+     * @param {RoleResourcePermissionCreateManyArgs} args - Arguments to create many RoleResourcePermissions.
+     * @example
+     * // Create many RoleResourcePermissions
+     * const roleResourcePermission = await prisma.roleResourcePermission.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RoleResourcePermissionCreateManyArgs>(args?: SelectSubset<T, RoleResourcePermissionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RoleResourcePermissions and returns the data saved in the database.
+     * @param {RoleResourcePermissionCreateManyAndReturnArgs} args - Arguments to create many RoleResourcePermissions.
+     * @example
+     * // Create many RoleResourcePermissions
+     * const roleResourcePermission = await prisma.roleResourcePermission.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RoleResourcePermissions and only return the `id`
+     * const roleResourcePermissionWithIdOnly = await prisma.roleResourcePermission.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RoleResourcePermissionCreateManyAndReturnArgs>(args?: SelectSubset<T, RoleResourcePermissionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RoleResourcePermission.
+     * @param {RoleResourcePermissionDeleteArgs} args - Arguments to delete one RoleResourcePermission.
+     * @example
+     * // Delete one RoleResourcePermission
+     * const RoleResourcePermission = await prisma.roleResourcePermission.delete({
+     *   where: {
+     *     // ... filter to delete one RoleResourcePermission
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RoleResourcePermissionDeleteArgs>(args: SelectSubset<T, RoleResourcePermissionDeleteArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RoleResourcePermission.
+     * @param {RoleResourcePermissionUpdateArgs} args - Arguments to update one RoleResourcePermission.
+     * @example
+     * // Update one RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RoleResourcePermissionUpdateArgs>(args: SelectSubset<T, RoleResourcePermissionUpdateArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RoleResourcePermissions.
+     * @param {RoleResourcePermissionDeleteManyArgs} args - Arguments to filter RoleResourcePermissions to delete.
+     * @example
+     * // Delete a few RoleResourcePermissions
+     * const { count } = await prisma.roleResourcePermission.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RoleResourcePermissionDeleteManyArgs>(args?: SelectSubset<T, RoleResourcePermissionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleResourcePermissions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RoleResourcePermissions
+     * const roleResourcePermission = await prisma.roleResourcePermission.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RoleResourcePermissionUpdateManyArgs>(args: SelectSubset<T, RoleResourcePermissionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleResourcePermissions and returns the data updated in the database.
+     * @param {RoleResourcePermissionUpdateManyAndReturnArgs} args - Arguments to update many RoleResourcePermissions.
+     * @example
+     * // Update many RoleResourcePermissions
+     * const roleResourcePermission = await prisma.roleResourcePermission.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RoleResourcePermissions and only return the `id`
+     * const roleResourcePermissionWithIdOnly = await prisma.roleResourcePermission.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RoleResourcePermissionUpdateManyAndReturnArgs>(args: SelectSubset<T, RoleResourcePermissionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RoleResourcePermission.
+     * @param {RoleResourcePermissionUpsertArgs} args - Arguments to update or create a RoleResourcePermission.
+     * @example
+     * // Update or create a RoleResourcePermission
+     * const roleResourcePermission = await prisma.roleResourcePermission.upsert({
+     *   create: {
+     *     // ... data to create a RoleResourcePermission
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RoleResourcePermission we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RoleResourcePermissionUpsertArgs>(args: SelectSubset<T, RoleResourcePermissionUpsertArgs<ExtArgs>>): Prisma__RoleResourcePermissionClient<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RoleResourcePermissions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionCountArgs} args - Arguments to filter RoleResourcePermissions to count.
+     * @example
+     * // Count the number of RoleResourcePermissions
+     * const count = await prisma.roleResourcePermission.count({
+     *   where: {
+     *     // ... the filter for the RoleResourcePermissions we want to count
+     *   }
+     * })
+    **/
+    count<T extends RoleResourcePermissionCountArgs>(
+      args?: Subset<T, RoleResourcePermissionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RoleResourcePermissionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RoleResourcePermission.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RoleResourcePermissionAggregateArgs>(args: Subset<T, RoleResourcePermissionAggregateArgs>): Prisma.PrismaPromise<GetRoleResourcePermissionAggregateType<T>>
+
+    /**
+     * Group by RoleResourcePermission.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleResourcePermissionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RoleResourcePermissionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RoleResourcePermissionGroupByArgs['orderBy'] }
+        : { orderBy?: RoleResourcePermissionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RoleResourcePermissionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleResourcePermissionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RoleResourcePermission model
+   */
+  readonly fields: RoleResourcePermissionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RoleResourcePermission.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RoleResourcePermissionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    role<T extends custom_roleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, custom_roleDefaultArgs<ExtArgs>>): Prisma__custom_roleClient<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RoleResourcePermission model
+   */
+  interface RoleResourcePermissionFieldRefs {
+    readonly id: FieldRef<"RoleResourcePermission", 'String'>
+    readonly roleId: FieldRef<"RoleResourcePermission", 'String'>
+    readonly resource: FieldRef<"RoleResourcePermission", 'String'>
+    readonly viewScope: FieldRef<"RoleResourcePermission", 'ScopeMode'>
+    readonly viewCompanyIds: FieldRef<"RoleResourcePermission", 'String[]'>
+    readonly writeScope: FieldRef<"RoleResourcePermission", 'ScopeMode'>
+    readonly writeCompanyIds: FieldRef<"RoleResourcePermission", 'String[]'>
+    readonly createdAt: FieldRef<"RoleResourcePermission", 'DateTime'>
+    readonly updatedAt: FieldRef<"RoleResourcePermission", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RoleResourcePermission findUnique
+   */
+  export type RoleResourcePermissionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleResourcePermission to fetch.
+     */
+    where: RoleResourcePermissionWhereUniqueInput
+  }
+
+  /**
+   * RoleResourcePermission findUniqueOrThrow
+   */
+  export type RoleResourcePermissionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleResourcePermission to fetch.
+     */
+    where: RoleResourcePermissionWhereUniqueInput
+  }
+
+  /**
+   * RoleResourcePermission findFirst
+   */
+  export type RoleResourcePermissionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleResourcePermission to fetch.
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleResourcePermissions to fetch.
+     */
+    orderBy?: RoleResourcePermissionOrderByWithRelationInput | RoleResourcePermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleResourcePermissions.
+     */
+    cursor?: RoleResourcePermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleResourcePermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleResourcePermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleResourcePermissions.
+     */
+    distinct?: RoleResourcePermissionScalarFieldEnum | RoleResourcePermissionScalarFieldEnum[]
+  }
+
+  /**
+   * RoleResourcePermission findFirstOrThrow
+   */
+  export type RoleResourcePermissionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleResourcePermission to fetch.
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleResourcePermissions to fetch.
+     */
+    orderBy?: RoleResourcePermissionOrderByWithRelationInput | RoleResourcePermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleResourcePermissions.
+     */
+    cursor?: RoleResourcePermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleResourcePermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleResourcePermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleResourcePermissions.
+     */
+    distinct?: RoleResourcePermissionScalarFieldEnum | RoleResourcePermissionScalarFieldEnum[]
+  }
+
+  /**
+   * RoleResourcePermission findMany
+   */
+  export type RoleResourcePermissionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleResourcePermissions to fetch.
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleResourcePermissions to fetch.
+     */
+    orderBy?: RoleResourcePermissionOrderByWithRelationInput | RoleResourcePermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RoleResourcePermissions.
+     */
+    cursor?: RoleResourcePermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleResourcePermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleResourcePermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleResourcePermissions.
+     */
+    distinct?: RoleResourcePermissionScalarFieldEnum | RoleResourcePermissionScalarFieldEnum[]
+  }
+
+  /**
+   * RoleResourcePermission create
+   */
+  export type RoleResourcePermissionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RoleResourcePermission.
+     */
+    data: XOR<RoleResourcePermissionCreateInput, RoleResourcePermissionUncheckedCreateInput>
+  }
+
+  /**
+   * RoleResourcePermission createMany
+   */
+  export type RoleResourcePermissionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RoleResourcePermissions.
+     */
+    data: RoleResourcePermissionCreateManyInput | RoleResourcePermissionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RoleResourcePermission createManyAndReturn
+   */
+  export type RoleResourcePermissionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * The data used to create many RoleResourcePermissions.
+     */
+    data: RoleResourcePermissionCreateManyInput | RoleResourcePermissionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleResourcePermission update
+   */
+  export type RoleResourcePermissionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RoleResourcePermission.
+     */
+    data: XOR<RoleResourcePermissionUpdateInput, RoleResourcePermissionUncheckedUpdateInput>
+    /**
+     * Choose, which RoleResourcePermission to update.
+     */
+    where: RoleResourcePermissionWhereUniqueInput
+  }
+
+  /**
+   * RoleResourcePermission updateMany
+   */
+  export type RoleResourcePermissionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RoleResourcePermissions.
+     */
+    data: XOR<RoleResourcePermissionUpdateManyMutationInput, RoleResourcePermissionUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleResourcePermissions to update
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * Limit how many RoleResourcePermissions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleResourcePermission updateManyAndReturn
+   */
+  export type RoleResourcePermissionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * The data used to update RoleResourcePermissions.
+     */
+    data: XOR<RoleResourcePermissionUpdateManyMutationInput, RoleResourcePermissionUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleResourcePermissions to update
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * Limit how many RoleResourcePermissions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleResourcePermission upsert
+   */
+  export type RoleResourcePermissionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RoleResourcePermission to update in case it exists.
+     */
+    where: RoleResourcePermissionWhereUniqueInput
+    /**
+     * In case the RoleResourcePermission found by the `where` argument doesn't exist, create a new RoleResourcePermission with this data.
+     */
+    create: XOR<RoleResourcePermissionCreateInput, RoleResourcePermissionUncheckedCreateInput>
+    /**
+     * In case the RoleResourcePermission was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RoleResourcePermissionUpdateInput, RoleResourcePermissionUncheckedUpdateInput>
+  }
+
+  /**
+   * RoleResourcePermission delete
+   */
+  export type RoleResourcePermissionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
+    /**
+     * Filter which RoleResourcePermission to delete.
+     */
+    where: RoleResourcePermissionWhereUniqueInput
+  }
+
+  /**
+   * RoleResourcePermission deleteMany
+   */
+  export type RoleResourcePermissionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleResourcePermissions to delete
+     */
+    where?: RoleResourcePermissionWhereInput
+    /**
+     * Limit how many RoleResourcePermissions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleResourcePermission without action
+   */
+  export type RoleResourcePermissionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleResourcePermission
+     */
+    select?: RoleResourcePermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleResourcePermission
+     */
+    omit?: RoleResourcePermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleResourcePermissionInclude<ExtArgs> | null
   }
 
 
@@ -18343,6 +20179,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     incentiveMatrices?: boolean | Company$incentiveMatricesArgs<ExtArgs>
+    salaryComponents?: boolean | Company$salaryComponentsArgs<ExtArgs>
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
@@ -18389,6 +20226,7 @@ export namespace Prisma {
   export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "code" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     incentiveMatrices?: boolean | Company$incentiveMatricesArgs<ExtArgs>
+    salaryComponents?: boolean | Company$salaryComponentsArgs<ExtArgs>
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
@@ -18411,6 +20249,7 @@ export namespace Prisma {
     name: "Company"
     objects: {
       incentiveMatrices: Prisma.$PayrollIncentiveMatrixPayload<ExtArgs>[]
+      salaryComponents: Prisma.$SalaryComponentPayload<ExtArgs>[]
       branches: Prisma.$BranchPayload<ExtArgs>[]
       roleKpis: Prisma.$RoleKpiPayload<ExtArgs>[]
       custom_roles: Prisma.$custom_rolePayload<ExtArgs>[]
@@ -18827,6 +20666,7 @@ export namespace Prisma {
   export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     incentiveMatrices<T extends Company$incentiveMatricesArgs<ExtArgs> = {}>(args?: Subset<T, Company$incentiveMatricesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollIncentiveMatrixPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    salaryComponents<T extends Company$salaryComponentsArgs<ExtArgs> = {}>(args?: Subset<T, Company$salaryComponentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     branches<T extends Company$branchesArgs<ExtArgs> = {}>(args?: Subset<T, Company$branchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     roleKpis<T extends Company$roleKpisArgs<ExtArgs> = {}>(args?: Subset<T, Company$roleKpisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     custom_roles<T extends Company$custom_rolesArgs<ExtArgs> = {}>(args?: Subset<T, Company$custom_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -19289,6 +21129,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PayrollIncentiveMatrixScalarFieldEnum | PayrollIncentiveMatrixScalarFieldEnum[]
+  }
+
+  /**
+   * Company.salaryComponents
+   */
+  export type Company$salaryComponentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    where?: SalaryComponentWhereInput
+    orderBy?: SalaryComponentOrderByWithRelationInput | SalaryComponentOrderByWithRelationInput[]
+    cursor?: SalaryComponentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SalaryComponentScalarFieldEnum | SalaryComponentScalarFieldEnum[]
   }
 
   /**
@@ -19805,6 +21669,7 @@ export namespace Prisma {
     bankAccounts?: boolean | Currency$bankAccountsArgs<ExtArgs>
     stocks?: boolean | Currency$stocksArgs<ExtArgs>
     stockMutations?: boolean | Currency$stockMutationsArgs<ExtArgs>
+    price?: boolean | Currency$priceArgs<ExtArgs>
     _count?: boolean | CurrencyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["currency"]>
 
@@ -19843,6 +21708,7 @@ export namespace Prisma {
     bankAccounts?: boolean | Currency$bankAccountsArgs<ExtArgs>
     stocks?: boolean | Currency$stocksArgs<ExtArgs>
     stockMutations?: boolean | Currency$stockMutationsArgs<ExtArgs>
+    price?: boolean | Currency$priceArgs<ExtArgs>
     _count?: boolean | CurrencyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CurrencyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -19854,6 +21720,7 @@ export namespace Prisma {
       bankAccounts: Prisma.$BankAccountPayload<ExtArgs>[]
       stocks: Prisma.$CurrencyStockPayload<ExtArgs>[]
       stockMutations: Prisma.$StockMutationPayload<ExtArgs>[]
+      price: Prisma.$CurrencyPricePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20260,6 +22127,7 @@ export namespace Prisma {
     bankAccounts<T extends Currency$bankAccountsArgs<ExtArgs> = {}>(args?: Subset<T, Currency$bankAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stocks<T extends Currency$stocksArgs<ExtArgs> = {}>(args?: Subset<T, Currency$stocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyStockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockMutations<T extends Currency$stockMutationsArgs<ExtArgs> = {}>(args?: Subset<T, Currency$stockMutationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMutationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    price<T extends Currency$priceArgs<ExtArgs> = {}>(args?: Subset<T, Currency$priceArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20761,6 +22629,25 @@ export namespace Prisma {
   }
 
   /**
+   * Currency.price
+   */
+  export type Currency$priceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    where?: CurrencyPriceWhereInput
+  }
+
+  /**
    * Currency without action
    */
   export type CurrencyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -20776,6 +22663,2201 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CurrencyInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CurrencyPrice
+   */
+
+  export type AggregateCurrencyPrice = {
+    _count: CurrencyPriceCountAggregateOutputType | null
+    _avg: CurrencyPriceAvgAggregateOutputType | null
+    _sum: CurrencyPriceSumAggregateOutputType | null
+    _min: CurrencyPriceMinAggregateOutputType | null
+    _max: CurrencyPriceMaxAggregateOutputType | null
+  }
+
+  export type CurrencyPriceAvgAggregateOutputType = {
+    buyPrice: Decimal | null
+    sellPrice: Decimal | null
+  }
+
+  export type CurrencyPriceSumAggregateOutputType = {
+    buyPrice: Decimal | null
+    sellPrice: Decimal | null
+  }
+
+  export type CurrencyPriceMinAggregateOutputType = {
+    id: string | null
+    currencyId: string | null
+    buyPrice: Decimal | null
+    sellPrice: Decimal | null
+    source: $Enums.PriceSource | null
+    isLocked: boolean | null
+    lastSyncedAt: Date | null
+    note: string | null
+    updatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CurrencyPriceMaxAggregateOutputType = {
+    id: string | null
+    currencyId: string | null
+    buyPrice: Decimal | null
+    sellPrice: Decimal | null
+    source: $Enums.PriceSource | null
+    isLocked: boolean | null
+    lastSyncedAt: Date | null
+    note: string | null
+    updatedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CurrencyPriceCountAggregateOutputType = {
+    id: number
+    currencyId: number
+    buyPrice: number
+    sellPrice: number
+    source: number
+    isLocked: number
+    lastSyncedAt: number
+    note: number
+    updatedBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CurrencyPriceAvgAggregateInputType = {
+    buyPrice?: true
+    sellPrice?: true
+  }
+
+  export type CurrencyPriceSumAggregateInputType = {
+    buyPrice?: true
+    sellPrice?: true
+  }
+
+  export type CurrencyPriceMinAggregateInputType = {
+    id?: true
+    currencyId?: true
+    buyPrice?: true
+    sellPrice?: true
+    source?: true
+    isLocked?: true
+    lastSyncedAt?: true
+    note?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CurrencyPriceMaxAggregateInputType = {
+    id?: true
+    currencyId?: true
+    buyPrice?: true
+    sellPrice?: true
+    source?: true
+    isLocked?: true
+    lastSyncedAt?: true
+    note?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CurrencyPriceCountAggregateInputType = {
+    id?: true
+    currencyId?: true
+    buyPrice?: true
+    sellPrice?: true
+    source?: true
+    isLocked?: true
+    lastSyncedAt?: true
+    note?: true
+    updatedBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CurrencyPriceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CurrencyPrice to aggregate.
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPrices to fetch.
+     */
+    orderBy?: CurrencyPriceOrderByWithRelationInput | CurrencyPriceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CurrencyPriceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPrices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPrices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CurrencyPrices
+    **/
+    _count?: true | CurrencyPriceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CurrencyPriceAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CurrencyPriceSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CurrencyPriceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CurrencyPriceMaxAggregateInputType
+  }
+
+  export type GetCurrencyPriceAggregateType<T extends CurrencyPriceAggregateArgs> = {
+        [P in keyof T & keyof AggregateCurrencyPrice]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCurrencyPrice[P]>
+      : GetScalarType<T[P], AggregateCurrencyPrice[P]>
+  }
+
+
+
+
+  export type CurrencyPriceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CurrencyPriceWhereInput
+    orderBy?: CurrencyPriceOrderByWithAggregationInput | CurrencyPriceOrderByWithAggregationInput[]
+    by: CurrencyPriceScalarFieldEnum[] | CurrencyPriceScalarFieldEnum
+    having?: CurrencyPriceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CurrencyPriceCountAggregateInputType | true
+    _avg?: CurrencyPriceAvgAggregateInputType
+    _sum?: CurrencyPriceSumAggregateInputType
+    _min?: CurrencyPriceMinAggregateInputType
+    _max?: CurrencyPriceMaxAggregateInputType
+  }
+
+  export type CurrencyPriceGroupByOutputType = {
+    id: string
+    currencyId: string
+    buyPrice: Decimal
+    sellPrice: Decimal
+    source: $Enums.PriceSource
+    isLocked: boolean
+    lastSyncedAt: Date | null
+    note: string | null
+    updatedBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: CurrencyPriceCountAggregateOutputType | null
+    _avg: CurrencyPriceAvgAggregateOutputType | null
+    _sum: CurrencyPriceSumAggregateOutputType | null
+    _min: CurrencyPriceMinAggregateOutputType | null
+    _max: CurrencyPriceMaxAggregateOutputType | null
+  }
+
+  type GetCurrencyPriceGroupByPayload<T extends CurrencyPriceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CurrencyPriceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CurrencyPriceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CurrencyPriceGroupByOutputType[P]>
+            : GetScalarType<T[P], CurrencyPriceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CurrencyPriceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currencyId?: boolean
+    buyPrice?: boolean
+    sellPrice?: boolean
+    source?: boolean
+    isLocked?: boolean
+    lastSyncedAt?: boolean
+    note?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["currencyPrice"]>
+
+  export type CurrencyPriceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currencyId?: boolean
+    buyPrice?: boolean
+    sellPrice?: boolean
+    source?: boolean
+    isLocked?: boolean
+    lastSyncedAt?: boolean
+    note?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["currencyPrice"]>
+
+  export type CurrencyPriceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    currencyId?: boolean
+    buyPrice?: boolean
+    sellPrice?: boolean
+    source?: boolean
+    isLocked?: boolean
+    lastSyncedAt?: boolean
+    note?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["currencyPrice"]>
+
+  export type CurrencyPriceSelectScalar = {
+    id?: boolean
+    currencyId?: boolean
+    buyPrice?: boolean
+    sellPrice?: boolean
+    source?: boolean
+    isLocked?: boolean
+    lastSyncedAt?: boolean
+    note?: boolean
+    updatedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CurrencyPriceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "currencyId" | "buyPrice" | "sellPrice" | "source" | "isLocked" | "lastSyncedAt" | "note" | "updatedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["currencyPrice"]>
+  export type CurrencyPriceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }
+  export type CurrencyPriceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }
+  export type CurrencyPriceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+  }
+
+  export type $CurrencyPricePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CurrencyPrice"
+    objects: {
+      currency: Prisma.$CurrencyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      currencyId: string
+      buyPrice: Prisma.Decimal
+      sellPrice: Prisma.Decimal
+      source: $Enums.PriceSource
+      isLocked: boolean
+      lastSyncedAt: Date | null
+      note: string | null
+      updatedBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["currencyPrice"]>
+    composites: {}
+  }
+
+  type CurrencyPriceGetPayload<S extends boolean | null | undefined | CurrencyPriceDefaultArgs> = $Result.GetResult<Prisma.$CurrencyPricePayload, S>
+
+  type CurrencyPriceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CurrencyPriceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CurrencyPriceCountAggregateInputType | true
+    }
+
+  export interface CurrencyPriceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CurrencyPrice'], meta: { name: 'CurrencyPrice' } }
+    /**
+     * Find zero or one CurrencyPrice that matches the filter.
+     * @param {CurrencyPriceFindUniqueArgs} args - Arguments to find a CurrencyPrice
+     * @example
+     * // Get one CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CurrencyPriceFindUniqueArgs>(args: SelectSubset<T, CurrencyPriceFindUniqueArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CurrencyPrice that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CurrencyPriceFindUniqueOrThrowArgs} args - Arguments to find a CurrencyPrice
+     * @example
+     * // Get one CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CurrencyPriceFindUniqueOrThrowArgs>(args: SelectSubset<T, CurrencyPriceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CurrencyPrice that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceFindFirstArgs} args - Arguments to find a CurrencyPrice
+     * @example
+     * // Get one CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CurrencyPriceFindFirstArgs>(args?: SelectSubset<T, CurrencyPriceFindFirstArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CurrencyPrice that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceFindFirstOrThrowArgs} args - Arguments to find a CurrencyPrice
+     * @example
+     * // Get one CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CurrencyPriceFindFirstOrThrowArgs>(args?: SelectSubset<T, CurrencyPriceFindFirstOrThrowArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CurrencyPrices that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CurrencyPrices
+     * const currencyPrices = await prisma.currencyPrice.findMany()
+     * 
+     * // Get first 10 CurrencyPrices
+     * const currencyPrices = await prisma.currencyPrice.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const currencyPriceWithIdOnly = await prisma.currencyPrice.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CurrencyPriceFindManyArgs>(args?: SelectSubset<T, CurrencyPriceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CurrencyPrice.
+     * @param {CurrencyPriceCreateArgs} args - Arguments to create a CurrencyPrice.
+     * @example
+     * // Create one CurrencyPrice
+     * const CurrencyPrice = await prisma.currencyPrice.create({
+     *   data: {
+     *     // ... data to create a CurrencyPrice
+     *   }
+     * })
+     * 
+     */
+    create<T extends CurrencyPriceCreateArgs>(args: SelectSubset<T, CurrencyPriceCreateArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CurrencyPrices.
+     * @param {CurrencyPriceCreateManyArgs} args - Arguments to create many CurrencyPrices.
+     * @example
+     * // Create many CurrencyPrices
+     * const currencyPrice = await prisma.currencyPrice.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CurrencyPriceCreateManyArgs>(args?: SelectSubset<T, CurrencyPriceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CurrencyPrices and returns the data saved in the database.
+     * @param {CurrencyPriceCreateManyAndReturnArgs} args - Arguments to create many CurrencyPrices.
+     * @example
+     * // Create many CurrencyPrices
+     * const currencyPrice = await prisma.currencyPrice.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CurrencyPrices and only return the `id`
+     * const currencyPriceWithIdOnly = await prisma.currencyPrice.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CurrencyPriceCreateManyAndReturnArgs>(args?: SelectSubset<T, CurrencyPriceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CurrencyPrice.
+     * @param {CurrencyPriceDeleteArgs} args - Arguments to delete one CurrencyPrice.
+     * @example
+     * // Delete one CurrencyPrice
+     * const CurrencyPrice = await prisma.currencyPrice.delete({
+     *   where: {
+     *     // ... filter to delete one CurrencyPrice
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CurrencyPriceDeleteArgs>(args: SelectSubset<T, CurrencyPriceDeleteArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CurrencyPrice.
+     * @param {CurrencyPriceUpdateArgs} args - Arguments to update one CurrencyPrice.
+     * @example
+     * // Update one CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CurrencyPriceUpdateArgs>(args: SelectSubset<T, CurrencyPriceUpdateArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CurrencyPrices.
+     * @param {CurrencyPriceDeleteManyArgs} args - Arguments to filter CurrencyPrices to delete.
+     * @example
+     * // Delete a few CurrencyPrices
+     * const { count } = await prisma.currencyPrice.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CurrencyPriceDeleteManyArgs>(args?: SelectSubset<T, CurrencyPriceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CurrencyPrices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CurrencyPrices
+     * const currencyPrice = await prisma.currencyPrice.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CurrencyPriceUpdateManyArgs>(args: SelectSubset<T, CurrencyPriceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CurrencyPrices and returns the data updated in the database.
+     * @param {CurrencyPriceUpdateManyAndReturnArgs} args - Arguments to update many CurrencyPrices.
+     * @example
+     * // Update many CurrencyPrices
+     * const currencyPrice = await prisma.currencyPrice.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CurrencyPrices and only return the `id`
+     * const currencyPriceWithIdOnly = await prisma.currencyPrice.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CurrencyPriceUpdateManyAndReturnArgs>(args: SelectSubset<T, CurrencyPriceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CurrencyPrice.
+     * @param {CurrencyPriceUpsertArgs} args - Arguments to update or create a CurrencyPrice.
+     * @example
+     * // Update or create a CurrencyPrice
+     * const currencyPrice = await prisma.currencyPrice.upsert({
+     *   create: {
+     *     // ... data to create a CurrencyPrice
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CurrencyPrice we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CurrencyPriceUpsertArgs>(args: SelectSubset<T, CurrencyPriceUpsertArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CurrencyPrices.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceCountArgs} args - Arguments to filter CurrencyPrices to count.
+     * @example
+     * // Count the number of CurrencyPrices
+     * const count = await prisma.currencyPrice.count({
+     *   where: {
+     *     // ... the filter for the CurrencyPrices we want to count
+     *   }
+     * })
+    **/
+    count<T extends CurrencyPriceCountArgs>(
+      args?: Subset<T, CurrencyPriceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CurrencyPriceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CurrencyPrice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CurrencyPriceAggregateArgs>(args: Subset<T, CurrencyPriceAggregateArgs>): Prisma.PrismaPromise<GetCurrencyPriceAggregateType<T>>
+
+    /**
+     * Group by CurrencyPrice.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CurrencyPriceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CurrencyPriceGroupByArgs['orderBy'] }
+        : { orderBy?: CurrencyPriceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CurrencyPriceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCurrencyPriceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CurrencyPrice model
+   */
+  readonly fields: CurrencyPriceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CurrencyPrice.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CurrencyPriceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    currency<T extends CurrencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyDefaultArgs<ExtArgs>>): Prisma__CurrencyClient<$Result.GetResult<Prisma.$CurrencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CurrencyPrice model
+   */
+  interface CurrencyPriceFieldRefs {
+    readonly id: FieldRef<"CurrencyPrice", 'String'>
+    readonly currencyId: FieldRef<"CurrencyPrice", 'String'>
+    readonly buyPrice: FieldRef<"CurrencyPrice", 'Decimal'>
+    readonly sellPrice: FieldRef<"CurrencyPrice", 'Decimal'>
+    readonly source: FieldRef<"CurrencyPrice", 'PriceSource'>
+    readonly isLocked: FieldRef<"CurrencyPrice", 'Boolean'>
+    readonly lastSyncedAt: FieldRef<"CurrencyPrice", 'DateTime'>
+    readonly note: FieldRef<"CurrencyPrice", 'String'>
+    readonly updatedBy: FieldRef<"CurrencyPrice", 'String'>
+    readonly createdAt: FieldRef<"CurrencyPrice", 'DateTime'>
+    readonly updatedAt: FieldRef<"CurrencyPrice", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CurrencyPrice findUnique
+   */
+  export type CurrencyPriceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPrice to fetch.
+     */
+    where: CurrencyPriceWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPrice findUniqueOrThrow
+   */
+  export type CurrencyPriceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPrice to fetch.
+     */
+    where: CurrencyPriceWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPrice findFirst
+   */
+  export type CurrencyPriceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPrice to fetch.
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPrices to fetch.
+     */
+    orderBy?: CurrencyPriceOrderByWithRelationInput | CurrencyPriceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CurrencyPrices.
+     */
+    cursor?: CurrencyPriceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPrices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPrices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPrices.
+     */
+    distinct?: CurrencyPriceScalarFieldEnum | CurrencyPriceScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPrice findFirstOrThrow
+   */
+  export type CurrencyPriceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPrice to fetch.
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPrices to fetch.
+     */
+    orderBy?: CurrencyPriceOrderByWithRelationInput | CurrencyPriceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CurrencyPrices.
+     */
+    cursor?: CurrencyPriceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPrices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPrices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPrices.
+     */
+    distinct?: CurrencyPriceScalarFieldEnum | CurrencyPriceScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPrice findMany
+   */
+  export type CurrencyPriceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPrices to fetch.
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPrices to fetch.
+     */
+    orderBy?: CurrencyPriceOrderByWithRelationInput | CurrencyPriceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CurrencyPrices.
+     */
+    cursor?: CurrencyPriceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPrices from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPrices.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPrices.
+     */
+    distinct?: CurrencyPriceScalarFieldEnum | CurrencyPriceScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPrice create
+   */
+  export type CurrencyPriceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CurrencyPrice.
+     */
+    data: XOR<CurrencyPriceCreateInput, CurrencyPriceUncheckedCreateInput>
+  }
+
+  /**
+   * CurrencyPrice createMany
+   */
+  export type CurrencyPriceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CurrencyPrices.
+     */
+    data: CurrencyPriceCreateManyInput | CurrencyPriceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CurrencyPrice createManyAndReturn
+   */
+  export type CurrencyPriceCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * The data used to create many CurrencyPrices.
+     */
+    data: CurrencyPriceCreateManyInput | CurrencyPriceCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CurrencyPrice update
+   */
+  export type CurrencyPriceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CurrencyPrice.
+     */
+    data: XOR<CurrencyPriceUpdateInput, CurrencyPriceUncheckedUpdateInput>
+    /**
+     * Choose, which CurrencyPrice to update.
+     */
+    where: CurrencyPriceWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPrice updateMany
+   */
+  export type CurrencyPriceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CurrencyPrices.
+     */
+    data: XOR<CurrencyPriceUpdateManyMutationInput, CurrencyPriceUncheckedUpdateManyInput>
+    /**
+     * Filter which CurrencyPrices to update
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * Limit how many CurrencyPrices to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CurrencyPrice updateManyAndReturn
+   */
+  export type CurrencyPriceUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * The data used to update CurrencyPrices.
+     */
+    data: XOR<CurrencyPriceUpdateManyMutationInput, CurrencyPriceUncheckedUpdateManyInput>
+    /**
+     * Filter which CurrencyPrices to update
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * Limit how many CurrencyPrices to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CurrencyPrice upsert
+   */
+  export type CurrencyPriceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CurrencyPrice to update in case it exists.
+     */
+    where: CurrencyPriceWhereUniqueInput
+    /**
+     * In case the CurrencyPrice found by the `where` argument doesn't exist, create a new CurrencyPrice with this data.
+     */
+    create: XOR<CurrencyPriceCreateInput, CurrencyPriceUncheckedCreateInput>
+    /**
+     * In case the CurrencyPrice was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CurrencyPriceUpdateInput, CurrencyPriceUncheckedUpdateInput>
+  }
+
+  /**
+   * CurrencyPrice delete
+   */
+  export type CurrencyPriceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+    /**
+     * Filter which CurrencyPrice to delete.
+     */
+    where: CurrencyPriceWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPrice deleteMany
+   */
+  export type CurrencyPriceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CurrencyPrices to delete
+     */
+    where?: CurrencyPriceWhereInput
+    /**
+     * Limit how many CurrencyPrices to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CurrencyPrice without action
+   */
+  export type CurrencyPriceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPrice
+     */
+    select?: CurrencyPriceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPrice
+     */
+    omit?: CurrencyPriceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CurrencyPriceInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CurrencyPriceSyncSetting
+   */
+
+  export type AggregateCurrencyPriceSyncSetting = {
+    _count: CurrencyPriceSyncSettingCountAggregateOutputType | null
+    _min: CurrencyPriceSyncSettingMinAggregateOutputType | null
+    _max: CurrencyPriceSyncSettingMaxAggregateOutputType | null
+  }
+
+  export type CurrencyPriceSyncSettingMinAggregateOutputType = {
+    id: string | null
+    autoSync: boolean | null
+    lastRunAt: Date | null
+    lastRunSummary: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type CurrencyPriceSyncSettingMaxAggregateOutputType = {
+    id: string | null
+    autoSync: boolean | null
+    lastRunAt: Date | null
+    lastRunSummary: string | null
+    updatedBy: string | null
+    updatedAt: Date | null
+  }
+
+  export type CurrencyPriceSyncSettingCountAggregateOutputType = {
+    id: number
+    autoSync: number
+    lastRunAt: number
+    lastRunSummary: number
+    updatedBy: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CurrencyPriceSyncSettingMinAggregateInputType = {
+    id?: true
+    autoSync?: true
+    lastRunAt?: true
+    lastRunSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type CurrencyPriceSyncSettingMaxAggregateInputType = {
+    id?: true
+    autoSync?: true
+    lastRunAt?: true
+    lastRunSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+  }
+
+  export type CurrencyPriceSyncSettingCountAggregateInputType = {
+    id?: true
+    autoSync?: true
+    lastRunAt?: true
+    lastRunSummary?: true
+    updatedBy?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CurrencyPriceSyncSettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CurrencyPriceSyncSetting to aggregate.
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPriceSyncSettings to fetch.
+     */
+    orderBy?: CurrencyPriceSyncSettingOrderByWithRelationInput | CurrencyPriceSyncSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CurrencyPriceSyncSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPriceSyncSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPriceSyncSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CurrencyPriceSyncSettings
+    **/
+    _count?: true | CurrencyPriceSyncSettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CurrencyPriceSyncSettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CurrencyPriceSyncSettingMaxAggregateInputType
+  }
+
+  export type GetCurrencyPriceSyncSettingAggregateType<T extends CurrencyPriceSyncSettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateCurrencyPriceSyncSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCurrencyPriceSyncSetting[P]>
+      : GetScalarType<T[P], AggregateCurrencyPriceSyncSetting[P]>
+  }
+
+
+
+
+  export type CurrencyPriceSyncSettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CurrencyPriceSyncSettingWhereInput
+    orderBy?: CurrencyPriceSyncSettingOrderByWithAggregationInput | CurrencyPriceSyncSettingOrderByWithAggregationInput[]
+    by: CurrencyPriceSyncSettingScalarFieldEnum[] | CurrencyPriceSyncSettingScalarFieldEnum
+    having?: CurrencyPriceSyncSettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CurrencyPriceSyncSettingCountAggregateInputType | true
+    _min?: CurrencyPriceSyncSettingMinAggregateInputType
+    _max?: CurrencyPriceSyncSettingMaxAggregateInputType
+  }
+
+  export type CurrencyPriceSyncSettingGroupByOutputType = {
+    id: string
+    autoSync: boolean
+    lastRunAt: Date | null
+    lastRunSummary: string | null
+    updatedBy: string | null
+    updatedAt: Date
+    _count: CurrencyPriceSyncSettingCountAggregateOutputType | null
+    _min: CurrencyPriceSyncSettingMinAggregateOutputType | null
+    _max: CurrencyPriceSyncSettingMaxAggregateOutputType | null
+  }
+
+  type GetCurrencyPriceSyncSettingGroupByPayload<T extends CurrencyPriceSyncSettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CurrencyPriceSyncSettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CurrencyPriceSyncSettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CurrencyPriceSyncSettingGroupByOutputType[P]>
+            : GetScalarType<T[P], CurrencyPriceSyncSettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CurrencyPriceSyncSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    autoSync?: boolean
+    lastRunAt?: boolean
+    lastRunSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["currencyPriceSyncSetting"]>
+
+  export type CurrencyPriceSyncSettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    autoSync?: boolean
+    lastRunAt?: boolean
+    lastRunSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["currencyPriceSyncSetting"]>
+
+  export type CurrencyPriceSyncSettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    autoSync?: boolean
+    lastRunAt?: boolean
+    lastRunSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["currencyPriceSyncSetting"]>
+
+  export type CurrencyPriceSyncSettingSelectScalar = {
+    id?: boolean
+    autoSync?: boolean
+    lastRunAt?: boolean
+    lastRunSummary?: boolean
+    updatedBy?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CurrencyPriceSyncSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "autoSync" | "lastRunAt" | "lastRunSummary" | "updatedBy" | "updatedAt", ExtArgs["result"]["currencyPriceSyncSetting"]>
+
+  export type $CurrencyPriceSyncSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CurrencyPriceSyncSetting"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      autoSync: boolean
+      lastRunAt: Date | null
+      /**
+       * Ringkasan sekali jalan, mis. "24 diperbarui · 3 terkunci · 1 dilewati".
+       */
+      lastRunSummary: string | null
+      updatedBy: string | null
+      updatedAt: Date
+    }, ExtArgs["result"]["currencyPriceSyncSetting"]>
+    composites: {}
+  }
+
+  type CurrencyPriceSyncSettingGetPayload<S extends boolean | null | undefined | CurrencyPriceSyncSettingDefaultArgs> = $Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload, S>
+
+  type CurrencyPriceSyncSettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CurrencyPriceSyncSettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CurrencyPriceSyncSettingCountAggregateInputType | true
+    }
+
+  export interface CurrencyPriceSyncSettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CurrencyPriceSyncSetting'], meta: { name: 'CurrencyPriceSyncSetting' } }
+    /**
+     * Find zero or one CurrencyPriceSyncSetting that matches the filter.
+     * @param {CurrencyPriceSyncSettingFindUniqueArgs} args - Arguments to find a CurrencyPriceSyncSetting
+     * @example
+     * // Get one CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CurrencyPriceSyncSettingFindUniqueArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingFindUniqueArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CurrencyPriceSyncSetting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CurrencyPriceSyncSettingFindUniqueOrThrowArgs} args - Arguments to find a CurrencyPriceSyncSetting
+     * @example
+     * // Get one CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CurrencyPriceSyncSettingFindUniqueOrThrowArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CurrencyPriceSyncSetting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingFindFirstArgs} args - Arguments to find a CurrencyPriceSyncSetting
+     * @example
+     * // Get one CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CurrencyPriceSyncSettingFindFirstArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingFindFirstArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CurrencyPriceSyncSetting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingFindFirstOrThrowArgs} args - Arguments to find a CurrencyPriceSyncSetting
+     * @example
+     * // Get one CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CurrencyPriceSyncSettingFindFirstOrThrowArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CurrencyPriceSyncSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CurrencyPriceSyncSettings
+     * const currencyPriceSyncSettings = await prisma.currencyPriceSyncSetting.findMany()
+     * 
+     * // Get first 10 CurrencyPriceSyncSettings
+     * const currencyPriceSyncSettings = await prisma.currencyPriceSyncSetting.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const currencyPriceSyncSettingWithIdOnly = await prisma.currencyPriceSyncSetting.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CurrencyPriceSyncSettingFindManyArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CurrencyPriceSyncSetting.
+     * @param {CurrencyPriceSyncSettingCreateArgs} args - Arguments to create a CurrencyPriceSyncSetting.
+     * @example
+     * // Create one CurrencyPriceSyncSetting
+     * const CurrencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.create({
+     *   data: {
+     *     // ... data to create a CurrencyPriceSyncSetting
+     *   }
+     * })
+     * 
+     */
+    create<T extends CurrencyPriceSyncSettingCreateArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingCreateArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CurrencyPriceSyncSettings.
+     * @param {CurrencyPriceSyncSettingCreateManyArgs} args - Arguments to create many CurrencyPriceSyncSettings.
+     * @example
+     * // Create many CurrencyPriceSyncSettings
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CurrencyPriceSyncSettingCreateManyArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CurrencyPriceSyncSettings and returns the data saved in the database.
+     * @param {CurrencyPriceSyncSettingCreateManyAndReturnArgs} args - Arguments to create many CurrencyPriceSyncSettings.
+     * @example
+     * // Create many CurrencyPriceSyncSettings
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CurrencyPriceSyncSettings and only return the `id`
+     * const currencyPriceSyncSettingWithIdOnly = await prisma.currencyPriceSyncSetting.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CurrencyPriceSyncSettingCreateManyAndReturnArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CurrencyPriceSyncSetting.
+     * @param {CurrencyPriceSyncSettingDeleteArgs} args - Arguments to delete one CurrencyPriceSyncSetting.
+     * @example
+     * // Delete one CurrencyPriceSyncSetting
+     * const CurrencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.delete({
+     *   where: {
+     *     // ... filter to delete one CurrencyPriceSyncSetting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CurrencyPriceSyncSettingDeleteArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingDeleteArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CurrencyPriceSyncSetting.
+     * @param {CurrencyPriceSyncSettingUpdateArgs} args - Arguments to update one CurrencyPriceSyncSetting.
+     * @example
+     * // Update one CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CurrencyPriceSyncSettingUpdateArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingUpdateArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CurrencyPriceSyncSettings.
+     * @param {CurrencyPriceSyncSettingDeleteManyArgs} args - Arguments to filter CurrencyPriceSyncSettings to delete.
+     * @example
+     * // Delete a few CurrencyPriceSyncSettings
+     * const { count } = await prisma.currencyPriceSyncSetting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CurrencyPriceSyncSettingDeleteManyArgs>(args?: SelectSubset<T, CurrencyPriceSyncSettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CurrencyPriceSyncSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CurrencyPriceSyncSettings
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CurrencyPriceSyncSettingUpdateManyArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CurrencyPriceSyncSettings and returns the data updated in the database.
+     * @param {CurrencyPriceSyncSettingUpdateManyAndReturnArgs} args - Arguments to update many CurrencyPriceSyncSettings.
+     * @example
+     * // Update many CurrencyPriceSyncSettings
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CurrencyPriceSyncSettings and only return the `id`
+     * const currencyPriceSyncSettingWithIdOnly = await prisma.currencyPriceSyncSetting.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CurrencyPriceSyncSettingUpdateManyAndReturnArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CurrencyPriceSyncSetting.
+     * @param {CurrencyPriceSyncSettingUpsertArgs} args - Arguments to update or create a CurrencyPriceSyncSetting.
+     * @example
+     * // Update or create a CurrencyPriceSyncSetting
+     * const currencyPriceSyncSetting = await prisma.currencyPriceSyncSetting.upsert({
+     *   create: {
+     *     // ... data to create a CurrencyPriceSyncSetting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CurrencyPriceSyncSetting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CurrencyPriceSyncSettingUpsertArgs>(args: SelectSubset<T, CurrencyPriceSyncSettingUpsertArgs<ExtArgs>>): Prisma__CurrencyPriceSyncSettingClient<$Result.GetResult<Prisma.$CurrencyPriceSyncSettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CurrencyPriceSyncSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingCountArgs} args - Arguments to filter CurrencyPriceSyncSettings to count.
+     * @example
+     * // Count the number of CurrencyPriceSyncSettings
+     * const count = await prisma.currencyPriceSyncSetting.count({
+     *   where: {
+     *     // ... the filter for the CurrencyPriceSyncSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends CurrencyPriceSyncSettingCountArgs>(
+      args?: Subset<T, CurrencyPriceSyncSettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CurrencyPriceSyncSettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CurrencyPriceSyncSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CurrencyPriceSyncSettingAggregateArgs>(args: Subset<T, CurrencyPriceSyncSettingAggregateArgs>): Prisma.PrismaPromise<GetCurrencyPriceSyncSettingAggregateType<T>>
+
+    /**
+     * Group by CurrencyPriceSyncSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CurrencyPriceSyncSettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CurrencyPriceSyncSettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CurrencyPriceSyncSettingGroupByArgs['orderBy'] }
+        : { orderBy?: CurrencyPriceSyncSettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CurrencyPriceSyncSettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCurrencyPriceSyncSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CurrencyPriceSyncSetting model
+   */
+  readonly fields: CurrencyPriceSyncSettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CurrencyPriceSyncSetting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CurrencyPriceSyncSettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CurrencyPriceSyncSetting model
+   */
+  interface CurrencyPriceSyncSettingFieldRefs {
+    readonly id: FieldRef<"CurrencyPriceSyncSetting", 'String'>
+    readonly autoSync: FieldRef<"CurrencyPriceSyncSetting", 'Boolean'>
+    readonly lastRunAt: FieldRef<"CurrencyPriceSyncSetting", 'DateTime'>
+    readonly lastRunSummary: FieldRef<"CurrencyPriceSyncSetting", 'String'>
+    readonly updatedBy: FieldRef<"CurrencyPriceSyncSetting", 'String'>
+    readonly updatedAt: FieldRef<"CurrencyPriceSyncSetting", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CurrencyPriceSyncSetting findUnique
+   */
+  export type CurrencyPriceSyncSettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPriceSyncSetting to fetch.
+     */
+    where: CurrencyPriceSyncSettingWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPriceSyncSetting findUniqueOrThrow
+   */
+  export type CurrencyPriceSyncSettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPriceSyncSetting to fetch.
+     */
+    where: CurrencyPriceSyncSettingWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPriceSyncSetting findFirst
+   */
+  export type CurrencyPriceSyncSettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPriceSyncSetting to fetch.
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPriceSyncSettings to fetch.
+     */
+    orderBy?: CurrencyPriceSyncSettingOrderByWithRelationInput | CurrencyPriceSyncSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CurrencyPriceSyncSettings.
+     */
+    cursor?: CurrencyPriceSyncSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPriceSyncSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPriceSyncSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPriceSyncSettings.
+     */
+    distinct?: CurrencyPriceSyncSettingScalarFieldEnum | CurrencyPriceSyncSettingScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPriceSyncSetting findFirstOrThrow
+   */
+  export type CurrencyPriceSyncSettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPriceSyncSetting to fetch.
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPriceSyncSettings to fetch.
+     */
+    orderBy?: CurrencyPriceSyncSettingOrderByWithRelationInput | CurrencyPriceSyncSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CurrencyPriceSyncSettings.
+     */
+    cursor?: CurrencyPriceSyncSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPriceSyncSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPriceSyncSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPriceSyncSettings.
+     */
+    distinct?: CurrencyPriceSyncSettingScalarFieldEnum | CurrencyPriceSyncSettingScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPriceSyncSetting findMany
+   */
+  export type CurrencyPriceSyncSettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which CurrencyPriceSyncSettings to fetch.
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CurrencyPriceSyncSettings to fetch.
+     */
+    orderBy?: CurrencyPriceSyncSettingOrderByWithRelationInput | CurrencyPriceSyncSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CurrencyPriceSyncSettings.
+     */
+    cursor?: CurrencyPriceSyncSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CurrencyPriceSyncSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CurrencyPriceSyncSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CurrencyPriceSyncSettings.
+     */
+    distinct?: CurrencyPriceSyncSettingScalarFieldEnum | CurrencyPriceSyncSettingScalarFieldEnum[]
+  }
+
+  /**
+   * CurrencyPriceSyncSetting create
+   */
+  export type CurrencyPriceSyncSettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to create a CurrencyPriceSyncSetting.
+     */
+    data: XOR<CurrencyPriceSyncSettingCreateInput, CurrencyPriceSyncSettingUncheckedCreateInput>
+  }
+
+  /**
+   * CurrencyPriceSyncSetting createMany
+   */
+  export type CurrencyPriceSyncSettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CurrencyPriceSyncSettings.
+     */
+    data: CurrencyPriceSyncSettingCreateManyInput | CurrencyPriceSyncSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CurrencyPriceSyncSetting createManyAndReturn
+   */
+  export type CurrencyPriceSyncSettingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * The data used to create many CurrencyPriceSyncSettings.
+     */
+    data: CurrencyPriceSyncSettingCreateManyInput | CurrencyPriceSyncSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CurrencyPriceSyncSetting update
+   */
+  export type CurrencyPriceSyncSettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to update a CurrencyPriceSyncSetting.
+     */
+    data: XOR<CurrencyPriceSyncSettingUpdateInput, CurrencyPriceSyncSettingUncheckedUpdateInput>
+    /**
+     * Choose, which CurrencyPriceSyncSetting to update.
+     */
+    where: CurrencyPriceSyncSettingWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPriceSyncSetting updateMany
+   */
+  export type CurrencyPriceSyncSettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CurrencyPriceSyncSettings.
+     */
+    data: XOR<CurrencyPriceSyncSettingUpdateManyMutationInput, CurrencyPriceSyncSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which CurrencyPriceSyncSettings to update
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * Limit how many CurrencyPriceSyncSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CurrencyPriceSyncSetting updateManyAndReturn
+   */
+  export type CurrencyPriceSyncSettingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * The data used to update CurrencyPriceSyncSettings.
+     */
+    data: XOR<CurrencyPriceSyncSettingUpdateManyMutationInput, CurrencyPriceSyncSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which CurrencyPriceSyncSettings to update
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * Limit how many CurrencyPriceSyncSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CurrencyPriceSyncSetting upsert
+   */
+  export type CurrencyPriceSyncSettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * The filter to search for the CurrencyPriceSyncSetting to update in case it exists.
+     */
+    where: CurrencyPriceSyncSettingWhereUniqueInput
+    /**
+     * In case the CurrencyPriceSyncSetting found by the `where` argument doesn't exist, create a new CurrencyPriceSyncSetting with this data.
+     */
+    create: XOR<CurrencyPriceSyncSettingCreateInput, CurrencyPriceSyncSettingUncheckedCreateInput>
+    /**
+     * In case the CurrencyPriceSyncSetting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CurrencyPriceSyncSettingUpdateInput, CurrencyPriceSyncSettingUncheckedUpdateInput>
+  }
+
+  /**
+   * CurrencyPriceSyncSetting delete
+   */
+  export type CurrencyPriceSyncSettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
+    /**
+     * Filter which CurrencyPriceSyncSetting to delete.
+     */
+    where: CurrencyPriceSyncSettingWhereUniqueInput
+  }
+
+  /**
+   * CurrencyPriceSyncSetting deleteMany
+   */
+  export type CurrencyPriceSyncSettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CurrencyPriceSyncSettings to delete
+     */
+    where?: CurrencyPriceSyncSettingWhereInput
+    /**
+     * Limit how many CurrencyPriceSyncSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CurrencyPriceSyncSetting without action
+   */
+  export type CurrencyPriceSyncSettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CurrencyPriceSyncSetting
+     */
+    select?: CurrencyPriceSyncSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CurrencyPriceSyncSetting
+     */
+    omit?: CurrencyPriceSyncSettingOmit<ExtArgs> | null
   }
 
 
@@ -32826,6 +36908,2329 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PayrollIncentiveTierInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SalaryComponent
+   */
+
+  export type AggregateSalaryComponent = {
+    _count: SalaryComponentCountAggregateOutputType | null
+    _avg: SalaryComponentAvgAggregateOutputType | null
+    _sum: SalaryComponentSumAggregateOutputType | null
+    _min: SalaryComponentMinAggregateOutputType | null
+    _max: SalaryComponentMaxAggregateOutputType | null
+  }
+
+  export type SalaryComponentAvgAggregateOutputType = {
+    defaultAmount: Decimal | null
+  }
+
+  export type SalaryComponentSumAggregateOutputType = {
+    defaultAmount: Decimal | null
+  }
+
+  export type SalaryComponentMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    name: string | null
+    kind: $Enums.SalaryComponentKind | null
+    defaultAmount: Decimal | null
+    note: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalaryComponentMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    name: string | null
+    kind: $Enums.SalaryComponentKind | null
+    defaultAmount: Decimal | null
+    note: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SalaryComponentCountAggregateOutputType = {
+    id: number
+    companyId: number
+    name: number
+    kind: number
+    defaultAmount: number
+    note: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SalaryComponentAvgAggregateInputType = {
+    defaultAmount?: true
+  }
+
+  export type SalaryComponentSumAggregateInputType = {
+    defaultAmount?: true
+  }
+
+  export type SalaryComponentMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    name?: true
+    kind?: true
+    defaultAmount?: true
+    note?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalaryComponentMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    name?: true
+    kind?: true
+    defaultAmount?: true
+    note?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SalaryComponentCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    name?: true
+    kind?: true
+    defaultAmount?: true
+    note?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SalaryComponentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SalaryComponent to aggregate.
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SalaryComponents to fetch.
+     */
+    orderBy?: SalaryComponentOrderByWithRelationInput | SalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SalaryComponents
+    **/
+    _count?: true | SalaryComponentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SalaryComponentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SalaryComponentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SalaryComponentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SalaryComponentMaxAggregateInputType
+  }
+
+  export type GetSalaryComponentAggregateType<T extends SalaryComponentAggregateArgs> = {
+        [P in keyof T & keyof AggregateSalaryComponent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSalaryComponent[P]>
+      : GetScalarType<T[P], AggregateSalaryComponent[P]>
+  }
+
+
+
+
+  export type SalaryComponentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SalaryComponentWhereInput
+    orderBy?: SalaryComponentOrderByWithAggregationInput | SalaryComponentOrderByWithAggregationInput[]
+    by: SalaryComponentScalarFieldEnum[] | SalaryComponentScalarFieldEnum
+    having?: SalaryComponentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SalaryComponentCountAggregateInputType | true
+    _avg?: SalaryComponentAvgAggregateInputType
+    _sum?: SalaryComponentSumAggregateInputType
+    _min?: SalaryComponentMinAggregateInputType
+    _max?: SalaryComponentMaxAggregateInputType
+  }
+
+  export type SalaryComponentGroupByOutputType = {
+    id: string
+    companyId: string | null
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount: Decimal | null
+    note: string | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: SalaryComponentCountAggregateOutputType | null
+    _avg: SalaryComponentAvgAggregateOutputType | null
+    _sum: SalaryComponentSumAggregateOutputType | null
+    _min: SalaryComponentMinAggregateOutputType | null
+    _max: SalaryComponentMaxAggregateOutputType | null
+  }
+
+  type GetSalaryComponentGroupByPayload<T extends SalaryComponentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SalaryComponentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SalaryComponentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SalaryComponentGroupByOutputType[P]>
+            : GetScalarType<T[P], SalaryComponentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SalaryComponentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    name?: boolean
+    kind?: boolean
+    defaultAmount?: boolean
+    note?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+    assignments?: boolean | SalaryComponent$assignmentsArgs<ExtArgs>
+    _count?: boolean | SalaryComponentCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["salaryComponent"]>
+
+  export type SalaryComponentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    name?: boolean
+    kind?: boolean
+    defaultAmount?: boolean
+    note?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+  }, ExtArgs["result"]["salaryComponent"]>
+
+  export type SalaryComponentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    name?: boolean
+    kind?: boolean
+    defaultAmount?: boolean
+    note?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+  }, ExtArgs["result"]["salaryComponent"]>
+
+  export type SalaryComponentSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    name?: boolean
+    kind?: boolean
+    defaultAmount?: boolean
+    note?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SalaryComponentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "name" | "kind" | "defaultAmount" | "note" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["salaryComponent"]>
+  export type SalaryComponentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+    assignments?: boolean | SalaryComponent$assignmentsArgs<ExtArgs>
+    _count?: boolean | SalaryComponentCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SalaryComponentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+  }
+  export type SalaryComponentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | SalaryComponent$companyArgs<ExtArgs>
+  }
+
+  export type $SalaryComponentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SalaryComponent"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs> | null
+      assignments: Prisma.$UserSalaryComponentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string | null
+      name: string
+      kind: $Enums.SalaryComponentKind
+      /**
+       * Nilai yang diusulkan saat komponen dipasang ke karyawan baru; nilai
+       * sesungguhnya selalu diambil dari UserSalaryComponent.amount.
+       */
+      defaultAmount: Prisma.Decimal | null
+      note: string | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["salaryComponent"]>
+    composites: {}
+  }
+
+  type SalaryComponentGetPayload<S extends boolean | null | undefined | SalaryComponentDefaultArgs> = $Result.GetResult<Prisma.$SalaryComponentPayload, S>
+
+  type SalaryComponentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SalaryComponentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SalaryComponentCountAggregateInputType | true
+    }
+
+  export interface SalaryComponentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SalaryComponent'], meta: { name: 'SalaryComponent' } }
+    /**
+     * Find zero or one SalaryComponent that matches the filter.
+     * @param {SalaryComponentFindUniqueArgs} args - Arguments to find a SalaryComponent
+     * @example
+     * // Get one SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SalaryComponentFindUniqueArgs>(args: SelectSubset<T, SalaryComponentFindUniqueArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SalaryComponent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SalaryComponentFindUniqueOrThrowArgs} args - Arguments to find a SalaryComponent
+     * @example
+     * // Get one SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SalaryComponentFindUniqueOrThrowArgs>(args: SelectSubset<T, SalaryComponentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SalaryComponent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentFindFirstArgs} args - Arguments to find a SalaryComponent
+     * @example
+     * // Get one SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SalaryComponentFindFirstArgs>(args?: SelectSubset<T, SalaryComponentFindFirstArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SalaryComponent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentFindFirstOrThrowArgs} args - Arguments to find a SalaryComponent
+     * @example
+     * // Get one SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SalaryComponentFindFirstOrThrowArgs>(args?: SelectSubset<T, SalaryComponentFindFirstOrThrowArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SalaryComponents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SalaryComponents
+     * const salaryComponents = await prisma.salaryComponent.findMany()
+     * 
+     * // Get first 10 SalaryComponents
+     * const salaryComponents = await prisma.salaryComponent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const salaryComponentWithIdOnly = await prisma.salaryComponent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SalaryComponentFindManyArgs>(args?: SelectSubset<T, SalaryComponentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SalaryComponent.
+     * @param {SalaryComponentCreateArgs} args - Arguments to create a SalaryComponent.
+     * @example
+     * // Create one SalaryComponent
+     * const SalaryComponent = await prisma.salaryComponent.create({
+     *   data: {
+     *     // ... data to create a SalaryComponent
+     *   }
+     * })
+     * 
+     */
+    create<T extends SalaryComponentCreateArgs>(args: SelectSubset<T, SalaryComponentCreateArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SalaryComponents.
+     * @param {SalaryComponentCreateManyArgs} args - Arguments to create many SalaryComponents.
+     * @example
+     * // Create many SalaryComponents
+     * const salaryComponent = await prisma.salaryComponent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SalaryComponentCreateManyArgs>(args?: SelectSubset<T, SalaryComponentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SalaryComponents and returns the data saved in the database.
+     * @param {SalaryComponentCreateManyAndReturnArgs} args - Arguments to create many SalaryComponents.
+     * @example
+     * // Create many SalaryComponents
+     * const salaryComponent = await prisma.salaryComponent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SalaryComponents and only return the `id`
+     * const salaryComponentWithIdOnly = await prisma.salaryComponent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SalaryComponentCreateManyAndReturnArgs>(args?: SelectSubset<T, SalaryComponentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SalaryComponent.
+     * @param {SalaryComponentDeleteArgs} args - Arguments to delete one SalaryComponent.
+     * @example
+     * // Delete one SalaryComponent
+     * const SalaryComponent = await prisma.salaryComponent.delete({
+     *   where: {
+     *     // ... filter to delete one SalaryComponent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SalaryComponentDeleteArgs>(args: SelectSubset<T, SalaryComponentDeleteArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SalaryComponent.
+     * @param {SalaryComponentUpdateArgs} args - Arguments to update one SalaryComponent.
+     * @example
+     * // Update one SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SalaryComponentUpdateArgs>(args: SelectSubset<T, SalaryComponentUpdateArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SalaryComponents.
+     * @param {SalaryComponentDeleteManyArgs} args - Arguments to filter SalaryComponents to delete.
+     * @example
+     * // Delete a few SalaryComponents
+     * const { count } = await prisma.salaryComponent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SalaryComponentDeleteManyArgs>(args?: SelectSubset<T, SalaryComponentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SalaryComponents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SalaryComponents
+     * const salaryComponent = await prisma.salaryComponent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SalaryComponentUpdateManyArgs>(args: SelectSubset<T, SalaryComponentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SalaryComponents and returns the data updated in the database.
+     * @param {SalaryComponentUpdateManyAndReturnArgs} args - Arguments to update many SalaryComponents.
+     * @example
+     * // Update many SalaryComponents
+     * const salaryComponent = await prisma.salaryComponent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SalaryComponents and only return the `id`
+     * const salaryComponentWithIdOnly = await prisma.salaryComponent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SalaryComponentUpdateManyAndReturnArgs>(args: SelectSubset<T, SalaryComponentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SalaryComponent.
+     * @param {SalaryComponentUpsertArgs} args - Arguments to update or create a SalaryComponent.
+     * @example
+     * // Update or create a SalaryComponent
+     * const salaryComponent = await prisma.salaryComponent.upsert({
+     *   create: {
+     *     // ... data to create a SalaryComponent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SalaryComponent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SalaryComponentUpsertArgs>(args: SelectSubset<T, SalaryComponentUpsertArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SalaryComponents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentCountArgs} args - Arguments to filter SalaryComponents to count.
+     * @example
+     * // Count the number of SalaryComponents
+     * const count = await prisma.salaryComponent.count({
+     *   where: {
+     *     // ... the filter for the SalaryComponents we want to count
+     *   }
+     * })
+    **/
+    count<T extends SalaryComponentCountArgs>(
+      args?: Subset<T, SalaryComponentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SalaryComponentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SalaryComponent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SalaryComponentAggregateArgs>(args: Subset<T, SalaryComponentAggregateArgs>): Prisma.PrismaPromise<GetSalaryComponentAggregateType<T>>
+
+    /**
+     * Group by SalaryComponent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SalaryComponentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SalaryComponentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SalaryComponentGroupByArgs['orderBy'] }
+        : { orderBy?: SalaryComponentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SalaryComponentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSalaryComponentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SalaryComponent model
+   */
+  readonly fields: SalaryComponentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SalaryComponent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SalaryComponentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends SalaryComponent$companyArgs<ExtArgs> = {}>(args?: Subset<T, SalaryComponent$companyArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    assignments<T extends SalaryComponent$assignmentsArgs<ExtArgs> = {}>(args?: Subset<T, SalaryComponent$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SalaryComponent model
+   */
+  interface SalaryComponentFieldRefs {
+    readonly id: FieldRef<"SalaryComponent", 'String'>
+    readonly companyId: FieldRef<"SalaryComponent", 'String'>
+    readonly name: FieldRef<"SalaryComponent", 'String'>
+    readonly kind: FieldRef<"SalaryComponent", 'SalaryComponentKind'>
+    readonly defaultAmount: FieldRef<"SalaryComponent", 'Decimal'>
+    readonly note: FieldRef<"SalaryComponent", 'String'>
+    readonly isActive: FieldRef<"SalaryComponent", 'Boolean'>
+    readonly createdAt: FieldRef<"SalaryComponent", 'DateTime'>
+    readonly updatedAt: FieldRef<"SalaryComponent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SalaryComponent findUnique
+   */
+  export type SalaryComponentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which SalaryComponent to fetch.
+     */
+    where: SalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * SalaryComponent findUniqueOrThrow
+   */
+  export type SalaryComponentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which SalaryComponent to fetch.
+     */
+    where: SalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * SalaryComponent findFirst
+   */
+  export type SalaryComponentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which SalaryComponent to fetch.
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SalaryComponents to fetch.
+     */
+    orderBy?: SalaryComponentOrderByWithRelationInput | SalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SalaryComponents.
+     */
+    cursor?: SalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SalaryComponents.
+     */
+    distinct?: SalaryComponentScalarFieldEnum | SalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * SalaryComponent findFirstOrThrow
+   */
+  export type SalaryComponentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which SalaryComponent to fetch.
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SalaryComponents to fetch.
+     */
+    orderBy?: SalaryComponentOrderByWithRelationInput | SalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SalaryComponents.
+     */
+    cursor?: SalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SalaryComponents.
+     */
+    distinct?: SalaryComponentScalarFieldEnum | SalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * SalaryComponent findMany
+   */
+  export type SalaryComponentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which SalaryComponents to fetch.
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SalaryComponents to fetch.
+     */
+    orderBy?: SalaryComponentOrderByWithRelationInput | SalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SalaryComponents.
+     */
+    cursor?: SalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SalaryComponents.
+     */
+    distinct?: SalaryComponentScalarFieldEnum | SalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * SalaryComponent create
+   */
+  export type SalaryComponentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SalaryComponent.
+     */
+    data: XOR<SalaryComponentCreateInput, SalaryComponentUncheckedCreateInput>
+  }
+
+  /**
+   * SalaryComponent createMany
+   */
+  export type SalaryComponentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SalaryComponents.
+     */
+    data: SalaryComponentCreateManyInput | SalaryComponentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SalaryComponent createManyAndReturn
+   */
+  export type SalaryComponentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * The data used to create many SalaryComponents.
+     */
+    data: SalaryComponentCreateManyInput | SalaryComponentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SalaryComponent update
+   */
+  export type SalaryComponentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SalaryComponent.
+     */
+    data: XOR<SalaryComponentUpdateInput, SalaryComponentUncheckedUpdateInput>
+    /**
+     * Choose, which SalaryComponent to update.
+     */
+    where: SalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * SalaryComponent updateMany
+   */
+  export type SalaryComponentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SalaryComponents.
+     */
+    data: XOR<SalaryComponentUpdateManyMutationInput, SalaryComponentUncheckedUpdateManyInput>
+    /**
+     * Filter which SalaryComponents to update
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * Limit how many SalaryComponents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SalaryComponent updateManyAndReturn
+   */
+  export type SalaryComponentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * The data used to update SalaryComponents.
+     */
+    data: XOR<SalaryComponentUpdateManyMutationInput, SalaryComponentUncheckedUpdateManyInput>
+    /**
+     * Filter which SalaryComponents to update
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * Limit how many SalaryComponents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SalaryComponent upsert
+   */
+  export type SalaryComponentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SalaryComponent to update in case it exists.
+     */
+    where: SalaryComponentWhereUniqueInput
+    /**
+     * In case the SalaryComponent found by the `where` argument doesn't exist, create a new SalaryComponent with this data.
+     */
+    create: XOR<SalaryComponentCreateInput, SalaryComponentUncheckedCreateInput>
+    /**
+     * In case the SalaryComponent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SalaryComponentUpdateInput, SalaryComponentUncheckedUpdateInput>
+  }
+
+  /**
+   * SalaryComponent delete
+   */
+  export type SalaryComponentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter which SalaryComponent to delete.
+     */
+    where: SalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * SalaryComponent deleteMany
+   */
+  export type SalaryComponentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SalaryComponents to delete
+     */
+    where?: SalaryComponentWhereInput
+    /**
+     * Limit how many SalaryComponents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SalaryComponent.company
+   */
+  export type SalaryComponent$companyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Company
+     */
+    select?: CompanySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Company
+     */
+    omit?: CompanyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CompanyInclude<ExtArgs> | null
+    where?: CompanyWhereInput
+  }
+
+  /**
+   * SalaryComponent.assignments
+   */
+  export type SalaryComponent$assignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    where?: UserSalaryComponentWhereInput
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    cursor?: UserSalaryComponentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserSalaryComponentScalarFieldEnum | UserSalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * SalaryComponent without action
+   */
+  export type SalaryComponentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SalaryComponent
+     */
+    select?: SalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SalaryComponent
+     */
+    omit?: SalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SalaryComponentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model UserSalaryComponent
+   */
+
+  export type AggregateUserSalaryComponent = {
+    _count: UserSalaryComponentCountAggregateOutputType | null
+    _avg: UserSalaryComponentAvgAggregateOutputType | null
+    _sum: UserSalaryComponentSumAggregateOutputType | null
+    _min: UserSalaryComponentMinAggregateOutputType | null
+    _max: UserSalaryComponentMaxAggregateOutputType | null
+  }
+
+  export type UserSalaryComponentAvgAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type UserSalaryComponentSumAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type UserSalaryComponentMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    componentId: string | null
+    amount: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserSalaryComponentMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    componentId: string | null
+    amount: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserSalaryComponentCountAggregateOutputType = {
+    id: number
+    userId: number
+    componentId: number
+    amount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type UserSalaryComponentAvgAggregateInputType = {
+    amount?: true
+  }
+
+  export type UserSalaryComponentSumAggregateInputType = {
+    amount?: true
+  }
+
+  export type UserSalaryComponentMinAggregateInputType = {
+    id?: true
+    userId?: true
+    componentId?: true
+    amount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserSalaryComponentMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    componentId?: true
+    amount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserSalaryComponentCountAggregateInputType = {
+    id?: true
+    userId?: true
+    componentId?: true
+    amount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type UserSalaryComponentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserSalaryComponent to aggregate.
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserSalaryComponents to fetch.
+     */
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserSalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserSalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserSalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserSalaryComponents
+    **/
+    _count?: true | UserSalaryComponentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UserSalaryComponentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSalaryComponentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserSalaryComponentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserSalaryComponentMaxAggregateInputType
+  }
+
+  export type GetUserSalaryComponentAggregateType<T extends UserSalaryComponentAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserSalaryComponent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserSalaryComponent[P]>
+      : GetScalarType<T[P], AggregateUserSalaryComponent[P]>
+  }
+
+
+
+
+  export type UserSalaryComponentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserSalaryComponentWhereInput
+    orderBy?: UserSalaryComponentOrderByWithAggregationInput | UserSalaryComponentOrderByWithAggregationInput[]
+    by: UserSalaryComponentScalarFieldEnum[] | UserSalaryComponentScalarFieldEnum
+    having?: UserSalaryComponentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserSalaryComponentCountAggregateInputType | true
+    _avg?: UserSalaryComponentAvgAggregateInputType
+    _sum?: UserSalaryComponentSumAggregateInputType
+    _min?: UserSalaryComponentMinAggregateInputType
+    _max?: UserSalaryComponentMaxAggregateInputType
+  }
+
+  export type UserSalaryComponentGroupByOutputType = {
+    id: string
+    userId: string
+    componentId: string
+    amount: Decimal
+    createdAt: Date
+    updatedAt: Date
+    _count: UserSalaryComponentCountAggregateOutputType | null
+    _avg: UserSalaryComponentAvgAggregateOutputType | null
+    _sum: UserSalaryComponentSumAggregateOutputType | null
+    _min: UserSalaryComponentMinAggregateOutputType | null
+    _max: UserSalaryComponentMaxAggregateOutputType | null
+  }
+
+  type GetUserSalaryComponentGroupByPayload<T extends UserSalaryComponentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UserSalaryComponentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserSalaryComponentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserSalaryComponentGroupByOutputType[P]>
+            : GetScalarType<T[P], UserSalaryComponentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserSalaryComponentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    componentId?: boolean
+    amount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userSalaryComponent"]>
+
+  export type UserSalaryComponentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    componentId?: boolean
+    amount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userSalaryComponent"]>
+
+  export type UserSalaryComponentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    componentId?: boolean
+    amount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userSalaryComponent"]>
+
+  export type UserSalaryComponentSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    componentId?: boolean
+    amount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type UserSalaryComponentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "componentId" | "amount" | "createdAt" | "updatedAt", ExtArgs["result"]["userSalaryComponent"]>
+  export type UserSalaryComponentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }
+  export type UserSalaryComponentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }
+  export type UserSalaryComponentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+    component?: boolean | SalaryComponentDefaultArgs<ExtArgs>
+  }
+
+  export type $UserSalaryComponentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserSalaryComponent"
+    objects: {
+      user: Prisma.$userPayload<ExtArgs>
+      component: Prisma.$SalaryComponentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      componentId: string
+      /**
+       * Selalu positif — arah (tambah/potong) ditentukan `component.kind`.
+       */
+      amount: Prisma.Decimal
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["userSalaryComponent"]>
+    composites: {}
+  }
+
+  type UserSalaryComponentGetPayload<S extends boolean | null | undefined | UserSalaryComponentDefaultArgs> = $Result.GetResult<Prisma.$UserSalaryComponentPayload, S>
+
+  type UserSalaryComponentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserSalaryComponentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserSalaryComponentCountAggregateInputType | true
+    }
+
+  export interface UserSalaryComponentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserSalaryComponent'], meta: { name: 'UserSalaryComponent' } }
+    /**
+     * Find zero or one UserSalaryComponent that matches the filter.
+     * @param {UserSalaryComponentFindUniqueArgs} args - Arguments to find a UserSalaryComponent
+     * @example
+     * // Get one UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UserSalaryComponentFindUniqueArgs>(args: SelectSubset<T, UserSalaryComponentFindUniqueArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UserSalaryComponent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UserSalaryComponentFindUniqueOrThrowArgs} args - Arguments to find a UserSalaryComponent
+     * @example
+     * // Get one UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UserSalaryComponentFindUniqueOrThrowArgs>(args: SelectSubset<T, UserSalaryComponentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserSalaryComponent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentFindFirstArgs} args - Arguments to find a UserSalaryComponent
+     * @example
+     * // Get one UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UserSalaryComponentFindFirstArgs>(args?: SelectSubset<T, UserSalaryComponentFindFirstArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserSalaryComponent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentFindFirstOrThrowArgs} args - Arguments to find a UserSalaryComponent
+     * @example
+     * // Get one UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UserSalaryComponentFindFirstOrThrowArgs>(args?: SelectSubset<T, UserSalaryComponentFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UserSalaryComponents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserSalaryComponents
+     * const userSalaryComponents = await prisma.userSalaryComponent.findMany()
+     * 
+     * // Get first 10 UserSalaryComponents
+     * const userSalaryComponents = await prisma.userSalaryComponent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userSalaryComponentWithIdOnly = await prisma.userSalaryComponent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UserSalaryComponentFindManyArgs>(args?: SelectSubset<T, UserSalaryComponentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UserSalaryComponent.
+     * @param {UserSalaryComponentCreateArgs} args - Arguments to create a UserSalaryComponent.
+     * @example
+     * // Create one UserSalaryComponent
+     * const UserSalaryComponent = await prisma.userSalaryComponent.create({
+     *   data: {
+     *     // ... data to create a UserSalaryComponent
+     *   }
+     * })
+     * 
+     */
+    create<T extends UserSalaryComponentCreateArgs>(args: SelectSubset<T, UserSalaryComponentCreateArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UserSalaryComponents.
+     * @param {UserSalaryComponentCreateManyArgs} args - Arguments to create many UserSalaryComponents.
+     * @example
+     * // Create many UserSalaryComponents
+     * const userSalaryComponent = await prisma.userSalaryComponent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UserSalaryComponentCreateManyArgs>(args?: SelectSubset<T, UserSalaryComponentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many UserSalaryComponents and returns the data saved in the database.
+     * @param {UserSalaryComponentCreateManyAndReturnArgs} args - Arguments to create many UserSalaryComponents.
+     * @example
+     * // Create many UserSalaryComponents
+     * const userSalaryComponent = await prisma.userSalaryComponent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many UserSalaryComponents and only return the `id`
+     * const userSalaryComponentWithIdOnly = await prisma.userSalaryComponent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends UserSalaryComponentCreateManyAndReturnArgs>(args?: SelectSubset<T, UserSalaryComponentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a UserSalaryComponent.
+     * @param {UserSalaryComponentDeleteArgs} args - Arguments to delete one UserSalaryComponent.
+     * @example
+     * // Delete one UserSalaryComponent
+     * const UserSalaryComponent = await prisma.userSalaryComponent.delete({
+     *   where: {
+     *     // ... filter to delete one UserSalaryComponent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UserSalaryComponentDeleteArgs>(args: SelectSubset<T, UserSalaryComponentDeleteArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UserSalaryComponent.
+     * @param {UserSalaryComponentUpdateArgs} args - Arguments to update one UserSalaryComponent.
+     * @example
+     * // Update one UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UserSalaryComponentUpdateArgs>(args: SelectSubset<T, UserSalaryComponentUpdateArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UserSalaryComponents.
+     * @param {UserSalaryComponentDeleteManyArgs} args - Arguments to filter UserSalaryComponents to delete.
+     * @example
+     * // Delete a few UserSalaryComponents
+     * const { count } = await prisma.userSalaryComponent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UserSalaryComponentDeleteManyArgs>(args?: SelectSubset<T, UserSalaryComponentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserSalaryComponents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserSalaryComponents
+     * const userSalaryComponent = await prisma.userSalaryComponent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UserSalaryComponentUpdateManyArgs>(args: SelectSubset<T, UserSalaryComponentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserSalaryComponents and returns the data updated in the database.
+     * @param {UserSalaryComponentUpdateManyAndReturnArgs} args - Arguments to update many UserSalaryComponents.
+     * @example
+     * // Update many UserSalaryComponents
+     * const userSalaryComponent = await prisma.userSalaryComponent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more UserSalaryComponents and only return the `id`
+     * const userSalaryComponentWithIdOnly = await prisma.userSalaryComponent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends UserSalaryComponentUpdateManyAndReturnArgs>(args: SelectSubset<T, UserSalaryComponentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one UserSalaryComponent.
+     * @param {UserSalaryComponentUpsertArgs} args - Arguments to update or create a UserSalaryComponent.
+     * @example
+     * // Update or create a UserSalaryComponent
+     * const userSalaryComponent = await prisma.userSalaryComponent.upsert({
+     *   create: {
+     *     // ... data to create a UserSalaryComponent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserSalaryComponent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UserSalaryComponentUpsertArgs>(args: SelectSubset<T, UserSalaryComponentUpsertArgs<ExtArgs>>): Prisma__UserSalaryComponentClient<$Result.GetResult<Prisma.$UserSalaryComponentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UserSalaryComponents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentCountArgs} args - Arguments to filter UserSalaryComponents to count.
+     * @example
+     * // Count the number of UserSalaryComponents
+     * const count = await prisma.userSalaryComponent.count({
+     *   where: {
+     *     // ... the filter for the UserSalaryComponents we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserSalaryComponentCountArgs>(
+      args?: Subset<T, UserSalaryComponentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserSalaryComponentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserSalaryComponent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserSalaryComponentAggregateArgs>(args: Subset<T, UserSalaryComponentAggregateArgs>): Prisma.PrismaPromise<GetUserSalaryComponentAggregateType<T>>
+
+    /**
+     * Group by UserSalaryComponent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserSalaryComponentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserSalaryComponentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserSalaryComponentGroupByArgs['orderBy'] }
+        : { orderBy?: UserSalaryComponentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserSalaryComponentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserSalaryComponentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UserSalaryComponent model
+   */
+  readonly fields: UserSalaryComponentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserSalaryComponent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UserSalaryComponentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    component<T extends SalaryComponentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SalaryComponentDefaultArgs<ExtArgs>>): Prisma__SalaryComponentClient<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UserSalaryComponent model
+   */
+  interface UserSalaryComponentFieldRefs {
+    readonly id: FieldRef<"UserSalaryComponent", 'String'>
+    readonly userId: FieldRef<"UserSalaryComponent", 'String'>
+    readonly componentId: FieldRef<"UserSalaryComponent", 'String'>
+    readonly amount: FieldRef<"UserSalaryComponent", 'Decimal'>
+    readonly createdAt: FieldRef<"UserSalaryComponent", 'DateTime'>
+    readonly updatedAt: FieldRef<"UserSalaryComponent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UserSalaryComponent findUnique
+   */
+  export type UserSalaryComponentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which UserSalaryComponent to fetch.
+     */
+    where: UserSalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * UserSalaryComponent findUniqueOrThrow
+   */
+  export type UserSalaryComponentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which UserSalaryComponent to fetch.
+     */
+    where: UserSalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * UserSalaryComponent findFirst
+   */
+  export type UserSalaryComponentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which UserSalaryComponent to fetch.
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserSalaryComponents to fetch.
+     */
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserSalaryComponents.
+     */
+    cursor?: UserSalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserSalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserSalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserSalaryComponents.
+     */
+    distinct?: UserSalaryComponentScalarFieldEnum | UserSalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * UserSalaryComponent findFirstOrThrow
+   */
+  export type UserSalaryComponentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which UserSalaryComponent to fetch.
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserSalaryComponents to fetch.
+     */
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserSalaryComponents.
+     */
+    cursor?: UserSalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserSalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserSalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserSalaryComponents.
+     */
+    distinct?: UserSalaryComponentScalarFieldEnum | UserSalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * UserSalaryComponent findMany
+   */
+  export type UserSalaryComponentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter, which UserSalaryComponents to fetch.
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserSalaryComponents to fetch.
+     */
+    orderBy?: UserSalaryComponentOrderByWithRelationInput | UserSalaryComponentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserSalaryComponents.
+     */
+    cursor?: UserSalaryComponentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserSalaryComponents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserSalaryComponents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserSalaryComponents.
+     */
+    distinct?: UserSalaryComponentScalarFieldEnum | UserSalaryComponentScalarFieldEnum[]
+  }
+
+  /**
+   * UserSalaryComponent create
+   */
+  export type UserSalaryComponentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserSalaryComponent.
+     */
+    data: XOR<UserSalaryComponentCreateInput, UserSalaryComponentUncheckedCreateInput>
+  }
+
+  /**
+   * UserSalaryComponent createMany
+   */
+  export type UserSalaryComponentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserSalaryComponents.
+     */
+    data: UserSalaryComponentCreateManyInput | UserSalaryComponentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UserSalaryComponent createManyAndReturn
+   */
+  export type UserSalaryComponentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * The data used to create many UserSalaryComponents.
+     */
+    data: UserSalaryComponentCreateManyInput | UserSalaryComponentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserSalaryComponent update
+   */
+  export type UserSalaryComponentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserSalaryComponent.
+     */
+    data: XOR<UserSalaryComponentUpdateInput, UserSalaryComponentUncheckedUpdateInput>
+    /**
+     * Choose, which UserSalaryComponent to update.
+     */
+    where: UserSalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * UserSalaryComponent updateMany
+   */
+  export type UserSalaryComponentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserSalaryComponents.
+     */
+    data: XOR<UserSalaryComponentUpdateManyMutationInput, UserSalaryComponentUncheckedUpdateManyInput>
+    /**
+     * Filter which UserSalaryComponents to update
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * Limit how many UserSalaryComponents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserSalaryComponent updateManyAndReturn
+   */
+  export type UserSalaryComponentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * The data used to update UserSalaryComponents.
+     */
+    data: XOR<UserSalaryComponentUpdateManyMutationInput, UserSalaryComponentUncheckedUpdateManyInput>
+    /**
+     * Filter which UserSalaryComponents to update
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * Limit how many UserSalaryComponents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserSalaryComponent upsert
+   */
+  export type UserSalaryComponentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserSalaryComponent to update in case it exists.
+     */
+    where: UserSalaryComponentWhereUniqueInput
+    /**
+     * In case the UserSalaryComponent found by the `where` argument doesn't exist, create a new UserSalaryComponent with this data.
+     */
+    create: XOR<UserSalaryComponentCreateInput, UserSalaryComponentUncheckedCreateInput>
+    /**
+     * In case the UserSalaryComponent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserSalaryComponentUpdateInput, UserSalaryComponentUncheckedUpdateInput>
+  }
+
+  /**
+   * UserSalaryComponent delete
+   */
+  export type UserSalaryComponentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
+    /**
+     * Filter which UserSalaryComponent to delete.
+     */
+    where: UserSalaryComponentWhereUniqueInput
+  }
+
+  /**
+   * UserSalaryComponent deleteMany
+   */
+  export type UserSalaryComponentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserSalaryComponents to delete
+     */
+    where?: UserSalaryComponentWhereInput
+    /**
+     * Limit how many UserSalaryComponents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserSalaryComponent without action
+   */
+  export type UserSalaryComponentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserSalaryComponent
+     */
+    select?: UserSalaryComponentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserSalaryComponent
+     */
+    omit?: UserSalaryComponentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserSalaryComponentInclude<ExtArgs> | null
   }
 
 
@@ -57668,6 +64073,8 @@ export namespace Prisma {
     isWithDoctorNote: 'isWithDoctorNote',
     status: 'status',
     notes: 'notes',
+    editedById: 'editedById',
+    editedAt: 'editedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -57715,6 +64122,7 @@ export namespace Prisma {
     companyId: 'companyId',
     permissions: 'permissions',
     payrollCompanyIds: 'payrollCompanyIds',
+    usesResourcePerms: 'usesResourcePerms',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -57755,6 +64163,21 @@ export namespace Prisma {
   };
 
   export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+  export const RoleResourcePermissionScalarFieldEnum: {
+    id: 'id',
+    roleId: 'roleId',
+    resource: 'resource',
+    viewScope: 'viewScope',
+    viewCompanyIds: 'viewCompanyIds',
+    writeScope: 'writeScope',
+    writeCompanyIds: 'writeCompanyIds',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RoleResourcePermissionScalarFieldEnum = (typeof RoleResourcePermissionScalarFieldEnum)[keyof typeof RoleResourcePermissionScalarFieldEnum]
 
 
   export const BankAccountScalarFieldEnum: {
@@ -57847,6 +64270,35 @@ export namespace Prisma {
   };
 
   export type CurrencyScalarFieldEnum = (typeof CurrencyScalarFieldEnum)[keyof typeof CurrencyScalarFieldEnum]
+
+
+  export const CurrencyPriceScalarFieldEnum: {
+    id: 'id',
+    currencyId: 'currencyId',
+    buyPrice: 'buyPrice',
+    sellPrice: 'sellPrice',
+    source: 'source',
+    isLocked: 'isLocked',
+    lastSyncedAt: 'lastSyncedAt',
+    note: 'note',
+    updatedBy: 'updatedBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CurrencyPriceScalarFieldEnum = (typeof CurrencyPriceScalarFieldEnum)[keyof typeof CurrencyPriceScalarFieldEnum]
+
+
+  export const CurrencyPriceSyncSettingScalarFieldEnum: {
+    id: 'id',
+    autoSync: 'autoSync',
+    lastRunAt: 'lastRunAt',
+    lastRunSummary: 'lastRunSummary',
+    updatedBy: 'updatedBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CurrencyPriceSyncSettingScalarFieldEnum = (typeof CurrencyPriceSyncSettingScalarFieldEnum)[keyof typeof CurrencyPriceSyncSettingScalarFieldEnum]
 
 
   export const PriceBenchmarkScalarFieldEnum: {
@@ -58020,6 +64472,33 @@ export namespace Prisma {
   };
 
   export type PayrollIncentiveTierScalarFieldEnum = (typeof PayrollIncentiveTierScalarFieldEnum)[keyof typeof PayrollIncentiveTierScalarFieldEnum]
+
+
+  export const SalaryComponentScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    name: 'name',
+    kind: 'kind',
+    defaultAmount: 'defaultAmount',
+    note: 'note',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SalaryComponentScalarFieldEnum = (typeof SalaryComponentScalarFieldEnum)[keyof typeof SalaryComponentScalarFieldEnum]
+
+
+  export const UserSalaryComponentScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    componentId: 'componentId',
+    amount: 'amount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type UserSalaryComponentScalarFieldEnum = (typeof UserSalaryComponentScalarFieldEnum)[keyof typeof UserSalaryComponentScalarFieldEnum]
 
 
   export const RefiningBatchScalarFieldEnum: {
@@ -58498,6 +64977,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'ScopeMode'
+   */
+  export type EnumScopeModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScopeMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'ScopeMode[]'
+   */
+  export type ListEnumScopeModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ScopeMode[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -58536,6 +65029,20 @@ export namespace Prisma {
    * Reference to a field of type 'DailyVerifyStatus[]'
    */
   export type ListEnumDailyVerifyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DailyVerifyStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PriceSource'
+   */
+  export type EnumPriceSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PriceSource'>
+    
+
+
+  /**
+   * Reference to a field of type 'PriceSource[]'
+   */
+  export type ListEnumPriceSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PriceSource[]'>
     
 
 
@@ -58676,6 +65183,20 @@ export namespace Prisma {
    * Reference to a field of type 'PayrollIncentiveOutcome[]'
    */
   export type ListEnumPayrollIncentiveOutcomeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayrollIncentiveOutcome[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SalaryComponentKind'
+   */
+  export type EnumSalaryComponentKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalaryComponentKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'SalaryComponentKind[]'
+   */
+  export type ListEnumSalaryComponentKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalaryComponentKind[]'>
     
 
 
@@ -58870,9 +65391,12 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
+    editedById?: StringNullableFilter<"Attendance"> | string | null
+    editedAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }
 
@@ -58893,9 +65417,12 @@ export namespace Prisma {
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    editedById?: SortOrderInput | SortOrder
+    editedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: userOrderByWithRelationInput
+    editedBy?: userOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
   }
 
@@ -58920,9 +65447,12 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
+    editedById?: StringNullableFilter<"Attendance"> | string | null
+    editedAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }, "id" | "userId_date">
 
@@ -58943,6 +65473,8 @@ export namespace Prisma {
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    editedById?: SortOrderInput | SortOrder
+    editedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: AttendanceCountOrderByAggregateInput
@@ -58972,6 +65504,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolWithAggregatesFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusWithAggregatesFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
+    editedById?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
+    editedAt?: DateTimeNullableWithAggregatesFilter<"Attendance"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
   }
@@ -59151,12 +65685,14 @@ export namespace Prisma {
     companyId?: StringNullableFilter<"custom_role"> | string | null
     permissions?: StringNullableListFilter<"custom_role">
     payrollCompanyIds?: StringNullableListFilter<"custom_role">
+    usesResourcePerms?: BoolFilter<"custom_role"> | boolean
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     users?: UserListRelationFilter
+    resourcePerms?: RoleResourcePermissionListRelationFilter
   }
 
   export type custom_roleOrderByWithRelationInput = {
@@ -59166,12 +65702,14 @@ export namespace Prisma {
     companyId?: SortOrderInput | SortOrder
     permissions?: SortOrder
     payrollCompanyIds?: SortOrder
+    usesResourcePerms?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     incentiveMatrices?: PayrollIncentiveMatrixOrderByRelationAggregateInput
     roleKpis?: RoleKpiOrderByRelationAggregateInput
     company?: CompanyOrderByWithRelationInput
     users?: userOrderByRelationAggregateInput
+    resourcePerms?: RoleResourcePermissionOrderByRelationAggregateInput
   }
 
   export type custom_roleWhereUniqueInput = Prisma.AtLeast<{
@@ -59185,12 +65723,14 @@ export namespace Prisma {
     companyId?: StringNullableFilter<"custom_role"> | string | null
     permissions?: StringNullableListFilter<"custom_role">
     payrollCompanyIds?: StringNullableListFilter<"custom_role">
+    usesResourcePerms?: BoolFilter<"custom_role"> | boolean
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     users?: UserListRelationFilter
+    resourcePerms?: RoleResourcePermissionListRelationFilter
   }, "id" | "name_companyId">
 
   export type custom_roleOrderByWithAggregationInput = {
@@ -59200,6 +65740,7 @@ export namespace Prisma {
     companyId?: SortOrderInput | SortOrder
     permissions?: SortOrder
     payrollCompanyIds?: SortOrder
+    usesResourcePerms?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: custom_roleCountOrderByAggregateInput
@@ -59217,6 +65758,7 @@ export namespace Prisma {
     companyId?: StringNullableWithAggregatesFilter<"custom_role"> | string | null
     permissions?: StringNullableListFilter<"custom_role">
     payrollCompanyIds?: StringNullableListFilter<"custom_role">
+    usesResourcePerms?: BoolWithAggregatesFilter<"custom_role"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"custom_role"> | Date | string
   }
@@ -59248,7 +65790,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodListRelationFilter
     kpiPeriodsLocked?: KpiPeriodListRelationFilter
     kpiMonthlyResults?: KpiMonthlyResultListRelationFilter
+    salaryComponents?: UserSalaryComponentListRelationFilter
     attendances?: AttendanceListRelationFilter
+    attendancesEdited?: AttendanceListRelationFilter
     samples?: SampleListRelationFilter
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
@@ -59280,7 +65824,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodOrderByRelationAggregateInput
     kpiPeriodsLocked?: KpiPeriodOrderByRelationAggregateInput
     kpiMonthlyResults?: KpiMonthlyResultOrderByRelationAggregateInput
+    salaryComponents?: UserSalaryComponentOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
+    attendancesEdited?: AttendanceOrderByRelationAggregateInput
     samples?: SampleOrderByRelationAggregateInput
     account?: accountOrderByRelationAggregateInput
     session?: sessionOrderByRelationAggregateInput
@@ -59315,7 +65861,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodListRelationFilter
     kpiPeriodsLocked?: KpiPeriodListRelationFilter
     kpiMonthlyResults?: KpiMonthlyResultListRelationFilter
+    salaryComponents?: UserSalaryComponentListRelationFilter
     attendances?: AttendanceListRelationFilter
+    attendancesEdited?: AttendanceListRelationFilter
     samples?: SampleListRelationFilter
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
@@ -59426,6 +65974,82 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"verification"> | Date | string
     createdAt?: DateTimeNullableWithAggregatesFilter<"verification"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"verification"> | Date | string | null
+  }
+
+  export type RoleResourcePermissionWhereInput = {
+    AND?: RoleResourcePermissionWhereInput | RoleResourcePermissionWhereInput[]
+    OR?: RoleResourcePermissionWhereInput[]
+    NOT?: RoleResourcePermissionWhereInput | RoleResourcePermissionWhereInput[]
+    id?: StringFilter<"RoleResourcePermission"> | string
+    roleId?: StringFilter<"RoleResourcePermission"> | string
+    resource?: StringFilter<"RoleResourcePermission"> | string
+    viewScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    viewCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    writeScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    writeCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    createdAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
+    role?: XOR<Custom_roleScalarRelationFilter, custom_roleWhereInput>
+  }
+
+  export type RoleResourcePermissionOrderByWithRelationInput = {
+    id?: SortOrder
+    roleId?: SortOrder
+    resource?: SortOrder
+    viewScope?: SortOrder
+    viewCompanyIds?: SortOrder
+    writeScope?: SortOrder
+    writeCompanyIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    role?: custom_roleOrderByWithRelationInput
+  }
+
+  export type RoleResourcePermissionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    roleId_resource?: RoleResourcePermissionRoleIdResourceCompoundUniqueInput
+    AND?: RoleResourcePermissionWhereInput | RoleResourcePermissionWhereInput[]
+    OR?: RoleResourcePermissionWhereInput[]
+    NOT?: RoleResourcePermissionWhereInput | RoleResourcePermissionWhereInput[]
+    roleId?: StringFilter<"RoleResourcePermission"> | string
+    resource?: StringFilter<"RoleResourcePermission"> | string
+    viewScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    viewCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    writeScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    writeCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    createdAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
+    role?: XOR<Custom_roleScalarRelationFilter, custom_roleWhereInput>
+  }, "id" | "roleId_resource">
+
+  export type RoleResourcePermissionOrderByWithAggregationInput = {
+    id?: SortOrder
+    roleId?: SortOrder
+    resource?: SortOrder
+    viewScope?: SortOrder
+    viewCompanyIds?: SortOrder
+    writeScope?: SortOrder
+    writeCompanyIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RoleResourcePermissionCountOrderByAggregateInput
+    _max?: RoleResourcePermissionMaxOrderByAggregateInput
+    _min?: RoleResourcePermissionMinOrderByAggregateInput
+  }
+
+  export type RoleResourcePermissionScalarWhereWithAggregatesInput = {
+    AND?: RoleResourcePermissionScalarWhereWithAggregatesInput | RoleResourcePermissionScalarWhereWithAggregatesInput[]
+    OR?: RoleResourcePermissionScalarWhereWithAggregatesInput[]
+    NOT?: RoleResourcePermissionScalarWhereWithAggregatesInput | RoleResourcePermissionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RoleResourcePermission"> | string
+    roleId?: StringWithAggregatesFilter<"RoleResourcePermission"> | string
+    resource?: StringWithAggregatesFilter<"RoleResourcePermission"> | string
+    viewScope?: EnumScopeModeWithAggregatesFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    viewCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    writeScope?: EnumScopeModeWithAggregatesFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    writeCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    createdAt?: DateTimeWithAggregatesFilter<"RoleResourcePermission"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RoleResourcePermission"> | Date | string
   }
 
   export type BankAccountWhereInput = {
@@ -59807,6 +66431,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Company"> | Date | string
     updatedAt?: DateTimeFilter<"Company"> | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixListRelationFilter
+    salaryComponents?: SalaryComponentListRelationFilter
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
@@ -59830,6 +66455,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     incentiveMatrices?: PayrollIncentiveMatrixOrderByRelationAggregateInput
+    salaryComponents?: SalaryComponentOrderByRelationAggregateInput
     branches?: BranchOrderByRelationAggregateInput
     roleKpis?: RoleKpiOrderByRelationAggregateInput
     custom_roles?: custom_roleOrderByRelationAggregateInput
@@ -59856,6 +66482,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Company"> | Date | string
     updatedAt?: DateTimeFilter<"Company"> | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixListRelationFilter
+    salaryComponents?: SalaryComponentListRelationFilter
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
@@ -59909,6 +66536,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountListRelationFilter
     stocks?: CurrencyStockListRelationFilter
     stockMutations?: StockMutationListRelationFilter
+    price?: XOR<CurrencyPriceNullableScalarRelationFilter, CurrencyPriceWhereInput> | null
   }
 
   export type CurrencyOrderByWithRelationInput = {
@@ -59922,6 +66550,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountOrderByRelationAggregateInput
     stocks?: CurrencyStockOrderByRelationAggregateInput
     stockMutations?: StockMutationOrderByRelationAggregateInput
+    price?: CurrencyPriceOrderByWithRelationInput
   }
 
   export type CurrencyWhereUniqueInput = Prisma.AtLeast<{
@@ -59938,6 +66567,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountListRelationFilter
     stocks?: CurrencyStockListRelationFilter
     stockMutations?: StockMutationListRelationFilter
+    price?: XOR<CurrencyPriceNullableScalarRelationFilter, CurrencyPriceWhereInput> | null
   }, "id" | "code">
 
   export type CurrencyOrderByWithAggregationInput = {
@@ -59964,6 +66594,150 @@ export namespace Prisma {
     isActive?: BoolWithAggregatesFilter<"Currency"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Currency"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Currency"> | Date | string
+  }
+
+  export type CurrencyPriceWhereInput = {
+    AND?: CurrencyPriceWhereInput | CurrencyPriceWhereInput[]
+    OR?: CurrencyPriceWhereInput[]
+    NOT?: CurrencyPriceWhereInput | CurrencyPriceWhereInput[]
+    id?: StringFilter<"CurrencyPrice"> | string
+    currencyId?: StringFilter<"CurrencyPrice"> | string
+    buyPrice?: DecimalFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFilter<"CurrencyPrice"> | $Enums.PriceSource
+    isLocked?: BoolFilter<"CurrencyPrice"> | boolean
+    lastSyncedAt?: DateTimeNullableFilter<"CurrencyPrice"> | Date | string | null
+    note?: StringNullableFilter<"CurrencyPrice"> | string | null
+    updatedBy?: StringNullableFilter<"CurrencyPrice"> | string | null
+    createdAt?: DateTimeFilter<"CurrencyPrice"> | Date | string
+    updatedAt?: DateTimeFilter<"CurrencyPrice"> | Date | string
+    currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
+  }
+
+  export type CurrencyPriceOrderByWithRelationInput = {
+    id?: SortOrder
+    currencyId?: SortOrder
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+    source?: SortOrder
+    isLocked?: SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    currency?: CurrencyOrderByWithRelationInput
+  }
+
+  export type CurrencyPriceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    currencyId?: string
+    AND?: CurrencyPriceWhereInput | CurrencyPriceWhereInput[]
+    OR?: CurrencyPriceWhereInput[]
+    NOT?: CurrencyPriceWhereInput | CurrencyPriceWhereInput[]
+    buyPrice?: DecimalFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFilter<"CurrencyPrice"> | $Enums.PriceSource
+    isLocked?: BoolFilter<"CurrencyPrice"> | boolean
+    lastSyncedAt?: DateTimeNullableFilter<"CurrencyPrice"> | Date | string | null
+    note?: StringNullableFilter<"CurrencyPrice"> | string | null
+    updatedBy?: StringNullableFilter<"CurrencyPrice"> | string | null
+    createdAt?: DateTimeFilter<"CurrencyPrice"> | Date | string
+    updatedAt?: DateTimeFilter<"CurrencyPrice"> | Date | string
+    currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
+  }, "id" | "currencyId">
+
+  export type CurrencyPriceOrderByWithAggregationInput = {
+    id?: SortOrder
+    currencyId?: SortOrder
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+    source?: SortOrder
+    isLocked?: SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CurrencyPriceCountOrderByAggregateInput
+    _avg?: CurrencyPriceAvgOrderByAggregateInput
+    _max?: CurrencyPriceMaxOrderByAggregateInput
+    _min?: CurrencyPriceMinOrderByAggregateInput
+    _sum?: CurrencyPriceSumOrderByAggregateInput
+  }
+
+  export type CurrencyPriceScalarWhereWithAggregatesInput = {
+    AND?: CurrencyPriceScalarWhereWithAggregatesInput | CurrencyPriceScalarWhereWithAggregatesInput[]
+    OR?: CurrencyPriceScalarWhereWithAggregatesInput[]
+    NOT?: CurrencyPriceScalarWhereWithAggregatesInput | CurrencyPriceScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CurrencyPrice"> | string
+    currencyId?: StringWithAggregatesFilter<"CurrencyPrice"> | string
+    buyPrice?: DecimalWithAggregatesFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalWithAggregatesFilter<"CurrencyPrice"> | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceWithAggregatesFilter<"CurrencyPrice"> | $Enums.PriceSource
+    isLocked?: BoolWithAggregatesFilter<"CurrencyPrice"> | boolean
+    lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"CurrencyPrice"> | Date | string | null
+    note?: StringNullableWithAggregatesFilter<"CurrencyPrice"> | string | null
+    updatedBy?: StringNullableWithAggregatesFilter<"CurrencyPrice"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CurrencyPrice"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CurrencyPrice"> | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingWhereInput = {
+    AND?: CurrencyPriceSyncSettingWhereInput | CurrencyPriceSyncSettingWhereInput[]
+    OR?: CurrencyPriceSyncSettingWhereInput[]
+    NOT?: CurrencyPriceSyncSettingWhereInput | CurrencyPriceSyncSettingWhereInput[]
+    id?: StringFilter<"CurrencyPriceSyncSetting"> | string
+    autoSync?: BoolFilter<"CurrencyPriceSyncSetting"> | boolean
+    lastRunAt?: DateTimeNullableFilter<"CurrencyPriceSyncSetting"> | Date | string | null
+    lastRunSummary?: StringNullableFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedBy?: StringNullableFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedAt?: DateTimeFilter<"CurrencyPriceSyncSetting"> | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingOrderByWithRelationInput = {
+    id?: SortOrder
+    autoSync?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    lastRunSummary?: SortOrderInput | SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceSyncSettingWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CurrencyPriceSyncSettingWhereInput | CurrencyPriceSyncSettingWhereInput[]
+    OR?: CurrencyPriceSyncSettingWhereInput[]
+    NOT?: CurrencyPriceSyncSettingWhereInput | CurrencyPriceSyncSettingWhereInput[]
+    autoSync?: BoolFilter<"CurrencyPriceSyncSetting"> | boolean
+    lastRunAt?: DateTimeNullableFilter<"CurrencyPriceSyncSetting"> | Date | string | null
+    lastRunSummary?: StringNullableFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedBy?: StringNullableFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedAt?: DateTimeFilter<"CurrencyPriceSyncSetting"> | Date | string
+  }, "id">
+
+  export type CurrencyPriceSyncSettingOrderByWithAggregationInput = {
+    id?: SortOrder
+    autoSync?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    lastRunSummary?: SortOrderInput | SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: CurrencyPriceSyncSettingCountOrderByAggregateInput
+    _max?: CurrencyPriceSyncSettingMaxOrderByAggregateInput
+    _min?: CurrencyPriceSyncSettingMinOrderByAggregateInput
+  }
+
+  export type CurrencyPriceSyncSettingScalarWhereWithAggregatesInput = {
+    AND?: CurrencyPriceSyncSettingScalarWhereWithAggregatesInput | CurrencyPriceSyncSettingScalarWhereWithAggregatesInput[]
+    OR?: CurrencyPriceSyncSettingScalarWhereWithAggregatesInput[]
+    NOT?: CurrencyPriceSyncSettingScalarWhereWithAggregatesInput | CurrencyPriceSyncSettingScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CurrencyPriceSyncSetting"> | string
+    autoSync?: BoolWithAggregatesFilter<"CurrencyPriceSyncSetting"> | boolean
+    lastRunAt?: DateTimeNullableWithAggregatesFilter<"CurrencyPriceSyncSetting"> | Date | string | null
+    lastRunSummary?: StringNullableWithAggregatesFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedBy?: StringNullableWithAggregatesFilter<"CurrencyPriceSyncSetting"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"CurrencyPriceSyncSetting"> | Date | string
   }
 
   export type PriceBenchmarkWhereInput = {
@@ -60881,6 +67655,153 @@ export namespace Prisma {
     note?: StringNullableWithAggregatesFilter<"PayrollIncentiveTier"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PayrollIncentiveTier"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PayrollIncentiveTier"> | Date | string
+  }
+
+  export type SalaryComponentWhereInput = {
+    AND?: SalaryComponentWhereInput | SalaryComponentWhereInput[]
+    OR?: SalaryComponentWhereInput[]
+    NOT?: SalaryComponentWhereInput | SalaryComponentWhereInput[]
+    id?: StringFilter<"SalaryComponent"> | string
+    companyId?: StringNullableFilter<"SalaryComponent"> | string | null
+    name?: StringFilter<"SalaryComponent"> | string
+    kind?: EnumSalaryComponentKindFilter<"SalaryComponent"> | $Enums.SalaryComponentKind
+    defaultAmount?: DecimalNullableFilter<"SalaryComponent"> | Decimal | DecimalJsLike | number | string | null
+    note?: StringNullableFilter<"SalaryComponent"> | string | null
+    isActive?: BoolFilter<"SalaryComponent"> | boolean
+    createdAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+    company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
+    assignments?: UserSalaryComponentListRelationFilter
+  }
+
+  export type SalaryComponentOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    kind?: SortOrder
+    defaultAmount?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+    assignments?: UserSalaryComponentOrderByRelationAggregateInput
+  }
+
+  export type SalaryComponentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    companyId_name?: SalaryComponentCompanyIdNameCompoundUniqueInput
+    AND?: SalaryComponentWhereInput | SalaryComponentWhereInput[]
+    OR?: SalaryComponentWhereInput[]
+    NOT?: SalaryComponentWhereInput | SalaryComponentWhereInput[]
+    companyId?: StringNullableFilter<"SalaryComponent"> | string | null
+    name?: StringFilter<"SalaryComponent"> | string
+    kind?: EnumSalaryComponentKindFilter<"SalaryComponent"> | $Enums.SalaryComponentKind
+    defaultAmount?: DecimalNullableFilter<"SalaryComponent"> | Decimal | DecimalJsLike | number | string | null
+    note?: StringNullableFilter<"SalaryComponent"> | string | null
+    isActive?: BoolFilter<"SalaryComponent"> | boolean
+    createdAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+    company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
+    assignments?: UserSalaryComponentListRelationFilter
+  }, "id" | "companyId_name">
+
+  export type SalaryComponentOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrderInput | SortOrder
+    name?: SortOrder
+    kind?: SortOrder
+    defaultAmount?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SalaryComponentCountOrderByAggregateInput
+    _avg?: SalaryComponentAvgOrderByAggregateInput
+    _max?: SalaryComponentMaxOrderByAggregateInput
+    _min?: SalaryComponentMinOrderByAggregateInput
+    _sum?: SalaryComponentSumOrderByAggregateInput
+  }
+
+  export type SalaryComponentScalarWhereWithAggregatesInput = {
+    AND?: SalaryComponentScalarWhereWithAggregatesInput | SalaryComponentScalarWhereWithAggregatesInput[]
+    OR?: SalaryComponentScalarWhereWithAggregatesInput[]
+    NOT?: SalaryComponentScalarWhereWithAggregatesInput | SalaryComponentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SalaryComponent"> | string
+    companyId?: StringNullableWithAggregatesFilter<"SalaryComponent"> | string | null
+    name?: StringWithAggregatesFilter<"SalaryComponent"> | string
+    kind?: EnumSalaryComponentKindWithAggregatesFilter<"SalaryComponent"> | $Enums.SalaryComponentKind
+    defaultAmount?: DecimalNullableWithAggregatesFilter<"SalaryComponent"> | Decimal | DecimalJsLike | number | string | null
+    note?: StringNullableWithAggregatesFilter<"SalaryComponent"> | string | null
+    isActive?: BoolWithAggregatesFilter<"SalaryComponent"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"SalaryComponent"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SalaryComponent"> | Date | string
+  }
+
+  export type UserSalaryComponentWhereInput = {
+    AND?: UserSalaryComponentWhereInput | UserSalaryComponentWhereInput[]
+    OR?: UserSalaryComponentWhereInput[]
+    NOT?: UserSalaryComponentWhereInput | UserSalaryComponentWhereInput[]
+    id?: StringFilter<"UserSalaryComponent"> | string
+    userId?: StringFilter<"UserSalaryComponent"> | string
+    componentId?: StringFilter<"UserSalaryComponent"> | string
+    amount?: DecimalFilter<"UserSalaryComponent"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
+    component?: XOR<SalaryComponentScalarRelationFilter, SalaryComponentWhereInput>
+  }
+
+  export type UserSalaryComponentOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    componentId?: SortOrder
+    amount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: userOrderByWithRelationInput
+    component?: SalaryComponentOrderByWithRelationInput
+  }
+
+  export type UserSalaryComponentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_componentId?: UserSalaryComponentUserIdComponentIdCompoundUniqueInput
+    AND?: UserSalaryComponentWhereInput | UserSalaryComponentWhereInput[]
+    OR?: UserSalaryComponentWhereInput[]
+    NOT?: UserSalaryComponentWhereInput | UserSalaryComponentWhereInput[]
+    userId?: StringFilter<"UserSalaryComponent"> | string
+    componentId?: StringFilter<"UserSalaryComponent"> | string
+    amount?: DecimalFilter<"UserSalaryComponent"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
+    component?: XOR<SalaryComponentScalarRelationFilter, SalaryComponentWhereInput>
+  }, "id" | "userId_componentId">
+
+  export type UserSalaryComponentOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    componentId?: SortOrder
+    amount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: UserSalaryComponentCountOrderByAggregateInput
+    _avg?: UserSalaryComponentAvgOrderByAggregateInput
+    _max?: UserSalaryComponentMaxOrderByAggregateInput
+    _min?: UserSalaryComponentMinOrderByAggregateInput
+    _sum?: UserSalaryComponentSumOrderByAggregateInput
+  }
+
+  export type UserSalaryComponentScalarWhereWithAggregatesInput = {
+    AND?: UserSalaryComponentScalarWhereWithAggregatesInput | UserSalaryComponentScalarWhereWithAggregatesInput[]
+    OR?: UserSalaryComponentScalarWhereWithAggregatesInput[]
+    NOT?: UserSalaryComponentScalarWhereWithAggregatesInput | UserSalaryComponentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"UserSalaryComponent"> | string
+    userId?: StringWithAggregatesFilter<"UserSalaryComponent"> | string
+    componentId?: StringWithAggregatesFilter<"UserSalaryComponent"> | string
+    amount?: DecimalWithAggregatesFilter<"UserSalaryComponent"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeWithAggregatesFilter<"UserSalaryComponent"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UserSalaryComponent"> | Date | string
   }
 
   export type RefiningBatchWhereInput = {
@@ -62710,9 +69631,11 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: userCreateNestedOneWithoutAttendancesInput
+    editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
   }
 
@@ -62733,6 +69656,8 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -62752,9 +69677,11 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
+    editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
   }
 
@@ -62775,6 +69702,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -62796,6 +69725,8 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -62815,6 +69746,7 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -62836,6 +69768,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -63033,12 +69967,14 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUncheckedCreateInput = {
@@ -63048,11 +69984,13 @@ export namespace Prisma {
     companyId?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUpdateInput = {
@@ -63061,12 +69999,14 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateInput = {
@@ -63076,11 +70016,13 @@ export namespace Prisma {
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleCreateManyInput = {
@@ -63090,6 +70032,7 @@ export namespace Prisma {
     companyId?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -63100,6 +70043,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -63111,6 +70055,7 @@ export namespace Prisma {
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -63137,7 +70082,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -63169,7 +70116,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -63197,7 +70146,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -63229,7 +70180,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -63354,6 +70307,89 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type RoleResourcePermissionCreateInput = {
+    id?: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role: custom_roleCreateNestedOneWithoutResourcePermsInput
+  }
+
+  export type RoleResourcePermissionUncheckedCreateInput = {
+    id?: string
+    roleId: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleResourcePermissionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: custom_roleUpdateOneRequiredWithoutResourcePermsNestedInput
+  }
+
+  export type RoleResourcePermissionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleResourcePermissionCreateManyInput = {
+    id?: string
+    roleId: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleResourcePermissionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleResourcePermissionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    roleId?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BankAccountCreateInput = {
@@ -63772,6 +70808,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -63795,6 +70832,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -63818,6 +70856,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -63841,6 +70880,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -63894,6 +70934,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateInput = {
@@ -63907,6 +70948,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyUpdateInput = {
@@ -63920,6 +70962,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateInput = {
@@ -63933,6 +70976,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
   }
 
   export type CurrencyCreateManyInput = {
@@ -63962,6 +71006,166 @@ export namespace Prisma {
     symbol?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceCreateInput = {
+    id?: string
+    buyPrice: Decimal | DecimalJsLike | number | string
+    sellPrice: Decimal | DecimalJsLike | number | string
+    source?: $Enums.PriceSource
+    isLocked?: boolean
+    lastSyncedAt?: Date | string | null
+    note?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    currency: CurrencyCreateNestedOneWithoutPriceInput
+  }
+
+  export type CurrencyPriceUncheckedCreateInput = {
+    id?: string
+    currencyId: string
+    buyPrice: Decimal | DecimalJsLike | number | string
+    sellPrice: Decimal | DecimalJsLike | number | string
+    source?: $Enums.PriceSource
+    isLocked?: boolean
+    lastSyncedAt?: Date | string | null
+    note?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currency?: CurrencyUpdateOneRequiredWithoutPriceNestedInput
+  }
+
+  export type CurrencyPriceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currencyId?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceCreateManyInput = {
+    id?: string
+    currencyId: string
+    buyPrice: Decimal | DecimalJsLike | number | string
+    sellPrice: Decimal | DecimalJsLike | number | string
+    source?: $Enums.PriceSource
+    isLocked?: boolean
+    lastSyncedAt?: Date | string | null
+    note?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    currencyId?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingCreateInput = {
+    id?: string
+    autoSync?: boolean
+    lastRunAt?: Date | string | null
+    lastRunSummary?: string | null
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceSyncSettingUncheckedCreateInput = {
+    id?: string
+    autoSync?: boolean
+    lastRunAt?: Date | string | null
+    lastRunSummary?: string | null
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceSyncSettingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    autoSync?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastRunSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    autoSync?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastRunSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingCreateManyInput = {
+    id?: string
+    autoSync?: boolean
+    lastRunAt?: Date | string | null
+    lastRunSummary?: string | null
+    updatedBy?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceSyncSettingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    autoSync?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastRunSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceSyncSettingUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    autoSync?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastRunSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -64976,6 +72180,154 @@ export namespace Prisma {
     mandatorySaturday?: BoolFieldUpdateOperationsInput | boolean
     topRank?: NullableIntFieldUpdateOperationsInput | number | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SalaryComponentCreateInput = {
+    id?: string
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company?: CompanyCreateNestedOneWithoutSalaryComponentsInput
+    assignments?: UserSalaryComponentCreateNestedManyWithoutComponentInput
+  }
+
+  export type SalaryComponentUncheckedCreateInput = {
+    id?: string
+    companyId?: string | null
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignments?: UserSalaryComponentUncheckedCreateNestedManyWithoutComponentInput
+  }
+
+  export type SalaryComponentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneWithoutSalaryComponentsNestedInput
+    assignments?: UserSalaryComponentUpdateManyWithoutComponentNestedInput
+  }
+
+  export type SalaryComponentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignments?: UserSalaryComponentUncheckedUpdateManyWithoutComponentNestedInput
+  }
+
+  export type SalaryComponentCreateManyInput = {
+    id?: string
+    companyId?: string | null
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SalaryComponentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SalaryComponentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentCreateInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: userCreateNestedOneWithoutSalaryComponentsInput
+    component: SalaryComponentCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type UserSalaryComponentUncheckedCreateInput = {
+    id?: string
+    userId: string
+    componentId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserSalaryComponentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutSalaryComponentsNestedInput
+    component?: SalaryComponentUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type UserSalaryComponentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    componentId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentCreateManyInput = {
+    id?: string
+    userId: string
+    componentId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserSalaryComponentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    componentId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -67040,6 +74392,11 @@ export namespace Prisma {
     isNot?: userWhereInput
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: userWhereInput | null
+    isNot?: userWhereInput | null
+  }
+
   export type BranchNullableScalarRelationFilter = {
     is?: BranchWhereInput | null
     isNot?: BranchWhereInput | null
@@ -67072,6 +74429,8 @@ export namespace Prisma {
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    editedById?: SortOrder
+    editedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67100,6 +74459,8 @@ export namespace Prisma {
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    editedById?: SortOrder
+    editedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67121,6 +74482,8 @@ export namespace Prisma {
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    editedById?: SortOrder
+    editedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67342,6 +74705,12 @@ export namespace Prisma {
     none?: userWhereInput
   }
 
+  export type RoleResourcePermissionListRelationFilter = {
+    every?: RoleResourcePermissionWhereInput
+    some?: RoleResourcePermissionWhereInput
+    none?: RoleResourcePermissionWhereInput
+  }
+
   export type PayrollIncentiveMatrixOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -67351,6 +74720,10 @@ export namespace Prisma {
   }
 
   export type userOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RoleResourcePermissionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -67366,6 +74739,7 @@ export namespace Prisma {
     companyId?: SortOrder
     permissions?: SortOrder
     payrollCompanyIds?: SortOrder
+    usesResourcePerms?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67375,6 +74749,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     companyId?: SortOrder
+    usesResourcePerms?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67384,6 +74759,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     companyId?: SortOrder
+    usesResourcePerms?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67415,6 +74791,12 @@ export namespace Prisma {
     every?: KpiMonthlyResultWhereInput
     some?: KpiMonthlyResultWhereInput
     none?: KpiMonthlyResultWhereInput
+  }
+
+  export type UserSalaryComponentListRelationFilter = {
+    every?: UserSalaryComponentWhereInput
+    some?: UserSalaryComponentWhereInput
+    none?: UserSalaryComponentWhereInput
   }
 
   export type AttendanceListRelationFilter = {
@@ -67455,6 +74837,10 @@ export namespace Prisma {
   }
 
   export type KpiMonthlyResultOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type UserSalaryComponentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -67591,6 +74977,65 @@ export namespace Prisma {
     expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumScopeModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScopeMode | EnumScopeModeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScopeModeFilter<$PrismaModel> | $Enums.ScopeMode
+  }
+
+  export type Custom_roleScalarRelationFilter = {
+    is?: custom_roleWhereInput
+    isNot?: custom_roleWhereInput
+  }
+
+  export type RoleResourcePermissionRoleIdResourceCompoundUniqueInput = {
+    roleId: string
+    resource: string
+  }
+
+  export type RoleResourcePermissionCountOrderByAggregateInput = {
+    id?: SortOrder
+    roleId?: SortOrder
+    resource?: SortOrder
+    viewScope?: SortOrder
+    viewCompanyIds?: SortOrder
+    writeScope?: SortOrder
+    writeCompanyIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleResourcePermissionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    roleId?: SortOrder
+    resource?: SortOrder
+    viewScope?: SortOrder
+    writeScope?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleResourcePermissionMinOrderByAggregateInput = {
+    id?: SortOrder
+    roleId?: SortOrder
+    resource?: SortOrder
+    viewScope?: SortOrder
+    writeScope?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumScopeModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScopeMode | EnumScopeModeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScopeModeWithAggregatesFilter<$PrismaModel> | $Enums.ScopeMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScopeModeFilter<$PrismaModel>
+    _max?: NestedEnumScopeModeFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -67983,6 +75428,12 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type SalaryComponentListRelationFilter = {
+    every?: SalaryComponentWhereInput
+    some?: SalaryComponentWhereInput
+    none?: SalaryComponentWhereInput
+  }
+
   export type BranchListRelationFilter = {
     every?: BranchWhereInput
     some?: BranchWhereInput
@@ -68053,6 +75504,10 @@ export namespace Prisma {
     every?: CorrectionRequestWhereInput
     some?: CorrectionRequestWhereInput
     none?: CorrectionRequestWhereInput
+  }
+
+  export type SalaryComponentOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type BranchOrderByRelationAggregateInput = {
@@ -68130,6 +75585,11 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type CurrencyPriceNullableScalarRelationFilter = {
+    is?: CurrencyPriceWhereInput | null
+    isNot?: CurrencyPriceWhereInput | null
+  }
+
   export type CurrencyCountOrderByAggregateInput = {
     id?: SortOrder
     code?: SortOrder
@@ -68157,6 +75617,102 @@ export namespace Prisma {
     symbol?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumPriceSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.PriceSource | EnumPriceSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumPriceSourceFilter<$PrismaModel> | $Enums.PriceSource
+  }
+
+  export type CurrencyPriceCountOrderByAggregateInput = {
+    id?: SortOrder
+    currencyId?: SortOrder
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+    source?: SortOrder
+    isLocked?: SortOrder
+    lastSyncedAt?: SortOrder
+    note?: SortOrder
+    updatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceAvgOrderByAggregateInput = {
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+  }
+
+  export type CurrencyPriceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    currencyId?: SortOrder
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+    source?: SortOrder
+    isLocked?: SortOrder
+    lastSyncedAt?: SortOrder
+    note?: SortOrder
+    updatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceMinOrderByAggregateInput = {
+    id?: SortOrder
+    currencyId?: SortOrder
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+    source?: SortOrder
+    isLocked?: SortOrder
+    lastSyncedAt?: SortOrder
+    note?: SortOrder
+    updatedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceSumOrderByAggregateInput = {
+    buyPrice?: SortOrder
+    sellPrice?: SortOrder
+  }
+
+  export type EnumPriceSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PriceSource | EnumPriceSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumPriceSourceWithAggregatesFilter<$PrismaModel> | $Enums.PriceSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPriceSourceFilter<$PrismaModel>
+    _max?: NestedEnumPriceSourceFilter<$PrismaModel>
+  }
+
+  export type CurrencyPriceSyncSettingCountOrderByAggregateInput = {
+    id?: SortOrder
+    autoSync?: SortOrder
+    lastRunAt?: SortOrder
+    lastRunSummary?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceSyncSettingMaxOrderByAggregateInput = {
+    id?: SortOrder
+    autoSync?: SortOrder
+    lastRunAt?: SortOrder
+    lastRunSummary?: SortOrder
+    updatedBy?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CurrencyPriceSyncSettingMinOrderByAggregateInput = {
+    id?: SortOrder
+    autoSync?: SortOrder
+    lastRunAt?: SortOrder
+    lastRunSummary?: SortOrder
+    updatedBy?: SortOrder
     updatedAt?: SortOrder
   }
 
@@ -68683,11 +76239,6 @@ export namespace Prisma {
     not?: NestedEnumKpiEntryStatusFilter<$PrismaModel> | $Enums.KpiEntryStatus
   }
 
-  export type UserNullableScalarRelationFilter = {
-    is?: userWhereInput | null
-    isNot?: userWhereInput | null
-  }
-
   export type RoleKpiScalarRelationFilter = {
     is?: RoleKpiWhereInput
     isNot?: RoleKpiWhereInput
@@ -69071,6 +76622,117 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPayrollIncentiveOutcomeFilter<$PrismaModel>
     _max?: NestedEnumPayrollIncentiveOutcomeFilter<$PrismaModel>
+  }
+
+  export type EnumSalaryComponentKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.SalaryComponentKind | EnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSalaryComponentKindFilter<$PrismaModel> | $Enums.SalaryComponentKind
+  }
+
+  export type SalaryComponentCompanyIdNameCompoundUniqueInput = {
+    companyId: string
+    name: string
+  }
+
+  export type SalaryComponentCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    name?: SortOrder
+    kind?: SortOrder
+    defaultAmount?: SortOrder
+    note?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SalaryComponentAvgOrderByAggregateInput = {
+    defaultAmount?: SortOrder
+  }
+
+  export type SalaryComponentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    name?: SortOrder
+    kind?: SortOrder
+    defaultAmount?: SortOrder
+    note?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SalaryComponentMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    name?: SortOrder
+    kind?: SortOrder
+    defaultAmount?: SortOrder
+    note?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SalaryComponentSumOrderByAggregateInput = {
+    defaultAmount?: SortOrder
+  }
+
+  export type EnumSalaryComponentKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SalaryComponentKind | EnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSalaryComponentKindWithAggregatesFilter<$PrismaModel> | $Enums.SalaryComponentKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSalaryComponentKindFilter<$PrismaModel>
+    _max?: NestedEnumSalaryComponentKindFilter<$PrismaModel>
+  }
+
+  export type SalaryComponentScalarRelationFilter = {
+    is?: SalaryComponentWhereInput
+    isNot?: SalaryComponentWhereInput
+  }
+
+  export type UserSalaryComponentUserIdComponentIdCompoundUniqueInput = {
+    userId: string
+    componentId: string
+  }
+
+  export type UserSalaryComponentCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    componentId?: SortOrder
+    amount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserSalaryComponentAvgOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type UserSalaryComponentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    componentId?: SortOrder
+    amount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserSalaryComponentMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    componentId?: SortOrder
+    amount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserSalaryComponentSumOrderByAggregateInput = {
+    amount?: SortOrder
   }
 
   export type EnumRefiningMethodFilter<$PrismaModel = never> = {
@@ -70454,6 +78116,12 @@ export namespace Prisma {
     connect?: userWhereUniqueInput
   }
 
+  export type userCreateNestedOneWithoutAttendancesEditedInput = {
+    create?: XOR<userCreateWithoutAttendancesEditedInput, userUncheckedCreateWithoutAttendancesEditedInput>
+    connectOrCreate?: userCreateOrConnectWithoutAttendancesEditedInput
+    connect?: userWhereUniqueInput
+  }
+
   export type BranchCreateNestedOneWithoutAttendancesInput = {
     create?: XOR<BranchCreateWithoutAttendancesInput, BranchUncheckedCreateWithoutAttendancesInput>
     connectOrCreate?: BranchCreateOrConnectWithoutAttendancesInput
@@ -70498,6 +78166,16 @@ export namespace Prisma {
     upsert?: userUpsertWithoutAttendancesInput
     connect?: userWhereUniqueInput
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutAttendancesInput, userUpdateWithoutAttendancesInput>, userUncheckedUpdateWithoutAttendancesInput>
+  }
+
+  export type userUpdateOneWithoutAttendancesEditedNestedInput = {
+    create?: XOR<userCreateWithoutAttendancesEditedInput, userUncheckedCreateWithoutAttendancesEditedInput>
+    connectOrCreate?: userCreateOrConnectWithoutAttendancesEditedInput
+    upsert?: userUpsertWithoutAttendancesEditedInput
+    disconnect?: userWhereInput | boolean
+    delete?: userWhereInput | boolean
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutAttendancesEditedInput, userUpdateWithoutAttendancesEditedInput>, userUncheckedUpdateWithoutAttendancesEditedInput>
   }
 
   export type BranchUpdateOneWithoutAttendancesNestedInput = {
@@ -70573,6 +78251,13 @@ export namespace Prisma {
     connect?: userWhereUniqueInput | userWhereUniqueInput[]
   }
 
+  export type RoleResourcePermissionCreateNestedManyWithoutRoleInput = {
+    create?: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput> | RoleResourcePermissionCreateWithoutRoleInput[] | RoleResourcePermissionUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: RoleResourcePermissionCreateOrConnectWithoutRoleInput | RoleResourcePermissionCreateOrConnectWithoutRoleInput[]
+    createMany?: RoleResourcePermissionCreateManyRoleInputEnvelope
+    connect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+  }
+
   export type PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput = {
     create?: XOR<PayrollIncentiveMatrixCreateWithoutCustomRoleInput, PayrollIncentiveMatrixUncheckedCreateWithoutCustomRoleInput> | PayrollIncentiveMatrixCreateWithoutCustomRoleInput[] | PayrollIncentiveMatrixUncheckedCreateWithoutCustomRoleInput[]
     connectOrCreate?: PayrollIncentiveMatrixCreateOrConnectWithoutCustomRoleInput | PayrollIncentiveMatrixCreateOrConnectWithoutCustomRoleInput[]
@@ -70592,6 +78277,13 @@ export namespace Prisma {
     connectOrCreate?: userCreateOrConnectWithoutCustomRoleInput | userCreateOrConnectWithoutCustomRoleInput[]
     createMany?: userCreateManyCustomRoleInputEnvelope
     connect?: userWhereUniqueInput | userWhereUniqueInput[]
+  }
+
+  export type RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput = {
+    create?: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput> | RoleResourcePermissionCreateWithoutRoleInput[] | RoleResourcePermissionUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: RoleResourcePermissionCreateOrConnectWithoutRoleInput | RoleResourcePermissionCreateOrConnectWithoutRoleInput[]
+    createMany?: RoleResourcePermissionCreateManyRoleInputEnvelope
+    connect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
   }
 
   export type custom_roleUpdatepermissionsInput = {
@@ -70656,6 +78348,20 @@ export namespace Prisma {
     deleteMany?: userScalarWhereInput | userScalarWhereInput[]
   }
 
+  export type RoleResourcePermissionUpdateManyWithoutRoleNestedInput = {
+    create?: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput> | RoleResourcePermissionCreateWithoutRoleInput[] | RoleResourcePermissionUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: RoleResourcePermissionCreateOrConnectWithoutRoleInput | RoleResourcePermissionCreateOrConnectWithoutRoleInput[]
+    upsert?: RoleResourcePermissionUpsertWithWhereUniqueWithoutRoleInput | RoleResourcePermissionUpsertWithWhereUniqueWithoutRoleInput[]
+    createMany?: RoleResourcePermissionCreateManyRoleInputEnvelope
+    set?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    disconnect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    delete?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    connect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    update?: RoleResourcePermissionUpdateWithWhereUniqueWithoutRoleInput | RoleResourcePermissionUpdateWithWhereUniqueWithoutRoleInput[]
+    updateMany?: RoleResourcePermissionUpdateManyWithWhereWithoutRoleInput | RoleResourcePermissionUpdateManyWithWhereWithoutRoleInput[]
+    deleteMany?: RoleResourcePermissionScalarWhereInput | RoleResourcePermissionScalarWhereInput[]
+  }
+
   export type PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput = {
     create?: XOR<PayrollIncentiveMatrixCreateWithoutCustomRoleInput, PayrollIncentiveMatrixUncheckedCreateWithoutCustomRoleInput> | PayrollIncentiveMatrixCreateWithoutCustomRoleInput[] | PayrollIncentiveMatrixUncheckedCreateWithoutCustomRoleInput[]
     connectOrCreate?: PayrollIncentiveMatrixCreateOrConnectWithoutCustomRoleInput | PayrollIncentiveMatrixCreateOrConnectWithoutCustomRoleInput[]
@@ -70696,6 +78402,20 @@ export namespace Prisma {
     update?: userUpdateWithWhereUniqueWithoutCustomRoleInput | userUpdateWithWhereUniqueWithoutCustomRoleInput[]
     updateMany?: userUpdateManyWithWhereWithoutCustomRoleInput | userUpdateManyWithWhereWithoutCustomRoleInput[]
     deleteMany?: userScalarWhereInput | userScalarWhereInput[]
+  }
+
+  export type RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput = {
+    create?: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput> | RoleResourcePermissionCreateWithoutRoleInput[] | RoleResourcePermissionUncheckedCreateWithoutRoleInput[]
+    connectOrCreate?: RoleResourcePermissionCreateOrConnectWithoutRoleInput | RoleResourcePermissionCreateOrConnectWithoutRoleInput[]
+    upsert?: RoleResourcePermissionUpsertWithWhereUniqueWithoutRoleInput | RoleResourcePermissionUpsertWithWhereUniqueWithoutRoleInput[]
+    createMany?: RoleResourcePermissionCreateManyRoleInputEnvelope
+    set?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    disconnect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    delete?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    connect?: RoleResourcePermissionWhereUniqueInput | RoleResourcePermissionWhereUniqueInput[]
+    update?: RoleResourcePermissionUpdateWithWhereUniqueWithoutRoleInput | RoleResourcePermissionUpdateWithWhereUniqueWithoutRoleInput[]
+    updateMany?: RoleResourcePermissionUpdateManyWithWhereWithoutRoleInput | RoleResourcePermissionUpdateManyWithWhereWithoutRoleInput[]
+    deleteMany?: RoleResourcePermissionScalarWhereInput | RoleResourcePermissionScalarWhereInput[]
   }
 
   export type KpiEntryCreateNestedManyWithoutEmployeeInput = {
@@ -70740,10 +78460,24 @@ export namespace Prisma {
     connect?: KpiMonthlyResultWhereUniqueInput | KpiMonthlyResultWhereUniqueInput[]
   }
 
+  export type UserSalaryComponentCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput> | UserSalaryComponentCreateWithoutUserInput[] | UserSalaryComponentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutUserInput | UserSalaryComponentCreateOrConnectWithoutUserInput[]
+    createMany?: UserSalaryComponentCreateManyUserInputEnvelope
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+  }
+
   export type AttendanceCreateNestedManyWithoutUserInput = {
     create?: XOR<AttendanceCreateWithoutUserInput, AttendanceUncheckedCreateWithoutUserInput> | AttendanceCreateWithoutUserInput[] | AttendanceUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutUserInput | AttendanceCreateOrConnectWithoutUserInput[]
     createMany?: AttendanceCreateManyUserInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
+  export type AttendanceCreateNestedManyWithoutEditedByInput = {
+    create?: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput> | AttendanceCreateWithoutEditedByInput[] | AttendanceUncheckedCreateWithoutEditedByInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutEditedByInput | AttendanceCreateOrConnectWithoutEditedByInput[]
+    createMany?: AttendanceCreateManyEditedByInputEnvelope
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
@@ -70822,10 +78556,24 @@ export namespace Prisma {
     connect?: KpiMonthlyResultWhereUniqueInput | KpiMonthlyResultWhereUniqueInput[]
   }
 
+  export type UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput> | UserSalaryComponentCreateWithoutUserInput[] | UserSalaryComponentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutUserInput | UserSalaryComponentCreateOrConnectWithoutUserInput[]
+    createMany?: UserSalaryComponentCreateManyUserInputEnvelope
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+  }
+
   export type AttendanceUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AttendanceCreateWithoutUserInput, AttendanceUncheckedCreateWithoutUserInput> | AttendanceCreateWithoutUserInput[] | AttendanceUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutUserInput | AttendanceCreateOrConnectWithoutUserInput[]
     createMany?: AttendanceCreateManyUserInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
+  export type AttendanceUncheckedCreateNestedManyWithoutEditedByInput = {
+    create?: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput> | AttendanceCreateWithoutEditedByInput[] | AttendanceUncheckedCreateWithoutEditedByInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutEditedByInput | AttendanceCreateOrConnectWithoutEditedByInput[]
+    createMany?: AttendanceCreateManyEditedByInputEnvelope
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
@@ -70942,6 +78690,20 @@ export namespace Prisma {
     deleteMany?: KpiMonthlyResultScalarWhereInput | KpiMonthlyResultScalarWhereInput[]
   }
 
+  export type UserSalaryComponentUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput> | UserSalaryComponentCreateWithoutUserInput[] | UserSalaryComponentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutUserInput | UserSalaryComponentCreateOrConnectWithoutUserInput[]
+    upsert?: UserSalaryComponentUpsertWithWhereUniqueWithoutUserInput | UserSalaryComponentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserSalaryComponentCreateManyUserInputEnvelope
+    set?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    disconnect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    delete?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    update?: UserSalaryComponentUpdateWithWhereUniqueWithoutUserInput | UserSalaryComponentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserSalaryComponentUpdateManyWithWhereWithoutUserInput | UserSalaryComponentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+  }
+
   export type AttendanceUpdateManyWithoutUserNestedInput = {
     create?: XOR<AttendanceCreateWithoutUserInput, AttendanceUncheckedCreateWithoutUserInput> | AttendanceCreateWithoutUserInput[] | AttendanceUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutUserInput | AttendanceCreateOrConnectWithoutUserInput[]
@@ -70953,6 +78715,20 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
     update?: AttendanceUpdateWithWhereUniqueWithoutUserInput | AttendanceUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AttendanceUpdateManyWithWhereWithoutUserInput | AttendanceUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
+  export type AttendanceUpdateManyWithoutEditedByNestedInput = {
+    create?: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput> | AttendanceCreateWithoutEditedByInput[] | AttendanceUncheckedCreateWithoutEditedByInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutEditedByInput | AttendanceCreateOrConnectWithoutEditedByInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutEditedByInput | AttendanceUpsertWithWhereUniqueWithoutEditedByInput[]
+    createMany?: AttendanceCreateManyEditedByInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutEditedByInput | AttendanceUpdateWithWhereUniqueWithoutEditedByInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutEditedByInput | AttendanceUpdateManyWithWhereWithoutEditedByInput[]
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
@@ -71102,6 +78878,20 @@ export namespace Prisma {
     deleteMany?: KpiMonthlyResultScalarWhereInput | KpiMonthlyResultScalarWhereInput[]
   }
 
+  export type UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput> | UserSalaryComponentCreateWithoutUserInput[] | UserSalaryComponentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutUserInput | UserSalaryComponentCreateOrConnectWithoutUserInput[]
+    upsert?: UserSalaryComponentUpsertWithWhereUniqueWithoutUserInput | UserSalaryComponentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserSalaryComponentCreateManyUserInputEnvelope
+    set?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    disconnect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    delete?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    update?: UserSalaryComponentUpdateWithWhereUniqueWithoutUserInput | UserSalaryComponentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserSalaryComponentUpdateManyWithWhereWithoutUserInput | UserSalaryComponentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+  }
+
   export type AttendanceUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AttendanceCreateWithoutUserInput, AttendanceUncheckedCreateWithoutUserInput> | AttendanceCreateWithoutUserInput[] | AttendanceUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutUserInput | AttendanceCreateOrConnectWithoutUserInput[]
@@ -71113,6 +78903,20 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
     update?: AttendanceUpdateWithWhereUniqueWithoutUserInput | AttendanceUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AttendanceUpdateManyWithWhereWithoutUserInput | AttendanceUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutEditedByNestedInput = {
+    create?: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput> | AttendanceCreateWithoutEditedByInput[] | AttendanceUncheckedCreateWithoutEditedByInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutEditedByInput | AttendanceCreateOrConnectWithoutEditedByInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutEditedByInput | AttendanceUpsertWithWhereUniqueWithoutEditedByInput[]
+    createMany?: AttendanceCreateManyEditedByInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutEditedByInput | AttendanceUpdateWithWhereUniqueWithoutEditedByInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutEditedByInput | AttendanceUpdateManyWithWhereWithoutEditedByInput[]
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
@@ -71156,6 +78960,42 @@ export namespace Prisma {
     update?: sessionUpdateWithWhereUniqueWithoutUserInput | sessionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: sessionUpdateManyWithWhereWithoutUserInput | sessionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: sessionScalarWhereInput | sessionScalarWhereInput[]
+  }
+
+  export type RoleResourcePermissionCreateviewCompanyIdsInput = {
+    set: string[]
+  }
+
+  export type RoleResourcePermissionCreatewriteCompanyIdsInput = {
+    set: string[]
+  }
+
+  export type custom_roleCreateNestedOneWithoutResourcePermsInput = {
+    create?: XOR<custom_roleCreateWithoutResourcePermsInput, custom_roleUncheckedCreateWithoutResourcePermsInput>
+    connectOrCreate?: custom_roleCreateOrConnectWithoutResourcePermsInput
+    connect?: custom_roleWhereUniqueInput
+  }
+
+  export type EnumScopeModeFieldUpdateOperationsInput = {
+    set?: $Enums.ScopeMode
+  }
+
+  export type RoleResourcePermissionUpdateviewCompanyIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type RoleResourcePermissionUpdatewriteCompanyIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type custom_roleUpdateOneRequiredWithoutResourcePermsNestedInput = {
+    create?: XOR<custom_roleCreateWithoutResourcePermsInput, custom_roleUncheckedCreateWithoutResourcePermsInput>
+    connectOrCreate?: custom_roleCreateOrConnectWithoutResourcePermsInput
+    upsert?: custom_roleUpsertWithoutResourcePermsInput
+    connect?: custom_roleWhereUniqueInput
+    update?: XOR<XOR<custom_roleUpdateToOneWithWhereWithoutResourcePermsInput, custom_roleUpdateWithoutResourcePermsInput>, custom_roleUncheckedUpdateWithoutResourcePermsInput>
   }
 
   export type CompanyCreateNestedOneWithoutBankAccountsInput = {
@@ -71563,6 +79403,13 @@ export namespace Prisma {
     connect?: PayrollIncentiveMatrixWhereUniqueInput | PayrollIncentiveMatrixWhereUniqueInput[]
   }
 
+  export type SalaryComponentCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
+    createMany?: SalaryComponentCreateManyCompanyInputEnvelope
+    connect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+  }
+
   export type BranchCreateNestedManyWithoutCompanyInput = {
     create?: XOR<BranchCreateWithoutCompanyInput, BranchUncheckedCreateWithoutCompanyInput> | BranchCreateWithoutCompanyInput[] | BranchUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: BranchCreateOrConnectWithoutCompanyInput | BranchCreateOrConnectWithoutCompanyInput[]
@@ -71659,6 +79506,13 @@ export namespace Prisma {
     connectOrCreate?: PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput | PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput[]
     createMany?: PayrollIncentiveMatrixCreateManyCompanyInputEnvelope
     connect?: PayrollIncentiveMatrixWhereUniqueInput | PayrollIncentiveMatrixWhereUniqueInput[]
+  }
+
+  export type SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
+    createMany?: SalaryComponentCreateManyCompanyInputEnvelope
+    connect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
   }
 
   export type BranchUncheckedCreateNestedManyWithoutCompanyInput = {
@@ -71764,6 +79618,20 @@ export namespace Prisma {
     update?: PayrollIncentiveMatrixUpdateWithWhereUniqueWithoutCompanyInput | PayrollIncentiveMatrixUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: PayrollIncentiveMatrixUpdateManyWithWhereWithoutCompanyInput | PayrollIncentiveMatrixUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: PayrollIncentiveMatrixScalarWhereInput | PayrollIncentiveMatrixScalarWhereInput[]
+  }
+
+  export type SalaryComponentUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
+    upsert?: SalaryComponentUpsertWithWhereUniqueWithoutCompanyInput | SalaryComponentUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: SalaryComponentCreateManyCompanyInputEnvelope
+    set?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    disconnect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    delete?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    connect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    update?: SalaryComponentUpdateWithWhereUniqueWithoutCompanyInput | SalaryComponentUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: SalaryComponentUpdateManyWithWhereWithoutCompanyInput | SalaryComponentUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: SalaryComponentScalarWhereInput | SalaryComponentScalarWhereInput[]
   }
 
   export type BranchUpdateManyWithoutCompanyNestedInput = {
@@ -71960,6 +79828,20 @@ export namespace Prisma {
     update?: PayrollIncentiveMatrixUpdateWithWhereUniqueWithoutCompanyInput | PayrollIncentiveMatrixUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: PayrollIncentiveMatrixUpdateManyWithWhereWithoutCompanyInput | PayrollIncentiveMatrixUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: PayrollIncentiveMatrixScalarWhereInput | PayrollIncentiveMatrixScalarWhereInput[]
+  }
+
+  export type SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
+    upsert?: SalaryComponentUpsertWithWhereUniqueWithoutCompanyInput | SalaryComponentUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: SalaryComponentCreateManyCompanyInputEnvelope
+    set?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    disconnect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    delete?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    connect?: SalaryComponentWhereUniqueInput | SalaryComponentWhereUniqueInput[]
+    update?: SalaryComponentUpdateWithWhereUniqueWithoutCompanyInput | SalaryComponentUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: SalaryComponentUpdateManyWithWhereWithoutCompanyInput | SalaryComponentUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: SalaryComponentScalarWhereInput | SalaryComponentScalarWhereInput[]
   }
 
   export type BranchUncheckedUpdateManyWithoutCompanyNestedInput = {
@@ -72165,6 +80047,12 @@ export namespace Prisma {
     connect?: StockMutationWhereUniqueInput | StockMutationWhereUniqueInput[]
   }
 
+  export type CurrencyPriceCreateNestedOneWithoutCurrencyInput = {
+    create?: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+    connectOrCreate?: CurrencyPriceCreateOrConnectWithoutCurrencyInput
+    connect?: CurrencyPriceWhereUniqueInput
+  }
+
   export type BankAccountUncheckedCreateNestedManyWithoutCurrencyInput = {
     create?: XOR<BankAccountCreateWithoutCurrencyInput, BankAccountUncheckedCreateWithoutCurrencyInput> | BankAccountCreateWithoutCurrencyInput[] | BankAccountUncheckedCreateWithoutCurrencyInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutCurrencyInput | BankAccountCreateOrConnectWithoutCurrencyInput[]
@@ -72184,6 +80072,12 @@ export namespace Prisma {
     connectOrCreate?: StockMutationCreateOrConnectWithoutCurrencyInput | StockMutationCreateOrConnectWithoutCurrencyInput[]
     createMany?: StockMutationCreateManyCurrencyInputEnvelope
     connect?: StockMutationWhereUniqueInput | StockMutationWhereUniqueInput[]
+  }
+
+  export type CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput = {
+    create?: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+    connectOrCreate?: CurrencyPriceCreateOrConnectWithoutCurrencyInput
+    connect?: CurrencyPriceWhereUniqueInput
   }
 
   export type BankAccountUpdateManyWithoutCurrencyNestedInput = {
@@ -72228,6 +80122,16 @@ export namespace Prisma {
     deleteMany?: StockMutationScalarWhereInput | StockMutationScalarWhereInput[]
   }
 
+  export type CurrencyPriceUpdateOneWithoutCurrencyNestedInput = {
+    create?: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+    connectOrCreate?: CurrencyPriceCreateOrConnectWithoutCurrencyInput
+    upsert?: CurrencyPriceUpsertWithoutCurrencyInput
+    disconnect?: CurrencyPriceWhereInput | boolean
+    delete?: CurrencyPriceWhereInput | boolean
+    connect?: CurrencyPriceWhereUniqueInput
+    update?: XOR<XOR<CurrencyPriceUpdateToOneWithWhereWithoutCurrencyInput, CurrencyPriceUpdateWithoutCurrencyInput>, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
+  }
+
   export type BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput = {
     create?: XOR<BankAccountCreateWithoutCurrencyInput, BankAccountUncheckedCreateWithoutCurrencyInput> | BankAccountCreateWithoutCurrencyInput[] | BankAccountUncheckedCreateWithoutCurrencyInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutCurrencyInput | BankAccountCreateOrConnectWithoutCurrencyInput[]
@@ -72268,6 +80172,34 @@ export namespace Prisma {
     update?: StockMutationUpdateWithWhereUniqueWithoutCurrencyInput | StockMutationUpdateWithWhereUniqueWithoutCurrencyInput[]
     updateMany?: StockMutationUpdateManyWithWhereWithoutCurrencyInput | StockMutationUpdateManyWithWhereWithoutCurrencyInput[]
     deleteMany?: StockMutationScalarWhereInput | StockMutationScalarWhereInput[]
+  }
+
+  export type CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput = {
+    create?: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+    connectOrCreate?: CurrencyPriceCreateOrConnectWithoutCurrencyInput
+    upsert?: CurrencyPriceUpsertWithoutCurrencyInput
+    disconnect?: CurrencyPriceWhereInput | boolean
+    delete?: CurrencyPriceWhereInput | boolean
+    connect?: CurrencyPriceWhereUniqueInput
+    update?: XOR<XOR<CurrencyPriceUpdateToOneWithWhereWithoutCurrencyInput, CurrencyPriceUpdateWithoutCurrencyInput>, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
+  }
+
+  export type CurrencyCreateNestedOneWithoutPriceInput = {
+    create?: XOR<CurrencyCreateWithoutPriceInput, CurrencyUncheckedCreateWithoutPriceInput>
+    connectOrCreate?: CurrencyCreateOrConnectWithoutPriceInput
+    connect?: CurrencyWhereUniqueInput
+  }
+
+  export type EnumPriceSourceFieldUpdateOperationsInput = {
+    set?: $Enums.PriceSource
+  }
+
+  export type CurrencyUpdateOneRequiredWithoutPriceNestedInput = {
+    create?: XOR<CurrencyCreateWithoutPriceInput, CurrencyUncheckedCreateWithoutPriceInput>
+    connectOrCreate?: CurrencyCreateOrConnectWithoutPriceInput
+    upsert?: CurrencyUpsertWithoutPriceInput
+    connect?: CurrencyWhereUniqueInput
+    update?: XOR<XOR<CurrencyUpdateToOneWithWhereWithoutPriceInput, CurrencyUpdateWithoutPriceInput>, CurrencyUncheckedUpdateWithoutPriceInput>
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -72820,6 +80752,96 @@ export namespace Prisma {
     upsert?: PayrollIncentiveMatrixUpsertWithoutTiersInput
     connect?: PayrollIncentiveMatrixWhereUniqueInput
     update?: XOR<XOR<PayrollIncentiveMatrixUpdateToOneWithWhereWithoutTiersInput, PayrollIncentiveMatrixUpdateWithoutTiersInput>, PayrollIncentiveMatrixUncheckedUpdateWithoutTiersInput>
+  }
+
+  export type CompanyCreateNestedOneWithoutSalaryComponentsInput = {
+    create?: XOR<CompanyCreateWithoutSalaryComponentsInput, CompanyUncheckedCreateWithoutSalaryComponentsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutSalaryComponentsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type UserSalaryComponentCreateNestedManyWithoutComponentInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput> | UserSalaryComponentCreateWithoutComponentInput[] | UserSalaryComponentUncheckedCreateWithoutComponentInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutComponentInput | UserSalaryComponentCreateOrConnectWithoutComponentInput[]
+    createMany?: UserSalaryComponentCreateManyComponentInputEnvelope
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+  }
+
+  export type UserSalaryComponentUncheckedCreateNestedManyWithoutComponentInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput> | UserSalaryComponentCreateWithoutComponentInput[] | UserSalaryComponentUncheckedCreateWithoutComponentInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutComponentInput | UserSalaryComponentCreateOrConnectWithoutComponentInput[]
+    createMany?: UserSalaryComponentCreateManyComponentInputEnvelope
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+  }
+
+  export type EnumSalaryComponentKindFieldUpdateOperationsInput = {
+    set?: $Enums.SalaryComponentKind
+  }
+
+  export type CompanyUpdateOneWithoutSalaryComponentsNestedInput = {
+    create?: XOR<CompanyCreateWithoutSalaryComponentsInput, CompanyUncheckedCreateWithoutSalaryComponentsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutSalaryComponentsInput
+    upsert?: CompanyUpsertWithoutSalaryComponentsInput
+    disconnect?: CompanyWhereInput | boolean
+    delete?: CompanyWhereInput | boolean
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutSalaryComponentsInput, CompanyUpdateWithoutSalaryComponentsInput>, CompanyUncheckedUpdateWithoutSalaryComponentsInput>
+  }
+
+  export type UserSalaryComponentUpdateManyWithoutComponentNestedInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput> | UserSalaryComponentCreateWithoutComponentInput[] | UserSalaryComponentUncheckedCreateWithoutComponentInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutComponentInput | UserSalaryComponentCreateOrConnectWithoutComponentInput[]
+    upsert?: UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput | UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput[]
+    createMany?: UserSalaryComponentCreateManyComponentInputEnvelope
+    set?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    disconnect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    delete?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    update?: UserSalaryComponentUpdateWithWhereUniqueWithoutComponentInput | UserSalaryComponentUpdateWithWhereUniqueWithoutComponentInput[]
+    updateMany?: UserSalaryComponentUpdateManyWithWhereWithoutComponentInput | UserSalaryComponentUpdateManyWithWhereWithoutComponentInput[]
+    deleteMany?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+  }
+
+  export type UserSalaryComponentUncheckedUpdateManyWithoutComponentNestedInput = {
+    create?: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput> | UserSalaryComponentCreateWithoutComponentInput[] | UserSalaryComponentUncheckedCreateWithoutComponentInput[]
+    connectOrCreate?: UserSalaryComponentCreateOrConnectWithoutComponentInput | UserSalaryComponentCreateOrConnectWithoutComponentInput[]
+    upsert?: UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput | UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput[]
+    createMany?: UserSalaryComponentCreateManyComponentInputEnvelope
+    set?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    disconnect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    delete?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    connect?: UserSalaryComponentWhereUniqueInput | UserSalaryComponentWhereUniqueInput[]
+    update?: UserSalaryComponentUpdateWithWhereUniqueWithoutComponentInput | UserSalaryComponentUpdateWithWhereUniqueWithoutComponentInput[]
+    updateMany?: UserSalaryComponentUpdateManyWithWhereWithoutComponentInput | UserSalaryComponentUpdateManyWithWhereWithoutComponentInput[]
+    deleteMany?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+  }
+
+  export type userCreateNestedOneWithoutSalaryComponentsInput = {
+    create?: XOR<userCreateWithoutSalaryComponentsInput, userUncheckedCreateWithoutSalaryComponentsInput>
+    connectOrCreate?: userCreateOrConnectWithoutSalaryComponentsInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type SalaryComponentCreateNestedOneWithoutAssignmentsInput = {
+    create?: XOR<SalaryComponentCreateWithoutAssignmentsInput, SalaryComponentUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutAssignmentsInput
+    connect?: SalaryComponentWhereUniqueInput
+  }
+
+  export type userUpdateOneRequiredWithoutSalaryComponentsNestedInput = {
+    create?: XOR<userCreateWithoutSalaryComponentsInput, userUncheckedCreateWithoutSalaryComponentsInput>
+    connectOrCreate?: userCreateOrConnectWithoutSalaryComponentsInput
+    upsert?: userUpsertWithoutSalaryComponentsInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutSalaryComponentsInput, userUpdateWithoutSalaryComponentsInput>, userUncheckedUpdateWithoutSalaryComponentsInput>
+  }
+
+  export type SalaryComponentUpdateOneRequiredWithoutAssignmentsNestedInput = {
+    create?: XOR<SalaryComponentCreateWithoutAssignmentsInput, SalaryComponentUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: SalaryComponentCreateOrConnectWithoutAssignmentsInput
+    upsert?: SalaryComponentUpsertWithoutAssignmentsInput
+    connect?: SalaryComponentWhereUniqueInput
+    update?: XOR<XOR<SalaryComponentUpdateToOneWithWhereWithoutAssignmentsInput, SalaryComponentUpdateWithoutAssignmentsInput>, SalaryComponentUncheckedUpdateWithoutAssignmentsInput>
   }
 
   export type SampleCreateNestedOneWithoutRefiningBatchesInput = {
@@ -73798,6 +81820,23 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumScopeModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScopeMode | EnumScopeModeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScopeModeFilter<$PrismaModel> | $Enums.ScopeMode
+  }
+
+  export type NestedEnumScopeModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ScopeMode | EnumScopeModeFieldRefInput<$PrismaModel>
+    in?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ScopeMode[] | ListEnumScopeModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumScopeModeWithAggregatesFilter<$PrismaModel> | $Enums.ScopeMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumScopeModeFilter<$PrismaModel>
+    _max?: NestedEnumScopeModeFilter<$PrismaModel>
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -73900,6 +81939,23 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPriceSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.PriceSource | EnumPriceSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumPriceSourceFilter<$PrismaModel> | $Enums.PriceSource
+  }
+
+  export type NestedEnumPriceSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PriceSource | EnumPriceSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PriceSource[] | ListEnumPriceSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumPriceSourceWithAggregatesFilter<$PrismaModel> | $Enums.PriceSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPriceSourceFilter<$PrismaModel>
+    _max?: NestedEnumPriceSourceFilter<$PrismaModel>
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -74147,6 +82203,23 @@ export namespace Prisma {
     _max?: NestedEnumPayrollIncentiveOutcomeFilter<$PrismaModel>
   }
 
+  export type NestedEnumSalaryComponentKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.SalaryComponentKind | EnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSalaryComponentKindFilter<$PrismaModel> | $Enums.SalaryComponentKind
+  }
+
+  export type NestedEnumSalaryComponentKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SalaryComponentKind | EnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SalaryComponentKind[] | ListEnumSalaryComponentKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSalaryComponentKindWithAggregatesFilter<$PrismaModel> | $Enums.SalaryComponentKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSalaryComponentKindFilter<$PrismaModel>
+    _max?: NestedEnumSalaryComponentKindFilter<$PrismaModel>
+  }
+
   export type NestedEnumRefiningMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.RefiningMethod | EnumRefiningMethodFieldRefInput<$PrismaModel>
     in?: $Enums.RefiningMethod[] | ListEnumRefiningMethodFieldRefInput<$PrismaModel>
@@ -74373,6 +82446,8 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -74404,6 +82479,8 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -74412,6 +82489,73 @@ export namespace Prisma {
   export type userCreateOrConnectWithoutAttendancesInput = {
     where: userWhereUniqueInput
     create: XOR<userCreateWithoutAttendancesInput, userUncheckedCreateWithoutAttendancesInput>
+  }
+
+  export type userCreateWithoutAttendancesEditedInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    isActive?: boolean
+    kpiEntries?: KpiEntryCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
+    attendances?: AttendanceCreateNestedManyWithoutUserInput
+    samples?: SampleCreateNestedManyWithoutTechnicianInput
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    branch?: BranchCreateNestedOneWithoutUsersInput
+    customRole?: custom_roleCreateNestedOneWithoutUsersInput
+  }
+
+  export type userUncheckedCreateWithoutAttendancesEditedInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    branchId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    isActive?: boolean
+    customRoleId?: string | null
+    kpiEntries?: KpiEntryUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryUncheckedCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutAttendancesEditedInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutAttendancesEditedInput, userUncheckedCreateWithoutAttendancesEditedInput>
   }
 
   export type BranchCreateWithoutAttendancesInput = {
@@ -74488,6 +82632,8 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -74519,6 +82665,81 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type userUpsertWithoutAttendancesEditedInput = {
+    update: XOR<userUpdateWithoutAttendancesEditedInput, userUncheckedUpdateWithoutAttendancesEditedInput>
+    create: XOR<userCreateWithoutAttendancesEditedInput, userUncheckedCreateWithoutAttendancesEditedInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutAttendancesEditedInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutAttendancesEditedInput, userUncheckedUpdateWithoutAttendancesEditedInput>
+  }
+
+  export type userUpdateWithoutAttendancesEditedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    kpiEntries?: KpiEntryUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    samples?: SampleUpdateManyWithoutTechnicianNestedInput
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    branch?: BranchUpdateOneWithoutUsersNestedInput
+    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutAttendancesEditedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    kpiEntries?: KpiEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -74593,7 +82814,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -74624,7 +82847,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -74667,7 +82892,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -74698,7 +82925,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -74725,7 +82954,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -74756,7 +82987,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
   }
@@ -74799,7 +83032,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -74830,7 +83065,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -74927,6 +83164,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
@@ -74949,6 +83187,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -74990,7 +83229,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -75020,7 +83261,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -75033,6 +83276,38 @@ export namespace Prisma {
 
   export type userCreateManyCustomRoleInputEnvelope = {
     data: userCreateManyCustomRoleInput | userCreateManyCustomRoleInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RoleResourcePermissionCreateWithoutRoleInput = {
+    id?: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleResourcePermissionUncheckedCreateWithoutRoleInput = {
+    id?: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleResourcePermissionCreateOrConnectWithoutRoleInput = {
+    where: RoleResourcePermissionWhereUniqueInput
+    create: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput>
+  }
+
+  export type RoleResourcePermissionCreateManyRoleInputEnvelope = {
+    data: RoleResourcePermissionCreateManyRoleInput | RoleResourcePermissionCreateManyRoleInput[]
     skipDuplicates?: boolean
   }
 
@@ -75125,6 +83400,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
@@ -75147,6 +83423,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -75198,6 +83475,37 @@ export namespace Prisma {
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     isActive?: BoolFilter<"user"> | boolean
     customRoleId?: StringNullableFilter<"user"> | string | null
+  }
+
+  export type RoleResourcePermissionUpsertWithWhereUniqueWithoutRoleInput = {
+    where: RoleResourcePermissionWhereUniqueInput
+    update: XOR<RoleResourcePermissionUpdateWithoutRoleInput, RoleResourcePermissionUncheckedUpdateWithoutRoleInput>
+    create: XOR<RoleResourcePermissionCreateWithoutRoleInput, RoleResourcePermissionUncheckedCreateWithoutRoleInput>
+  }
+
+  export type RoleResourcePermissionUpdateWithWhereUniqueWithoutRoleInput = {
+    where: RoleResourcePermissionWhereUniqueInput
+    data: XOR<RoleResourcePermissionUpdateWithoutRoleInput, RoleResourcePermissionUncheckedUpdateWithoutRoleInput>
+  }
+
+  export type RoleResourcePermissionUpdateManyWithWhereWithoutRoleInput = {
+    where: RoleResourcePermissionScalarWhereInput
+    data: XOR<RoleResourcePermissionUpdateManyMutationInput, RoleResourcePermissionUncheckedUpdateManyWithoutRoleInput>
+  }
+
+  export type RoleResourcePermissionScalarWhereInput = {
+    AND?: RoleResourcePermissionScalarWhereInput | RoleResourcePermissionScalarWhereInput[]
+    OR?: RoleResourcePermissionScalarWhereInput[]
+    NOT?: RoleResourcePermissionScalarWhereInput | RoleResourcePermissionScalarWhereInput[]
+    id?: StringFilter<"RoleResourcePermission"> | string
+    roleId?: StringFilter<"RoleResourcePermission"> | string
+    resource?: StringFilter<"RoleResourcePermission"> | string
+    viewScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    viewCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    writeScope?: EnumScopeModeFilter<"RoleResourcePermission"> | $Enums.ScopeMode
+    writeCompanyIds?: StringNullableListFilter<"RoleResourcePermission">
+    createdAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleResourcePermission"> | Date | string
   }
 
   export type KpiEntryCreateWithoutEmployeeInput = {
@@ -75448,6 +83756,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserSalaryComponentCreateWithoutUserInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    component: SalaryComponentCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type UserSalaryComponentUncheckedCreateWithoutUserInput = {
+    id?: string
+    componentId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserSalaryComponentCreateOrConnectWithoutUserInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    create: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserSalaryComponentCreateManyUserInputEnvelope = {
+    data: UserSalaryComponentCreateManyUserInput | UserSalaryComponentCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AttendanceCreateWithoutUserInput = {
     id?: string
     date: Date | string
@@ -75463,8 +83797,10 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
   }
 
@@ -75484,6 +83820,8 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -75495,6 +83833,60 @@ export namespace Prisma {
 
   export type AttendanceCreateManyUserInputEnvelope = {
     data: AttendanceCreateManyUserInput | AttendanceCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AttendanceCreateWithoutEditedByInput = {
+    id?: string
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: userCreateNestedOneWithoutAttendancesInput
+    branch?: BranchCreateNestedOneWithoutAttendancesInput
+  }
+
+  export type AttendanceUncheckedCreateWithoutEditedByInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateOrConnectWithoutEditedByInput = {
+    where: AttendanceWhereUniqueInput
+    create: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput>
+  }
+
+  export type AttendanceCreateManyEditedByInputEnvelope = {
+    data: AttendanceCreateManyEditedByInput | AttendanceCreateManyEditedByInput[]
     skipDuplicates?: boolean
   }
 
@@ -75657,11 +84049,13 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUncheckedCreateWithoutUsersInput = {
@@ -75671,10 +84065,12 @@ export namespace Prisma {
     companyId?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleCreateOrConnectWithoutUsersInput = {
@@ -75832,6 +84228,34 @@ export namespace Prisma {
     calculatedAt?: DateTimeFilter<"KpiMonthlyResult"> | Date | string
   }
 
+  export type UserSalaryComponentUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    update: XOR<UserSalaryComponentUpdateWithoutUserInput, UserSalaryComponentUncheckedUpdateWithoutUserInput>
+    create: XOR<UserSalaryComponentCreateWithoutUserInput, UserSalaryComponentUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserSalaryComponentUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    data: XOR<UserSalaryComponentUpdateWithoutUserInput, UserSalaryComponentUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserSalaryComponentUpdateManyWithWhereWithoutUserInput = {
+    where: UserSalaryComponentScalarWhereInput
+    data: XOR<UserSalaryComponentUpdateManyMutationInput, UserSalaryComponentUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UserSalaryComponentScalarWhereInput = {
+    AND?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+    OR?: UserSalaryComponentScalarWhereInput[]
+    NOT?: UserSalaryComponentScalarWhereInput | UserSalaryComponentScalarWhereInput[]
+    id?: StringFilter<"UserSalaryComponent"> | string
+    userId?: StringFilter<"UserSalaryComponent"> | string
+    componentId?: StringFilter<"UserSalaryComponent"> | string
+    amount?: DecimalFilter<"UserSalaryComponent"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"UserSalaryComponent"> | Date | string
+  }
+
   export type AttendanceUpsertWithWhereUniqueWithoutUserInput = {
     where: AttendanceWhereUniqueInput
     update: XOR<AttendanceUpdateWithoutUserInput, AttendanceUncheckedUpdateWithoutUserInput>
@@ -75868,8 +84292,26 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
+    editedById?: StringNullableFilter<"Attendance"> | string | null
+    editedAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
+  }
+
+  export type AttendanceUpsertWithWhereUniqueWithoutEditedByInput = {
+    where: AttendanceWhereUniqueInput
+    update: XOR<AttendanceUpdateWithoutEditedByInput, AttendanceUncheckedUpdateWithoutEditedByInput>
+    create: XOR<AttendanceCreateWithoutEditedByInput, AttendanceUncheckedCreateWithoutEditedByInput>
+  }
+
+  export type AttendanceUpdateWithWhereUniqueWithoutEditedByInput = {
+    where: AttendanceWhereUniqueInput
+    data: XOR<AttendanceUpdateWithoutEditedByInput, AttendanceUncheckedUpdateWithoutEditedByInput>
+  }
+
+  export type AttendanceUpdateManyWithWhereWithoutEditedByInput = {
+    where: AttendanceScalarWhereInput
+    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutEditedByInput>
   }
 
   export type SampleUpsertWithWhereUniqueWithoutTechnicianInput = {
@@ -76036,11 +84478,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateWithoutUsersInput = {
@@ -76050,10 +84494,88 @@ export namespace Prisma {
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
+  }
+
+  export type custom_roleCreateWithoutResourcePermsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    permissions?: custom_roleCreatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCustomRoleInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    company?: CompanyCreateNestedOneWithoutCustom_rolesInput
+    users?: userCreateNestedManyWithoutCustomRoleInput
+  }
+
+  export type custom_roleUncheckedCreateWithoutResourcePermsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    companyId?: string | null
+    permissions?: custom_roleCreatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+  }
+
+  export type custom_roleCreateOrConnectWithoutResourcePermsInput = {
+    where: custom_roleWhereUniqueInput
+    create: XOR<custom_roleCreateWithoutResourcePermsInput, custom_roleUncheckedCreateWithoutResourcePermsInput>
+  }
+
+  export type custom_roleUpsertWithoutResourcePermsInput = {
+    update: XOR<custom_roleUpdateWithoutResourcePermsInput, custom_roleUncheckedUpdateWithoutResourcePermsInput>
+    create: XOR<custom_roleCreateWithoutResourcePermsInput, custom_roleUncheckedCreateWithoutResourcePermsInput>
+    where?: custom_roleWhereInput
+  }
+
+  export type custom_roleUpdateToOneWithWhereWithoutResourcePermsInput = {
+    where?: custom_roleWhereInput
+    data: XOR<custom_roleUpdateWithoutResourcePermsInput, custom_roleUncheckedUpdateWithoutResourcePermsInput>
+  }
+
+  export type custom_roleUpdateWithoutResourcePermsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    permissions?: custom_roleUpdatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCustomRoleNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
+    users?: userUpdateManyWithoutCustomRoleNestedInput
+  }
+
+  export type custom_roleUncheckedUpdateWithoutResourcePermsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    permissions?: custom_roleUpdatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
   }
 
   export type CompanyCreateWithoutBankAccountsInput = {
@@ -76064,6 +84586,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -76086,6 +84609,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -76115,6 +84639,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutBankAccountsInput = {
@@ -76127,6 +84652,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutBankAccountsInput = {
@@ -76221,6 +84747,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -76243,6 +84770,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -76278,6 +84806,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutBankAccountsInput = {
@@ -76290,6 +84819,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
   }
 
   export type BankMutationUpsertWithWhereUniqueWithoutBankAccountInput = {
@@ -76524,6 +85054,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
@@ -76546,6 +85077,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -76685,7 +85217,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -76715,7 +85249,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -76746,9 +85282,11 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: userCreateNestedOneWithoutAttendancesInput
+    editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
   }
 
   export type AttendanceUncheckedCreateWithoutBranchInput = {
@@ -76767,6 +85305,8 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -76800,6 +85340,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
@@ -76822,6 +85363,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -76991,6 +85533,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SalaryComponentCreateWithoutCompanyInput = {
+    id?: string
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignments?: UserSalaryComponentCreateNestedManyWithoutComponentInput
+  }
+
+  export type SalaryComponentUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignments?: UserSalaryComponentUncheckedCreateNestedManyWithoutComponentInput
+  }
+
+  export type SalaryComponentCreateOrConnectWithoutCompanyInput = {
+    where: SalaryComponentWhereUniqueInput
+    create: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type SalaryComponentCreateManyCompanyInputEnvelope = {
+    data: SalaryComponentCreateManyCompanyInput | SalaryComponentCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BranchCreateWithoutCompanyInput = {
     id?: string
     name: string
@@ -77097,11 +85673,13 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
     users?: userCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUncheckedCreateWithoutCompanyInput = {
@@ -77110,11 +85688,13 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleCreateOrConnectWithoutCompanyInput = {
@@ -77507,6 +86087,37 @@ export namespace Prisma {
     data: XOR<PayrollIncentiveMatrixUpdateManyMutationInput, PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyInput>
   }
 
+  export type SalaryComponentUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: SalaryComponentWhereUniqueInput
+    update: XOR<SalaryComponentUpdateWithoutCompanyInput, SalaryComponentUncheckedUpdateWithoutCompanyInput>
+    create: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type SalaryComponentUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: SalaryComponentWhereUniqueInput
+    data: XOR<SalaryComponentUpdateWithoutCompanyInput, SalaryComponentUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type SalaryComponentUpdateManyWithWhereWithoutCompanyInput = {
+    where: SalaryComponentScalarWhereInput
+    data: XOR<SalaryComponentUpdateManyMutationInput, SalaryComponentUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type SalaryComponentScalarWhereInput = {
+    AND?: SalaryComponentScalarWhereInput | SalaryComponentScalarWhereInput[]
+    OR?: SalaryComponentScalarWhereInput[]
+    NOT?: SalaryComponentScalarWhereInput | SalaryComponentScalarWhereInput[]
+    id?: StringFilter<"SalaryComponent"> | string
+    companyId?: StringNullableFilter<"SalaryComponent"> | string | null
+    name?: StringFilter<"SalaryComponent"> | string
+    kind?: EnumSalaryComponentKindFilter<"SalaryComponent"> | $Enums.SalaryComponentKind
+    defaultAmount?: DecimalNullableFilter<"SalaryComponent"> | Decimal | DecimalJsLike | number | string | null
+    note?: StringNullableFilter<"SalaryComponent"> | string | null
+    isActive?: BoolFilter<"SalaryComponent"> | boolean
+    createdAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+    updatedAt?: DateTimeFilter<"SalaryComponent"> | Date | string
+  }
+
   export type BranchUpsertWithWhereUniqueWithoutCompanyInput = {
     where: BranchWhereUniqueInput
     update: XOR<BranchUpdateWithoutCompanyInput, BranchUncheckedUpdateWithoutCompanyInput>
@@ -77582,6 +86193,7 @@ export namespace Prisma {
     companyId?: StringNullableFilter<"custom_role"> | string | null
     permissions?: StringNullableListFilter<"custom_role">
     payrollCompanyIds?: StringNullableListFilter<"custom_role">
+    usesResourcePerms?: BoolFilter<"custom_role"> | boolean
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
   }
@@ -78014,6 +86626,37 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CurrencyPriceCreateWithoutCurrencyInput = {
+    id?: string
+    buyPrice: Decimal | DecimalJsLike | number | string
+    sellPrice: Decimal | DecimalJsLike | number | string
+    source?: $Enums.PriceSource
+    isLocked?: boolean
+    lastSyncedAt?: Date | string | null
+    note?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceUncheckedCreateWithoutCurrencyInput = {
+    id?: string
+    buyPrice: Decimal | DecimalJsLike | number | string
+    sellPrice: Decimal | DecimalJsLike | number | string
+    source?: $Enums.PriceSource
+    isLocked?: boolean
+    lastSyncedAt?: Date | string | null
+    note?: string | null
+    updatedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CurrencyPriceCreateOrConnectWithoutCurrencyInput = {
+    where: CurrencyPriceWhereUniqueInput
+    create: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+  }
+
   export type BankAccountUpsertWithWhereUniqueWithoutCurrencyInput = {
     where: BankAccountWhereUniqueInput
     update: XOR<BankAccountUpdateWithoutCurrencyInput, BankAccountUncheckedUpdateWithoutCurrencyInput>
@@ -78062,6 +86705,111 @@ export namespace Prisma {
     data: XOR<StockMutationUpdateManyMutationInput, StockMutationUncheckedUpdateManyWithoutCurrencyInput>
   }
 
+  export type CurrencyPriceUpsertWithoutCurrencyInput = {
+    update: XOR<CurrencyPriceUpdateWithoutCurrencyInput, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
+    create: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
+    where?: CurrencyPriceWhereInput
+  }
+
+  export type CurrencyPriceUpdateToOneWithWhereWithoutCurrencyInput = {
+    where?: CurrencyPriceWhereInput
+    data: XOR<CurrencyPriceUpdateWithoutCurrencyInput, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
+  }
+
+  export type CurrencyPriceUpdateWithoutCurrencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyPriceUncheckedUpdateWithoutCurrencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    buyPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    source?: EnumPriceSourceFieldUpdateOperationsInput | $Enums.PriceSource
+    isLocked?: BoolFieldUpdateOperationsInput | boolean
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CurrencyCreateWithoutPriceInput = {
+    id?: string
+    code: string
+    name: string
+    symbol?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
+    stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
+    stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+  }
+
+  export type CurrencyUncheckedCreateWithoutPriceInput = {
+    id?: string
+    code: string
+    name: string
+    symbol?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
+    stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
+    stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+  }
+
+  export type CurrencyCreateOrConnectWithoutPriceInput = {
+    where: CurrencyWhereUniqueInput
+    create: XOR<CurrencyCreateWithoutPriceInput, CurrencyUncheckedCreateWithoutPriceInput>
+  }
+
+  export type CurrencyUpsertWithoutPriceInput = {
+    update: XOR<CurrencyUpdateWithoutPriceInput, CurrencyUncheckedUpdateWithoutPriceInput>
+    create: XOR<CurrencyCreateWithoutPriceInput, CurrencyUncheckedCreateWithoutPriceInput>
+    where?: CurrencyWhereInput
+  }
+
+  export type CurrencyUpdateToOneWithWhereWithoutPriceInput = {
+    where?: CurrencyWhereInput
+    data: XOR<CurrencyUpdateWithoutPriceInput, CurrencyUncheckedUpdateWithoutPriceInput>
+  }
+
+  export type CurrencyUpdateWithoutPriceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
+    stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
+    stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+  }
+
+  export type CurrencyUncheckedUpdateWithoutPriceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
+    stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
+    stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+  }
+
   export type CompanyCreateWithoutCompanyStockItemsInput = {
     id?: string
     name: string
@@ -78070,6 +86818,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -78092,6 +86841,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -78262,6 +87012,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -78284,6 +87035,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -78485,6 +87237,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
@@ -78507,6 +87260,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -78532,11 +87286,13 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUncheckedCreateWithoutRoleKpisInput = {
@@ -78546,10 +87302,12 @@ export namespace Prisma {
     companyId?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleCreateOrConnectWithoutRoleKpisInput = {
@@ -78667,6 +87425,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
@@ -78689,6 +87448,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -78720,11 +87480,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateWithoutRoleKpisInput = {
@@ -78734,10 +87496,12 @@ export namespace Prisma {
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type KpiDefinitionUpsertWithoutRoleKpisInput = {
@@ -78824,7 +87588,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -78855,7 +87621,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -78887,7 +87655,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -78918,7 +87688,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -78950,7 +87722,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -78981,7 +87755,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -79073,7 +87849,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79104,7 +87882,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79142,7 +87922,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79173,7 +87955,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79211,7 +87995,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79242,7 +88028,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79324,7 +88112,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -79355,7 +88145,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -79387,7 +88179,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -79418,7 +88212,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -79461,7 +88257,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79492,7 +88290,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79530,7 +88330,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79561,7 +88363,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79588,7 +88392,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -79619,7 +88425,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -79662,7 +88470,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -79693,7 +88503,9 @@ export namespace Prisma {
     kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -79706,6 +88518,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -79728,6 +88541,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -79754,11 +88568,13 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleUncheckedCreateWithoutIncentiveMatricesInput = {
@@ -79768,10 +88584,12 @@ export namespace Prisma {
     companyId?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
 
   export type custom_roleCreateOrConnectWithoutIncentiveMatricesInput = {
@@ -79833,6 +88651,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -79855,6 +88674,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -79887,11 +88707,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateWithoutIncentiveMatricesInput = {
@@ -79901,10 +88723,12 @@ export namespace Prisma {
     companyId?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type PayrollIncentiveTierUpsertWithWhereUniqueWithoutMatrixInput = {
@@ -79991,6 +88815,360 @@ export namespace Prisma {
     companyId?: StringFieldUpdateOperationsInput | string
     customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CompanyCreateWithoutSalaryComponentsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutSalaryComponentsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutSalaryComponentsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutSalaryComponentsInput, CompanyUncheckedCreateWithoutSalaryComponentsInput>
+  }
+
+  export type UserSalaryComponentCreateWithoutComponentInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: userCreateNestedOneWithoutSalaryComponentsInput
+  }
+
+  export type UserSalaryComponentUncheckedCreateWithoutComponentInput = {
+    id?: string
+    userId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserSalaryComponentCreateOrConnectWithoutComponentInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    create: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput>
+  }
+
+  export type UserSalaryComponentCreateManyComponentInputEnvelope = {
+    data: UserSalaryComponentCreateManyComponentInput | UserSalaryComponentCreateManyComponentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CompanyUpsertWithoutSalaryComponentsInput = {
+    update: XOR<CompanyUpdateWithoutSalaryComponentsInput, CompanyUncheckedUpdateWithoutSalaryComponentsInput>
+    create: XOR<CompanyCreateWithoutSalaryComponentsInput, CompanyUncheckedCreateWithoutSalaryComponentsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutSalaryComponentsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutSalaryComponentsInput, CompanyUncheckedUpdateWithoutSalaryComponentsInput>
+  }
+
+  export type CompanyUpdateWithoutSalaryComponentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutSalaryComponentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    update: XOR<UserSalaryComponentUpdateWithoutComponentInput, UserSalaryComponentUncheckedUpdateWithoutComponentInput>
+    create: XOR<UserSalaryComponentCreateWithoutComponentInput, UserSalaryComponentUncheckedCreateWithoutComponentInput>
+  }
+
+  export type UserSalaryComponentUpdateWithWhereUniqueWithoutComponentInput = {
+    where: UserSalaryComponentWhereUniqueInput
+    data: XOR<UserSalaryComponentUpdateWithoutComponentInput, UserSalaryComponentUncheckedUpdateWithoutComponentInput>
+  }
+
+  export type UserSalaryComponentUpdateManyWithWhereWithoutComponentInput = {
+    where: UserSalaryComponentScalarWhereInput
+    data: XOR<UserSalaryComponentUpdateManyMutationInput, UserSalaryComponentUncheckedUpdateManyWithoutComponentInput>
+  }
+
+  export type userCreateWithoutSalaryComponentsInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    isActive?: boolean
+    kpiEntries?: KpiEntryCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
+    samples?: SampleCreateNestedManyWithoutTechnicianInput
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    branch?: BranchCreateNestedOneWithoutUsersInput
+    customRole?: custom_roleCreateNestedOneWithoutUsersInput
+  }
+
+  export type userUncheckedCreateWithoutSalaryComponentsInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    branchId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    isActive?: boolean
+    customRoleId?: string | null
+    kpiEntries?: KpiEntryUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryUncheckedCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
+    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutSalaryComponentsInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutSalaryComponentsInput, userUncheckedCreateWithoutSalaryComponentsInput>
+  }
+
+  export type SalaryComponentCreateWithoutAssignmentsInput = {
+    id?: string
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company?: CompanyCreateNestedOneWithoutSalaryComponentsInput
+  }
+
+  export type SalaryComponentUncheckedCreateWithoutAssignmentsInput = {
+    id?: string
+    companyId?: string | null
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SalaryComponentCreateOrConnectWithoutAssignmentsInput = {
+    where: SalaryComponentWhereUniqueInput
+    create: XOR<SalaryComponentCreateWithoutAssignmentsInput, SalaryComponentUncheckedCreateWithoutAssignmentsInput>
+  }
+
+  export type userUpsertWithoutSalaryComponentsInput = {
+    update: XOR<userUpdateWithoutSalaryComponentsInput, userUncheckedUpdateWithoutSalaryComponentsInput>
+    create: XOR<userCreateWithoutSalaryComponentsInput, userUncheckedCreateWithoutSalaryComponentsInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutSalaryComponentsInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutSalaryComponentsInput, userUncheckedUpdateWithoutSalaryComponentsInput>
+  }
+
+  export type userUpdateWithoutSalaryComponentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    kpiEntries?: KpiEntryUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
+    samples?: SampleUpdateManyWithoutTechnicianNestedInput
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    branch?: BranchUpdateOneWithoutUsersNestedInput
+    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutSalaryComponentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    kpiEntries?: KpiEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SalaryComponentUpsertWithoutAssignmentsInput = {
+    update: XOR<SalaryComponentUpdateWithoutAssignmentsInput, SalaryComponentUncheckedUpdateWithoutAssignmentsInput>
+    create: XOR<SalaryComponentCreateWithoutAssignmentsInput, SalaryComponentUncheckedCreateWithoutAssignmentsInput>
+    where?: SalaryComponentWhereInput
+  }
+
+  export type SalaryComponentUpdateToOneWithWhereWithoutAssignmentsInput = {
+    where?: SalaryComponentWhereInput
+    data: XOR<SalaryComponentUpdateWithoutAssignmentsInput, SalaryComponentUncheckedUpdateWithoutAssignmentsInput>
+  }
+
+  export type SalaryComponentUpdateWithoutAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneWithoutSalaryComponentsNestedInput
+  }
+
+  export type SalaryComponentUncheckedUpdateWithoutAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80098,7 +89276,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -80129,7 +89309,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
     kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -80218,7 +89400,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -80249,7 +89433,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -80631,6 +89817,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutStocksInput = {
@@ -80643,6 +89830,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutStocksInput = {
@@ -80718,6 +89906,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutStocksInput = {
@@ -80730,6 +89919,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
   }
 
   export type BranchCreateWithoutStockMutationsInput = {
@@ -80783,6 +89973,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutStockMutationsInput = {
@@ -80795,6 +89986,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutStockMutationsInput = {
@@ -80870,6 +90062,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutStockMutationsInput = {
@@ -80882,6 +90075,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
   }
 
   export type DailyStockEntryCreateWithoutStockItemInput = {
@@ -81116,6 +90310,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -81138,6 +90333,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -81272,6 +90468,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -81294,6 +90491,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -81820,6 +91018,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -81842,6 +91041,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -81918,6 +91118,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -81940,6 +91141,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82056,6 +91258,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82078,6 +91281,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82151,6 +91355,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82173,6 +91378,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82236,6 +91442,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82258,6 +91465,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82296,6 +91504,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82318,6 +91527,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82340,6 +91550,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82362,6 +91573,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82400,6 +91612,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82422,6 +91635,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82444,6 +91658,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82466,6 +91681,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82504,6 +91720,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82526,6 +91743,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82548,6 +91766,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82570,6 +91789,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82608,6 +91828,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82630,6 +91851,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82652,6 +91874,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
@@ -82674,6 +91897,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
@@ -82712,6 +91936,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
@@ -82734,6 +91959,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
@@ -82795,6 +92021,17 @@ export namespace Prisma {
     bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     isActive?: boolean
+  }
+
+  export type RoleResourcePermissionCreateManyRoleInput = {
+    id?: string
+    resource: string
+    viewScope?: $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionCreateviewCompanyIdsInput | string[]
+    writeScope?: $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionCreatewriteCompanyIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PayrollIncentiveMatrixUpdateWithoutCustomRoleInput = {
@@ -82913,7 +92150,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -82943,7 +92182,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -82966,6 +92207,39 @@ export namespace Prisma {
     bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type RoleResourcePermissionUpdateWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleResourcePermissionUncheckedUpdateWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleResourcePermissionUncheckedUpdateManyWithoutRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    resource?: StringFieldUpdateOperationsInput | string
+    viewScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    viewCompanyIds?: RoleResourcePermissionUpdateviewCompanyIdsInput | string[]
+    writeScope?: EnumScopeModeFieldUpdateOperationsInput | $Enums.ScopeMode
+    writeCompanyIds?: RoleResourcePermissionUpdatewriteCompanyIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type KpiEntryCreateManyEmployeeInput = {
@@ -83062,6 +92336,14 @@ export namespace Prisma {
     calculatedAt?: Date | string
   }
 
+  export type UserSalaryComponentCreateManyUserInput = {
+    id?: string
+    componentId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AttendanceCreateManyUserInput = {
     id?: string
     branchId?: string | null
@@ -83078,6 +92360,30 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateManyEditedByInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -83404,6 +92710,30 @@ export namespace Prisma {
     calculatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UserSalaryComponentUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    component?: SalaryComponentUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type UserSalaryComponentUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    componentId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    componentId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AttendanceUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83419,8 +92749,10 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
   }
 
@@ -83440,6 +92772,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -83460,6 +92794,74 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUpdateWithoutEditedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutAttendancesNestedInput
+    branch?: BranchUpdateOneWithoutAttendancesNestedInput
+  }
+
+  export type AttendanceUncheckedUpdateWithoutEditedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutEditedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -83750,6 +93152,8 @@ export namespace Prisma {
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -83877,7 +93281,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -83907,7 +93313,9 @@ export namespace Prisma {
     kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
     kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
     kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -83947,9 +93355,11 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
+    editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutBranchInput = {
@@ -83968,6 +93378,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -83988,6 +93400,8 @@ export namespace Prisma {
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -83996,6 +93410,17 @@ export namespace Prisma {
     id?: string
     customRoleId?: string | null
     name?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SalaryComponentCreateManyCompanyInput = {
+    id?: string
+    name: string
+    kind: $Enums.SalaryComponentKind
+    defaultAmount?: Decimal | DecimalJsLike | number | string | null
+    note?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84041,6 +93466,7 @@ export namespace Prisma {
     description?: string | null
     permissions?: custom_roleCreatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -84196,6 +93622,41 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SalaryComponentUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignments?: UserSalaryComponentUpdateManyWithoutComponentNestedInput
+  }
+
+  export type SalaryComponentUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignments?: UserSalaryComponentUncheckedUpdateManyWithoutComponentNestedInput
+  }
+
+  export type SalaryComponentUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    kind?: EnumSalaryComponentKindFieldUpdateOperationsInput | $Enums.SalaryComponentKind
+    defaultAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BranchUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -84316,11 +93777,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateWithoutCompanyInput = {
@@ -84329,11 +93792,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCustomRoleNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
 
   export type custom_roleUncheckedUpdateManyWithoutCompanyInput = {
@@ -84342,6 +93807,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     permissions?: custom_roleUpdatepermissionsInput | string[]
     payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -85278,6 +94744,38 @@ export namespace Prisma {
     mandatorySaturday?: BoolFieldUpdateOperationsInput | boolean
     topRank?: NullableIntFieldUpdateOperationsInput | number | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentCreateManyComponentInput = {
+    id?: string
+    userId: string
+    amount: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserSalaryComponentUpdateWithoutComponentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutSalaryComponentsNestedInput
+  }
+
+  export type UserSalaryComponentUncheckedUpdateWithoutComponentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserSalaryComponentUncheckedUpdateManyWithoutComponentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

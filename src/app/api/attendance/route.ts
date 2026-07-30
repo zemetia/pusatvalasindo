@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
-import { AttendanceStatus } from "@src/generated/prisma";
-
-// Work start time: 17:40 (5:40 PM). Check-in after this = LATE.
-const WORK_START_HOUR = 17;
-const WORK_START_MINUTE = 40;
+import { resolveArrivalStatus } from "@/lib/attendance-rules";
+import { authorize } from "@/backend/helpers/authz";
+import { userService } from "@/backend/services/user.service";
 
 // Flag as suspicious if GPS and manual location differ by more than this (km)
 const LOCATION_SUSPECT_THRESHOLD_KM = 0.5;
@@ -28,15 +27,12 @@ function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function resolveStatus(checkInTime: Date): AttendanceStatus {
-  const h = checkInTime.getHours();
-  const m = checkInTime.getMinutes();
-  const isLate =
-    h > WORK_START_HOUR || (h === WORK_START_HOUR && m > WORK_START_MINUTE);
-  return isLate ? AttendanceStatus.LATE : AttendanceStatus.PRESENT;
-}
-
 export async function POST(req: NextRequest) {
+  // Clock-in menulis presensi MILIK SENDIRI — resource `attendance.self`, yang
+  // memang tanpa dimensi PT. Sebelumnya cukup "punya sesi", jadi mencabut
+  // Presensi di matriks hanya menyembunyikan menunya, bukan menutup aksinya.
+  const authz = await authorize("attendance.self", "write");
+  if (authz instanceof NextResponse) return authz;
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -106,7 +102,7 @@ export async function POST(req: NextRequest) {
   }
 
   const checkInTime = new Date(checkIn);
-  const status = resolveStatus(checkInTime);
+  const status = resolveArrivalStatus(checkInTime);
 
   let isLocationSuspect = false;
   if (
@@ -161,6 +157,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  // Clock-out: sama seperti POST, menulis presensi sendiri.
+  const authz = await authorize("attendance.self", "write");
+  if (authz instanceof NextResponse) return authz;
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -236,6 +235,23 @@ export async function GET(req: NextRequest) {
   const month = searchParams.get("month");
   const year = searchParams.get("year");
   const userId = searchParams.get("userId") ?? session.user.id;
+
+  if (userId === session.user.id) {
+    // Presensi sendiri.
+    const authz = await authorize("attendance.self", "view");
+    if (authz instanceof NextResponse) return authz;
+  } else {
+    // Presensi orang lain. Dulu `?userId=` menerima id siapa pun tanpa
+    // pemeriksaan apa pun — siapa saja yang login bisa membaca riwayat
+    // kehadiran seluruh karyawan. Sekarang butuh `attendance.all`, DAN PT
+    // karyawan itu harus masuk scope bacanya.
+    const authz = await authorize("attendance.all", "view");
+    if (authz instanceof NextResponse) return authz;
+    const targetCompanyId = await userService.getCompanyOf(userId);
+    if (!authz.canView(targetCompanyId)) {
+      return NextResponse.json({ error: "Tidak punya akses ke PT ini" }, { status: 403 });
+    }
+  }
 
   const where: Record<string, unknown> = { userId };
   if (month && year) {

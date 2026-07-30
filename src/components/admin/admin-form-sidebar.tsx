@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, Children } from "react";
+import type { ReactNode} from "react";
+import { Children } from "react";
 import { motion } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";

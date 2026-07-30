@@ -5,9 +5,7 @@ import { companyStockItemRepository } from '@/backend/repositories/company-stock
 import { ok } from '@/backend/helpers/api-response'
 import { handleError } from '@/backend/helpers/handle-error'
 import { withValidation } from '@/backend/middleware/with-validation'
-import { requirePermission } from '@/backend/helpers/get-admin-caller'
-import { PERMISSIONS } from '@/lib/permissions'
-import { assertCompanyAccess } from '@/backend/services/stockist.service'
+import { authorize } from '@/backend/helpers/authz'
 import { NotFoundError } from '@/backend/errors/app-error'
 
 const updateSchema = z.object({
@@ -23,13 +21,13 @@ type UpdateBody = z.infer<typeof updateSchema>
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.COMPANY_STOCK_VIEW)
+    const caller = await authorize("stock.pt", "view")
     if (caller instanceof NextResponse) return caller
 
     const { id } = await params
     const item = await companyStockItemRepository.findById(id)
     if (!item) throw new NotFoundError('Stock item not found')
-    assertCompanyAccess(caller, item.companyId)
+    caller.assertCompany(item.companyId)
 
     return NextResponse.json(ok(item))
   } catch (e) {
@@ -40,13 +38,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export const PUT = withValidation(updateSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.COMPANY_STOCK_MANAGE)
+      const caller = await authorize("stock.pt", "write")
       if (caller instanceof NextResponse) return caller
 
       const { id } = await ctx.params
       const existing = await companyStockItemRepository.findById(id)
       if (!existing) throw new NotFoundError('Stock item not found')
-      assertCompanyAccess(caller, existing.companyId)
+      caller.assertCompany(existing.companyId)
 
       const item = await companyStockItemRepository.update(id, ctx.body)
       return NextResponse.json(ok(item, 'Stock item updated'))
@@ -58,13 +56,13 @@ export const PUT = withValidation(updateSchema)(
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.COMPANY_STOCK_MANAGE)
+    const caller = await authorize("stock.pt", "write")
     if (caller instanceof NextResponse) return caller
 
     const { id } = await params
     const existing = await companyStockItemRepository.findById(id)
     if (!existing) throw new NotFoundError('Stock item not found')
-    assertCompanyAccess(caller, existing.companyId)
+    caller.assertCompany(existing.companyId)
 
     await companyStockItemRepository.softDelete(id)
     return NextResponse.json(ok(null, 'Stock item deactivated'))

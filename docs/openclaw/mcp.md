@@ -136,8 +136,9 @@ Each gated by the matching web permission; PT-scoped automatically. Common args:
 
 | Tool | Service | Permission |
 |---|---|---|
-| `get_price_benchmark` | price-benchmark (Patokan Harga list, global, optional `code` filter) | `currency.view` |
-| `set_price_benchmark` | price-benchmark (upsert sell/buy adjustment rule for one currency) | `currency.manage` |
+| `get_patokan_harga` | price-benchmark (aturan penyesuaian jual/beli per currency, global, optional `code` filter) | `currency.view` |
+| `set_patokan_harga` | price-benchmark (upsert aturan penyesuaian jual/beli untuk satu currency) | `currency.manage` |
+| `get_harga_final` | price-benchmark (harga jual/beli akhir = kurs SmartDeal + aturan penyesuaian, optional `code` filter) | `currency.view` |
 | `update_currency_rate` | currency-stock (updates buy/sell rate; branch-scope checked) | `currency.manage` |
 | `create_bank_mutation` | bank-mutation (CREDIT/DEBIT + balance update; PT-scoped) | `bank.manage` |
 | `confirm_stockist_head` | stockist head-confirmation (kepala cabang re-count per item) | `stockist.verify` |

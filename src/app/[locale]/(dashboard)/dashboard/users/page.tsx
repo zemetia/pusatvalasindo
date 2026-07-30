@@ -1,53 +1,61 @@
 import prisma from "@/lib/prisma";
 import { ErrorPanel } from "@/components/admin/page-shell";
 import { UsersPageClient } from "@/components/admin/users-page-client";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { can, isAdminRole, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
-import { redirect } from "next/navigation";
+import { requireResource } from "@/backend/helpers/authz";
+import { resolve } from "@/lib/authz/resolve";
 
-export default async function UsersPage() {
-  // Hanya Super Admin, Owner, dan Kepala Cabang yang boleh membuka halaman ini —
-  // role lain (HR, Akuntan, Kasir, dst.) diarahkan kembali ke dashboard.
-  const caller = await getCaller();
-  if (!caller || !isAdminRole(caller.roleName)) {
-    redirect("/dashboard");
-  }
+export default async function UsersPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  // Gerbangnya resource `users`, bukan lagi `isAdminRole`: siapa yang boleh
+  // membuka halaman ini — dan untuk PT mana — sepenuhnya datang dari matriks
+  // izin, sehingga bisa didelegasikan tanpa menyentuh kode.
+  const authz = await requireResource("users", "view", locale);
 
-  // Super Admin / Owner melihat semua PT; Kepala Cabang dikunci ke PT-nya
-  // sendiri (companyId diturunkan dari cabang, lihat getCallerRecord).
-  const global = isGlobalRole(caller.roleName);
-  // Kepala Cabang tanpa PT (tidak punya cabang) tidak bisa di-scope dengan aman.
-  if (!global && !caller.companyId) {
-    redirect("/dashboard");
-  }
-  // companyId is guaranteed non-null here for scoped callers (redirected above).
-  const scopedCompanyId: string | undefined = global ? undefined : caller.companyId ?? undefined;
+  // Daftar PT yang boleh DIUBAH bisa lebih sempit daripada yang boleh dilihat
+  // ("lihat PT A+B, ubah hanya PT A"), jadi sumbu tulis diresolusi tersendiri.
+  // `null` berarti seluruh PT.
+  const writeDecision = resolve(authz.subject, "users", "write");
+  const writableCompanyIds = writeDecision.allowed ? writeDecision.companyIds : [];
+
+  // Pengguna dimiliki satu PT lewat cabangnya. Saat scope-nya seluruh PT,
+  // filternya sengaja dikosongkan — `{ branch: { ... } }` yang selalu dipasang
+  // akan ikut membuang pengguna yang belum punya cabang.
+  const companyIds = authz.companyIds;
+  const userWhere =
+    companyIds === null ? {} : { branch: { companyId: { in: companyIds } } };
 
   let result;
   try {
     result = await Promise.all([
       prisma.user.findMany({
-        where: scopedCompanyId !== undefined ? { branch: { companyId: scopedCompanyId } } : undefined,
+        where: userWhere,
         include: {
-          branch: { select: { id: true, name: true, company: { select: { code: true } } } },
+          branch: {
+            select: { id: true, name: true, companyId: true, company: { select: { code: true } } },
+          },
           customRole: { select: { id: true, name: true } },
         },
         orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
       }),
       prisma.branch.findMany({
-        where: { isActive: true, ...(scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : {}) },
+        where: { isActive: true, ...authz.where() },
         orderBy: { name: "asc" },
         select: { id: true, name: true, companyId: true },
       }),
       prisma.company.findMany({
-        where: { isActive: true, ...(scopedCompanyId !== undefined ? { id: scopedCompanyId } : {}) },
+        where: { isActive: true, ...authz.where("id") },
         orderBy: { name: "asc" },
         select: { id: true, name: true },
       }),
       prisma.custom_role.findMany({
-        // Kepala Cabang hanya boleh menetapkan role milik PT-nya (tidak ada
-        // role global seperti Super Admin/Owner yang companyId-nya null).
-        where: scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : undefined,
+        // Jabatan yang boleh ditetapkan mengikuti scope yang sama: pemegang
+        // scope satu PT tidak bisa memberi jabatan milik PT lain — termasuk
+        // jabatan sistem (companyId null) seperti Super Admin/Owner.
+        where: companyIds === null ? undefined : { companyId: { in: companyIds } },
         orderBy: { name: "asc" },
         select: { id: true, name: true, companyId: true },
       }),
@@ -82,8 +90,7 @@ export default async function UsersPage() {
 
   // Nama karyawan baru jadi tautan bila caller memang boleh membuka detailnya —
   // gerbangnya sama persis dengan yang dijaga halaman detail.
-  const canOpenDetail =
-    isGlobalRole(caller.roleName) || can(caller.permissions, PERMISSIONS.USERS_VIEW_DETAIL);
+  const canOpenDetail = authz.can("users.detail", "view");
 
   return (
     <UsersPageClient
@@ -92,6 +99,7 @@ export default async function UsersPage() {
       companies={companies}
       roles={roles}
       canOpenDetail={canOpenDetail}
+      writableCompanyIds={writableCompanyIds}
     />
   );
 }

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { branchService } from "@/backend/services/branch.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 const createBranchSchema = z.object({
   name: z.string().min(1).max(100),
@@ -20,12 +20,14 @@ const createBranchSchema = z.object({
 type CreateBody = z.infer<typeof createBranchSchema>;
 
 export async function GET(req: NextRequest) {
-  try {
-    const caller = await requirePermission(PERMISSIONS.BRANCHES_VIEW);
-    if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("branches", "view");
+  if (authz instanceof NextResponse) return authz;
 
+  try {
     const onlyActive = req.nextUrl.searchParams.get("active") === "true";
-    const branches = await branchService.getAll(onlyActive);
+    // Daftarnya tersaring scope PT: pemegang wewenang satu PT tidak pernah
+    // melihat cabang PT lain, termasuk cabang yang belum punya PT.
+    const branches = await branchService.getAll(onlyActive, authz.companyIds);
     return NextResponse.json(ok(branches));
   } catch (e) {
     return handleError(e);
@@ -34,10 +36,13 @@ export async function GET(req: NextRequest) {
 
 export const POST = withValidation(createBranchSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
-    try {
-      const caller = await requirePermission(PERMISSIONS.BRANCHES_MANAGE);
-      if (caller instanceof NextResponse) return caller;
+    const authz = await authorize("branches", "write");
+    if (authz instanceof NextResponse) return authz;
 
+    try {
+      // Cabang tanpa PT (companyId null) hanya boleh dibuat pemegang scope
+      // seluruh PT — assertCompany(null) menolak scope yang terbatas.
+      authz.assertCompany(ctx.body.companyId ?? null);
       const branch = await branchService.create(ctx.body);
       return NextResponse.json(ok(branch, "Branch created"), { status: 201 });
     } catch (e) {

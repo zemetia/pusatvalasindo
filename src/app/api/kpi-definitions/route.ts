@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 export const kpiDefinitionSchema = z.object({
   code: z
@@ -37,7 +37,7 @@ type CreateBody = z.infer<typeof kpiDefinitionSchema>;
 
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+    const caller = await authorize("kpi.definitions", "view");
     if (caller instanceof NextResponse) return caller;
 
     const activeOnly = req.nextUrl.searchParams.get("activeOnly") === "true";
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(kpiDefinitionSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      const caller = await authorize("kpi.definitions", "write");
       if (caller instanceof NextResponse) return caller;
 
       const definition = await kpiService.createDefinition(ctx.body);

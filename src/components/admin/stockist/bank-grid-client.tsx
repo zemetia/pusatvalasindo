@@ -114,6 +114,8 @@ interface Props {
   companyId: string
   date: string
   canManage: boolean
+  /** Koreksi pada PT ini langsung berlaku, tanpa antre Persetujuan Koreksi. */
+  canDirectCorrect?: boolean
   onUnfilledChange?: (count: number) => void
   /** Payload yang sudah dirender server (bentuknya identik dengan respons /api/bank-harian). */
   initialGrid?: unknown
@@ -129,6 +131,7 @@ export function BankGridClient({
   companyId,
   date,
   canManage,
+  canDirectCorrect = false,
   onUnfilledChange,
   initialGrid,
   initialGridKey,
@@ -253,23 +256,43 @@ export function BankGridClient({
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
       toast.success(data.message ?? "Verifikasi tersimpan")
+      // `applied` = koreksi langsung berlaku (izin correction.direct): saldonya sudah
+      // berubah di server dan statusnya jadi "Sesuai", jadi barisnya ikut diperbarui —
+      // bukan diberi badge "menunggu persetujuan".
+      const applied = data.data?.applied === true && correctedBalance !== undefined
       setRows((prev) =>
-        prev.map((r) =>
-          r.bankAccountId === bankAccountId
-            ? {
-                ...r,
-                verifyStatus: status,
-                verifyNote: note ?? null,
-                pendingCorrection: data.data?.correctionRequestId
-                  ? {
-                      id: data.data.correctionRequestId,
-                      proposedValue: String(correctedBalance ?? ""),
-                      reason: note ?? "",
-                    }
-                  : undefined,
-              }
-            : r
-        )
+        prev.map((r) => {
+          if (r.bankAccountId !== bankAccountId) return r
+          if (applied) {
+            const next = String(correctedBalance)
+            return {
+              ...r,
+              balance: next,
+              savedBalance: next,
+              verifyStatus: "BENAR",
+              verifyNote: note ?? null,
+              pendingCorrection: undefined,
+              approvedCorrection: {
+                id: "",
+                currentValue: r.savedBalance,
+                proposedValue: next,
+                reason: note ?? "",
+              },
+            }
+          }
+          return {
+            ...r,
+            verifyStatus: status,
+            verifyNote: note ?? null,
+            pendingCorrection: data.data?.correctionRequestId
+              ? {
+                  id: data.data.correctionRequestId,
+                  proposedValue: String(correctedBalance ?? ""),
+                  reason: note ?? "",
+                }
+              : undefined,
+          }
+        })
       )
       return true
     } catch (err) {
@@ -358,6 +381,7 @@ export function BankGridClient({
                 key={r.bankAccountId}
                 row={r}
                 canManage={canManage}
+                canDirectCorrect={canDirectCorrect}
                 isPast={isPast}
                 onChange={updateRow}
                 onBlurSave={saveRow}
@@ -401,6 +425,7 @@ function SaveIndicator({ state }: { state: SaveState }) {
 function BankRowEdit({
   row,
   canManage,
+  canDirectCorrect,
   isPast,
   onChange,
   onBlurSave,
@@ -411,6 +436,7 @@ function BankRowEdit({
 }: {
   row: Row
   canManage: boolean
+  canDirectCorrect: boolean
   isPast: boolean
   onChange: (id: string, field: "balance" | "note", val: string) => void
   onBlurSave: (id: string) => void
@@ -500,6 +526,7 @@ function BankRowEdit({
               pending={row.pendingCorrection}
               approved={row.approvedCorrection}
               canVerify={canManage}
+              canDirectCorrect={canDirectCorrect}
               onVerify={(status, note, correctedBalance) =>
                 onVerify(row.bankAccountId, status, note, correctedBalance)
               }

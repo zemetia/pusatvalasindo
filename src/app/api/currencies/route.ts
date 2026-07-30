@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { currencyService } from "@/backend/services/currency.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 const createCurrencySchema = z.object({
   code: z.string().min(2).max(10),
@@ -17,8 +17,11 @@ type CreateBody = z.infer<typeof createCurrencySchema>;
 
 export async function GET(req: NextRequest) {
   try {
-    const caller = await requirePermission(PERMISSIONS.CURRENCY_VIEW);
-    if (caller instanceof NextResponse) return caller;
+    // Master mata uang tidak dimiliki PT mana pun, jadi yang berlaku hanya
+    // punya-akses atau tidak — scope PT-nya dipakai di /api/currency-stock,
+    // tempat angkanya benar-benar melekat pada cabang.
+    const authz = await authorize("currency", "view");
+    if (authz instanceof NextResponse) return authz;
 
     const onlyActive = req.nextUrl.searchParams.get("active") === "true";
     const currencies = await currencyService.getAll(onlyActive);
@@ -31,8 +34,8 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createCurrencySchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.CURRENCY_MANAGE);
-      if (caller instanceof NextResponse) return caller;
+      const authz = await authorize("currency", "write");
+      if (authz instanceof NextResponse) return authz;
 
       const currency = await currencyService.create(ctx.body);
       return NextResponse.json(ok(currency, "Currency created"), { status: 201 });

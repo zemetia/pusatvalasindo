@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server"
 import { sampleRepository } from "@/backend/repositories/sample.repository"
 import { generateSampleQRCodeSvg } from "@/services/qr.service"
 import { ok } from "@/backend/helpers/api-response"

@@ -322,9 +322,11 @@
         "status": {
           "present": "Present",
           "late": "Late",
+          "wfh": "WFH",
           "absent": "Absent",
           "permission": "Permission",
           "sick": "Sick",
+          "leave": "Leave",
           "holiday": "Holiday"
         },
         "alerts": {

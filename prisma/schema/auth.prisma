@@ -36,12 +36,21 @@ model custom_role {
   companyId         String?
   permissions       String[]
   payrollCompanyIds String[]      @default([])
+  /// True setelah jabatan ini dipindahkan ke matriks izin per-resource.
+  /// Penanda ini WAJIB eksplisit, tidak boleh disimpulkan dari "punya baris
+  /// RoleResourcePermission atau tidak": mencabut seluruh izin sebuah jabatan
+  /// menyisakan nol baris, dan tanpa penanda ini akses lamanya akan hidup lagi.
+  usesResourcePerms Boolean       @default(false)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   incentiveMatrices PayrollIncentiveMatrix[]
   roleKpis          RoleKpi[]
   company           Company?      @relation(fields: [companyId], references: [id])
   users             user[]
+  // Izin per-resource dengan scope PT terpisah untuk baca & tulis.
+  // `permissions` di atas adalah model lama yang masih dibaca selama migrasi
+  // bertahap (lihat src/lib/authz/resolve.ts).
+  resourcePerms     RoleResourcePermission[]
 
   @@unique([name, companyId])
 }
@@ -70,7 +79,9 @@ model user {
   kpiPeriods         KpiPeriod[]        @relation("KpiPeriodEmployee")
   kpiPeriodsLocked   KpiPeriod[]        @relation("KpiPeriodLockedBy")
   kpiMonthlyResults  KpiMonthlyResult[]
-  attendances        Attendance[]
+  salaryComponents   UserSalaryComponent[]
+  attendances        Attendance[]       @relation("AttendanceEmployee")
+  attendancesEdited  Attendance[]       @relation("AttendanceEditedBy")
   samples            Sample[]
   account            account[]
   session            session[]

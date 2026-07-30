@@ -1,9 +1,15 @@
 enum AttendanceStatus {
   PRESENT
   LATE
+  // Kerja dari rumah — hari kerja penuh, jadi tidak dipotong dan tidak
+  // dihitung sebagai pelanggaran; dibedakan dari PRESENT supaya HR bisa
+  // melihat siapa yang tidak hadir fisik di cabang.
+  WFH
   ABSENT
   PERMISSION
   SICK
+  // Cuti resmi (berbayar) — berbeda dari PERMISSION yang izin insidental.
+  LEAVE
   HOLIDAY
 }
 
@@ -26,16 +32,23 @@ model Attendance {
   isWithDoctorNote  Boolean          @default(false)
   status            AttendanceStatus @default(PRESENT)
   notes             String?
+  // Jejak koreksi manual oleh HR/atasan lewat halaman Presensi Karyawan.
+  // Tanpa ini, jam masuk yang diketik orang lain tidak bisa dibedakan dari
+  // jam hasil clock-in karyawan sendiri — padahal keduanya memengaruhi gaji.
+  editedById        String?
+  editedAt          DateTime?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  user     user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  editedBy user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])
   @@index([branchId])
   @@index([date])
+  @@index([editedById])
 }
 
 model account {
@@ -76,20 +89,29 @@ model custom_role {
   companyId         String?
   permissions       String[]
   payrollCompanyIds String[]                 @default([])
+  /// True setelah jabatan ini dipindahkan ke matriks izin per-resource.
+  /// Penanda ini WAJIB eksplisit, tidak boleh disimpulkan dari "punya baris
+  /// RoleResourcePermission atau tidak": mencabut seluruh izin sebuah jabatan
+  /// menyisakan nol baris, dan tanpa penanda ini akses lamanya akan hidup lagi.
+  usesResourcePerms Boolean                  @default(false)
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
   incentiveMatrices PayrollIncentiveMatrix[]
   roleKpis          RoleKpi[]
   company           Company?                 @relation(fields: [companyId], references: [id])
   users             user[]
+  // Izin per-resource dengan scope PT terpisah untuk baca & tulis.
+  // `permissions` di atas adalah model lama yang masih dibaca selama migrasi
+  // bertahap (lihat src/lib/authz/resolve.ts).
+  resourcePerms     RoleResourcePermission[]
 
   @@unique([name, companyId])
 }
 
 model user {
-  id                 String             @id
+  id                 String                @id
   name               String
-  email              String             @unique
+  email              String                @unique
   emailVerified      Boolean
   image              String?
   createdAt          DateTime
@@ -102,20 +124,22 @@ model user {
   positionAllowance  Decimal?
   bpjsKesehatan      Decimal?
   joinDate           DateTime?
-  isActive           Boolean            @default(true)
+  isActive           Boolean               @default(true)
   customRoleId       String?
-  kpiEntries         KpiEntry[]         @relation("KpiEntryEmployee")
-  kpiEntriesCreated  KpiEntry[]         @relation("KpiEntryCreatedBy")
-  kpiEntriesReviewed KpiEntry[]         @relation("KpiEntryReviewedBy")
-  kpiPeriods         KpiPeriod[]        @relation("KpiPeriodEmployee")
-  kpiPeriodsLocked   KpiPeriod[]        @relation("KpiPeriodLockedBy")
+  kpiEntries         KpiEntry[]            @relation("KpiEntryEmployee")
+  kpiEntriesCreated  KpiEntry[]            @relation("KpiEntryCreatedBy")
+  kpiEntriesReviewed KpiEntry[]            @relation("KpiEntryReviewedBy")
+  kpiPeriods         KpiPeriod[]           @relation("KpiPeriodEmployee")
+  kpiPeriodsLocked   KpiPeriod[]           @relation("KpiPeriodLockedBy")
   kpiMonthlyResults  KpiMonthlyResult[]
-  attendances        Attendance[]
+  salaryComponents   UserSalaryComponent[]
+  attendances        Attendance[]          @relation("AttendanceEmployee")
+  attendancesEdited  Attendance[]          @relation("AttendanceEditedBy")
   samples            Sample[]
   account            account[]
   session            session[]
-  branch             Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
+  branch             Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  customRole         custom_role?          @relation(fields: [customRoleId], references: [id])
 
   @@index([branchId])
   @@index([customRoleId])
@@ -128,6 +152,53 @@ model verification {
   expiresAt  DateTime
   createdAt  DateTime?
   updatedAt  DateTime?
+}
+
+// ─── Authorization: per-resource, per-PT scope ───────────────────────────────
+// Menggantikan `custom_role.permissions: String[]` yang flat (satu izin = satu
+// string, tanpa dimensi PT). Model ini memisahkan dua hal yang dulu tercampur:
+//
+//   1. RESOURCE  — apa yang boleh diakses (satu halaman + service/API di baliknya)
+//   2. SCOPE     — PT mana saja yang berlaku, terpisah untuk baca dan tulis
+//
+// Karena `custom_role` sudah unique([name, companyId]), "Role A di PT A" dan
+// "Role A di PT B" adalah dua baris role berbeda — jadi izin per-PT-per-role
+// jatuh keluar dari model ini tanpa kolom tambahan.
+
+enum ScopeMode {
+  /// Tidak punya akses sama sekali. Halaman disembunyikan dari sidebar,
+  /// API mengembalikan 403. Ini juga arti dari "tidak ada baris sama sekali".
+  NONE
+  /// Hanya PT milik role itu sendiri (custom_role.companyId).
+  OWN
+  /// Daftar PT eksplisit di kolom *CompanyIds.
+  SELECTED
+  /// Semua PT aktif.
+  ALL
+}
+
+model RoleResourcePermission {
+  id       String @id @default(cuid())
+  roleId   String
+  /// Kunci resource dari registry di src/lib/authz/resources.ts.
+  /// Sengaja String, bukan enum DB: menambah halaman baru tidak boleh butuh migrasi.
+  resource String
+
+  viewScope      ScopeMode @default(NONE)
+  /// Hanya dibaca saat viewScope = SELECTED.
+  viewCompanyIds String[]  @default([])
+
+  writeScope      ScopeMode @default(NONE)
+  /// Hanya dibaca saat writeScope = SELECTED.
+  writeCompanyIds String[]  @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role custom_role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, resource])
+  @@index([roleId])
 }
 
 model BankAccount {
@@ -220,6 +291,7 @@ model Company {
   createdAt                 DateTime                        @default(now())
   updatedAt                 DateTime                        @updatedAt
   incentiveMatrices         PayrollIncentiveMatrix[]
+  salaryComponents          SalaryComponent[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
   custom_roles              custom_role[]
@@ -246,6 +318,54 @@ model Currency {
   bankAccounts   BankAccount[]
   stocks         CurrencyStock[]
   stockMutations StockMutation[]
+  price          CurrencyPrice?
+}
+
+// Harga Valas: harga beli & jual yang benar-benar dipakai Pusat Valas Indo hari
+// ini, diisi manual per mata uang. Beda dengan PriceBenchmark yang menyimpan
+// *aturan* penyesuaian di atas kurs SmartDeal — di sini yang disimpan adalah
+// angka rupiahnya langsung, jadi harga tetap ada meski scraper SmartDeal mati.
+// Global (bukan per cabang/PT), sama seperti PriceBenchmark: satu daftar harga
+// yang berlaku untuk seluruh perusahaan.
+model CurrencyPrice {
+  id           String      @id @default(cuid())
+  currencyId   String      @unique
+  // Harga kita MEMBELI valas dari nasabah, dalam IDR per 1 unit mata uang.
+  buyPrice     Decimal     @db.Decimal(18, 4)
+  // Harga kita MENJUAL valas ke nasabah, dalam IDR per 1 unit mata uang.
+  sellPrice    Decimal     @db.Decimal(18, 4)
+  // Dari mana angka yang sekarang berasal. Dipakai UI untuk menandai baris dan
+  // untuk menyusun ringkasan hasil sync.
+  source       PriceSource @default(MANUAL)
+  // Gembok baris. SATU-SATUNYA hal yang melindungi harga dari ditimpa sync —
+  // mengedit manual saja tidak melindungi (lihat currency-price-sync.service).
+  isLocked     Boolean     @default(false)
+  lastSyncedAt DateTime?
+  note         String?
+  updatedBy    String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  currency     Currency    @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+}
+
+enum PriceSource {
+  MANUAL
+  SYNCED
+}
+
+// Saklar auto-sync Harga Valas. Tabel satu baris (`id` selalu "singleton"):
+// konsumennya cuma satu dan field-nya jelas, jadi tidak dibuat tabel key-value
+// generik yang nilainya tak bertipe.
+model CurrencyPriceSyncSetting {
+  id             String    @id @default("singleton")
+  // Saat true, setiap kurs SmartDeal baru yang masuk langsung disalurkan ke
+  // Harga Valas lewat aturan Patokan Harga.
+  autoSync       Boolean   @default(false)
+  lastRunAt      DateTime?
+  /// Ringkasan sekali jalan, mis. "24 diperbarui · 3 terkunci · 1 dilewati".
+  lastRunSummary String?
+  updatedBy      String?
+  updatedAt      DateTime  @updatedAt
 }
 
 // Patokan Harga: manual sell/buy adjustment rules layered on top of the live
@@ -639,6 +759,68 @@ model PayrollIncentiveTier {
   matrix PayrollIncentiveMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
 
   @@index([matrixId])
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// KOMPONEN GAJI TAMBAHAN
+//
+// Uang makan, transport, jabatan, dan BPJS sudah jadi kolom tetap di `user`
+// karena dipakai semua karyawan. Komponen di bawah ini untuk sisanya — yang
+// jumlah dan namanya beda-beda per PT (tunjangan pulsa, komunikasi, kacamata,
+// potongan koperasi, dst.) — supaya menambah jenis tunjangan/potongan baru
+// tidak perlu migrasi schema lagi.
+//
+// Semuanya nominal TETAP PER BULAN, sama seperti kolom tetap di atas. Tidak
+// ada perhitungan pro-rata per hari hadir.
+// ───────────────────────────────────────────────────────────────────────────
+
+/// Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.
+model SalaryComponent {
+  id            String              @id @default(cuid())
+  companyId     String?
+  name          String
+  kind          SalaryComponentKind
+  /// Nilai yang diusulkan saat komponen dipasang ke karyawan baru; nilai
+  /// sesungguhnya selalu diambil dari UserSalaryComponent.amount.
+  defaultAmount Decimal?
+  note          String?
+  isActive      Boolean             @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company?              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignments UserSalaryComponent[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+/// Nilai komponen untuk satu karyawan. Tanpa baris ini komponen tidak ikut
+/// dihitung, jadi daftar induk boleh berisi komponen yang belum dipakai.
+model UserSalaryComponent {
+  id          String  @id @default(cuid())
+  userId      String
+  componentId String
+  /// Selalu positif — arah (tambah/potong) ditentukan `component.kind`.
+  amount      Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      user            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  component SalaryComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, componentId])
+  @@index([userId])
+  @@index([componentId])
+}
+
+enum SalaryComponentKind {
+  /// Menambah gaji kotor (mis. tunjangan pulsa, alokasi BPJS tambahan).
+  ALLOWANCE
+  /// Mengurangi gaji diterima (mis. potongan koperasi, cicilan seragam).
+  DEDUCTION
 }
 
 enum PayrollIncentiveOutcome {

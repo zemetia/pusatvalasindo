@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { payrollService, assertPayrollAccess } from "@/backend/services/payroll.service";
-import { ok } from "@/backend/helpers/api-response";
+import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { getAdminCaller } from "@/backend/helpers/get-admin-caller";
+import { requireAuth } from "@/backend/helpers/get-admin-caller";
+import { getAuthzSubject } from "@/backend/helpers/authz";
 import prisma from "@/lib/prisma";
 
 const calculateSchema = z.object({
@@ -18,8 +20,14 @@ type CalculateBody = z.infer<typeof calculateSchema>;
 export const POST = withValidation(calculateSchema)(
   async (_req: NextRequest, ctx: { body: CalculateBody }) => {
     try {
-      const caller = await getAdminCaller();
+      // Gerbangnya bukan lagi "role admin", melainkan `payroll.manage` di PT
+      // karyawan yang bersangkutan — atau karyawan itu dirinya sendiri.
+      const caller = await requireAuth();
       if (caller instanceof NextResponse) return caller;
+      const subject = await getAuthzSubject();
+      if (!subject) {
+        return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+      }
 
       const { employeeId, month, year } = ctx.body;
 
@@ -27,7 +35,7 @@ export const POST = withValidation(calculateSchema)(
         where: { id: employeeId },
         select: { branch: { select: { companyId: true } } },
       });
-      assertPayrollAccess(caller, employeeId, target?.branch?.companyId ?? null);
+      assertPayrollAccess(subject, caller.id, employeeId, target?.branch?.companyId ?? null);
 
       const result = await payrollService.calculateMonthlyPayroll(
         employeeId,

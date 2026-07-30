@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { priceBenchmarkService } from "@/backend/services/price-benchmark.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 const saveAdjustmentSchema = z.object({
   code: z.string().min(1).max(10),
@@ -16,7 +16,7 @@ const saveAdjustmentSchema = z.object({
 type SaveAdjustmentBody = z.infer<typeof saveAdjustmentSchema>;
 
 export async function GET() {
-  const caller = await requirePermission(PERMISSIONS.CURRENCY_VIEW);
+  const caller = await authorize("price.benchmark", "view");
   if (caller instanceof NextResponse) return caller;
 
   try {
@@ -29,13 +29,13 @@ export async function GET() {
 
 export const PUT = withValidation(saveAdjustmentSchema)(
   async (_req: NextRequest, ctx: { body: SaveAdjustmentBody }) => {
-    const caller = await requirePermission(PERMISSIONS.CURRENCY_MANAGE);
+    const caller = await authorize("price.benchmark", "write");
     if (caller instanceof NextResponse) return caller;
 
     try {
       const row = await priceBenchmarkService.saveAdjustment({
         ...ctx.body,
-        updatedBy: caller.id,
+        updatedBy: caller.userId,
       });
       return NextResponse.json(ok(row, "Penyesuaian harga disimpan"));
     } catch (e) {

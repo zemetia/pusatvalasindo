@@ -1,6 +1,6 @@
 "use client";
 
-import { Attendance, AttendanceStatus } from "@src/generated/prisma";
+import type { Attendance, AttendanceStatus } from "@src/generated/prisma";
 import { format, differenceInMinutes } from "date-fns";
 import { id } from "date-fns/locale";
 import {
@@ -33,9 +33,11 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
   const statusConfig: Record<AttendanceStatus, { label: string; color: string; icon: any }> = {
     PRESENT:    { label: t("status.present"),    color: "bg-success-muted text-success border-success/25", icon: IconCheck },
     LATE:       { label: t("status.late"),        color: "bg-warning-muted text-warning-foreground border-warning/25",       icon: IconClock },
+    WFH:        { label: t("status.wfh"),         color: "bg-success-muted text-success border-success/25", icon: IconCheck },
     ABSENT:     { label: t("status.absent"),      color: "bg-destructive/10 text-destructive border-destructive/25",          icon: IconAlertTriangle },
     PERMISSION: { label: t("status.permission"),  color: "bg-info-muted text-info border-info/25",          icon: IconCalendar },
     SICK:       { label: t("status.sick"),         color: "bg-info-muted text-info border-info/25",    icon: IconCalendar },
+    LEAVE:      { label: t("status.leave"),        color: "bg-info-muted text-info border-info/25",    icon: IconCalendar },
     HOLIDAY:    { label: t("status.holiday"),     color: "bg-muted text-foreground border-border",       icon: IconCalendar },
   };
 

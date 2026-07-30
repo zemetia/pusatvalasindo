@@ -2,8 +2,16 @@ import prisma from "@/lib/prisma";
 import { DefinitionsPageClient } from "@/components/admin/kpi/definitions-page-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconListDetails } from "@tabler/icons-react";
+import { requireResource } from "@/backend/helpers/authz";
 
-export default async function KpiDefinitionsPage() {
+export default async function KpiDefinitionsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  await requireResource("kpi.definitions", "view", locale);
+
   let definitions;
   try {
     definitions = await prisma.kpiDefinition.findMany({

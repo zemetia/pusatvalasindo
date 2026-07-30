@@ -2,31 +2,31 @@ import prisma from "@/lib/prisma";
 import { RolesPageClient } from "@/components/admin/roles-page-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconShieldLock } from "@tabler/icons-react";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
-import { redirect } from "next/navigation";
+import { requireResource } from "@/backend/helpers/authz";
+import { isGlobalRole } from "@/lib/permissions";
 
-export default async function RolesPage() {
-  const caller = await getCaller();
-  if (!caller || !can(caller.permissions, PERMISSIONS.ROLES_VIEW)) {
-    redirect("/dashboard");
-  }
-
-  // Global role (Super Admin/Owner) melihat role semua PT; role lain di-scope ke PT-nya.
-  const scopedCompanyId = isGlobalRole(caller.roleName) ? undefined : caller.companyId;
+export default async function RolesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  // Resource `roles` bersifat global (lihat lib/authz/resources.ts): matriks
+  // izin adalah satu sistem yang sama untuk seluruh PT, jadi tidak ada dimensi
+  // PT di sini — yang ada hanya punya akses atau tidak.
+  const authz = await requireResource("roles", "view", locale);
+  const canManage = authz.can("roles", "write");
 
   let result;
   try {
     result = await Promise.all([
       prisma.custom_role.findMany({
-        where: scopedCompanyId !== undefined ? { companyId: scopedCompanyId } : undefined,
         orderBy: { name: "asc" },
         include: {
           _count: { select: { users: true } },
         },
       }),
       prisma.company.findMany({
-        where: scopedCompanyId ? { id: scopedCompanyId } : undefined,
         orderBy: { name: "asc" },
       }),
     ]);
@@ -47,6 +47,13 @@ export default async function RolesPage() {
       />
 
       <RolesPageClient
+        canManage={canManage}
+        // Mode "Semua PT" di matriks izin tetap dikunci ke Super Admin & Owner,
+        // terpisah dari wewenang mengelola jabatan. Pengelola jabatan yang
+        // didelegasikan boleh mengatur izin, tapi tidak boleh memberikan
+        // wewenang yang lebih luas daripada PT-nya sendiri — batas yang sama
+        // ditegakkan ulang di PUT /api/roles/[id]/permissions.
+        canGrantAll={isGlobalRole(authz.roleName)}
         companies={companies}
         roles={roles.map((r) => ({
           ...r,

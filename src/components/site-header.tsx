@@ -46,7 +46,6 @@ const SEGMENT_LABELS: Record<string, string> = {
   bank: "Saldo Bank Harian",
   history: "Riwayat",
   label: "Label",
-  mutasi: "Mutasi",
   "patokan-harga": "Patokan Harga",
   payroll: "Hitung Gaji",
   "persetujuan-koreksi": "Persetujuan Koreksi",

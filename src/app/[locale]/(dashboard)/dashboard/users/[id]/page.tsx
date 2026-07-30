@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   IconArrowLeft,
   IconCalendarStats,
@@ -10,10 +10,10 @@ import {
 } from "@tabler/icons-react";
 
 import prisma from "@/lib/prisma";
-import { getCallerRecord } from "@/backend/helpers/get-admin-caller";
 import { canViewPayrollOf } from "@/backend/services/payroll.service";
+import { requireResource } from "@/backend/helpers/authz";
 import { payrollIncentiveService } from "@/backend/services/payroll-incentive.service";
-import { can, isGlobalRole, PERMISSIONS } from "@/lib/permissions";
+import { can, PERMISSIONS } from "@/lib/permissions";
 import { toKey, todayKeyJakarta } from "@/lib/finance-period";
 import { formatCount, formatIdr, formatPercent, pctChange } from "@/lib/format";
 import {
@@ -170,21 +170,12 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
   const { id, locale } = await params;
   const { tahun } = await searchParams;
 
-  const caller = await getCallerRecord();
-  if (!caller) redirect(`/${locale}/login`);
-
-  // Untuk sekarang hanya Owner & Super Admin. Gerbangnya berupa izin tersendiri
-  // supaya role lain (mis. HR) bisa diberi akses dari halaman Jabatan tanpa
-  // menyentuh kode. isGlobalRole tetap dipakai sebagai jaring pengaman: array
-  // izin tersimpan di DB, jadi tanpa ini satu seed yang tertinggal bisa mengunci
-  // pemilik sistem dari halamannya sendiri.
-  const isSelf = caller.id === id;
-  if (
-    !isGlobalRole(caller.roleName) &&
-    !can(caller.permissions, PERMISSIONS.USERS_VIEW_DETAIL)
-  ) {
-    redirect(`/${locale}/dashboard`);
-  }
+  // Gerbangnya resource `users.detail` — terpisah dari `users` karena melihat
+  // daftar pengguna tidak sama dengan boleh membuka rapor lengkap seseorang.
+  // Scope PT-nya ikut dipakai di bawah untuk membatasi karyawan PT mana yang
+  // boleh dibuka. Role global tetap lolos lewat resolve() sebagai jaring pengaman.
+  const authz = await requireResource("users.detail", "view", locale);
+  const isSelf = authz.userId === id;
 
   // "Hari ini" mengikuti WIB, bukan jam server — lihat todayKeyJakarta().
   const today = todayKeyJakarta();
@@ -200,18 +191,23 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
       ? requestedYear
       : currentYear;
 
+  // Bagian absensi & KPI di halaman ini belum punya resource sendiri, jadi
+  // gerbangnya masih memakai array izin lama — sumber yang sama persis dengan
+  // sebelumnya (`caller.permissions`), kini dibaca lewat subjek izin.
+  const permissions = authz.subject.legacyPermissions;
+
   // Gerbang absensi & KPI tidak bergantung pada PT target, jadi bisa diputuskan
   // sebelum query — yang tidak boleh dilihat tidak ikut ditarik.
-  const canSeeAttendance = isSelf || can(caller.permissions, PERMISSIONS.ATTENDANCE_VIEW_ALL);
+  const canSeeAttendance = isSelf || can(permissions, PERMISSIONS.ATTENDANCE_VIEW_ALL);
   const canSeeKpi =
-    can(caller.permissions, PERMISSIONS.KPI_VIEW_ALL) ||
-    (isSelf && can(caller.permissions, PERMISSIONS.KPI_VIEW_OWN));
+    can(permissions, PERMISSIONS.KPI_VIEW_ALL) ||
+    (isSelf && can(permissions, PERMISSIONS.KPI_VIEW_OWN));
   // Gerbang gaji baru bisa dipastikan setelah PT target diketahui; sebelum itu
   // cukup superset-nya, hanya untuk memutuskan apakah skor KPI perlu ditarik.
   const maySeeSalary =
-    can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_ALL) ||
-    can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY) ||
-    (isSelf && can(caller.permissions, PERMISSIONS.PAYROLL_VIEW_OWN));
+    can(permissions, PERMISSIONS.PAYROLL_VIEW_ALL) ||
+    can(permissions, PERMISSIONS.PAYROLL_VIEW_COMPANY) ||
+    (isSelf && can(permissions, PERMISSIONS.PAYROLL_VIEW_OWN));
 
   let data;
   try {
@@ -281,12 +277,15 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
   if (!employee) notFound();
 
   const companyId = employee.branch?.companyId ?? null;
-  // Role non-global hanya melihat karyawan PT-nya sendiri (PT diturunkan dari cabang).
-  if (!isSelf && !isGlobalRole(caller.roleName) && companyId !== caller.companyId) {
+  // Karyawan di luar scope PT si pemanggil tidak pernah terlihat — kecuali
+  // dirinya sendiri.
+  if (!isSelf && !authz.canView(companyId)) {
     notFound();
   }
 
-  const canSeeSalary = canViewPayrollOf(caller, id, companyId);
+  // Bagian gaji ditampilkan hanya kalau pemanggil berhak atas gaji PT karyawan
+  // ini (`payroll.manage`) atau ini memang dirinya sendiri (`payroll.self`).
+  const canSeeSalary = canViewPayrollOf(authz.subject, authz.userId, id, companyId);
 
   /* ── Absensi ───────────────────────────────────────────────────────────── */
 
@@ -300,17 +299,20 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
   const counts: Record<AttendanceStatusKey, number> = {
     PRESENT: 0,
     LATE: 0,
+    WFH: 0,
     PERMISSION: 0,
     SICK: 0,
+    LEAVE: 0,
     ABSENT: 0,
     HOLIDAY: 0,
   };
   for (const day of attendanceDays) counts[day.status] += 1;
 
-  // Hari libur tidak ikut penyebut — kehadiran diukur terhadap hari kerja yang
-  // benar-benar tercatat, bukan terhadap 365 hari kalender.
-  const workdays = attendanceDays.length - counts.HOLIDAY;
-  const presentDays = counts.PRESENT + counts.LATE;
+  // Hari libur dan cuti resmi tidak ikut penyebut — kehadiran diukur terhadap
+  // hari kerja yang benar-benar tercatat, bukan terhadap 365 hari kalender.
+  const workdays = attendanceDays.length - counts.HOLIDAY - counts.LEAVE;
+  // WFH tetap hari kerja yang dijalani, jadi ikut dihitung hadir.
+  const presentDays = counts.PRESENT + counts.LATE + counts.WFH;
   const attendanceRate = workdays > 0 ? (presentDays / workdays) * 100 : null;
 
   /* ── KPI ───────────────────────────────────────────────────────────────── */

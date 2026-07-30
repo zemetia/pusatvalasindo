@@ -221,13 +221,24 @@ describe("kpiCollectorService.collectForPeriod", () => {
     expect(db.kpiEntry.createMany).toHaveBeenCalledTimes(2);
   });
 
-  it("membatasi ke satu PT bila diminta", async () => {
+  it("membatasi ke PT dalam scope bila diminta", async () => {
     db.user.findMany.mockResolvedValue([]);
 
-    await kpiCollectorService.collectForPeriod(7, 2026, { companyId: "pt-1" });
+    await kpiCollectorService.collectForPeriod(7, 2026, { companyIds: ["pt-1", "pt-2"] });
 
     const where = db.user.findMany.mock.calls[0][0].where;
-    expect(where.branch).toEqual({ companyId: "pt-1" });
+    expect(where.branch).toEqual({ companyId: { in: ["pt-1", "pt-2"] } });
     expect(where.isActive).toBe(true);
+  });
+
+  // Scope kosong berarti "tidak ada PT satu pun", bukan "semua PT" — kalau ini
+  // terbalik, jabatan tanpa wewenang justru menarik seluruh karyawan.
+  it("scope kosong tidak menarik siapa pun", async () => {
+    db.user.findMany.mockResolvedValue([]);
+
+    await kpiCollectorService.collectForPeriod(7, 2026, { companyIds: [] });
+
+    const where = db.user.findMany.mock.calls[0][0].where;
+    expect(where.branch).toEqual({ companyId: { in: [] } });
   });
 });

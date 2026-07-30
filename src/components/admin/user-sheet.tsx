@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AdminFormSidebar, AdminFormFooter } from "./admin-form-sidebar";
 import { PremiumField, PremiumNativeSelect, FormSection } from "./premium-field";
+import {
+  UserSalaryComponents,
+  type SalaryComponentItem,
+} from "./user-salary-components";
 import { NumericFormat } from "react-number-format";
 import {
   UserCog,
@@ -78,6 +82,13 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
     joinDate: "",
   });
 
+  /**
+   * Komponen gaji tambahan. Disimpan lewat endpoint terpisah karena gerbang
+   * izinnya beda (payroll.components, bukan kelola pengguna) — lihat
+   * src/app/api/users/[id]/salary-components/route.ts.
+   */
+  const [salaryComponents, setSalaryComponents] = useState<SalaryComponentItem[]>([]);
+
   useEffect(() => {
     if (open) {
       setForm({
@@ -137,6 +148,22 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
         toast.error(data.message || "Gagal menyimpan pengguna");
         return;
       }
+
+      // Profil sudah tersimpan di titik ini; kegagalan komponen dilaporkan
+      // sendiri supaya jelas bagian mana yang belum tersimpan. 403 diabaikan:
+      // artinya editor komponen memang tidak ditampilkan untuk pemanggil ini.
+      const compRes = await fetch(`/api/users/${user.id}/salary-components`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: salaryComponents }),
+      });
+      if (!compRes.ok && compRes.status !== 403) {
+        const compData = await compRes.json().catch(() => ({}));
+        toast.error(compData.message || "Profil tersimpan, tapi komponen gaji gagal disimpan");
+        router.refresh();
+        return;
+      }
+
       toast.success("Pengguna diperbarui");
       setOpen(false);
       router.refresh();
@@ -288,6 +315,20 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
           onChange={(e) => set("joinDate")(e.target.value)}
           icon={<Calendar className="w-4 h-4" />}
         />
+      </FormSection>
+
+      <FormSection
+        title="Komponen Gaji Tambahan"
+        icon={<Banknote className="w-3.5 h-3.5" />}
+      >
+        {open && (
+          <UserSalaryComponents
+            userId={user.id}
+            companyId={form.companyId}
+            value={salaryComponents}
+            onChange={setSalaryComponents}
+          />
+        )}
       </FormSection>
     </AdminFormSidebar>
   );

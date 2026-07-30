@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getCallerRecord } from "@/backend/helpers/get-admin-caller";
 import { can, isGlobalRole, type Permission } from "@/lib/permissions";
+import type { Authz } from "@/backend/helpers/authz";
 
 /**
  * Server-component auth guard for dashboard pages. Reuses the request-cached
@@ -10,28 +11,54 @@ import { can, isGlobalRole, type Permission } from "@/lib/permissions";
  *
  * Redirects to login when unauthenticated, or to the dashboard when the caller
  * lacks `permission`. Returns the caller record otherwise.
+ *
+ * @deprecated Pakai `requireResource(resource, action, locale)`. Sama seperti
+ * `requirePermission`, jabatan yang sudah memakai matriks izin ditolak di sini —
+ * `permissions[]` lama tidak dikosongkan saat migrasi, jadi meloloskannya akan
+ * membuat pencabutan izin di matriks tidak berarti apa-apa.
  */
 export async function requirePageCaller(permission: Permission, locale: string) {
   const caller = await getCallerRecord();
   if (!caller) redirect(`/${locale}/login`);
+  if (caller.usesResourcePerms) redirect(`/${locale}/dashboard`);
   if (!can(caller.permissions, permission)) redirect(`/${locale}/dashboard`);
   return caller;
 }
 
+// Dulu ada `requireGlobalPageCaller` di sini — gerbang "hanya Owner & Super
+// Admin" untuk halaman lintas PT. Sudah dihapus: halaman terakhir yang
+// memakainya (Laporan Finance) kini dijaga `requireResource("finance.report")`
+// dengan `scoping: "global"`. Perilaku default-nya sama (tanpa peta legacy,
+// jadi hanya role global), bedanya kini bisa didelegasikan lewat matriks izin.
+// Halaman baru yang butuh gerbang lintas PT harus lewat resource, bukan
+// gerbang peran tersendiri yang tak terlihat di UI Jabatan.
+
 /**
- * Guard untuk halaman yang hanya boleh dilihat role global (Owner & Super Admin),
- * mis. Laporan Finance yang menampilkan posisi keuangan seluruh PT sekaligus.
- *
- * Sengaja role-gated, bukan permission-gated — sama alasannya dengan halaman
- * Pengguna (lihat `isAdminRole` di lib/permissions): daftar permission tersimpan
- * di DB per role, jadi gating lewat permission bisa melenceng kalau role di-seed
- * ulang. Kepala Cabang tidak boleh masuk ke sini: ia hanya berhak atas PT-nya.
+ * Versi `getScopedCompanies` yang sadar resource: daftar PT-nya berasal dari
+ * scope izin, bukan dari "global atau bukan". Inilah yang membuat sebuah
+ * jabatan bisa memilih PT A dan PT B di satu halaman sementara di halaman lain
+ * terkunci ke PT-nya sendiri.
  */
-export async function requireGlobalPageCaller(locale: string) {
-  const caller = await getCallerRecord();
-  if (!caller) redirect(`/${locale}/login`);
-  if (!isGlobalRole(caller.roleName)) redirect(`/${locale}/dashboard`);
-  return caller;
+export async function getScopedCompaniesFor(authz: Authz): Promise<CompanyScope> {
+  const companies = await prisma.company.findMany({
+    where: { isActive: true, ...authz.where("id") },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+
+  // Boleh memilih hanya kalau memang ada lebih dari satu PT dalam jangkauannya.
+  // Kalau cuma satu PT yang terjangkau, langsung dipilihkan. Saat tidak ada
+  // satu pun, hasilnya null — BUKAN PT si pemanggil, supaya scope kosong tidak
+  // diam-diam berubah jadi akses ke PT sendiri.
+  const canSelectCompany = companies.length > 1;
+  const defaultCompanyId = canSelectCompany ? null : (companies[0]?.id ?? null);
+
+  return {
+    canSelectCompany,
+    effectiveCompanyId: authz.companyId,
+    companies,
+    defaultCompanyId,
+  };
 }
 
 export type CompanyScope = {

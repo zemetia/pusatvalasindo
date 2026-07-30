@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { smartdealRateService } from "@/backend/services/smartdeal-rate.service";
+import { currencyPriceSyncService } from "@/backend/services/currency-price-sync.service";
 
 // GET /api/scrape/smartdeal
 // Runs the SmartDeal scrape and upserts the results into SmartdealRate — not
@@ -21,7 +23,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await smartdealRateService.refreshFromSource();
-    return NextResponse.json(ok(result));
+
+    // Anak panah terakhir dari SmartDeal → Patokan Harga → Harga Valas, kalau
+    // saklar auto-sync menyala. Sengaja DI SINI, bukan di dalam
+    // `refreshFromSource`: kurs yang sudah berhasil disimpan tidak boleh ikut
+    // gagal gara-gara sinkronisasi turunannya, jadi hasilnya cuma dilaporkan.
+    const autoSync = await currencyPriceSyncService.runIfAutoEnabled();
+
+    return NextResponse.json(ok({ ...result, autoSync }));
   } catch (e) {
     return handleError(e);
   }

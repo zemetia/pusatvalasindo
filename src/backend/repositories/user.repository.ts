@@ -45,6 +45,34 @@ export const userRepository = {
       orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
     }),
 
+  /**
+   * Daftar pengguna dalam jangkauan izin pemanggil. `companyIds` null berarti
+   * seluruh PT — dan sengaja TIDAK memasang filter `branch` sama sekali, supaya
+   * pengguna yang belum punya cabang tetap ikut terlihat. Array kosong berarti
+   * tidak ada PT satu pun, jadi hasilnya nol baris.
+   */
+  findScoped: (opts: {
+    companyIds: string[] | null;
+    branchId?: string | null;
+    onlyActive?: boolean;
+  }) =>
+    prisma.user.findMany({
+      where: {
+        ...(opts.companyIds === null ? {} : { branch: { companyId: { in: opts.companyIds } } }),
+        ...(opts.branchId ? { branchId: opts.branchId } : {}),
+        ...(opts.onlyActive ? { isActive: true } : {}),
+      },
+      select,
+      orderBy: [{ branch: { name: "asc" } }, { name: "asc" }],
+    }),
+
+  /** PT pemilik seorang pengguna, diturunkan dari cabangnya. */
+  findCompanyOf: (id: string) =>
+    prisma.user.findUnique({
+      where: { id },
+      select: { branch: { select: { companyId: true } } },
+    }),
+
   findByCompany: (companyId: string, onlyActive = false) =>
     prisma.user.findMany({
       // A user's PT is derived from their branch, so scope by the branch's company.

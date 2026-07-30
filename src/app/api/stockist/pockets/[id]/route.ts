@@ -3,10 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
 import { NotFoundError, ValidationError } from "@/backend/errors/app-error";
 
@@ -24,13 +22,13 @@ type UpdateBody = z.infer<typeof updatePocketSchema>;
 export const PATCH = withValidation(updatePocketSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+      const caller = await authorize("stockist.daily", "write");
       if (caller instanceof NextResponse) return caller;
 
       const { id } = await ctx.params;
       const existing = await stockistPocketRepository.findById(id);
       if (!existing) throw new NotFoundError("Pocket tidak ditemukan");
-      assertCompanyAccess(caller, existing.companyId);
+      caller.assertCompany(existing.companyId);
       if (existing.isDefault) {
         throw new ValidationError("Pocket Total tidak bisa diubah");
       }
@@ -46,13 +44,13 @@ export const PATCH = withValidation(updatePocketSchema)(
 // DELETE /api/stockist/pockets/[id] — soft delete pocket (stockist.manage). Pocket Total tidak bisa dihapus.
 export async function DELETE(_req: NextRequest, ctx: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+    const caller = await authorize("stockist.daily", "write");
     if (caller instanceof NextResponse) return caller;
 
     const { id } = await ctx.params;
     const existing = await stockistPocketRepository.findById(id);
     if (!existing || existing.deletedAt) throw new NotFoundError("Pocket tidak ditemukan");
-    assertCompanyAccess(caller, existing.companyId);
+    caller.assertCompany(existing.companyId);
     if (existing.isDefault) {
       throw new ValidationError("Pocket Total tidak bisa dihapus");
     }

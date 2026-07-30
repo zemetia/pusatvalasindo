@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { bankMutationRepository } from "@/backend/repositories/bank-mutation.repository";
 import { NotFoundError, ValidationError } from "@/backend/errors/app-error";
 import { BankMutationType } from "@src/generated/prisma/client";
 
@@ -11,19 +10,15 @@ export type CreateBankMutationInput = {
   createdBy?: string;
 };
 
+/**
+ * Satu-satunya pintu tersisa ke BankMutation adalah tool MCP `create_bank_mutation`,
+ * yang memeriksa PT rekening lebih dulu (lihat mcp/operate-tools). Route HTTP
+ * `/api/bank-mutations` beserta halaman Rekening Bank → Mutasi sudah dihapus:
+ * keduanya menerima `bankAccountId` mentah tanpa memeriksa PT-nya, sehingga
+ * pemegang izin Rekening Bank di PT mana pun bisa membaca riwayat — dan lewat
+ * POST, menggeser saldo — rekening milik PT lain.
+ */
 export const bankMutationService = {
-  getByAccount: async (bankAccountId: string) => {
-    const account = await prisma.bankAccount.findUnique({ where: { id: bankAccountId } });
-    if (!account) throw new NotFoundError("Bank account not found");
-    return bankMutationRepository.findByAccount(bankAccountId);
-  },
-
-  getById: async (id: string) => {
-    const mutation = await bankMutationRepository.findById(id);
-    if (!mutation) throw new NotFoundError("Bank mutation not found");
-    return mutation;
-  },
-
   create: async (data: CreateBankMutationInput) => {
     if (data.amount <= 0) throw new ValidationError("Amount must be greater than 0");
 

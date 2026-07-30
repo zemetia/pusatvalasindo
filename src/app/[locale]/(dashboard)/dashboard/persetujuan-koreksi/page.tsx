@@ -1,5 +1,5 @@
-import { can, PERMISSIONS } from "@/lib/permissions";
-import { requirePageCaller, getScopedCompanies } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
+import { getScopedCompaniesFor } from "@/backend/helpers/page-access";
 import { CorrectionApprovalClient } from "@/components/admin/stockist/correction-approval-client";
 import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { IconGavel } from "@tabler/icons-react";
@@ -10,12 +10,12 @@ export default async function CorrectionApprovalPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await requirePageCaller(PERMISSIONS.CORRECTION_VIEW, locale);
-  // Melihat daftar cukup correction.view; memutuskan (setujui/tolak) butuh
-  // correction.approve, yang hanya dimiliki Owner & Super Admin.
-  const canApprove = can(caller.permissions, PERMISSIONS.CORRECTION_APPROVE);
+  // Resource global: keputusan koreksi mengubah saldo, jadi wewenangnya tidak
+  // dipecah per PT. Melihat daftar dan memutuskan tetap izin terpisah.
+  const authz = await requireResource("correction", "view", locale);
+  const canApprove = authz.can("correction", "write");
 
-  const { companies, defaultCompanyId, canSelectCompany } = await getScopedCompanies(caller);
+  const { companies, defaultCompanyId, canSelectCompany } = await getScopedCompaniesFor(authz);
 
   return (
     <PageShell>

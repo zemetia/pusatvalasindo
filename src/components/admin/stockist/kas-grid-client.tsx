@@ -57,6 +57,8 @@ interface Props {
   companyId: string
   date: string
   canManage: boolean
+  /** Koreksi pada PT ini langsung berlaku, tanpa antre Persetujuan Koreksi. */
+  canDirectCorrect?: boolean
   onUnfilledChange?: (count: number) => void
 }
 
@@ -64,7 +66,13 @@ interface Props {
 const NAV_COLUMNS = ["balance", "note"] as const
 const NAV_SELECT_ON_FOCUS = ["balance"] as const
 
-export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: Props) {
+export function KasGridClient({
+  companyId,
+  date,
+  canManage,
+  canDirectCorrect = false,
+  onUnfilledChange,
+}: Props) {
   const [pockets, setPockets] = useState<Pocket[]>([])
   const [rows, setRows] = useState<Row[]>([])
   const [serverDate, setServerDate] = useState<string | null>(null)
@@ -193,23 +201,43 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
       toast.success(data.message ?? "Verifikasi tersimpan")
+      // `applied` = koreksi langsung berlaku (izin correction.direct): saldonya sudah
+      // berubah di server dan statusnya jadi "Sesuai", jadi barisnya ikut diperbarui —
+      // bukan diberi badge "menunggu persetujuan".
+      const applied = data.data?.applied === true && correctedBalance !== undefined
       setRows((prev) =>
-        prev.map((r) =>
-          r.kasPocketId === kasPocketId
-            ? {
-                ...r,
-                verifyStatus: status,
-                verifyNote: note ?? null,
-                pendingCorrection: data.data?.correctionRequestId
-                  ? {
-                      id: data.data.correctionRequestId,
-                      proposedValue: String(correctedBalance ?? ""),
-                      reason: note ?? "",
-                    }
-                  : undefined,
-              }
-            : r
-        )
+        prev.map((r) => {
+          if (r.kasPocketId !== kasPocketId) return r
+          if (applied) {
+            const next = String(correctedBalance)
+            return {
+              ...r,
+              balance: next,
+              savedBalance: next,
+              verifyStatus: "BENAR" as const,
+              verifyNote: note ?? null,
+              pendingCorrection: undefined,
+              approvedCorrection: {
+                id: "",
+                currentValue: r.savedBalance,
+                proposedValue: next,
+                reason: note ?? "",
+              },
+            }
+          }
+          return {
+            ...r,
+            verifyStatus: status,
+            verifyNote: note ?? null,
+            pendingCorrection: data.data?.correctionRequestId
+              ? {
+                  id: data.data.correctionRequestId,
+                  proposedValue: String(correctedBalance ?? ""),
+                  reason: note ?? "",
+                }
+              : undefined,
+          }
+        })
       )
       return true
     } catch (err) {
@@ -309,6 +337,7 @@ export function KasGridClient({ companyId, date, canManage, onUnfilledChange }: 
                 key={r.kasPocketId}
                 row={r}
                 canManage={canManage}
+                canDirectCorrect={canDirectCorrect}
                 isPast={isPast}
                 onChange={updateRow}
                 onBlurSave={saveRow}
@@ -351,6 +380,7 @@ function SaveIndicator({ state }: { state: SaveState }) {
 function KasRowEdit({
   row,
   canManage,
+  canDirectCorrect,
   isPast,
   onChange,
   onBlurSave,
@@ -361,6 +391,7 @@ function KasRowEdit({
 }: {
   row: Row
   canManage: boolean
+  canDirectCorrect: boolean
   isPast: boolean
   onChange: (id: string, field: "balance" | "note", val: string) => void
   onBlurSave: (id: string) => void
@@ -447,6 +478,7 @@ function KasRowEdit({
               pending={row.pendingCorrection}
               approved={row.approvedCorrection}
               canVerify={canManage}
+              canDirectCorrect={canDirectCorrect}
               onVerify={(status, note, correctedBalance) =>
                 onVerify(row.kasPocketId, status, note, correctedBalance)
               }

@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 
 /**
  * Parameter penilaian. Mana yang wajib diisi tergantung scoringType definisinya
@@ -39,17 +38,17 @@ const createSchema = z.object({
 type CreateBody = z.infer<typeof createSchema>;
 
 export async function GET(req: NextRequest) {
-  const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+  const caller = await authorize("kpi.config", "view");
   if (caller instanceof NextResponse) return caller;
 
   try {
     const requestedCompanyId = req.nextUrl.searchParams.get("companyId");
     const customRoleId = req.nextUrl.searchParams.get("customRoleId");
-    // Company-scoped callers can't request another PT's KPI config, and
-    // can't omit companyId to see every PT's config either.
-    const companyId = requestedCompanyId ?? caller.companyId;
-
-    if (companyId) assertCompanyAccess(caller, companyId);
+    // `kpi.config` bersifat global (lintas PT) — bobot KPI dipakai bersama
+    // seluruh PT. Jadi companyId di sini murni FILTER tampilan, bukan pembatas
+    // akses; tanpa filter, seluruh PT ditampilkan. Sebelumnya nilai ini
+    // di-default ke PT pemanggil, yang membuat delegasi lintas PT mustahil.
+    const companyId = requestedCompanyId;
 
     if (companyId && customRoleId) {
       return NextResponse.json(ok(await kpiService.getByCompanyRole(companyId, customRoleId)));
@@ -65,11 +64,10 @@ export async function GET(req: NextRequest) {
 
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
-    const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+    const caller = await authorize("kpi.config", "write");
     if (caller instanceof NextResponse) return caller;
 
     try {
-      assertCompanyAccess(caller, ctx.body.companyId);
       const roleKpi = await kpiService.createRoleKpi(ctx.body);
       return NextResponse.json(ok(roleKpi, "Konfigurasi KPI jabatan berhasil ditambahkan"), {
         status: 201,

@@ -1,13 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
+import { getAuthzCaller } from "@/backend/helpers/authz";
 
 /** Antrian entri KPI yang menunggu persetujuan, dibatasi PT si peninjau. */
 export async function GET(_req: NextRequest) {
   try {
-    const caller = await getCaller();
+    const caller = await getAuthzCaller();
     if (!caller) {
       return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
     }

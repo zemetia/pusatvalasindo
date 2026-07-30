@@ -1,7 +1,8 @@
-import {
-  bankAccountRepository,
+import type {
   CreateBankAccountInput,
-  UpdateBankAccountInput,
+  UpdateBankAccountInput} from "@/backend/repositories/bank-account.repository";
+import {
+  bankAccountRepository
 } from "@/backend/repositories/bank-account.repository";
 import { ConflictError, NotFoundError } from "@/backend/errors/app-error";
 

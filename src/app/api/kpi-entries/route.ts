@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok, fail } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { getAuthzCaller } from "@/backend/helpers/authz";
 
 /**
  * Entri KPI harian — menggantikan /api/kpi-logs dan /api/revenues sekaligus.
@@ -42,7 +42,7 @@ function parseDateKey(value: string) {
 
 export async function GET(req: NextRequest) {
   try {
-    const caller = await getCaller();
+    const caller = await getAuthzCaller();
     if (!caller) {
       return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
     }
@@ -55,12 +55,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(fail("VALIDATION", "month dan year diperlukan"), { status: 400 });
     }
 
-    // Melihat entri orang lain butuh izin lihat-semua; entri sendiri cukup sesi.
-    if (employeeId !== caller.id && !can(caller.permissions, PERMISSIONS.KPI_VIEW_ALL)) {
-      return NextResponse.json(fail("FORBIDDEN", "Tidak memiliki izin melihat KPI karyawan lain"), {
-        status: 403,
-      });
-    }
+    // Entri sendiri cukup sesi; entri orang lain butuh scope BACA `kpi.review`
+    // yang mencakup PT karyawan itu. Aturannya di service — PT-nya harus dibaca
+    // dulu, dan /api/kpi-monthly-results memakai gerbang yang sama.
+    await kpiService.assertCanViewEntriesOf(caller, employeeId);
 
     const [entries, period] = await Promise.all([
       kpiService.getEntriesByEmployeePeriod(employeeId, year, month),
@@ -76,7 +74,7 @@ export async function GET(req: NextRequest) {
 export const POST = withValidation(createSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await getCaller();
+      const caller = await getAuthzCaller();
       if (!caller) {
         return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
       }

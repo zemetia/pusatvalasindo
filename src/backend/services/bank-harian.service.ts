@@ -1,5 +1,4 @@
-import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import type { Authz } from "@/backend/helpers/authz";
 import { ForbiddenError } from "@/backend/errors/app-error";
 import { bankAccountRepository } from "@/backend/repositories/bank-account.repository";
 import { dailyBankEntryRepository } from "@/backend/repositories/daily-bank-entry.repository";
@@ -16,13 +15,16 @@ import { todayDateOnly } from "@/backend/helpers/date-only";
  * function so the two paths can never drift apart.
  *
  * Enforces the caller's PT scope itself — do not call it with an unvalidated companyId.
+ * Scope baca dan tulis diperiksa terpisah: sebuah jabatan bisa berhak MELIHAT
+ * PT ini tanpa berhak MENGINPUT-nya, dan `canInput` di payload mencerminkan itu
+ * per-PT, bukan sekadar "punya izin input" secara umum.
  */
 export async function buildBankHarianPayload(
-  caller: AdminCaller,
+  authz: Authz,
   companyId: string,
   date: Date
 ) {
-  if (caller.companyId && caller.companyId !== companyId) {
+  if (!authz.canView(companyId)) {
     throw new ForbiddenError("Tidak punya akses ke PT ini");
   }
 
@@ -87,6 +89,6 @@ export async function buildBankHarianPayload(
         { balance: e.balance.toString(), date: e.date.toISOString().slice(0, 10) },
       ])
     ),
-    canInput: caller.permissions.includes(PERMISSIONS.BANK_DAILY_INPUT),
+    canInput: authz.canWrite(companyId),
   };
 }

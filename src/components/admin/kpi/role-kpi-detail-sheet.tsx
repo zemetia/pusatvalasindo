@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconInfoCircle } from "@tabler/icons-react";
-import { KpiDefinitionRow, INPUT_SOURCE_OPTIONS } from "../kpi-definition-sheet";
+import type { KpiDefinitionRow} from "../kpi-definition-sheet";
+import { INPUT_SOURCE_OPTIONS } from "../kpi-definition-sheet";
 import { SCORING_TYPE_LABELS } from "@/lib/kpi-utils";
 
 export type RoleKpiDetailRow = {

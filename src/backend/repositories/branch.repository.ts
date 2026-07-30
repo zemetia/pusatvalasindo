@@ -13,9 +13,16 @@ export type CreateBranchInput = {
 export type UpdateBranchInput = Partial<CreateBranchInput & { isActive: boolean }>;
 
 export const branchRepository = {
-  findAll: (onlyActive = false) =>
+  /**
+   * `companyIds` null berarti seluruh PT (tanpa penyaringan); array kosong
+   * berarti tidak ada PT satu pun, jadi hasilnya nol baris — gagal ke arah aman.
+   */
+  findAll: (onlyActive = false, companyIds: string[] | null = null) =>
     prisma.branch.findMany({
-      where: onlyActive ? { isActive: true } : undefined,
+      where: {
+        ...(onlyActive ? { isActive: true } : {}),
+        ...(companyIds === null ? {} : { companyId: { in: companyIds } }),
+      },
       orderBy: { name: "asc" },
     }),
 

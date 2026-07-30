@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/table";
 import { SectionCard, EmptyState } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
-import { RoleSheet, RoleRow } from "./role-sheet";
+import { RoleSheet } from "./role-sheet";
+import type { RoleRow } from "./role-sheet";
 import { RoleActions } from "./role-actions";
 
 type Company = {
@@ -32,12 +33,16 @@ type RoleWithCount = RoleRow & {
 interface Props {
   companies: Company[];
   roles: RoleWithCount[];
+  /** True untuk Super Admin/Owner — hanya mereka yang boleh memberi akses seluruh PT. */
+  canGrantAll?: boolean;
+  /** Sumbu tulis resource `roles` — menentukan tombol tambah/ubah/hapus muncul. */
+  canManage?: boolean;
 }
 
 /** Jumlah hak akses yang ditampilkan penuh sebelum diringkas jadi "+N". */
 const PERMISSION_PREVIEW = 4;
 
-export function RolesPageClient({ companies, roles }: Props) {
+export function RolesPageClient({ companies, roles, canGrantAll, canManage = false }: Props) {
   const [activeTab, setActiveTab] = useState(
     companies.length > 0 ? companies[0].id : "unassigned"
   );
@@ -69,10 +74,12 @@ export function RolesPageClient({ companies, roles }: Props) {
           )}
         </TabsList>
 
-        <RoleSheet
-          currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined}
-          companies={companies}
-        />
+        {canManage && (
+          <RoleSheet
+            currentCompanyId={activeTab !== "unassigned" ? activeTab : undefined}
+            companies={companies}
+          />
+        )}
       </div>
 
       {companies.map((c) => {
@@ -84,6 +91,8 @@ export function RolesPageClient({ companies, roles }: Props) {
               roles={companyRoles}
               currentCompanyId={c.id}
               companies={companies}
+              canGrantAll={canGrantAll}
+              canManage={canManage}
               emptyText={`Belum ada custom role untuk ${c.name}`}
             />
           </TabsContent>
@@ -96,6 +105,8 @@ export function RolesPageClient({ companies, roles }: Props) {
             roles={unassignedRoles}
             currentCompanyId={undefined}
             companies={companies}
+            canGrantAll={canGrantAll}
+            canManage={canManage}
             emptyText="Belum ada role sistem/global"
           />
         </TabsContent>
@@ -108,11 +119,15 @@ function RoleTable({
   roles,
   currentCompanyId,
   companies,
+  canGrantAll,
+  canManage,
   emptyText,
 }: {
   roles: RoleWithCount[];
   currentCompanyId?: string;
   companies: Company[];
+  canGrantAll?: boolean;
+  canManage?: boolean;
   emptyText: string;
 }) {
   const [search, setSearch] = useState("");
@@ -130,7 +145,11 @@ function RoleTable({
           icon={<IconShieldLock className="size-5" />}
           title={emptyText}
           description="Tambahkan role baru untuk mengelompokkan hak akses pengguna berdasarkan tanggung jawabnya."
-          action={<RoleSheet currentCompanyId={currentCompanyId} companies={companies} />}
+          action={
+            canManage ? (
+              <RoleSheet currentCompanyId={currentCompanyId} companies={companies} />
+            ) : undefined
+          }
         />
       </SectionCard>
     );
@@ -215,11 +234,14 @@ function RoleTable({
                     </span>
                   </TableCell>
                   <TableCell className="py-3">
-                    <RoleActions
-                      role={role}
-                      currentCompanyId={currentCompanyId}
-                      companies={companies}
-                    />
+                    {canManage && (
+                      <RoleActions
+                        role={role}
+                        currentCompanyId={currentCompanyId}
+                        companies={companies}
+                        canGrantAll={canGrantAll}
+                      />
+                    )}
                   </TableCell>
                 </TableRow>
               );

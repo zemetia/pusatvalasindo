@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import { stockMutationRepository, StockMutationFilters } from "@/backend/repositories/stock-mutation.repository";
+import type { StockMutationFilters } from "@/backend/repositories/stock-mutation.repository";
+import { stockMutationRepository } from "@/backend/repositories/stock-mutation.repository";
 import { NotFoundError, ValidationError } from "@/backend/errors/app-error";
 import { StockMutationType } from "@src/generated/prisma/client";
 

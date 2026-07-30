@@ -137,6 +137,8 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   isWithDoctorNote: 'isWithDoctorNote',
   status: 'status',
   notes: 'notes',
+  editedById: 'editedById',
+  editedAt: 'editedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -175,6 +177,7 @@ exports.Prisma.Custom_roleScalarFieldEnum = {
   companyId: 'companyId',
   permissions: 'permissions',
   payrollCompanyIds: 'payrollCompanyIds',
+  usesResourcePerms: 'usesResourcePerms',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -204,6 +207,18 @@ exports.Prisma.VerificationScalarFieldEnum = {
   identifier: 'identifier',
   value: 'value',
   expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoleResourcePermissionScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  resource: 'resource',
+  viewScope: 'viewScope',
+  viewCompanyIds: 'viewCompanyIds',
+  writeScope: 'writeScope',
+  writeCompanyIds: 'writeCompanyIds',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -279,6 +294,29 @@ exports.Prisma.CurrencyScalarFieldEnum = {
   symbol: 'symbol',
   isActive: 'isActive',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CurrencyPriceScalarFieldEnum = {
+  id: 'id',
+  currencyId: 'currencyId',
+  buyPrice: 'buyPrice',
+  sellPrice: 'sellPrice',
+  source: 'source',
+  isLocked: 'isLocked',
+  lastSyncedAt: 'lastSyncedAt',
+  note: 'note',
+  updatedBy: 'updatedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CurrencyPriceSyncSettingScalarFieldEnum = {
+  id: 'id',
+  autoSync: 'autoSync',
+  lastRunAt: 'lastRunAt',
+  lastRunSummary: 'lastRunSummary',
+  updatedBy: 'updatedBy',
   updatedAt: 'updatedAt'
 };
 
@@ -421,6 +459,27 @@ exports.Prisma.PayrollIncentiveTierScalarFieldEnum = {
   mandatorySaturday: 'mandatorySaturday',
   topRank: 'topRank',
   note: 'note',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SalaryComponentScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  name: 'name',
+  kind: 'kind',
+  defaultAmount: 'defaultAmount',
+  note: 'note',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.UserSalaryComponentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  componentId: 'componentId',
+  amount: 'amount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -739,10 +798,19 @@ exports.Prisma.JsonNullValueFilter = {
 exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
   PRESENT: 'PRESENT',
   LATE: 'LATE',
+  WFH: 'WFH',
   ABSENT: 'ABSENT',
   PERMISSION: 'PERMISSION',
   SICK: 'SICK',
+  LEAVE: 'LEAVE',
   HOLIDAY: 'HOLIDAY'
+};
+
+exports.ScopeMode = exports.$Enums.ScopeMode = {
+  NONE: 'NONE',
+  OWN: 'OWN',
+  SELECTED: 'SELECTED',
+  ALL: 'ALL'
 };
 
 exports.BankMutationType = exports.$Enums.BankMutationType = {
@@ -754,6 +822,11 @@ exports.DailyVerifyStatus = exports.$Enums.DailyVerifyStatus = {
   BELUM_REVIEW: 'BELUM_REVIEW',
   BENAR: 'BENAR',
   BEDA: 'BEDA'
+};
+
+exports.PriceSource = exports.$Enums.PriceSource = {
+  MANUAL: 'MANUAL',
+  SYNCED: 'SYNCED'
 };
 
 exports.CompanyStockItemType = exports.$Enums.CompanyStockItemType = {
@@ -812,6 +885,11 @@ exports.PayrollIncentiveOutcome = exports.$Enums.PayrollIncentiveOutcome = {
   SAFE_ZONE: 'SAFE_ZONE',
   DEDUCTION: 'DEDUCTION',
   TOP_PERFORMER: 'TOP_PERFORMER'
+};
+
+exports.SalaryComponentKind = exports.$Enums.SalaryComponentKind = {
+  ALLOWANCE: 'ALLOWANCE',
+  DEDUCTION: 'DEDUCTION'
 };
 
 exports.RefiningMethod = exports.$Enums.RefiningMethod = {
@@ -909,12 +987,15 @@ exports.Prisma.ModelName = {
   custom_role: 'custom_role',
   user: 'user',
   verification: 'verification',
+  RoleResourcePermission: 'RoleResourcePermission',
   BankAccount: 'BankAccount',
   BankMutation: 'BankMutation',
   DailyBankEntry: 'DailyBankEntry',
   Branch: 'Branch',
   Company: 'Company',
   Currency: 'Currency',
+  CurrencyPrice: 'CurrencyPrice',
+  CurrencyPriceSyncSetting: 'CurrencyPriceSyncSetting',
   PriceBenchmark: 'PriceBenchmark',
   SmartdealRate: 'SmartdealRate',
   CompanyStockItem: 'CompanyStockItem',
@@ -925,6 +1006,8 @@ exports.Prisma.ModelName = {
   KpiMonthlyResult: 'KpiMonthlyResult',
   PayrollIncentiveMatrix: 'PayrollIncentiveMatrix',
   PayrollIncentiveTier: 'PayrollIncentiveTier',
+  SalaryComponent: 'SalaryComponent',
+  UserSalaryComponent: 'UserSalaryComponent',
   RefiningBatch: 'RefiningBatch',
   Sample: 'Sample',
   ShipmentProvider: 'ShipmentProvider',

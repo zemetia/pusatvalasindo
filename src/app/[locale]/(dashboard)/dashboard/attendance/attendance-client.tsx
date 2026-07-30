@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { Attendance } from "@src/generated/prisma";
+import type { Attendance } from "@src/generated/prisma";
 import { LiveClock } from "@/components/attendance/live-clock";
 import { CameraCapture } from "@/components/attendance/camera-capture";
 import { LocationStatus } from "@/components/attendance/location-status";

@@ -15,6 +15,7 @@ const ONE_DECIMAL = new Intl.NumberFormat("id-ID", {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
+const RATE = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 4 });
 
 /** Nilai kosong / non-finite selalu jadi em dash — lihat DATA_PRESENTATION §7. */
 export const EM_DASH = "—";
@@ -62,6 +63,15 @@ export function formatCompactIdr(value: number | null | undefined): string {
 export function formatQty(value: number | null | undefined): string {
   if (missing(value)) return EM_DASH;
   return QTY.format(value);
+}
+
+/**
+ * Kurs valas — beda dari rupiah karena mata uang kecil (JPY, KRW, VND) baru
+ * bermakna di belakang koma: `16.250` untuk USD, `108,4567` untuk JPY.
+ */
+export function formatRate(value: number | null | undefined): string {
+  if (missing(value)) return EM_DASH;
+  return RATE.format(value);
 }
 
 /** `4,2%` — satu desimal, koma, persen menempel (DATA_PRESENTATION §7). */

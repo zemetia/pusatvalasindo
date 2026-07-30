@@ -135,6 +135,12 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.USERS_VIEW,
+  // Kepala Cabang memang sudah bisa tambah/ubah/hapus pengguna cabangnya —
+  // dulu lewat gerbang peran `isAdminRole` di halaman & API Pengguna, bukan
+  // lewat array ini. Setelah gerbang itu diganti resource `users`, izinnya
+  // harus tertulis di sini supaya perilakunya tidak diam-diam menyusut jadi
+  // baca saja. Scope-nya tetap PT sendiri (fallback legacy = OWN).
+  PERMISSIONS.USERS_MANAGE,
   PERMISSIONS.ROLES_VIEW,
 ];
 
@@ -297,6 +303,22 @@ export function normalizeRoleName(roleName: string): string {
 /** True for unscoped roles (Super Admin, Owner) — they see every PT. */
 export function isGlobalRole(roleName: string): boolean {
   return GLOBAL_ROLES.includes(normalizeRoleName(roleName));
+}
+
+/**
+ * True untuk nama jabatan yang, karena namanya saja, langsung mendapat akses
+ * seluruh PT lewat `isGlobalRole` — jaring pengaman di `resolve()` yang sengaja
+ * mendahului matriks izin.
+ *
+ * Karena `isGlobalRole` mencocokkan NAMA (bukan id atau flag), membuat jabatan
+ * bernama "Owner" sama saja dengan memberi diri sendiri wewenang penuh lintas
+ * PT tanpa satu baris izin pun. Karena itu nama-nama ini dilindungi: hanya
+ * pemanggil yang memang sudah global boleh memakainya. Perhatikan bahwa
+ * normalisasinya menyamakan spasi dengan underscore, jadi "super admin",
+ * "Super Admin", dan "SUPER_ADMIN" semuanya tertangkap.
+ */
+export function isReservedRoleName(roleName: string): boolean {
+  return isGlobalRole(roleName);
 }
 
 /**

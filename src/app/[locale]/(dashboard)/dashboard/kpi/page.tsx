@@ -1,13 +1,25 @@
 import prisma from "@/lib/prisma";
-import {
-  KpiPageClient,
+import type {
   CompanyRow,
-  RoleKpiSummaryRow,
+  RoleKpiSummaryRow} from "@/components/admin/kpi-page-client";
+import {
+  KpiPageClient
 } from "@/components/admin/kpi-page-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconTargetArrow } from "@tabler/icons-react";
+import { requireResource } from "@/backend/helpers/authz";
 
-export default async function KpiPage() {
+export default async function KpiPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  // Sebelumnya halaman ini sama sekali tidak dijaga di server — hanya
+  // disembunyikan dari sidebar, jadi siapa pun yang login bisa membukanya
+  // dengan mengetik URL-nya.
+  await requireResource("kpi.config", "view", locale);
+
   let result;
   try {
     result = await Promise.all([

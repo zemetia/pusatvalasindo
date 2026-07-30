@@ -4,7 +4,7 @@ import React, { useRef } from "react"
 import { motion, useScroll } from "framer-motion"
 import { ArrowUpRight, HandCoins, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { RateResult } from "@/lib/rates"
+import type { RateResult } from "@/lib/rates"
 import { useTranslations } from 'next-intl'
 
 interface ExchangeRatesProps {

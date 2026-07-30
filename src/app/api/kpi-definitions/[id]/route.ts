@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 import { kpiDefinitionSchema } from "../route";
 
 const updateSchema = kpiDefinitionSchema.partial();
@@ -14,7 +14,7 @@ type UpdateBody = ReturnType<typeof updateSchema.parse>;
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+    const caller = await authorize("kpi.definitions", "view");
     if (caller instanceof NextResponse) return caller;
 
     const { id } = await params;
@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export const PUT = withValidation(updateSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      const caller = await authorize("kpi.definitions", "write");
       if (caller instanceof NextResponse) return caller;
 
       const { id } = await ctx.params;
@@ -41,7 +41,7 @@ export const PUT = withValidation(updateSchema)(
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+    const caller = await authorize("kpi.definitions", "write");
     if (caller instanceof NextResponse) return caller;
 
     const { id } = await params;

@@ -17,6 +17,7 @@ import { seedKpi } from './seeds/kpi'
 import { seedRoleKpis } from './seeds/role-kpi'
 import { seedPayrollIncentives } from './seeds/payroll-incentive'
 import { seedUsers } from './seeds/users'
+import { seedPriceBenchmarks } from './seeds/price-benchmarks'
 import { seedRoles } from './seeds/roles'
 
 const pool = new pg.Pool({
@@ -64,6 +65,9 @@ async function main() {
 
   console.log('🌱 Seeding matriks insentif payroll...')
   await seedPayrollIncentives(prisma, companyIds)
+
+  console.log('🌱 Seeding patokan harga (penyesuaian jual/beli)...')
+  await seedPriceBenchmarks(prisma)
 
   console.log('🌱 Seeding users...')
   await seedUsers(prisma, companyIds, branchIds)

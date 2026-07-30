@@ -38,7 +38,15 @@ export default async function layout({
     redirect(`/${locale}/login`);
   }
 
-  const permissions = caller.permissions;
+  // Subjek izin dirakit sekali di sini; sidebar memakainya lewat resource
+  // registry yang sama dengan page guard, tanpa query DB tambahan.
+  const subject = {
+    roleName: caller.roleName,
+    companyId: caller.companyId,
+    grants: caller.resourceGrants,
+    migrated: caller.usesResourcePerms,
+    legacyPermissions: caller.permissions,
+  };
   const sidebarUser = { name: caller.name, email: caller.email };
 
   return (
@@ -50,7 +58,7 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={sidebarUser} permissions={permissions} roleName={caller.roleName} />
+      <AppSidebar user={sidebarUser} subject={subject} />
       <SidebarInset className="bg-surface">
         <SiteHeader />
         {/* Padding vertikal halaman hidup di sini saja; tiap halaman cukup

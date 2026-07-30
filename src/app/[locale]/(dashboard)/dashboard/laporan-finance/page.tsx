@@ -1,6 +1,6 @@
 import { IconReportMoney } from "@tabler/icons-react";
 
-import { requireGlobalPageCaller } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
 import {
   financeReportService,
   type FinanceReport,
@@ -29,8 +29,11 @@ import { FinanceReportView } from "@/components/admin/finance/finance-report-vie
  * fetch setelah hydrate, dan satu periode tertentu bisa langsung dibagikan lewat
  * tautan.
  *
- * Batas akses: peran global saja (Owner & Super Admin). Kepala Cabang tidak
- * boleh masuk karena isinya lintas PT.
+ * Batas akses: resource `finance.report`, scoping global. Laporannya adalah
+ * posisi konsolidasi seluruh PT — filter `?pt=` di dalamnya cuma cara membaca
+ * laporan yang sama, bukan batas wewenang — jadi izinnya tidak dipecah per PT.
+ * Default-nya tetap Owner & Super Admin (tanpa peta legacy); jabatan lain harus
+ * diberi akses eksplisit lewat matriks izin.
  */
 
 type SearchParams = {
@@ -49,7 +52,7 @@ export default async function LaporanFinancePage({
   searchParams: Promise<SearchParams>;
 }) {
   const { locale } = await params;
-  await requireGlobalPageCaller(locale);
+  await requireResource("finance.report", "view", locale);
 
   const query = await searchParams;
   const range = resolvePeriod({

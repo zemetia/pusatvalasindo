@@ -50,6 +50,8 @@ interface Props {
   companyId: string
   date: string
   canManage: boolean
+  /** Koreksi pada PT ini langsung berlaku, tanpa antre Persetujuan Koreksi. */
+  canDirectCorrect?: boolean
   onAlertsChange?: (alerts: { beda: number; belumReview: number; belumIsi: number }) => void
   /** Payload grid yang sudah dirender server (bentuknya identik dengan respons /api/stockist/grid). */
   initialGrid?: unknown
@@ -125,6 +127,7 @@ export function StockistGridClient({
   companyId,
   date,
   canManage,
+  canDirectCorrect = false,
   onAlertsChange,
   initialGrid,
   initialGridKey,
@@ -281,6 +284,18 @@ export function StockistGridClient({
             ...prev,
             [key]: {
               id: data.data.correctionRequestId,
+              proposedValue: String(correctedQuantity),
+              reason: note ?? "",
+            },
+          }))
+        } else if (data.data?.applied && correctedQuantity !== undefined) {
+          // Izin correction.direct: saldonya sudah digeser di server, jadi selnya
+          // langsung ditandai "pernah dikoreksi" tanpa mampir ke antrean ACC.
+          setApprovedCorrections((prev) => ({
+            ...prev,
+            [key]: {
+              id: "",
+              currentValue: String(prevCheck.enteredQuantity ?? 0),
               proposedValue: String(correctedQuantity),
               reason: note ?? "",
             },
@@ -598,6 +613,7 @@ export function StockistGridClient({
                               qty={qty ?? 0}
                               status={check?.status ?? "BELUM_REVIEW"}
                               note={check?.note ?? null}
+                              canDirectCorrect={canDirectCorrect}
                               onBenar={() => markCheck(p.id, cur.id, "BENAR")}
                               onBeda={(note, corrected) =>
                                 markCheck(p.id, cur.id, "BEDA", note, corrected)
@@ -636,6 +652,7 @@ export function StockistGridClient({
                     qty={checks[activeKey]?.enteredQuantity ?? 0}
                     status={checks[activeKey]?.status ?? "BELUM_REVIEW"}
                     note={checks[activeKey]?.note ?? null}
+                    canDirectCorrect={canDirectCorrect}
                     onBenar={() => markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BENAR")}
                     onBeda={(note, corrected) =>
                       markCheck(activeCell.pocketId, activeCell.companyStockItemId, "BEDA", note, corrected)
@@ -688,16 +705,19 @@ function InlineFillCell({
       return
     }
     if (savingRef.current) return
-    if (draft === undefined || draft === committedRef.current) {
+    // Sel dikosongkan: kalau sebelumnya sudah terisi, artinya jadi 0 — bukan batal edit.
+    const next = draft === undefined ? (committedRef.current === null ? undefined : 0) : draft
+    if (next === undefined || next === committedRef.current) {
       setDraft(committedRef.current ?? undefined)
       return
     }
     savingRef.current = true
     setSaving(true)
-    const ok = await onSave(draft)
+    const ok = await onSave(next)
     savingRef.current = false
     setSaving(false)
     if (!ok) setDraft(committedRef.current ?? undefined)
+    else setDraft(next)
   }, [draft, onSave])
 
   return (
@@ -740,6 +760,7 @@ function CellActionForm({
   qty,
   status,
   note,
+  canDirectCorrect,
   onBenar,
   onBeda,
   hideHeader,
@@ -749,6 +770,7 @@ function CellActionForm({
   qty: number
   status: CheckStatus
   note: string | null
+  canDirectCorrect?: boolean
   onBenar: () => Promise<unknown> | void
   onBeda: (note: string, correctedQuantity?: number) => Promise<unknown> | void
   hideHeader?: boolean
@@ -830,8 +852,9 @@ function CellActionForm({
               className="font-mono text-right"
             />
             <p className="text-[10px] text-muted-foreground">
-              Saldo tidak langsung berubah — angka ini diajukan dulu dan baru berlaku setelah
-              disetujui Owner / Super Admin di halaman Persetujuan Koreksi.
+              {canDirectCorrect
+                ? "Saldo langsung berubah begitu disimpan — koreksinya tetap tercatat di riwayat Persetujuan Koreksi."
+                : "Saldo tidak langsung berubah — angka ini diajukan dulu dan baru berlaku setelah disetujui Owner / Super Admin di halaman Persetujuan Koreksi."}
             </p>
           </div>
           <div className="flex gap-2">

@@ -68,7 +68,9 @@ const STATUS_LABELS: Record<string, string> = {
   ABSENT: "Alpa",
   PERMISSION: "Izin",
   SICK: "Sakit",
+  LEAVE: "Cuti",
   PRESENT: "Hadir",
+  WFH: "WFH",
   HOLIDAY: "Libur",
 };
 
@@ -197,7 +199,10 @@ export function collectClosingPunctuality(
   const skipped: SkippedDay[] = [];
 
   for (const record of records) {
-    if (record.status === "HOLIDAY" || record.status === "ABSENT") continue;
+    // Cuti disamakan dengan libur: tidak ada shift yang bisa ditutup, jadi
+    // menandainya "perlu diperiksa manual" hanya menambah bising.
+    if (record.status === "HOLIDAY" || record.status === "ABSENT" || record.status === "LEAVE")
+      continue;
 
     if (!record.checkOut) {
       // Lupa absen pulang bukan bukti closing terlambat. Menghukumnya di sini

@@ -53,6 +53,68 @@ model PayrollIncentiveTier {
   @@index([matrixId])
 }
 
+// ───────────────────────────────────────────────────────────────────────────
+// KOMPONEN GAJI TAMBAHAN
+//
+// Uang makan, transport, jabatan, dan BPJS sudah jadi kolom tetap di `user`
+// karena dipakai semua karyawan. Komponen di bawah ini untuk sisanya — yang
+// jumlah dan namanya beda-beda per PT (tunjangan pulsa, komunikasi, kacamata,
+// potongan koperasi, dst.) — supaya menambah jenis tunjangan/potongan baru
+// tidak perlu migrasi schema lagi.
+//
+// Semuanya nominal TETAP PER BULAN, sama seperti kolom tetap di atas. Tidak
+// ada perhitungan pro-rata per hari hadir.
+// ───────────────────────────────────────────────────────────────────────────
+
+/// Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.
+model SalaryComponent {
+  id        String              @id @default(cuid())
+  companyId String?
+  name      String
+  kind      SalaryComponentKind
+  /// Nilai yang diusulkan saat komponen dipasang ke karyawan baru; nilai
+  /// sesungguhnya selalu diambil dari UserSalaryComponent.amount.
+  defaultAmount Decimal?
+  note          String?
+  isActive      Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company?              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignments UserSalaryComponent[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+/// Nilai komponen untuk satu karyawan. Tanpa baris ini komponen tidak ikut
+/// dihitung, jadi daftar induk boleh berisi komponen yang belum dipakai.
+model UserSalaryComponent {
+  id          String  @id @default(cuid())
+  userId      String
+  componentId String
+  /// Selalu positif — arah (tambah/potong) ditentukan `component.kind`.
+  amount Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      user            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  component SalaryComponent @relation(fields: [componentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, componentId])
+  @@index([userId])
+  @@index([componentId])
+}
+
+enum SalaryComponentKind {
+  /// Menambah gaji kotor (mis. tunjangan pulsa, alokasi BPJS tambahan).
+  ALLOWANCE
+  /// Mengurangi gaji diterima (mis. potongan koperasi, cicilan seragam).
+  DEDUCTION
+}
+
 enum PayrollIncentiveOutcome {
   /// Dapat bonus tunai sebesar cashAmount.
   BONUS_CASH

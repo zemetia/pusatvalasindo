@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { UserSheet, UserRow } from "./user-sheet";
+import type { UserRow } from "./user-sheet";
+import { UserSheet } from "./user-sheet";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 

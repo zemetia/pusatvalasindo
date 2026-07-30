@@ -1,9 +1,15 @@
 enum AttendanceStatus {
   PRESENT
   LATE
+  // Kerja dari rumah — hari kerja penuh, jadi tidak dipotong dan tidak
+  // dihitung sebagai pelanggaran; dibedakan dari PRESENT supaya HR bisa
+  // melihat siapa yang tidak hadir fisik di cabang.
+  WFH
   ABSENT
   PERMISSION
   SICK
+  // Cuti resmi (berbayar) — berbeda dari PERMISSION yang izin insidental.
+  LEAVE
   HOLIDAY
 }
 
@@ -26,14 +32,21 @@ model Attendance {
   isWithDoctorNote  Boolean          @default(false)
   status            AttendanceStatus @default(PRESENT)
   notes             String?
+  // Jejak koreksi manual oleh HR/atasan lewat halaman Presensi Karyawan.
+  // Tanpa ini, jam masuk yang diketik orang lain tidak bisa dibedakan dari
+  // jam hasil clock-in karyawan sendiri — padahal keduanya memengaruhi gaji.
+  editedById        String?
+  editedAt          DateTime?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user   user    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  user     user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  editedBy user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])
   @@index([branchId])
   @@index([date])
+  @@index([editedById])
 }

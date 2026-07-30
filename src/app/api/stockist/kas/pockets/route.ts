@@ -3,10 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { kasPocketRepository } from "@/backend/repositories/kas-pocket.repository";
 
 const createPocketSchema = z.object({
@@ -22,10 +20,11 @@ type CreateBody = z.infer<typeof createPocketSchema>;
 export const POST = withValidation(createPocketSchema)(
   async (_req: NextRequest, ctx: { body: CreateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.STOCKIST_MANAGE);
+      // PT tujuan diuji langsung oleh guard-nya — pocket baru lahir di PT itu.
+      const caller = await authorize("stockist.daily", "write", {
+        companyId: ctx.body.companyId,
+      });
       if (caller instanceof NextResponse) return caller;
-
-      assertCompanyAccess(caller, ctx.body.companyId);
 
       const pocket = await kasPocketRepository.create(ctx.body);
       return NextResponse.json(ok(pocket, "Kas pocket berhasil dibuat"), { status: 201 });

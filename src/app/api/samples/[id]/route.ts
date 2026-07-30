@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server"
 import { sampleRepository } from "@/backend/repositories/sample.repository"
 import { ok } from "@/backend/helpers/api-response"
 import { handleError } from "@/backend/helpers/handle-error"

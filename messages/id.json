@@ -322,9 +322,11 @@
         "status": {
           "present": "Hadir",
           "late": "Terlambat",
+          "wfh": "WFH",
           "absent": "Alpa",
           "permission": "Izin",
           "sick": "Sakit",
+          "leave": "Cuti",
           "holiday": "Libur"
         },
         "alerts": {

@@ -1,18 +1,16 @@
-import { redirect } from "next/navigation";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { isGlobalRole } from "@/lib/permissions";
+import { requireResource } from "@/backend/helpers/authz";
 import { kpiAnalyticsService } from "@/backend/services/kpi-analytics.service";
 import { PerformanceAnalysisClient } from "@/components/admin/kpi/performance-analysis-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconChartHistogram } from "@tabler/icons-react";
 
 /**
- * Analisis Kinerja — khusus Owner & Super Admin.
+ * Analisis Kinerja — resource `kpi.analytics`, scoping global.
  *
- * Gerbangnya memakai `isGlobalRole`, bukan permission KPI, dengan sengaja:
- * halaman ini memeringkat karyawan lintas PT dan membandingkan cabang satu
- * sama lain, jadi tidak boleh ikut terbuka oleh peran yang terikat satu PT
- * meski peran itu punya `kpi.view_all` di PT-nya sendiri.
+ * Halaman ini memeringkat karyawan lintas PT dan membandingkan cabang satu
+ * sama lain, jadi izinnya tidak dipecah per PT: yang ada hanya "boleh membuka"
+ * atau tidak. Default-nya tetap Owner & Super Admin (tanpa peta legacy), tapi
+ * kini bisa didelegasikan eksplisit lewat matriks izin di halaman Jabatan.
  */
 export default async function KpiAnalysisPage({
   params,
@@ -22,9 +20,7 @@ export default async function KpiAnalysisPage({
   searchParams: Promise<{ month?: string; year?: string }>;
 }) {
   const { locale } = await params;
-  const caller = await getCaller();
-  if (!caller) redirect(`/${locale}/login`);
-  if (!isGlobalRole(caller.roleName)) redirect(`/${locale}/dashboard`);
+  await requireResource("kpi.analytics", "view", locale);
 
   const sp = await searchParams;
   const now = new Date();

@@ -3,10 +3,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
+import { authorize } from "@/backend/helpers/authz";
+import { allowsCompany } from "@/lib/authz/resolve";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { PERMISSIONS } from "@/lib/permissions";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
 import { stockistHeadConfirmationService } from "@/backend/services/stockist-head-confirmation.service";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -25,17 +24,21 @@ type Body = z.infer<typeof upsertSchema>;
 export const PATCH = withValidation(upsertSchema)(
   async (_req: NextRequest, ctx: { body: Body }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.STOCKIST_VERIFY);
+      const caller = await authorize("stockist.verify", "write");
       if (caller instanceof NextResponse) return caller;
 
-      assertCompanyAccess(caller, ctx.body.companyId);
+      caller.assertCompany(ctx.body.companyId);
 
       const result = await stockistHeadConfirmationService.upsertStockTotalConfirmation({
         companyId: ctx.body.companyId,
         date: new Date(ctx.body.date),
         confirmedIdrValue: ctx.body.confirmedIdrValue,
         note: ctx.body.note,
-        caller,
+        caller: {
+          id: caller.userId,
+          // Hak backdate dinilai untuk PT yang sedang disentuh.
+          canBackdate: allowsCompany(caller.subject, "daily.backdate", "write", ctx.body.companyId),
+        },
       });
 
       // companyTotal ikut di respons — client memakainya langsung tanpa GET ulang.

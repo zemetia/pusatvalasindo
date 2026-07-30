@@ -1,6 +1,7 @@
 import { priceBenchmarkRepository } from "@/backend/repositories/price-benchmark.repository";
+import { smartdealRateService } from "@/backend/services/smartdeal-rate.service";
 import { SMARTDEAL_CURRENCIES } from "@/lib/smartdeal-currencies";
-import { isValidPriceAdjustment } from "@/lib/price-adjustment";
+import { applyPriceAdjustment, isValidPriceAdjustment } from "@/lib/price-adjustment";
 import { ValidationError } from "@/backend/errors/app-error";
 
 export interface PriceBenchmarkRow {
@@ -9,6 +10,25 @@ export interface PriceBenchmarkRow {
   sellAdjustment: string;
   buyAdjustment: string;
   updatedAt: string | null;
+}
+
+/** A currency's final Pusat Valas Indo price: SmartDeal base + adjustment rule. */
+export interface PriceBenchmarkQuote {
+  code: string;
+  name: string;
+  /** SmartDeal quote this was derived from. */
+  baseSell: number;
+  baseBuy: number;
+  /** Adjustment expression applied ("" = none). */
+  sellAdjustment: string;
+  buyAdjustment: string;
+  /** Final price after the adjustment. */
+  sell: number;
+  buy: number;
+  /** sell - buy, the spread we keep. */
+  spread: number;
+  /** When the SmartDeal base was last scraped. */
+  fetchedAt: string;
 }
 
 export const priceBenchmarkService = {
@@ -37,6 +57,47 @@ export const priceBenchmarkService = {
           updatedAt: row?.updatedAt.toISOString() ?? null,
         };
       });
+  },
+
+  /**
+   * Final patokan harga per currency: the latest SmartDeal rate with this PT's
+   * adjustment rule applied. Only currencies SmartDeal actually quotes appear —
+   * an adjustment rule without a base rate has no price to compute, so it is
+   * skipped rather than emitted with a zero/null price.
+   */
+  getQuotes: async (filterCode?: string): Promise<PriceBenchmarkQuote[]> => {
+    const [saved, rates] = await Promise.all([
+      priceBenchmarkRepository.findAll(),
+      smartdealRateService.getLatest(),
+    ]);
+
+    const savedByCode = new Map(saved.map((row) => [row.code, row]));
+    const nameByCode = new Map(SMARTDEAL_CURRENCIES.map((c) => [c.code, c.name]));
+    const wanted = filterCode?.trim().toUpperCase();
+
+    return rates
+      .filter((rate) => !wanted || rate.code === wanted)
+      .map((rate) => {
+        const rule = savedByCode.get(rate.code);
+        const sellAdjustment = rule?.sellAdjustment ?? "";
+        const buyAdjustment = rule?.buyAdjustment ?? "";
+        const sell = applyPriceAdjustment(rate.sell, sellAdjustment);
+        const buy = applyPriceAdjustment(rate.buy, buyAdjustment);
+
+        return {
+          code: rate.code,
+          name: rule?.name ?? nameByCode.get(rate.code) ?? rate.name,
+          baseSell: rate.sell,
+          baseBuy: rate.buy,
+          sellAdjustment,
+          buyAdjustment,
+          sell,
+          buy,
+          spread: Math.round((sell - buy) * 1e4) / 1e4,
+          fetchedAt: rate.fetchedAt,
+        };
+      })
+      .sort((a, b) => a.code.localeCompare(b.code));
   },
 
   saveAdjustment: async (input: {

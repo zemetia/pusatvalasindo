@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
-import { getCaller } from "@/backend/helpers/get-admin-caller";
-import { can, PERMISSIONS } from "@/lib/permissions";
+import { requireResource } from "@/backend/helpers/authz";
 import { kpiService, resolveInputPolicy } from "@/backend/services/kpi.service";
 import { KpiSelfFillClient } from "@/components/kpi-self-fill-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
@@ -12,16 +10,14 @@ export default async function KpiSelfPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await getCaller();
-  if (!caller) redirect(`/${locale}/login`);
-
-  if (!can(caller.permissions, PERMISSIONS.KPI_FILL_OWN)) {
-    redirect(`/${locale}/dashboard`);
-  }
+  // `kpi.self` — data milik sendiri, jadi tanpa dimensi PT. Gerbangnya izin
+  // TULIS: halaman ini untuk MENGISI KPI sendiri, dan yang hanya boleh melihat
+  // skornya cukup lewat Detail Karyawan.
+  const caller = await requireResource("kpi.self", "write", locale);
 
   let data;
   try {
-    data = await kpiService.getRoleKpisForEmployee(caller.id);
+    data = await kpiService.getRoleKpisForEmployee(caller.userId);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="kpi/self/page" message={msg} />;
@@ -58,7 +54,7 @@ export default async function KpiSelfPage({
         icon={<IconPencil className="size-5" />}
       />
       <KpiSelfFillClient
-        userId={caller.id}
+        userId={caller.userId}
         userName={data.employee.name}
         roleName={data.employee.roleName}
         companyName={data.employee.companyName}

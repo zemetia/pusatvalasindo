@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import type { Permission } from "@/lib/permissions";
 import { can, isAdminRole } from "@/lib/permissions";
+import type { ResourceGrant } from "@/lib/authz/resolve";
 import { fail } from "./api-response";
 
 export type AdminCaller = {
@@ -25,6 +26,10 @@ type CallerRecord = {
   roleName: string;
   permissions: string[];
   payrollCompanyIds: string[];
+  /** Izin per-resource dengan scope PT (sistem baru). */
+  resourceGrants: ResourceGrant[];
+  /** True kalau jabatannya sudah pakai matriks izin; kalau tidak, `permissions` yang berlaku. */
+  usesResourcePerms: boolean;
 } | null;
 
 /**
@@ -53,6 +58,8 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
       roleName: string | null;
       permissions: string[] | null;
       payrollCompanyIds: string[] | null;
+      resourceGrants: ResourceGrant[] | null;
+      usesResourcePerms: boolean | null;
     }[]
   >`
     SELECT u."name",
@@ -61,10 +68,26 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
            b."companyId"          AS "companyId",
            r."name"               AS "roleName",
            r."permissions"        AS "permissions",
-           r."payrollCompanyIds"  AS "payrollCompanyIds"
+           r."payrollCompanyIds"  AS "payrollCompanyIds",
+           r."usesResourcePerms"  AS "usesResourcePerms",
+           g."grants"             AS "resourceGrants"
     FROM "user" u
     LEFT JOIN "Branch"      b ON b."id" = u."branchId"
     LEFT JOIN "custom_role" r ON r."id" = u."customRoleId"
+    -- Izin per-resource ikut diambil dalam query yang SAMA lewat lateral join
+    -- + json_agg. Menambah query terpisah akan menambah satu round-trip ke DB
+    -- remote pada SETIAP render halaman dan SETIAP panggilan API.
+    LEFT JOIN LATERAL (
+      SELECT json_agg(json_build_object(
+               'resource',        p."resource",
+               'viewScope',       p."viewScope",
+               'viewCompanyIds',  p."viewCompanyIds",
+               'writeScope',      p."writeScope",
+               'writeCompanyIds', p."writeCompanyIds"
+             )) AS "grants"
+      FROM "RoleResourcePermission" p
+      WHERE p."roleId" = r."id"
+    ) g ON TRUE
     WHERE u."id" = ${session.user.id}
     LIMIT 1
   `;
@@ -85,6 +108,8 @@ export const getCallerRecord = cache(async (): Promise<CallerRecord> => {
     roleName: row.roleName ?? "",
     permissions: row.permissions ?? [],
     payrollCompanyIds: row.payrollCompanyIds ?? [],
+    resourceGrants: row.resourceGrants ?? [],
+    usesResourcePerms: row.usesResourcePerms ?? false,
   };
 });
 
@@ -165,6 +190,10 @@ export async function requireAuth(): Promise<AdminCaller | NextResponse> {
 /**
  * Middleware helper for page/API routes that require a specific permission.
  * Returns the caller if authorized, or a 401/403 NextResponse.
+ *
+ * @deprecated Pakai `authorize(resource, action)` dari `helpers/authz`. Fungsi
+ * ini membaca `custom_role.permissions` (model lama tanpa dimensi PT) dan
+ * SENGAJA menolak jabatan yang sudah memakai matriks izin — lihat di bawah.
  */
 export async function requirePermission(
   permission: Permission
@@ -172,6 +201,21 @@ export async function requirePermission(
   const caller = await getCallerRecord();
   if (!caller) {
     return NextResponse.json(fail("UNAUTHORIZED", "Tidak terautentikasi"), { status: 401 });
+  }
+
+  // Jabatan yang sudah dipindah ke matriks izin tidak boleh lagi lolos lewat
+  // `permissions[]` lama. Kolom itu TIDAK dikosongkan saat migrasi, jadi tanpa
+  // gerbang ini mencabut izin di matriks tidak berpengaruh apa pun di jalur
+  // lama — pencabutan yang tidak mencabut. Gagal ke arah aman: kalau ada rute
+  // yang belum dimigrasi, dia menolak (403), bukan diam-diam mengizinkan.
+  if (caller.usesResourcePerms) {
+    return NextResponse.json(
+      fail(
+        "FORBIDDEN",
+        "Jabatan ini memakai matriks izin per-resource; endpoint lama tidak berlaku lagi"
+      ),
+      { status: 403 }
+    );
   }
 
   if (!can(caller.permissions, permission)) {

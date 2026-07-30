@@ -1,12 +1,15 @@
-import {
-  branchRepository,
+import type {
   CreateBranchInput,
-  UpdateBranchInput,
+  UpdateBranchInput} from "@/backend/repositories/branch.repository";
+import {
+  branchRepository
 } from "@/backend/repositories/branch.repository";
 import { NotFoundError } from "@/backend/errors/app-error";
 
 export const branchService = {
-  getAll: (onlyActive = false) => branchRepository.findAll(onlyActive),
+  /** `companyIds` null = seluruh PT; array kosong = tidak ada PT satu pun. */
+  getAll: (onlyActive = false, companyIds: string[] | null = null) =>
+    branchRepository.findAll(onlyActive, companyIds),
 
   getById: async (id: string) => {
     const branch = await branchRepository.findById(id);

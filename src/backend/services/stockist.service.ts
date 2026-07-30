@@ -2,8 +2,8 @@ import prisma from "@/lib/prisma";
 import type { Prisma} from "@src/generated/prisma/client";
 import { StockistCheckStatus, StockistMutationType } from "@src/generated/prisma/client";
 import { ForbiddenError, NotFoundError, ValidationError } from "@/backend/errors/app-error";
-import { PERMISSIONS } from "@/lib/permissions";
 import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
+import type { Authz } from "@/backend/helpers/authz";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
 import { stockistBalanceRepository } from "@/backend/repositories/stockist-balance.repository";
 import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
@@ -369,13 +369,17 @@ export const stockistService = {
  * Enforces the caller's PT scope itself — do not call it with an unvalidated companyId.
  */
 export async function buildStockistGridPayload(
-  caller: AdminCaller,
+  authz: Authz,
   companyId: string,
   date: Date
 ) {
-  assertCompanyAccess(caller, companyId);
+  if (!authz.canView(companyId)) {
+    throw new ForbiddenError("Tidak punya akses ke PT ini");
+  }
 
-  const canManage = caller.permissions.includes(PERMISSIONS.STOCKIST_MANAGE);
+  // Scope baca dan tulis diperiksa terpisah: sebuah jabatan bisa berhak MELIHAT
+  // PT ini tanpa berhak MENGISI-nya.
+  const canManage = authz.canWrite(companyId);
   const [grid, pending, approved] = await Promise.all([
     stockistService.getOrCreateGridForDate(companyId, date),
     correctionRequestRepository.findPendingByCompanyDateTargets(companyId, date, ["STOCKIST"]),

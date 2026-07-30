@@ -1,6 +1,14 @@
 import { ForbiddenError, NotFoundError } from "@/backend/errors/app-error";
-import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
-import { isGlobalRole } from "@/lib/permissions";
+/**
+ * Hanya dua hal yang dibutuhkan: siapa yang mengonfirmasi, dan apakah ia boleh
+ * mengubah tanggal lampau. Sengaja bukan `AdminCaller` utuh supaya service ini
+ * bisa dipanggil dengan konteks izin mana pun.
+ */
+type ConfirmationActor = {
+  id: string;
+  /** Boleh mengubah angka tanggal lampau untuk PT yang bersangkutan? */
+  canBackdate: boolean;
+};
 import { companyStockItemRepository } from "@/backend/repositories/company-stock-item.repository";
 import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
 import { kasPocketRepository } from "@/backend/repositories/kas-pocket.repository";
@@ -20,9 +28,9 @@ function todayDateOnly(): Date {
 }
 
 /** Kepala Cabang can only edit today's confirmation; editing a past date requires a global role (Super Admin/Owner). */
-function assertEditableDate(caller: AdminCaller, date: Date) {
+function assertEditableDate(caller: ConfirmationActor, date: Date) {
   const isPast = date.getTime() < todayDateOnly().getTime();
-  const canEditPastDate = isGlobalRole(caller.roleName);
+  const canEditPastDate = caller.canBackdate;
   if (isPast && !canEditPastDate) {
     throw new ForbiddenError(
       "Tanggal sudah lewat — edit perlu otorisasi Super Admin/Owner"
@@ -207,7 +215,7 @@ export const stockistHeadConfirmationService = {
     date: Date;
     confirmedQuantity: number;
     note?: string;
-    caller: AdminCaller;
+    caller: ConfirmationActor;
   }) => {
     assertEditableDate(input.caller, input.date);
 
@@ -233,7 +241,7 @@ export const stockistHeadConfirmationService = {
     date: Date;
     confirmedIdrValue: number;
     note?: string;
-    caller: AdminCaller;
+    caller: ConfirmationActor;
   }) => {
     assertEditableDate(input.caller, input.date);
 
@@ -266,7 +274,7 @@ export const stockistHeadConfirmationService = {
     date: Date;
     confirmedIdrValue: number;
     note?: string;
-    caller: AdminCaller;
+    caller: ConfirmationActor;
   }) => {
     assertEditableDate(input.caller, input.date);
 
@@ -299,7 +307,7 @@ export const stockistHeadConfirmationService = {
     date: Date;
     confirmedIdrValue: number;
     note?: string;
-    caller: AdminCaller;
+    caller: ConfirmationActor;
   }) => {
     assertEditableDate(input.caller, input.date);
 

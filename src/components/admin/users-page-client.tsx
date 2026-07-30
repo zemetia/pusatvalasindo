@@ -43,17 +43,13 @@ type User = {
   joinDate: string | null;
   isActive: boolean;
   createdAt: string;
-  branch: { id: string; name: string; company: { code: string } | null } | null;
+  branch: {
+    id: string;
+    name: string;
+    companyId: string | null;
+    company: { code: string } | null;
+  } | null;
 };
-
-function fmtSalary(val: unknown): string {
-  if (val == null) return "—";
-  return Number(val.toString()).toLocaleString("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  });
-}
 
 interface UsersPageClientProps {
   users: User[];
@@ -62,6 +58,12 @@ interface UsersPageClientProps {
   roles: Role[];
   /** Izin `users.view_detail` — menentukan nama jadi tautan ke rapor karyawan. */
   canOpenDetail?: boolean;
+  /**
+   * PT yang boleh diubah (sumbu tulis resource `users`). `null` = seluruh PT.
+   * Sengaja daftar PT, bukan satu boolean: sebuah jabatan bisa berhak melihat
+   * pengguna PT A+B tapi hanya boleh mengubah PT A.
+   */
+  writableCompanyIds?: string[] | null;
 }
 
 export function UsersPageClient({
@@ -70,8 +72,22 @@ export function UsersPageClient({
   companies,
   roles,
   canOpenDetail = false,
+  writableCompanyIds = [],
 }: UsersPageClientProps) {
   const [search, setSearch] = useState("");
+
+  // Pengguna tanpa cabang tidak punya PT, jadi hanya pemegang scope seluruh PT
+  // yang boleh menyentuhnya — sama seperti gerbang di sisi server.
+  const canWrite = (companyId: string | null | undefined) =>
+    writableCompanyIds === null || (!!companyId && writableCompanyIds.includes(companyId));
+
+  // Tombol "tambah pengguna" hanya berguna kalau ada PT yang boleh diisi.
+  const canCreate = writableCompanyIds === null || writableCompanyIds.length > 0;
+  // Cabang & jabatan yang bisa dipilih saat membuat pengguna dibatasi ke PT
+  // yang boleh ditulis, supaya form tidak menawarkan pilihan yang pasti ditolak API.
+  const writableBranches = branches.filter((b) => canWrite(b.companyId));
+  const writableCompanies = companies.filter((c) => canWrite(c.id));
+  const writableRoles = roles.filter((r) => canWrite(r.companyId));
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -88,7 +104,15 @@ export function UsersPageClient({
         title="Pengguna"
         description="Daftar seluruh pengguna sistem per cabang"
         icon={<IconUsers className="size-5" />}
-        action={<CreateUserSheet branches={branches} companies={companies} roles={roles} />}
+        action={
+          canCreate ? (
+            <CreateUserSheet
+              branches={writableBranches}
+              companies={writableCompanies}
+              roles={writableRoles}
+            />
+          ) : undefined
+        }
       />
 
       {users.length === 0 ? (
@@ -97,7 +121,15 @@ export function UsersPageClient({
             icon={<IconUsers className="size-5" />}
             title="Belum ada pengguna"
             description="Buat pengguna pertama untuk mulai mengatur akses cabang."
-            action={<CreateUserSheet branches={branches} companies={companies} roles={roles} />}
+            action={
+              canCreate ? (
+                <CreateUserSheet
+                  branches={writableBranches}
+                  companies={writableCompanies}
+                  roles={writableRoles}
+                />
+              ) : undefined
+            }
           />
         </SectionCard>
       ) : (
@@ -124,7 +156,6 @@ export function UsersPageClient({
                 <TableHead>Cabang</TableHead>
                 <TableHead>Jabatan</TableHead>
                 <TableHead>Telepon</TableHead>
-                <TableHead className="text-right">Gaji Pokok</TableHead>
                 <TableHead>Bergabung</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-10" />
@@ -133,7 +164,7 @@ export function UsersPageClient({
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={9} className="p-0">
+                  <TableCell colSpan={8} className="p-0">
                     <EmptyState
                       title="Tidak ada hasil"
                       description={`Tidak ada pengguna yang cocok dengan "${search}".`}
@@ -183,9 +214,6 @@ export function UsersPageClient({
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{u.phone ?? "—"}</TableCell>
-                    <TableCell className="tabular text-right">
-                      {fmtSalary(u.baseSalary)}
-                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {u.joinDate
                         ? new Date(u.joinDate).toLocaleDateString("id-ID", {
@@ -201,7 +229,14 @@ export function UsersPageClient({
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <UserActions user={u} branches={branches} companies={companies} roles={roles} />
+                      {canWrite(u.branch?.companyId) && (
+                        <UserActions
+                          user={u}
+                          branches={writableBranches}
+                          companies={writableCompanies}
+                          roles={writableRoles}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

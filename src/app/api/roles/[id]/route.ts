@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { roleService } from "@/backend/services/role.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { isGlobalRole, PERMISSIONS, PermissionValues } from "@/lib/permissions";
-import { ForbiddenError } from "@/backend/errors/app-error";
+import { authorize, grantableCompanyIds } from "@/backend/helpers/authz";
+import { PermissionValues } from "@/lib/permissions";
 
 const updateRoleSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -18,24 +18,20 @@ const updateRoleSchema = z.object({
 
 type UpdateBody = z.infer<typeof updateRoleSchema>;
 
-async function assertOwnCompanyRole(callerRoleName: string, callerCompanyId: string | null, id: string) {
-  if (isGlobalRole(callerRoleName)) return;
-  const role = await roleService.getById(id);
-  if (role.companyId !== callerCompanyId) {
-    throw new ForbiddenError("Tidak punya akses ke role PT ini");
-  }
-}
+// `roles` bersifat global: siapa pun yang berhak mengelola jabatan, berhak atas
+// jabatan seluruh PT — tidak ada lagi penyempitan "hanya jabatan PT saya".
+// Batas eskalasi lintas PT ditegakkan di tempat izin benar-benar diberikan,
+// yaitu PUT /api/roles/[id]/permissions.
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const caller = await requirePermission(PERMISSIONS.ROLES_VIEW);
-  if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("roles", "view");
+  if (authz instanceof NextResponse) return authz;
 
   try {
     const { id } = await params;
-    await assertOwnCompanyRole(caller.roleName, caller.companyId, id);
     const role = await roleService.getById(id);
     return NextResponse.json(ok(role));
   } catch (e) {
@@ -45,15 +41,12 @@ export async function GET(
 
 export const PATCH = withValidation(updateRoleSchema)(
   async (_req: NextRequest, ctx: { body: UpdateBody; params: Promise<{ id: string }> }) => {
-    const caller = await requirePermission(PERMISSIONS.ROLES_MANAGE);
-    if (caller instanceof NextResponse) return caller;
+    const authz = await authorize("roles", "write");
+    if (authz instanceof NextResponse) return authz;
 
     try {
       const { id } = await ctx.params;
-      await assertOwnCompanyRole(caller.roleName, caller.companyId, id);
-      const isSystem = isGlobalRole(caller.roleName);
-      const body = isSystem ? ctx.body : { ...ctx.body, companyId: caller.companyId };
-      const role = await roleService.update(id, body);
+      const role = await roleService.update(id, ctx.body, grantableCompanyIds(authz));
       return NextResponse.json(ok(role, "Role updated"));
     } catch (e) {
       return handleError(e);
@@ -65,13 +58,12 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const caller = await requirePermission(PERMISSIONS.ROLES_MANAGE);
-  if (caller instanceof NextResponse) return caller;
+  const authz = await authorize("roles", "write");
+  if (authz instanceof NextResponse) return authz;
 
   try {
     const { id } = await params;
-    await assertOwnCompanyRole(caller.roleName, caller.companyId, id);
-    await roleService.delete(id);
+    await roleService.delete(id, grantableCompanyIds(authz));
     return NextResponse.json(ok(null, "Role deleted"));
   } catch (e) {
     return handleError(e);

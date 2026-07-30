@@ -1,5 +1,4 @@
-import { can, PERMISSIONS } from "@/lib/permissions";
-import { requirePageCaller } from "@/backend/helpers/page-access";
+import { requireResource } from "@/backend/helpers/authz";
 import { priceBenchmarkService } from "@/backend/services/price-benchmark.service";
 import { PatokanHargaPageClient } from "@/components/admin/patokan-harga-page-client";
 
@@ -9,10 +8,20 @@ export default async function PatokanHargaPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const caller = await requirePageCaller(PERMISSIONS.CURRENCY_VIEW, locale);
+  // Resource global: patokan harga adalah acuan tunggal untuk seluruh PT,
+  // jadi tidak ada penyaringan per PT di sini.
+  const authz = await requireResource("price.benchmark", "view", locale);
 
   const rows = await priceBenchmarkService.getAll();
-  const canManage = can(caller.permissions, PERMISSIONS.CURRENCY_MANAGE);
+  const canManage = authz.can("price.benchmark", "write");
 
-  return <PatokanHargaPageClient initialRows={rows} canManage={canManage} />;
+  return (
+    <PatokanHargaPageClient
+      initialRows={rows}
+      canManage={canManage}
+      // Tombol "Terapkan ke Harga Valas" digerbangi izin tulis halaman TUJUAN,
+      // bukan halaman ini — di sanalah angkanya berubah.
+      canPushToPrices={authz.can("currency.price", "write")}
+    />
+  );
 }

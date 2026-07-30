@@ -2,8 +2,16 @@ import prisma from "@/lib/prisma";
 import { LogPageClient } from "@/components/admin/kpi/log-page-client";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconReport } from "@tabler/icons-react";
+import { requireResource } from "@/backend/helpers/authz";
 
-export default async function KpiLogPage() {
+export default async function KpiLogPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  await requireResource("kpi.review", "view", locale);
+
   let users;
   try {
     // KPI per karyawan diambil client-side saat karyawan dipilih — memuat

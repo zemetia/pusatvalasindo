@@ -1,12 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { kpiService } from "@/backend/services/kpi.service";
 import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { withValidation } from "@/backend/middleware/with-validation";
-import { requirePermission } from "@/backend/helpers/get-admin-caller";
-import { assertCompanyAccess } from "@/backend/services/stockist.service";
-import { PERMISSIONS } from "@/lib/permissions";
+import { authorize } from "@/backend/helpers/authz";
 import { roleKpiScoringSchema } from "../route";
 
 const updateSchema = z.object(roleKpiScoringSchema).partial();
@@ -16,12 +15,11 @@ type UpdateBody = z.infer<typeof updateSchema>;
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_VIEW_ALL);
+    const caller = await authorize("kpi.config", "view");
     if (caller instanceof NextResponse) return caller;
 
     const { id } = await params;
     const roleKpi = await kpiService.getRoleKpiById(id);
-    assertCompanyAccess(caller, roleKpi.companyId);
     return NextResponse.json(ok(roleKpi));
   } catch (e) {
     return handleError(e);
@@ -31,14 +29,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export const PUT = withValidation(updateSchema)(
   async (_req: NextRequest, ctx: Params & { body: UpdateBody }) => {
     try {
-      const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+      const caller = await authorize("kpi.config", "write");
       if (caller instanceof NextResponse) return caller;
 
       const { id } = await ctx.params;
-      // Cek PT sebelum menulis: tanpa ini pemegang KPI_MANAGE di satu PT bisa
-      // mengubah konfigurasi PT lain hanya dengan menebak id-nya.
-      const existing = await kpiService.getRoleKpiById(id);
-      assertCompanyAccess(caller, existing.companyId);
+      // Memastikan barisnya ada — melempar NotFoundError kalau tidak. Tidak ada
+      // lagi cek per PT di sini: `kpi.config` bersifat global, bobot KPI dipakai
+      // bersama seluruh PT.
+      await kpiService.getRoleKpiById(id);
 
       const updated = await kpiService.updateRoleKpi(id, ctx.body);
       return NextResponse.json(ok(updated, "Konfigurasi KPI jabatan berhasil diperbarui"));
@@ -50,12 +48,11 @@ export const PUT = withValidation(updateSchema)(
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    const caller = await requirePermission(PERMISSIONS.KPI_MANAGE);
+    const caller = await authorize("kpi.config", "write");
     if (caller instanceof NextResponse) return caller;
 
     const { id } = await params;
-    const existing = await kpiService.getRoleKpiById(id);
-    assertCompanyAccess(caller, existing.companyId);
+    await kpiService.getRoleKpiById(id);
 
     await kpiService.deleteRoleKpi(id);
     return NextResponse.json(ok(null, "Konfigurasi KPI jabatan berhasil dihapus"));

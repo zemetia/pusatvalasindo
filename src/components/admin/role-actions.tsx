@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import { RoleSheet, RoleRow } from "./role-sheet";
-import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { RoleSheet } from "./role-sheet";
+import type { RoleRow } from "./role-sheet";
+import { RolePermissionPicker } from "./role-permission-picker";
+import { IconPencil, IconTrash, IconShieldLock } from "@tabler/icons-react";
 
 type CompanyOption = { id: string; name: string; code: string };
 
@@ -14,9 +16,11 @@ interface Props {
   role: RoleRow;
   currentCompanyId?: string;
   companies?: CompanyOption[];
+  /** True untuk Super Admin/Owner — hanya mereka yang boleh memberi mode "Semua PT". */
+  canGrantAll?: boolean;
 }
 
-export function RoleActions({ role, currentCompanyId, companies }: Props) {
+export function RoleActions({ role, currentCompanyId, companies, canGrantAll }: Props) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
@@ -38,6 +42,25 @@ export function RoleActions({ role, currentCompanyId, companies }: Props) {
 
   return (
     <div className="flex items-center gap-1 justify-end">
+      <RolePermissionPicker
+        roleId={role.id}
+        roleName={role.name}
+        roleCompanyId={role.companyId}
+        companies={companies ?? []}
+        canGrantAll={canGrantAll}
+        trigger={
+          <Button
+            size="sm"
+            variant="outline"
+            title="Cari izin lalu pilih PT yang berlaku"
+            className="h-8 gap-1.5 px-2.5 text-xs hover:border-primary/40 hover:text-primary transition-colors"
+          >
+            <IconShieldLock className="size-3.5" />
+            Perizinan
+          </Button>
+        }
+      />
+
       <RoleSheet
         role={role}
         currentCompanyId={currentCompanyId}
