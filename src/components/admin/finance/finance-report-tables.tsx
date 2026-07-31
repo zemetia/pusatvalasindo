@@ -442,3 +442,89 @@ export function QualityTable({ companies }: { companies: CompanyFinanceReport[] 
     </Table>
   );
 }
+
+/* ── Dana tertahan ────────────────────────────────────────────────────────── */
+
+/**
+ * Dana Tertahan per PT: posisi belum lunas di akhir periode, berapa yang cair,
+ * dan seberapa besar piutang itu dibanding aset yang sudah dikonfirmasi.
+ *
+ * Kolom terakhir itulah alasan tabel ini ada. "Belum lunas Rp 40 juta" tidak
+ * berarti apa-apa sampai dibandingkan dengan posisi asetnya — angka yang sama
+ * bisa berarti kebocoran serius di satu PT dan pembulatan di PT lain.
+ */
+export function HeldFundTable({
+  companies,
+  group,
+}: {
+  companies: CompanyFinanceReport[];
+  group: GroupFinanceReport;
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow className="hover:bg-transparent">
+          <TableHead className={HEAD}>PT</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Belum Lunas</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Catatan</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Cair Periode Ini</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Tercatat Periode Ini</TableHead>
+          <TableHead className={HEAD_NUMERIC}>vs Total Aset</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {companies.map((company) => {
+          const held = company.heldFunds;
+          return (
+            <TableRow key={company.id}>
+              <TableCell className="font-medium">{company.name}</TableCell>
+              <TableCell
+                className={cn(
+                  NUMERIC,
+                  held.outstanding > 0 ? "text-warning font-medium" : "text-muted-foreground",
+                )}
+              >
+                {formatIdr(held.outstanding)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatCount(held.outstandingCount)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, held.settled > 0 && "text-success")}>
+                {formatIdr(held.settled)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatIdr(held.added)}
+              </TableCell>
+              {/* Porsi terhadap posisi aset PT-nya sendiri, bukan terhadap grup:
+                  yang ingin diketahui adalah seberapa berat piutang itu untuk PT
+                  yang menanggungnya. */}
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatPercent(share(held.outstanding, company.closing.total))}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+      <TableFooter>
+        <TableRow className="hover:bg-transparent">
+          <TableCell className="font-semibold">Konsolidasi</TableCell>
+          <TableCell className={cn(NUMERIC, "font-semibold")}>
+            {formatIdr(group.heldFunds.outstanding)}
+          </TableCell>
+          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+            {formatCount(group.heldFunds.outstandingCount)}
+          </TableCell>
+          <TableCell className={cn(NUMERIC, "font-semibold")}>
+            {formatIdr(group.heldFunds.settled)}
+          </TableCell>
+          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+            {formatIdr(group.heldFunds.added)}
+          </TableCell>
+          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+            {formatPercent(share(group.heldFunds.outstanding, group.closing.total))}
+          </TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  );
+}

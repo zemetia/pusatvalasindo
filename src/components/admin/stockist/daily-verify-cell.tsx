@@ -54,6 +54,7 @@ export function DailyVerifyCell({
   approved,
   canVerify,
   canDirectCorrect,
+  allowNegative = false,
   onVerify,
 }: {
   status: DailyVerifyStatus
@@ -63,6 +64,13 @@ export function DailyVerifyCell({
   approved?: ApprovedCorrection
   canVerify: boolean
   canDirectCorrect?: boolean
+  /**
+   * Angka pengganti boleh minus. Dinyalakan oleh grid Bank: rekening bisa
+   * overdraft/kartu kredit, jadi saldo negatif adalah keadaan yang sah — dan
+   * koreksinya harus bisa mencapai keadaan itu. Grid stock & kas tetap `false`:
+   * kuantitas fisik dan uang tunai di tangan tidak bisa kurang dari nol.
+   */
+  allowNegative?: boolean
   onVerify: (
     status: "BENAR" | "BEDA",
     note?: string,
@@ -170,6 +178,7 @@ export function DailyVerifyCell({
               <NumberInput
                 value={corrected}
                 onValueChange={setCorrected}
+                allowNegative={allowNegative}
                 className="font-mono text-right"
               />
             </div>

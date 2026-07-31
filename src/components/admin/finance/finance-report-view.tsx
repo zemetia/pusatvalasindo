@@ -4,6 +4,7 @@ import {
   IconArrowsDiff,
   IconCalendarMonth,
   IconChartAreaLine,
+  IconClockDollar,
   IconCoins,
   IconReportMoney,
   IconShieldCheck,
@@ -29,6 +30,7 @@ import {
   CompositionBar,
   CrossCheckTable,
   DailyDetailTable,
+  HeldFundTable,
   QualityTable,
   StockPositionTable,
 } from "@/components/admin/finance/finance-report-tables";
@@ -323,6 +325,47 @@ export function FinanceReportView({
         <SectionCard className="mt-6" padded={false}>
           <StockPositionTable companies={report.companies} />
         </SectionCard>
+      </section>
+
+      {/* ── Dana tertahan ────────────────────────────────────────────────── */}
+      <section>
+        <SectionHeading
+          icon={<IconClockDollar className="size-4" />}
+          title="Dana Tertahan"
+          description="Hutang orang ke perusahaan — uang yang sudah tercatat tapi belum masuk. Sengaja di luar Total Aset di atas: angka itu hanya memuat yang sudah dikonfirmasi kepala cabang."
+        />
+        <MetricRow columns={3} className="mt-6">
+          <MetricBlock
+            size="secondary"
+            label="Belum Lunas"
+            prefix={group.heldFunds.outstanding > 0 ? "Rp" : undefined}
+            tone={group.heldFunds.outstanding > 0 ? "warning" : "muted"}
+            value={
+              group.heldFunds.outstanding > 0 ? formatIdr(group.heldFunds.outstanding) : "Nihil"
+            }
+            meta={`${formatCount(group.heldFunds.outstandingCount)} catatan, posisi ${formatDate(range.to)}`}
+          />
+          <MetricBlock
+            size="secondary"
+            label="Cair di Periode Ini"
+            prefix={rp(group.heldFunds.settled)}
+            tone={group.heldFunds.settled > 0 ? "success" : "muted"}
+            value={formatIdr(group.heldFunds.settled)}
+            meta={`${formatCount(group.heldFunds.settledCount)} catatan dinyatakan lunas`}
+          />
+          <MetricBlock
+            size="secondary"
+            label="Tercatat di Periode Ini"
+            prefix={rp(group.heldFunds.added)}
+            value={formatIdr(group.heldFunds.added)}
+            meta="Hutang baru sepanjang periode, lunas maupun belum"
+          />
+        </MetricRow>
+        {group.heldFunds.outstanding > 0 && (
+          <SectionCard className="mt-8" padded={false}>
+            <HeldFundTable companies={report.companies} group={group} />
+          </SectionCard>
+        )}
       </section>
 
       {/* ── Kualitas data ────────────────────────────────────────────────── */}

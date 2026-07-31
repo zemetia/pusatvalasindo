@@ -20,6 +20,7 @@ import {
   IconPencil,
   IconWallet,
   IconClipboardCheck,
+  IconClockDollar,
   IconGavel,
   IconChartCandle,
   IconChartHistogram,
@@ -61,9 +62,14 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
    * halaman yang benar-benar boleh dibuka.
    */
   subject: AuthzSubject;
+  /**
+   * User tanpa cabang tidak punya tempat presensi maupun periode KPI sendiri,
+   * jadi section "Aktivitas Saya" disembunyikan untuk mereka.
+   */
+  hasBranch: boolean;
 }
 
-export function AppSidebar({ user, subject, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarProps) {
   if (!user) {
     throw new Error("AppSidebar requires a user but received undefined.");
   }
@@ -83,7 +89,7 @@ export function AppSidebar({ user, subject, ...props }: AppSidebarProps) {
   // ── Aktivitas Saya ────────────────────────────────────────────────────────
   const navSelf: NavItem[] = [];
 
-  if (show("attendance.self")) {
+  if (hasBranch && show("attendance.self")) {
     navSelf.push({
       title: "Presensi",
       url: "/dashboard/attendance",
@@ -91,7 +97,7 @@ export function AppSidebar({ user, subject, ...props }: AppSidebarProps) {
     });
   }
 
-  if (show("kpi.self")) {
+  if (hasBranch && show("kpi.self")) {
     navSelf.push({
       title: "Input KPI Saya",
       url: "/dashboard/kpi/self",
@@ -252,6 +258,16 @@ export function AppSidebar({ user, subject, ...props }: AppSidebarProps) {
       title: "Saldo Bank Harian",
       url: "/dashboard/stockist/bank",
       icon: IconBuildingBank,
+    });
+  }
+
+  // Dana Tertahan duduk di section input harian karena polanya sama: dibuka per
+  // tanggal dan diisi hari itu. Bedanya barisnya bertahan sampai dinyatakan lunas.
+  if (show("finance.receivable")) {
+    navFinanceDailyInput.push({
+      title: "Dana Tertahan",
+      url: "/dashboard/hutang",
+      icon: IconClockDollar,
     });
   }
 

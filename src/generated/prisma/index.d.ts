@@ -161,6 +161,11 @@ export type SalaryComponent = $Result.DefaultSelection<Prisma.$SalaryComponentPa
  */
 export type UserSalaryComponent = $Result.DefaultSelection<Prisma.$UserSalaryComponentPayload>
 /**
+ * Model HeldFund
+ * 
+ */
+export type HeldFund = $Result.DefaultSelection<Prisma.$HeldFundPayload>
+/**
  * Model RefiningBatch
  * 
  */
@@ -1037,6 +1042,16 @@ export class PrismaClient<
   get userSalaryComponent(): Prisma.UserSalaryComponentDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.heldFund`: Exposes CRUD operations for the **HeldFund** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more HeldFunds
+    * const heldFunds = await prisma.heldFund.findMany()
+    * ```
+    */
+  get heldFund(): Prisma.HeldFundDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.refiningBatch`: Exposes CRUD operations for the **RefiningBatch** model.
     * Example usage:
     * ```ts
@@ -1706,6 +1721,7 @@ export namespace Prisma {
     PayrollIncentiveTier: 'PayrollIncentiveTier',
     SalaryComponent: 'SalaryComponent',
     UserSalaryComponent: 'UserSalaryComponent',
+    HeldFund: 'HeldFund',
     RefiningBatch: 'RefiningBatch',
     Sample: 'Sample',
     ShipmentProvider: 'ShipmentProvider',
@@ -1742,7 +1758,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollIncentiveMatrix" | "payrollIncentiveTier" | "salaryComponent" | "userSalaryComponent" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
+      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollIncentiveMatrix" | "payrollIncentiveTier" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3744,6 +3760,80 @@ export namespace Prisma {
           }
         }
       }
+      HeldFund: {
+        payload: Prisma.$HeldFundPayload<ExtArgs>
+        fields: Prisma.HeldFundFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HeldFundFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HeldFundFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          findFirst: {
+            args: Prisma.HeldFundFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HeldFundFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          findMany: {
+            args: Prisma.HeldFundFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>[]
+          }
+          create: {
+            args: Prisma.HeldFundCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          createMany: {
+            args: Prisma.HeldFundCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HeldFundCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>[]
+          }
+          delete: {
+            args: Prisma.HeldFundDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          update: {
+            args: Prisma.HeldFundUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          deleteMany: {
+            args: Prisma.HeldFundDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HeldFundUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HeldFundUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>[]
+          }
+          upsert: {
+            args: Prisma.HeldFundUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HeldFundPayload>
+          }
+          aggregate: {
+            args: Prisma.HeldFundAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHeldFund>
+          }
+          groupBy: {
+            args: Prisma.HeldFundGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HeldFundGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HeldFundCountArgs<ExtArgs>
+            result: $Utils.Optional<HeldFundCountAggregateOutputType> | number
+          }
+        }
+      }
       RefiningBatch: {
         payload: Prisma.$RefiningBatchPayload<ExtArgs>
         fields: Prisma.RefiningBatchFieldRefs
@@ -5433,6 +5523,7 @@ export namespace Prisma {
     payrollIncentiveTier?: PayrollIncentiveTierOmit
     salaryComponent?: SalaryComponentOmit
     userSalaryComponent?: UserSalaryComponentOmit
+    heldFund?: HeldFundOmit
     refiningBatch?: RefiningBatchOmit
     sample?: SampleOmit
     shipmentProvider?: ShipmentProviderOmit
@@ -5844,6 +5935,7 @@ export namespace Prisma {
     bankHeadConfirmations: number
     headConfirmationTotals: number
     correctionRequests: number
+    heldFunds: number
   }
 
   export type CompanyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5862,6 +5954,7 @@ export namespace Prisma {
     bankHeadConfirmations?: boolean | CompanyCountOutputTypeCountBankHeadConfirmationsArgs
     headConfirmationTotals?: boolean | CompanyCountOutputTypeCountHeadConfirmationTotalsArgs
     correctionRequests?: boolean | CompanyCountOutputTypeCountCorrectionRequestsArgs
+    heldFunds?: boolean | CompanyCountOutputTypeCountHeldFundsArgs
   }
 
   // Custom InputTypes
@@ -5978,6 +6071,13 @@ export namespace Prisma {
    */
   export type CompanyCountOutputTypeCountCorrectionRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CorrectionRequestWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountHeldFundsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HeldFundWhereInput
   }
 
 
@@ -20193,6 +20293,7 @@ export namespace Prisma {
     bankHeadConfirmations?: boolean | Company$bankHeadConfirmationsArgs<ExtArgs>
     headConfirmationTotals?: boolean | Company$headConfirmationTotalsArgs<ExtArgs>
     correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
+    heldFunds?: boolean | Company$heldFundsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
 
@@ -20240,6 +20341,7 @@ export namespace Prisma {
     bankHeadConfirmations?: boolean | Company$bankHeadConfirmationsArgs<ExtArgs>
     headConfirmationTotals?: boolean | Company$headConfirmationTotalsArgs<ExtArgs>
     correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
+    heldFunds?: boolean | Company$heldFundsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CompanyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -20263,6 +20365,7 @@ export namespace Prisma {
       bankHeadConfirmations: Prisma.$BankHeadConfirmationPayload<ExtArgs>[]
       headConfirmationTotals: Prisma.$CompanyHeadConfirmationTotalPayload<ExtArgs>[]
       correctionRequests: Prisma.$CorrectionRequestPayload<ExtArgs>[]
+      heldFunds: Prisma.$HeldFundPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20680,6 +20783,7 @@ export namespace Prisma {
     bankHeadConfirmations<T extends Company$bankHeadConfirmationsArgs<ExtArgs> = {}>(args?: Subset<T, Company$bankHeadConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankHeadConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     headConfirmationTotals<T extends Company$headConfirmationTotalsArgs<ExtArgs> = {}>(args?: Subset<T, Company$headConfirmationTotalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompanyHeadConfirmationTotalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     correctionRequests<T extends Company$correctionRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Company$correctionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    heldFunds<T extends Company$heldFundsArgs<ExtArgs> = {}>(args?: Subset<T, Company$heldFundsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21465,6 +21569,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CorrectionRequestScalarFieldEnum | CorrectionRequestScalarFieldEnum[]
+  }
+
+  /**
+   * Company.heldFunds
+   */
+  export type Company$heldFundsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    where?: HeldFundWhereInput
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    cursor?: HeldFundWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
   }
 
   /**
@@ -39231,6 +39359,1181 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserSalaryComponentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model HeldFund
+   */
+
+  export type AggregateHeldFund = {
+    _count: HeldFundCountAggregateOutputType | null
+    _avg: HeldFundAvgAggregateOutputType | null
+    _sum: HeldFundSumAggregateOutputType | null
+    _min: HeldFundMinAggregateOutputType | null
+    _max: HeldFundMaxAggregateOutputType | null
+  }
+
+  export type HeldFundAvgAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type HeldFundSumAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type HeldFundMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    name: string | null
+    amount: Decimal | null
+    note: string | null
+    settledAt: Date | null
+    settledBy: string | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type HeldFundMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    date: Date | null
+    name: string | null
+    amount: Decimal | null
+    note: string | null
+    settledAt: Date | null
+    settledBy: string | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type HeldFundCountAggregateOutputType = {
+    id: number
+    companyId: number
+    date: number
+    name: number
+    amount: number
+    note: number
+    settledAt: number
+    settledBy: number
+    createdBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type HeldFundAvgAggregateInputType = {
+    amount?: true
+  }
+
+  export type HeldFundSumAggregateInputType = {
+    amount?: true
+  }
+
+  export type HeldFundMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    name?: true
+    amount?: true
+    note?: true
+    settledAt?: true
+    settledBy?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type HeldFundMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    name?: true
+    amount?: true
+    note?: true
+    settledAt?: true
+    settledBy?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type HeldFundCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    date?: true
+    name?: true
+    amount?: true
+    note?: true
+    settledAt?: true
+    settledBy?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type HeldFundAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HeldFund to aggregate.
+     */
+    where?: HeldFundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HeldFunds to fetch.
+     */
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HeldFundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HeldFunds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HeldFunds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned HeldFunds
+    **/
+    _count?: true | HeldFundCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: HeldFundAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: HeldFundSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HeldFundMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HeldFundMaxAggregateInputType
+  }
+
+  export type GetHeldFundAggregateType<T extends HeldFundAggregateArgs> = {
+        [P in keyof T & keyof AggregateHeldFund]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHeldFund[P]>
+      : GetScalarType<T[P], AggregateHeldFund[P]>
+  }
+
+
+
+
+  export type HeldFundGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HeldFundWhereInput
+    orderBy?: HeldFundOrderByWithAggregationInput | HeldFundOrderByWithAggregationInput[]
+    by: HeldFundScalarFieldEnum[] | HeldFundScalarFieldEnum
+    having?: HeldFundScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HeldFundCountAggregateInputType | true
+    _avg?: HeldFundAvgAggregateInputType
+    _sum?: HeldFundSumAggregateInputType
+    _min?: HeldFundMinAggregateInputType
+    _max?: HeldFundMaxAggregateInputType
+  }
+
+  export type HeldFundGroupByOutputType = {
+    id: string
+    companyId: string
+    date: Date
+    name: string
+    amount: Decimal
+    note: string | null
+    settledAt: Date | null
+    settledBy: string | null
+    createdBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: HeldFundCountAggregateOutputType | null
+    _avg: HeldFundAvgAggregateOutputType | null
+    _sum: HeldFundSumAggregateOutputType | null
+    _min: HeldFundMinAggregateOutputType | null
+    _max: HeldFundMaxAggregateOutputType | null
+  }
+
+  type GetHeldFundGroupByPayload<T extends HeldFundGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HeldFundGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HeldFundGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HeldFundGroupByOutputType[P]>
+            : GetScalarType<T[P], HeldFundGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HeldFundSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    name?: boolean
+    amount?: boolean
+    note?: boolean
+    settledAt?: boolean
+    settledBy?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["heldFund"]>
+
+  export type HeldFundSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    name?: boolean
+    amount?: boolean
+    note?: boolean
+    settledAt?: boolean
+    settledBy?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["heldFund"]>
+
+  export type HeldFundSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    name?: boolean
+    amount?: boolean
+    note?: boolean
+    settledAt?: boolean
+    settledBy?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["heldFund"]>
+
+  export type HeldFundSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    date?: boolean
+    name?: boolean
+    amount?: boolean
+    note?: boolean
+    settledAt?: boolean
+    settledBy?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type HeldFundOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "name" | "amount" | "note" | "settledAt" | "settledBy" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["heldFund"]>
+  export type HeldFundInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type HeldFundIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+  export type HeldFundIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+  }
+
+  export type $HeldFundPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "HeldFund"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      date: Date
+      name: string
+      amount: Prisma.Decimal
+      note: string | null
+      settledAt: Date | null
+      settledBy: string | null
+      createdBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["heldFund"]>
+    composites: {}
+  }
+
+  type HeldFundGetPayload<S extends boolean | null | undefined | HeldFundDefaultArgs> = $Result.GetResult<Prisma.$HeldFundPayload, S>
+
+  type HeldFundCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HeldFundFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HeldFundCountAggregateInputType | true
+    }
+
+  export interface HeldFundDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['HeldFund'], meta: { name: 'HeldFund' } }
+    /**
+     * Find zero or one HeldFund that matches the filter.
+     * @param {HeldFundFindUniqueArgs} args - Arguments to find a HeldFund
+     * @example
+     * // Get one HeldFund
+     * const heldFund = await prisma.heldFund.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HeldFundFindUniqueArgs>(args: SelectSubset<T, HeldFundFindUniqueArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one HeldFund that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HeldFundFindUniqueOrThrowArgs} args - Arguments to find a HeldFund
+     * @example
+     * // Get one HeldFund
+     * const heldFund = await prisma.heldFund.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HeldFundFindUniqueOrThrowArgs>(args: SelectSubset<T, HeldFundFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HeldFund that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundFindFirstArgs} args - Arguments to find a HeldFund
+     * @example
+     * // Get one HeldFund
+     * const heldFund = await prisma.heldFund.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HeldFundFindFirstArgs>(args?: SelectSubset<T, HeldFundFindFirstArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HeldFund that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundFindFirstOrThrowArgs} args - Arguments to find a HeldFund
+     * @example
+     * // Get one HeldFund
+     * const heldFund = await prisma.heldFund.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HeldFundFindFirstOrThrowArgs>(args?: SelectSubset<T, HeldFundFindFirstOrThrowArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more HeldFunds that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all HeldFunds
+     * const heldFunds = await prisma.heldFund.findMany()
+     * 
+     * // Get first 10 HeldFunds
+     * const heldFunds = await prisma.heldFund.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const heldFundWithIdOnly = await prisma.heldFund.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HeldFundFindManyArgs>(args?: SelectSubset<T, HeldFundFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a HeldFund.
+     * @param {HeldFundCreateArgs} args - Arguments to create a HeldFund.
+     * @example
+     * // Create one HeldFund
+     * const HeldFund = await prisma.heldFund.create({
+     *   data: {
+     *     // ... data to create a HeldFund
+     *   }
+     * })
+     * 
+     */
+    create<T extends HeldFundCreateArgs>(args: SelectSubset<T, HeldFundCreateArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many HeldFunds.
+     * @param {HeldFundCreateManyArgs} args - Arguments to create many HeldFunds.
+     * @example
+     * // Create many HeldFunds
+     * const heldFund = await prisma.heldFund.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HeldFundCreateManyArgs>(args?: SelectSubset<T, HeldFundCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many HeldFunds and returns the data saved in the database.
+     * @param {HeldFundCreateManyAndReturnArgs} args - Arguments to create many HeldFunds.
+     * @example
+     * // Create many HeldFunds
+     * const heldFund = await prisma.heldFund.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many HeldFunds and only return the `id`
+     * const heldFundWithIdOnly = await prisma.heldFund.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HeldFundCreateManyAndReturnArgs>(args?: SelectSubset<T, HeldFundCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a HeldFund.
+     * @param {HeldFundDeleteArgs} args - Arguments to delete one HeldFund.
+     * @example
+     * // Delete one HeldFund
+     * const HeldFund = await prisma.heldFund.delete({
+     *   where: {
+     *     // ... filter to delete one HeldFund
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HeldFundDeleteArgs>(args: SelectSubset<T, HeldFundDeleteArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one HeldFund.
+     * @param {HeldFundUpdateArgs} args - Arguments to update one HeldFund.
+     * @example
+     * // Update one HeldFund
+     * const heldFund = await prisma.heldFund.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HeldFundUpdateArgs>(args: SelectSubset<T, HeldFundUpdateArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more HeldFunds.
+     * @param {HeldFundDeleteManyArgs} args - Arguments to filter HeldFunds to delete.
+     * @example
+     * // Delete a few HeldFunds
+     * const { count } = await prisma.heldFund.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HeldFundDeleteManyArgs>(args?: SelectSubset<T, HeldFundDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HeldFunds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many HeldFunds
+     * const heldFund = await prisma.heldFund.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HeldFundUpdateManyArgs>(args: SelectSubset<T, HeldFundUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HeldFunds and returns the data updated in the database.
+     * @param {HeldFundUpdateManyAndReturnArgs} args - Arguments to update many HeldFunds.
+     * @example
+     * // Update many HeldFunds
+     * const heldFund = await prisma.heldFund.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more HeldFunds and only return the `id`
+     * const heldFundWithIdOnly = await prisma.heldFund.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HeldFundUpdateManyAndReturnArgs>(args: SelectSubset<T, HeldFundUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one HeldFund.
+     * @param {HeldFundUpsertArgs} args - Arguments to update or create a HeldFund.
+     * @example
+     * // Update or create a HeldFund
+     * const heldFund = await prisma.heldFund.upsert({
+     *   create: {
+     *     // ... data to create a HeldFund
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the HeldFund we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HeldFundUpsertArgs>(args: SelectSubset<T, HeldFundUpsertArgs<ExtArgs>>): Prisma__HeldFundClient<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of HeldFunds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundCountArgs} args - Arguments to filter HeldFunds to count.
+     * @example
+     * // Count the number of HeldFunds
+     * const count = await prisma.heldFund.count({
+     *   where: {
+     *     // ... the filter for the HeldFunds we want to count
+     *   }
+     * })
+    **/
+    count<T extends HeldFundCountArgs>(
+      args?: Subset<T, HeldFundCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HeldFundCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a HeldFund.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HeldFundAggregateArgs>(args: Subset<T, HeldFundAggregateArgs>): Prisma.PrismaPromise<GetHeldFundAggregateType<T>>
+
+    /**
+     * Group by HeldFund.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HeldFundGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HeldFundGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HeldFundGroupByArgs['orderBy'] }
+        : { orderBy?: HeldFundGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HeldFundGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHeldFundGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the HeldFund model
+   */
+  readonly fields: HeldFundFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for HeldFund.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HeldFundClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the HeldFund model
+   */
+  interface HeldFundFieldRefs {
+    readonly id: FieldRef<"HeldFund", 'String'>
+    readonly companyId: FieldRef<"HeldFund", 'String'>
+    readonly date: FieldRef<"HeldFund", 'DateTime'>
+    readonly name: FieldRef<"HeldFund", 'String'>
+    readonly amount: FieldRef<"HeldFund", 'Decimal'>
+    readonly note: FieldRef<"HeldFund", 'String'>
+    readonly settledAt: FieldRef<"HeldFund", 'DateTime'>
+    readonly settledBy: FieldRef<"HeldFund", 'String'>
+    readonly createdBy: FieldRef<"HeldFund", 'String'>
+    readonly createdAt: FieldRef<"HeldFund", 'DateTime'>
+    readonly updatedAt: FieldRef<"HeldFund", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * HeldFund findUnique
+   */
+  export type HeldFundFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter, which HeldFund to fetch.
+     */
+    where: HeldFundWhereUniqueInput
+  }
+
+  /**
+   * HeldFund findUniqueOrThrow
+   */
+  export type HeldFundFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter, which HeldFund to fetch.
+     */
+    where: HeldFundWhereUniqueInput
+  }
+
+  /**
+   * HeldFund findFirst
+   */
+  export type HeldFundFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter, which HeldFund to fetch.
+     */
+    where?: HeldFundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HeldFunds to fetch.
+     */
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HeldFunds.
+     */
+    cursor?: HeldFundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HeldFunds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HeldFunds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HeldFunds.
+     */
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
+  }
+
+  /**
+   * HeldFund findFirstOrThrow
+   */
+  export type HeldFundFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter, which HeldFund to fetch.
+     */
+    where?: HeldFundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HeldFunds to fetch.
+     */
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HeldFunds.
+     */
+    cursor?: HeldFundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HeldFunds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HeldFunds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HeldFunds.
+     */
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
+  }
+
+  /**
+   * HeldFund findMany
+   */
+  export type HeldFundFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter, which HeldFunds to fetch.
+     */
+    where?: HeldFundWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HeldFunds to fetch.
+     */
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing HeldFunds.
+     */
+    cursor?: HeldFundWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HeldFunds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HeldFunds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HeldFunds.
+     */
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
+  }
+
+  /**
+   * HeldFund create
+   */
+  export type HeldFundCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * The data needed to create a HeldFund.
+     */
+    data: XOR<HeldFundCreateInput, HeldFundUncheckedCreateInput>
+  }
+
+  /**
+   * HeldFund createMany
+   */
+  export type HeldFundCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many HeldFunds.
+     */
+    data: HeldFundCreateManyInput | HeldFundCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HeldFund createManyAndReturn
+   */
+  export type HeldFundCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * The data used to create many HeldFunds.
+     */
+    data: HeldFundCreateManyInput | HeldFundCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HeldFund update
+   */
+  export type HeldFundUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * The data needed to update a HeldFund.
+     */
+    data: XOR<HeldFundUpdateInput, HeldFundUncheckedUpdateInput>
+    /**
+     * Choose, which HeldFund to update.
+     */
+    where: HeldFundWhereUniqueInput
+  }
+
+  /**
+   * HeldFund updateMany
+   */
+  export type HeldFundUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update HeldFunds.
+     */
+    data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyInput>
+    /**
+     * Filter which HeldFunds to update
+     */
+    where?: HeldFundWhereInput
+    /**
+     * Limit how many HeldFunds to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HeldFund updateManyAndReturn
+   */
+  export type HeldFundUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * The data used to update HeldFunds.
+     */
+    data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyInput>
+    /**
+     * Filter which HeldFunds to update
+     */
+    where?: HeldFundWhereInput
+    /**
+     * Limit how many HeldFunds to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HeldFund upsert
+   */
+  export type HeldFundUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * The filter to search for the HeldFund to update in case it exists.
+     */
+    where: HeldFundWhereUniqueInput
+    /**
+     * In case the HeldFund found by the `where` argument doesn't exist, create a new HeldFund with this data.
+     */
+    create: XOR<HeldFundCreateInput, HeldFundUncheckedCreateInput>
+    /**
+     * In case the HeldFund was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HeldFundUpdateInput, HeldFundUncheckedUpdateInput>
+  }
+
+  /**
+   * HeldFund delete
+   */
+  export type HeldFundDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    /**
+     * Filter which HeldFund to delete.
+     */
+    where: HeldFundWhereUniqueInput
+  }
+
+  /**
+   * HeldFund deleteMany
+   */
+  export type HeldFundDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HeldFunds to delete
+     */
+    where?: HeldFundWhereInput
+    /**
+     * Limit how many HeldFunds to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * HeldFund without action
+   */
+  export type HeldFundDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
   }
 
 
@@ -64501,6 +65804,23 @@ export namespace Prisma {
   export type UserSalaryComponentScalarFieldEnum = (typeof UserSalaryComponentScalarFieldEnum)[keyof typeof UserSalaryComponentScalarFieldEnum]
 
 
+  export const HeldFundScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    date: 'date',
+    name: 'name',
+    amount: 'amount',
+    note: 'note',
+    settledAt: 'settledAt',
+    settledBy: 'settledBy',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type HeldFundScalarFieldEnum = (typeof HeldFundScalarFieldEnum)[keyof typeof HeldFundScalarFieldEnum]
+
+
   export const RefiningBatchScalarFieldEnum: {
     id: 'id',
     batchNumber: 'batchNumber',
@@ -66445,6 +67765,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationListRelationFilter
     headConfirmationTotals?: CompanyHeadConfirmationTotalListRelationFilter
     correctionRequests?: CorrectionRequestListRelationFilter
+    heldFunds?: HeldFundListRelationFilter
   }
 
   export type CompanyOrderByWithRelationInput = {
@@ -66469,6 +67790,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationOrderByRelationAggregateInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalOrderByRelationAggregateInput
     correctionRequests?: CorrectionRequestOrderByRelationAggregateInput
+    heldFunds?: HeldFundOrderByRelationAggregateInput
   }
 
   export type CompanyWhereUniqueInput = Prisma.AtLeast<{
@@ -66496,6 +67818,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationListRelationFilter
     headConfirmationTotals?: CompanyHeadConfirmationTotalListRelationFilter
     correctionRequests?: CorrectionRequestListRelationFilter
+    heldFunds?: HeldFundListRelationFilter
   }, "id" | "name" | "code">
 
   export type CompanyOrderByWithAggregationInput = {
@@ -67802,6 +69125,93 @@ export namespace Prisma {
     amount?: DecimalWithAggregatesFilter<"UserSalaryComponent"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"UserSalaryComponent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"UserSalaryComponent"> | Date | string
+  }
+
+  export type HeldFundWhereInput = {
+    AND?: HeldFundWhereInput | HeldFundWhereInput[]
+    OR?: HeldFundWhereInput[]
+    NOT?: HeldFundWhereInput | HeldFundWhereInput[]
+    id?: StringFilter<"HeldFund"> | string
+    companyId?: StringFilter<"HeldFund"> | string
+    date?: DateTimeFilter<"HeldFund"> | Date | string
+    name?: StringFilter<"HeldFund"> | string
+    amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"HeldFund"> | string | null
+    settledAt?: DateTimeNullableFilter<"HeldFund"> | Date | string | null
+    settledBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdAt?: DateTimeFilter<"HeldFund"> | Date | string
+    updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }
+
+  export type HeldFundOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    amount?: SortOrder
+    note?: SortOrderInput | SortOrder
+    settledAt?: SortOrderInput | SortOrder
+    settledBy?: SortOrderInput | SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+  }
+
+  export type HeldFundWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: HeldFundWhereInput | HeldFundWhereInput[]
+    OR?: HeldFundWhereInput[]
+    NOT?: HeldFundWhereInput | HeldFundWhereInput[]
+    companyId?: StringFilter<"HeldFund"> | string
+    date?: DateTimeFilter<"HeldFund"> | Date | string
+    name?: StringFilter<"HeldFund"> | string
+    amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"HeldFund"> | string | null
+    settledAt?: DateTimeNullableFilter<"HeldFund"> | Date | string | null
+    settledBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdAt?: DateTimeFilter<"HeldFund"> | Date | string
+    updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+  }, "id">
+
+  export type HeldFundOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    amount?: SortOrder
+    note?: SortOrderInput | SortOrder
+    settledAt?: SortOrderInput | SortOrder
+    settledBy?: SortOrderInput | SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: HeldFundCountOrderByAggregateInput
+    _avg?: HeldFundAvgOrderByAggregateInput
+    _max?: HeldFundMaxOrderByAggregateInput
+    _min?: HeldFundMinOrderByAggregateInput
+    _sum?: HeldFundSumOrderByAggregateInput
+  }
+
+  export type HeldFundScalarWhereWithAggregatesInput = {
+    AND?: HeldFundScalarWhereWithAggregatesInput | HeldFundScalarWhereWithAggregatesInput[]
+    OR?: HeldFundScalarWhereWithAggregatesInput[]
+    NOT?: HeldFundScalarWhereWithAggregatesInput | HeldFundScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"HeldFund"> | string
+    companyId?: StringWithAggregatesFilter<"HeldFund"> | string
+    date?: DateTimeWithAggregatesFilter<"HeldFund"> | Date | string
+    name?: StringWithAggregatesFilter<"HeldFund"> | string
+    amount?: DecimalWithAggregatesFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableWithAggregatesFilter<"HeldFund"> | string | null
+    settledAt?: DateTimeNullableWithAggregatesFilter<"HeldFund"> | Date | string | null
+    settledBy?: StringNullableWithAggregatesFilter<"HeldFund"> | string | null
+    createdBy?: StringNullableWithAggregatesFilter<"HeldFund"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"HeldFund"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"HeldFund"> | Date | string
   }
 
   export type RefiningBatchWhereInput = {
@@ -70822,6 +72232,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateInput = {
@@ -70846,6 +72257,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUpdateInput = {
@@ -70870,6 +72282,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateInput = {
@@ -70894,6 +72307,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateManyInput = {
@@ -72328,6 +73742,103 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     componentId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundCreateInput = {
+    id?: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutHeldFundsInput
+  }
+
+  export type HeldFundUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutHeldFundsNestedInput
+  }
+
+  export type HeldFundUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundCreateManyInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -75506,6 +77017,12 @@ export namespace Prisma {
     none?: CorrectionRequestWhereInput
   }
 
+  export type HeldFundListRelationFilter = {
+    every?: HeldFundWhereInput
+    some?: HeldFundWhereInput
+    none?: HeldFundWhereInput
+  }
+
   export type SalaryComponentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -75555,6 +77072,10 @@ export namespace Prisma {
   }
 
   export type CorrectionRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type HeldFundOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -76732,6 +78253,56 @@ export namespace Prisma {
   }
 
   export type UserSalaryComponentSumOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type HeldFundCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    amount?: SortOrder
+    note?: SortOrder
+    settledAt?: SortOrder
+    settledBy?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HeldFundAvgOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type HeldFundMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    amount?: SortOrder
+    note?: SortOrder
+    settledAt?: SortOrder
+    settledBy?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HeldFundMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    amount?: SortOrder
+    note?: SortOrder
+    settledAt?: SortOrder
+    settledBy?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HeldFundSumOrderByAggregateInput = {
     amount?: SortOrder
   }
 
@@ -79501,6 +81072,13 @@ export namespace Prisma {
     connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
   }
 
+  export type HeldFundCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput> | HeldFundCreateWithoutCompanyInput[] | HeldFundUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCompanyInput | HeldFundCreateOrConnectWithoutCompanyInput[]
+    createMany?: HeldFundCreateManyCompanyInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+  }
+
   export type PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<PayrollIncentiveMatrixCreateWithoutCompanyInput, PayrollIncentiveMatrixUncheckedCreateWithoutCompanyInput> | PayrollIncentiveMatrixCreateWithoutCompanyInput[] | PayrollIncentiveMatrixUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput | PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput[]
@@ -79604,6 +81182,13 @@ export namespace Prisma {
     connectOrCreate?: CorrectionRequestCreateOrConnectWithoutCompanyInput | CorrectionRequestCreateOrConnectWithoutCompanyInput[]
     createMany?: CorrectionRequestCreateManyCompanyInputEnvelope
     connect?: CorrectionRequestWhereUniqueInput | CorrectionRequestWhereUniqueInput[]
+  }
+
+  export type HeldFundUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput> | HeldFundCreateWithoutCompanyInput[] | HeldFundUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCompanyInput | HeldFundCreateOrConnectWithoutCompanyInput[]
+    createMany?: HeldFundCreateManyCompanyInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
   }
 
   export type PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput = {
@@ -79816,6 +81401,20 @@ export namespace Prisma {
     deleteMany?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
   }
 
+  export type HeldFundUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput> | HeldFundCreateWithoutCompanyInput[] | HeldFundUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCompanyInput | HeldFundCreateOrConnectWithoutCompanyInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutCompanyInput | HeldFundUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: HeldFundCreateManyCompanyInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutCompanyInput | HeldFundUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutCompanyInput | HeldFundUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+  }
+
   export type PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<PayrollIncentiveMatrixCreateWithoutCompanyInput, PayrollIncentiveMatrixUncheckedCreateWithoutCompanyInput> | PayrollIncentiveMatrixCreateWithoutCompanyInput[] | PayrollIncentiveMatrixUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput | PayrollIncentiveMatrixCreateOrConnectWithoutCompanyInput[]
@@ -80024,6 +81623,20 @@ export namespace Prisma {
     update?: CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput | CorrectionRequestUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: CorrectionRequestUpdateManyWithWhereWithoutCompanyInput | CorrectionRequestUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: CorrectionRequestScalarWhereInput | CorrectionRequestScalarWhereInput[]
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput> | HeldFundCreateWithoutCompanyInput[] | HeldFundUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCompanyInput | HeldFundCreateOrConnectWithoutCompanyInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutCompanyInput | HeldFundUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: HeldFundCreateManyCompanyInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutCompanyInput | HeldFundUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutCompanyInput | HeldFundUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
   }
 
   export type BankAccountCreateNestedManyWithoutCurrencyInput = {
@@ -80842,6 +82455,20 @@ export namespace Prisma {
     upsert?: SalaryComponentUpsertWithoutAssignmentsInput
     connect?: SalaryComponentWhereUniqueInput
     update?: XOR<XOR<SalaryComponentUpdateToOneWithWhereWithoutAssignmentsInput, SalaryComponentUpdateWithoutAssignmentsInput>, SalaryComponentUncheckedUpdateWithoutAssignmentsInput>
+  }
+
+  export type CompanyCreateNestedOneWithoutHeldFundsInput = {
+    create?: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutHeldFundsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type CompanyUpdateOneRequiredWithoutHeldFundsNestedInput = {
+    create?: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutHeldFundsInput
+    upsert?: CompanyUpsertWithoutHeldFundsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutHeldFundsInput, CompanyUpdateWithoutHeldFundsInput>, CompanyUncheckedUpdateWithoutHeldFundsInput>
   }
 
   export type SampleCreateNestedOneWithoutRefiningBatchesInput = {
@@ -83177,6 +84804,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCustom_rolesInput = {
@@ -83200,6 +84828,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCustom_rolesInput = {
@@ -83413,6 +85042,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCustom_rolesInput = {
@@ -83436,6 +85066,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type userUpsertWithWhereUniqueWithoutCustomRoleInput = {
@@ -84599,6 +86230,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBankAccountsInput = {
@@ -84622,6 +86254,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBankAccountsInput = {
@@ -84760,6 +86393,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBankAccountsInput = {
@@ -84783,6 +86417,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyUpsertWithoutBankAccountsInput = {
@@ -85067,6 +86702,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBranchesInput = {
@@ -85090,6 +86726,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBranchesInput = {
@@ -85353,6 +86990,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBranchesInput = {
@@ -85376,6 +87014,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyStockUpsertWithWhereUniqueWithoutBranchInput = {
@@ -86071,6 +87710,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type HeldFundCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundCreateOrConnectWithoutCompanyInput = {
+    where: HeldFundWhereUniqueInput
+    create: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type HeldFundCreateManyCompanyInputEnvelope = {
+    data: HeldFundCreateManyCompanyInput | HeldFundCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PayrollIncentiveMatrixUpsertWithWhereUniqueWithoutCompanyInput = {
     where: PayrollIncentiveMatrixWhereUniqueInput
     update: XOR<PayrollIncentiveMatrixUpdateWithoutCompanyInput, PayrollIncentiveMatrixUncheckedUpdateWithoutCompanyInput>
@@ -86520,6 +88195,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"CorrectionRequest"> | Date | string
   }
 
+  export type HeldFundUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: HeldFundWhereUniqueInput
+    update: XOR<HeldFundUpdateWithoutCompanyInput, HeldFundUncheckedUpdateWithoutCompanyInput>
+    create: XOR<HeldFundCreateWithoutCompanyInput, HeldFundUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type HeldFundUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: HeldFundWhereUniqueInput
+    data: XOR<HeldFundUpdateWithoutCompanyInput, HeldFundUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type HeldFundUpdateManyWithWhereWithoutCompanyInput = {
+    where: HeldFundScalarWhereInput
+    data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type HeldFundScalarWhereInput = {
+    AND?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+    OR?: HeldFundScalarWhereInput[]
+    NOT?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+    id?: StringFilter<"HeldFund"> | string
+    companyId?: StringFilter<"HeldFund"> | string
+    date?: DateTimeFilter<"HeldFund"> | Date | string
+    name?: StringFilter<"HeldFund"> | string
+    amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"HeldFund"> | string | null
+    settledAt?: DateTimeNullableFilter<"HeldFund"> | Date | string | null
+    settledBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdAt?: DateTimeFilter<"HeldFund"> | Date | string
+    updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
+  }
+
   export type BankAccountCreateWithoutCurrencyInput = {
     id?: string
     bankName: string
@@ -86831,6 +88539,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCompanyStockItemsInput = {
@@ -86854,6 +88563,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCompanyStockItemsInput = {
@@ -87025,6 +88735,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCompanyStockItemsInput = {
@@ -87048,6 +88759,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutCompanyStockItemInput = {
@@ -87250,6 +88962,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutRoleKpisInput = {
@@ -87273,6 +88986,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutRoleKpisInput = {
@@ -87438,6 +89152,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutRoleKpisInput = {
@@ -87461,6 +89176,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type custom_roleUpsertWithoutRoleKpisInput = {
@@ -88532,6 +90248,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutIncentiveMatricesInput = {
@@ -88555,6 +90272,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutIncentiveMatricesInput = {
@@ -88665,6 +90383,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutIncentiveMatricesInput = {
@@ -88688,6 +90407,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type custom_roleUpsertWithoutIncentiveMatricesInput = {
@@ -88841,6 +90561,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutSalaryComponentsInput = {
@@ -88864,6 +90585,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutSalaryComponentsInput = {
@@ -88929,6 +90651,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutSalaryComponentsInput = {
@@ -88952,6 +90675,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput = {
@@ -89172,6 +90896,118 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CompanyCreateWithoutHeldFundsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutHeldFundsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedCreateNestedManyWithoutCompanyInput
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutHeldFundsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
+  }
+
+  export type CompanyUpsertWithoutHeldFundsInput = {
+    update: XOR<CompanyUpdateWithoutHeldFundsInput, CompanyUncheckedUpdateWithoutHeldFundsInput>
+    create: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutHeldFundsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutHeldFundsInput, CompanyUncheckedUpdateWithoutHeldFundsInput>
+  }
+
+  export type CompanyUpdateWithoutHeldFundsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutHeldFundsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incentiveMatrices?: PayrollIncentiveMatrixUncheckedUpdateManyWithoutCompanyNestedInput
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type SampleCreateWithoutRefiningBatchesInput = {
@@ -90323,6 +92159,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistPocketsInput = {
@@ -90346,6 +92183,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistPocketsInput = {
@@ -90481,6 +92319,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistPocketsInput = {
@@ -90504,6 +92343,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutPocketInput = {
@@ -91031,6 +92871,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasPocketsInput = {
@@ -91054,6 +92895,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasPocketsInput = {
@@ -91131,6 +92973,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasPocketsInput = {
@@ -91154,6 +92997,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type KasDailyEntryUpsertWithWhereUniqueWithoutKasPocketInput = {
@@ -91271,6 +93115,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistHeadConfirmationsInput = {
@@ -91294,6 +93139,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistHeadConfirmationsInput = {
@@ -91368,6 +93214,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistHeadConfirmationsInput = {
@@ -91391,6 +93238,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyStockItemUpsertWithoutStockistHeadConfirmationsInput = {
@@ -91455,6 +93303,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput = {
@@ -91478,6 +93327,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistTotalHeadConfirmsInput = {
@@ -91517,6 +93367,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput = {
@@ -91540,6 +93391,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutKasHeadConfirmationsInput = {
@@ -91563,6 +93415,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasHeadConfirmationsInput = {
@@ -91586,6 +93439,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasHeadConfirmationsInput = {
@@ -91625,6 +93479,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasHeadConfirmationsInput = {
@@ -91648,6 +93503,7 @@ export namespace Prisma {
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutBankHeadConfirmationsInput = {
@@ -91671,6 +93527,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBankHeadConfirmationsInput = {
@@ -91694,6 +93551,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBankHeadConfirmationsInput = {
@@ -91733,6 +93591,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput = {
@@ -91756,6 +93615,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutHeadConfirmationTotalsInput = {
@@ -91779,6 +93639,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutHeadConfirmationTotalsInput = {
@@ -91802,6 +93663,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutHeadConfirmationTotalsInput = {
@@ -91841,6 +93703,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutHeadConfirmationTotalsInput = {
@@ -91864,6 +93727,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutCorrectionRequestsInput = {
@@ -91887,6 +93751,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
     bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCorrectionRequestsInput = {
@@ -91910,6 +93775,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCorrectionRequestsInput = {
@@ -91949,6 +93815,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
     bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCorrectionRequestsInput = {
@@ -91972,6 +93839,7 @@ export namespace Prisma {
     kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type PayrollIncentiveMatrixCreateManyCustomRoleInput = {
@@ -93593,6 +95461,19 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type HeldFundCreateManyCompanyInput = {
+    id?: string
+    date: Date | string
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type PayrollIncentiveMatrixUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
@@ -94194,6 +96075,45 @@ export namespace Prisma {
     decidedBy?: NullableStringFieldUpdateOperationsInput | string | null
     decidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     decisionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

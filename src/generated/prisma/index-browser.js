@@ -484,6 +484,20 @@ exports.Prisma.UserSalaryComponentScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.HeldFundScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  date: 'date',
+  name: 'name',
+  amount: 'amount',
+  note: 'note',
+  settledAt: 'settledAt',
+  settledBy: 'settledBy',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.RefiningBatchScalarFieldEnum = {
   id: 'id',
   batchNumber: 'batchNumber',
@@ -1008,6 +1022,7 @@ exports.Prisma.ModelName = {
   PayrollIncentiveTier: 'PayrollIncentiveTier',
   SalaryComponent: 'SalaryComponent',
   UserSalaryComponent: 'UserSalaryComponent',
+  HeldFund: 'HeldFund',
   RefiningBatch: 'RefiningBatch',
   Sample: 'Sample',
   ShipmentProvider: 'ShipmentProvider',

@@ -17,10 +17,15 @@ vi.mock("../repositories/finance-report.repository", () => ({
   },
 }));
 
+vi.mock("../repositories/held-fund.repository", () => ({
+  heldFundRepository: { outstandingReport: vi.fn() },
+}));
+
 import prisma from "@/lib/prisma";
 import { resolvePeriod } from "@/lib/finance-period";
 import { financeReportService } from "./finance-report.service";
 import { financeReportRepository } from "../repositories/finance-report.repository";
+import { heldFundRepository } from "../repositories/held-fund.repository";
 
 /**
  * Yang diuji di sini adalah bagian yang paling mudah salah dan paling mahal
@@ -44,6 +49,7 @@ function setup(overrides: {
   systemSums?: Awaited<ReturnType<typeof financeReportRepository.systemSumsInRange>>;
   quality?: Awaited<ReturnType<typeof financeReportRepository.qualityCounts>>;
   stockQty?: Awaited<ReturnType<typeof financeReportRepository.closingStockQuantities>>;
+  heldFunds?: Awaited<ReturnType<typeof heldFundRepository.outstandingReport>>;
 }) {
   vi.mocked(prisma.company.findMany).mockResolvedValue([
     { id: "pvi", name: "Pusat Valas Indo", code: "PVI" },
@@ -61,6 +67,7 @@ function setup(overrides: {
   vi.mocked(financeReportRepository.closingStockQuantities).mockResolvedValue(
     overrides.stockQty ?? [],
   );
+  vi.mocked(heldFundRepository.outstandingReport).mockResolvedValue(overrides.heldFunds ?? []);
 }
 
 beforeEach(() => {
@@ -152,5 +159,64 @@ describe("financeReportService.getReport()", () => {
     expect(kas?.diff).toBe(30);
     expect(kas?.date).toBe("2026-07-04");
     expect(kas?.worstDiff).toBe(30);
+  });
+
+  it("menjumlahkan dana tertahan lintas PT dan tidak mencampurnya ke total aset", async () => {
+    setup({
+      confirmations: [{ kind: "KAS", companyId: "pvi", date: "2026-07-04", amount: 1000 }],
+      heldFunds: [
+        {
+          companyId: "pvi",
+          outstanding: 400,
+          outstandingCount: 3,
+          settledInRange: 250,
+          settledCount: 2,
+          addedInRange: 650,
+        },
+        {
+          companyId: "ptu",
+          outstanding: 100,
+          outstandingCount: 1,
+          settledInRange: 0,
+          settledCount: 0,
+          addedInRange: 100,
+        },
+      ],
+    });
+
+    const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
+
+    expect(report.companies.find((c) => c.id === "pvi")?.heldFunds).toEqual({
+      outstanding: 400,
+      outstandingCount: 3,
+      settled: 250,
+      settledCount: 2,
+      added: 650,
+    });
+    expect(report.group.heldFunds).toEqual({
+      outstanding: 500,
+      outstandingCount: 4,
+      settled: 250,
+      settledCount: 2,
+      added: 750,
+    });
+    // Inilah alasan piutang berada di section sendiri: kalau ia ikut dijumlahkan
+    // ke posisi aset, seluruh kolom selisih cross-check jadi tidak bisa dicocokkan
+    // dengan angka konfirmasi kepala cabang mana pun.
+    expect(report.group.closing.total).toBe(1000);
+  });
+
+  it("melaporkan dana tertahan nol untuk PT yang belum punya catatan sama sekali", async () => {
+    // Repository memakai LEFT JOIN, tapi PT tanpa baris tetap bisa absen dari hasil
+    // (mis. saat filter PT dipersempit). Nol — bukan em dash — karena "tidak ada
+    // piutang" memang berarti nol rupiah tertahan, beda dari saldo yang belum
+    // dikonfirmasi.
+    setup({ heldFunds: [] });
+
+    const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
+
+    expect(report.companies.every((c) => c.heldFunds.outstanding === 0)).toBe(true);
+    expect(report.group.heldFunds.outstanding).toBe(0);
+    expect(report.group.heldFunds.outstandingCount).toBe(0);
   });
 });

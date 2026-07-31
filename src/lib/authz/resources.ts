@@ -256,6 +256,37 @@ export const RESOURCES: ResourceDef[] = [
     apis: ["/api/bank-harian"],
     legacy: { view: PERMISSIONS.BANK_VIEW, write: PERMISSIONS.BANK_DAILY_INPUT },
   },
+  {
+    key: "finance.receivable",
+    label: "Dana Tertahan (Hutang)",
+    group: "Keuangan",
+    description:
+      "Catatan uang yang belum masuk — hutang orang ke perusahaan, per tanggal. Tulis = boleh menambah pihak baru, mengubah nama & jumlahnya, dan menghapus barisnya. Mengubah baris bertanggal lampau tetap butuh izin ubah tanggal lampau.",
+    page: "/dashboard/hutang",
+    apis: ["/api/dana-tertahan"],
+    // Per-PT (`scoping` default "company"): piutangnya milik satu PT, dan
+    // halamannya berpindah PT seperti Saldo Bank Harian. Tanpa peta legacy —
+    // modul baru, jadi tidak ada permission lama yang setara; sebelum
+    // didelegasikan lewat matriks hanya Owner & Super Admin yang berhak.
+  },
+  {
+    // Kemampuan, bukan halaman: hak MENYATAKAN LUNAS sengaja dipisah dari hak
+    // ubah isi. Yang mencatat hutang (kasir/marketing) belum tentu yang berhak
+    // menyatakan uangnya sudah masuk — kalau keduanya satu sakelar, orang yang
+    // mencatat piutang bisa menghapusnya dari laporan sendiri.
+    //
+    // Berlaku untuk hari berjalan MAUPUN tanggal lampau, dan sengaja TIDAK ikut
+    // digerbangi `daily.backdate`: pelunasan hari lampau adalah alur normalnya
+    // (uangnya baru masuk hari ini untuk hutang minggu lalu), bukan pembetulan
+    // angka yang sudah lewat.
+    key: "finance.receivable.settle",
+    label: "Menyatakan Dana Tertahan Lunas",
+    group: "Keuangan",
+    description:
+      "Menandai hutang sudah dibayar, maupun membatalkan penandaan itu — untuk hari berjalan dan tanggal lampau. Tanpa ini, isi hutang boleh diubah tapi statusnya tidak.",
+    capability: true,
+    apis: ["/api/dana-tertahan"],
+  },
 
   // ── Stok & Valas ───────────────────────────────────────────────────────────
   {

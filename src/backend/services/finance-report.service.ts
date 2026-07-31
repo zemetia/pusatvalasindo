@@ -7,6 +7,10 @@ import {
   type StockQtyRow,
   type SystemSumRow,
 } from "@/backend/repositories/finance-report.repository";
+import {
+  heldFundRepository,
+  type HeldFundReportRow,
+} from "@/backend/repositories/held-fund.repository";
 import { enumerateDates, type PeriodRange } from "@/lib/finance-period";
 
 /**
@@ -89,6 +93,27 @@ export type StockItemPosition = {
   date: string | null;
 };
 
+/**
+ * Dana Tertahan — hutang orang ke perusahaan yang uangnya belum masuk.
+ *
+ * Sengaja BUKAN bagian dari `FinancePosition`. Stock/kas/bank di atas adalah
+ * angka hasil cross-check kepala cabang, dan seluruh logika carry-forward serta
+ * cross-check bergantung pada definisi itu. Piutang tidak pernah dikonfirmasi
+ * lewat jalur yang sama, jadi menjumlahkannya ke "Total Aset Konsolidasi" akan
+ * membuat kolom selisih cross-check ikut bergeser dan angkanya tidak lagi bisa
+ * dicocokkan dengan apa pun. Ia dilaporkan sebagai posisi terpisah.
+ */
+export type HeldFundSummary = {
+  /** Belum lunas pada akhir periode — posisi, bukan arus. */
+  outstanding: number;
+  outstandingCount: number;
+  /** Dilunasi sepanjang periode. */
+  settled: number;
+  settledCount: number;
+  /** Tercatat sepanjang periode, lunas maupun belum. */
+  added: number;
+};
+
 export type CompanyFinanceReport = {
   id: string;
   name: string;
@@ -106,6 +131,7 @@ export type CompanyFinanceReport = {
   verification: { stock: VerificationCounts; kas: VerificationCounts; bank: VerificationCounts };
   corrections: CorrectionCounts;
   stockItems: StockItemPosition[];
+  heldFunds: HeldFundSummary;
 };
 
 export type GroupFinanceReport = {
@@ -125,6 +151,7 @@ export type GroupFinanceReport = {
   fullSeries: FinanceSeriesPoint[];
   verification: VerificationCounts;
   corrections: CorrectionCounts;
+  heldFunds: HeldFundSummary;
 };
 
 export type FinanceReport = {
@@ -399,7 +426,7 @@ export const financeReportService = {
   /**
    * Menyusun laporan lengkap untuk `companyIds` pada `range`.
    *
-   * Tujuh query ditembak sekaligus (tanpa waterfall): konfirmasi & posisi awal
+   * Delapan query ditembak sekaligus (tanpa waterfall): konfirmasi & posisi awal
    * mencakup periode pembanding sekaligus, sehingga seluruh delta "vs periode
    * sebelumnya" bisa dihitung tanpa round-trip tambahan.
    */
@@ -409,30 +436,40 @@ export const financeReportService = {
     // terpilih tidak perlu dihitung ulang lewat query terpisah.
     const fullDates = enumerateDates(range.prevFrom, range.to);
 
-    const [companies, confirmations, openings, systemSums, quality, stockQuantities, stockItems] =
-      await Promise.all([
-        prisma.company.findMany({
-          where: { id: { in: companyIds } },
-          orderBy: { name: "asc" },
-          select: { id: true, name: true, code: true },
-        }),
-        financeReportRepository.confirmationsInRange(companyIds, range.prevFrom, range.to),
-        financeReportRepository.openingPositions(companyIds, range.prevFrom),
-        financeReportRepository.systemSumsInRange(companyIds, range.from, range.to),
-        financeReportRepository.qualityCounts(companyIds, range.from, range.to),
-        financeReportRepository.closingStockQuantities(companyIds, range.from, range.to),
-        prisma.companyStockItem.findMany({
-          where: { companyId: { in: companyIds }, isActive: true },
-          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-          select: { id: true, companyId: true, name: true, code: true, type: true },
-        }),
-      ]);
+    const [
+      companies,
+      confirmations,
+      openings,
+      systemSums,
+      quality,
+      stockQuantities,
+      stockItems,
+      heldFunds,
+    ] = await Promise.all([
+      prisma.company.findMany({
+        where: { id: { in: companyIds } },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, code: true },
+      }),
+      financeReportRepository.confirmationsInRange(companyIds, range.prevFrom, range.to),
+      financeReportRepository.openingPositions(companyIds, range.prevFrom),
+      financeReportRepository.systemSumsInRange(companyIds, range.from, range.to),
+      financeReportRepository.qualityCounts(companyIds, range.from, range.to),
+      financeReportRepository.closingStockQuantities(companyIds, range.from, range.to),
+      prisma.companyStockItem.findMany({
+        where: { companyId: { in: companyIds }, isActive: true },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        select: { id: true, companyId: true, name: true, code: true, type: true },
+      }),
+      heldFundRepository.outstandingReport(companyIds, range.from, range.to),
+    ]);
 
     const confirmationIndex = indexConfirmations(confirmations);
     const openingIndex = indexConfirmations(openings);
     const systemIndex = indexSystemSums(systemSums);
     const qualityIndex = indexQuality(quality, companyIds);
     const stockQtyIndex = indexStockQuantities(stockQuantities);
+    const heldFundIndex = new Map(heldFunds.map((row) => [row.companyId, row]));
 
     const periodOffset = fullDates.indexOf(range.from);
     const prevClosingIndex = periodOffset - 1;
@@ -521,6 +558,7 @@ export const financeReportService = {
               date: entry?.date ?? null,
             };
           }),
+        heldFunds: heldFundOf(heldFundIndex.get(company.id)),
       };
     });
 
@@ -567,10 +605,44 @@ export const financeReportService = {
           }),
           { pending: 0, approved: 0, rejected: 0, total: 0 },
         ),
+        heldFunds: companyReports.reduce<HeldFundSummary>(
+          (acc, company) => ({
+            outstanding: acc.outstanding + company.heldFunds.outstanding,
+            outstandingCount: acc.outstandingCount + company.heldFunds.outstandingCount,
+            settled: acc.settled + company.heldFunds.settled,
+            settledCount: acc.settledCount + company.heldFunds.settledCount,
+            added: acc.added + company.heldFunds.added,
+          }),
+          EMPTY_HELD_FUNDS,
+        ),
       },
     };
   },
 };
+
+const EMPTY_HELD_FUNDS: HeldFundSummary = {
+  outstanding: 0,
+  outstandingCount: 0,
+  settled: 0,
+  settledCount: 0,
+  added: 0,
+};
+
+/**
+ * Nol, bukan `null`, saat sebuah PT tidak punya baris Dana Tertahan sama sekali.
+ * Di sini "tidak ada piutang" memang berarti nol rupiah tertahan — beda dari
+ * stock/kas/bank, di mana absennya konfirmasi berarti angkanya belum diketahui.
+ */
+function heldFundOf(row: HeldFundReportRow | undefined): HeldFundSummary {
+  if (!row) return { ...EMPTY_HELD_FUNDS };
+  return {
+    outstanding: row.outstanding,
+    outstandingCount: row.outstandingCount,
+    settled: row.settledInRange,
+    settledCount: row.settledCount,
+    added: row.addedInRange,
+  };
+}
 
 function delta(from: number | null, to: number | null): number | null {
   if (from == null || to == null) return null;

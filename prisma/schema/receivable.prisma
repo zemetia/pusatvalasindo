@@ -1,0 +1,40 @@
+// Dana Tertahan (hutang orang ke perusahaan) — piutang harian per PT.
+//
+// Bentuknya sengaja BEDA dari DailyBankEntry / KasDailyEntry. Dua model itu satu
+// baris per pocket per tanggal, sehingga punya `@@unique([pocketId, date])` dan
+// selalu ada barisnya. Di sini tiap tanggal dimulai kosong dan barisnya ditambah
+// sebanyak yang memang terjadi — jadi tidak ada kunci unik per tanggal, dan
+// "tidak ada baris" adalah kondisi normal, bukan "belum diisi".
+//
+// Statusnya BERTAHAN melintasi tanggal: baris yang dicatat hari Senin tetap
+// terhitung tertahan sampai ada yang menyatakannya lunas, mungkin seminggu
+// kemudian. Karena itu total dana tertahan dijumlahkan dari SELURUH tanggal yang
+// belum lunas, bukan dari tanggal yang sedang dibuka di halaman.
+model HeldFund {
+  id        String   @id @default(cuid())
+  companyId String
+  // Tanggal hutangnya tercatat — bukan tanggal jatuh tempo. Inilah tanggal yang
+  // dinavigasi di halaman Dana Tertahan.
+  date      DateTime @db.Date
+  name      String // nama orang/pihak yang uangnya belum masuk
+  amount    Decimal  @default(0)
+  note      String?
+
+  // Pelunasan menandai, tidak menghapus. Baris yang dihapus akan menghilangkan
+  // fakta bahwa dananya pernah tertahan, dan laporan periode lampau justru butuh
+  // fakta itu. `settledAt != null` adalah satu-satunya penanda lunas — sengaja
+  // tanpa boolean terpisah supaya tidak ada dua sumber kebenaran yang bisa beda.
+  settledAt DateTime?
+  settledBy String?
+
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  // Halaman membaca satu PT satu tanggal; laporan membaca yang belum lunas
+  // lintas tanggal. Dua index terpisah karena dua pola baca yang berbeda.
+  @@index([companyId, date])
+  @@index([companyId, settledAt])
+}

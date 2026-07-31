@@ -483,9 +483,15 @@ function BankRowEdit({
         )}
       </TableCell>
       <TableCell className="text-right">
+        {/* Saldo bank boleh MINUS. Rekening bisa overdraft atau berupa fasilitas
+            kredit, jadi "bank hutang" adalah keadaan nyata yang harus bisa
+            diinput — bukan salah ketik yang perlu dicegah. Berbeda dari grid
+            stock & kas, yang menghitung barang dan uang tunai di tangan dan
+            karenanya tidak bisa kurang dari nol. */}
         <NumberInput
           ref={registerCell(rowIndex, "balance")}
           value={row.balance}
+          allowNegative
           disabled={!editable}
           onValueChange={(val) => onChange(row.bankAccountId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.bankAccountId)}
@@ -527,6 +533,9 @@ function BankRowEdit({
               approved={row.approvedCorrection}
               canVerify={canManage}
               canDirectCorrect={canDirectCorrect}
+              // Koreksi saldo bank juga boleh minus — kalau tidak, sel yang salah
+              // dicatat positif mustahil dibetulkan ke keadaan overdraft.
+              allowNegative
               onVerify={(status, note, correctedBalance) =>
                 onVerify(row.bankAccountId, status, note, correctedBalance)
               }

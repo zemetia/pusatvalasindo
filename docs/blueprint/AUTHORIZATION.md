@@ -95,6 +95,19 @@ lalu seketika ditandai `APPROVED` atas nama si pengubah (`correctionService
 persis seperti koreksi yang di-ACC manual. Owner & Super Admin mendapatkannya
 otomatis lewat jalur role global.
 
+Contoh ketiga: `finance.receivable.settle` — boleh **menyatakan dana tertahan
+lunas** (dan membatalkannya). Sengaja dipisah dari hak tulis
+`finance.receivable`, yang hanya mencakup menambah pihak baru serta mengubah nama
+& jumlahnya: kalau keduanya satu sakelar, orang yang mencatat piutang bisa
+menghapus piutangnya sendiri dari laporan. Juga per PT.
+
+Perhatikan satu perbedaan penting dari dua capability di atas: pelunasan
+**tidak** digerbangi `daily.backdate`. Menandai lunas hutang bertanggal lampau
+adalah alur normal modul ini — uangnya memang baru masuk hari ini — bukan
+pembetulan angka yang sudah lewat. Yang tetap butuh `daily.backdate` hanyalah
+mengubah *isi* baris bertanggal lampau (lihat
+[`held-fund-guard.ts`](../../src/backend/helpers/held-fund-guard.ts)).
+
 ## Mode scope
 
 | Mode | Arti |
@@ -189,6 +202,7 @@ Tanpa `--apply` script hanya menampilkan rencana. Aman diulang.
 | Modul | Resource | Scope |
 |---|---|---|
 | Saldo Bank Harian | `bank.daily` | per PT, view/edit terpisah |
+| Dana Tertahan (Hutang) | `finance.receivable` + capability `finance.receivable.settle` | per PT, view/edit terpisah; hak "lunas" izin tersendiri |
 | Stock & Kas Harian | `stockist.daily` | per PT, view/edit terpisah |
 | Cross-Check Stock | `stockist.verify` | per PT |
 | Rekening Bank | `bank.accounts` | per PT |

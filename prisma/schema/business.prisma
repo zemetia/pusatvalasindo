@@ -41,6 +41,7 @@ model Company {
   bankHeadConfirmations     BankHeadConfirmation[]
   headConfirmationTotals    CompanyHeadConfirmationTotal[]
   correctionRequests        CorrectionRequest[]
+  heldFunds                 HeldFund[]
 }
 
 model Currency {
