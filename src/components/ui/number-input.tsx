@@ -18,14 +18,19 @@ type NumberInputProps = Omit<
  * but reports/submits the raw unformatted number (100000).
  */
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ className, value, onValueChange, ...props }, ref) => {
+  ({ className, value, onValueChange, allowNegative, ...props }, ref) => {
     return (
       <NumericFormat
         getInputRef={ref}
         value={value ?? ""}
         thousandSeparator="."
         decimalSeparator=","
-        allowNegative={false}
+        // Dibaca dari prop yang sudah dipisahkan, BUKAN dibiarkan tertimpa
+        // `{...props}` di bawah: pemanggil yang meneruskan prop opsional bernilai
+        // `undefined` (mis. `allowNegative={props.allowNegative}`) dulu justru
+        // menghidupkan minus, karena default react-number-format sendiri `true`.
+        // Default aman di sini adalah menolak minus; yang butuh harus meminta.
+        allowNegative={allowNegative ?? false}
         onValueChange={(values) => {
           onValueChange?.(values.floatValue)
         }}

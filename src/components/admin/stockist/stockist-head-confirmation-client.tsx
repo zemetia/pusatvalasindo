@@ -487,9 +487,10 @@ export function StockistHeadConfirmationClient({
 
           <IdrCrossCheckSection
             title="Cross-Check Bank"
-            description="Total sistem = jumlah saldo Bank Harian seluruh rekening aktif PT pada tanggal ini."
+            description="Total sistem = jumlah saldo Bank Harian seluruh rekening aktif PT pada tanggal ini. Boleh minus bila ada rekening yang overdraft."
             state={bank}
             locked={locked}
+            allowNegative
             onChange={(val) => setBank((prev) => (prev ? { ...prev, idrDraft: val } : prev))}
             onBlur={() => saveIdr(bank, setBank, "/api/stockist/bank/head-confirmation")}
           />
@@ -528,6 +529,7 @@ function IdrCrossCheckSection({
   description,
   state,
   locked,
+  allowNegative = false,
   onChange,
   onBlur,
 }: {
@@ -535,6 +537,13 @@ function IdrCrossCheckSection({
   description?: string
   state: IdrState | null
   locked: boolean
+  /**
+   * Total kepala cabang boleh minus. Dinyalakan oleh Cross-Check Bank: rekening
+   * bisa overdraft, jadi total sistemnya pun bisa minus — dan kalau angka
+   * hitung ulangnya tidak bisa minus, selisihnya mustahil dibuat nol.
+   * Cross-Check Kas tetap `false`: uang tunai di tangan tidak bisa kurang dari nol.
+   */
+  allowNegative?: boolean
   onChange: (value: number | undefined) => void
   onBlur: () => void
 }) {
@@ -564,6 +573,7 @@ function IdrCrossCheckSection({
               <TableCell className="text-right">
                 <NumberInput
                   value={state.idrDraft ?? ""}
+                  allowNegative={allowNegative}
                   disabled={locked}
                   onValueChange={onChange}
                   onBlur={onBlur}
