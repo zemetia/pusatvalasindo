@@ -2,7 +2,7 @@
 // Modul ini murni (tanpa I/O, tanpa Prisma) sehingga bisa dipakai di server
 // component, API route, maupun client component.
 
-import { isGlobalRole } from "@/lib/permissions";
+import { isGlobalRole, type Permission } from "@/lib/permissions";
 import { getResource, type ResourceKey } from "./resources";
 
 export type ScopeMode = "NONE" | "OWN" | "SELECTED" | "ALL";
@@ -87,9 +87,20 @@ function resolveLegacy(
   subject: AuthzSubject
 ): AuthzDecision {
   const def = getResource(resource);
-  const needed = def?.legacy?.[action];
-  if (!needed) return DENIED;
-  if (!subject.legacyPermissions.includes(needed)) return DENIED;
+  if (!def) return DENIED;
+
+  // Resource "self" hanya punya SATU sumbu (lihat resolve di bawah), jadi
+  // padanan legacy-nya juga satu: izin lama mana pun yang terpetakan ke sini
+  // sudah berarti "boleh membuka & memakai halamannya". Dulu sumbu tulis
+  // dicari terpisah, dan karena model lama tidak punya permission "boleh
+  // clock-in", `attendance.self` write selalu DENIED.
+  const needed: Permission[] =
+    def.scoping === "self"
+      ? [def.legacy?.view, def.legacy?.write].filter((p): p is Permission => !!p)
+      : [def.legacy?.[action]].filter((p): p is Permission => !!p);
+
+  if (needed.length === 0) return DENIED;
+  if (!needed.some((p) => subject.legacyPermissions.includes(p))) return DENIED;
   // Resource tanpa dimensi PT tidak boleh dipersempit ke PT si pemanggil.
   if (def.scoping && def.scoping !== "company") return ALL_ACCESS;
   return decide("OWN", [], subject.companyId);
@@ -123,9 +134,25 @@ export function resolve(
   const ids = action === "view" ? grant.viewCompanyIds : grant.writeCompanyIds;
 
   const def = getResource(resource);
-  if (def?.scoping && def.scoping !== "company") {
-    // Tanpa dimensi PT ("self" atau "global"): yang berlaku hanya punya-akses
-    // atau tidak. `companyIds: null` berarti tidak ada penyaringan per PT.
+
+  // Resource "self" adalah SATU sakelar, bukan dua sumbu. UI Jabatan memang
+  // hanya menawarkan satu baris "Akses ..." untuknya (lihat buildEntries di
+  // role-permission-picker.tsx), jadi membaca view & write terpisah di sini
+  // membuat data dan UI bisa berbeda arti: sakelarnya tampak HIDUP karena
+  // viewScope terisi, sementara writeScope NONE diam-diam menolak setiap aksi.
+  // Persis itu yang terjadi pada `attendance.self` — halaman & riwayat terbuka,
+  // tapi clock-in/clock-out 403 untuk seluruh jabatan non-global.
+  //
+  // Tidak berlaku untuk `scoping: "global"`: di sana dua sumbunya nyata dan
+  // dirender sebagai dua baris ("Lihat" & "Ubah"), mis. `kpi.config`.
+  if (def?.scoping === "self") {
+    const on = grant.viewScope !== "NONE" || grant.writeScope !== "NONE";
+    return on ? { allowed: true, scope: "ALL", companyIds: null } : DENIED;
+  }
+
+  if (def?.scoping === "global") {
+    // Tanpa dimensi PT: yang berlaku hanya punya-akses atau tidak.
+    // `companyIds: null` berarti tidak ada penyaringan per PT.
     return mode === "NONE" ? DENIED : { allowed: true, scope: mode, companyIds: null };
   }
 

@@ -47,13 +47,20 @@ function grantsFor(permissions: string[], roleName: string): Grant[] {
     const hasWrite = def.legacy?.write ? permissions.includes(def.legacy.write) : false
     if (!hasView && !hasWrite) continue
 
+    // Resource "self" hanya punya satu sumbu — UI Jabatan merendernya sebagai
+    // satu sakelar "Akses". Menurunkan writeScope dari `legacy.write` untuk
+    // resource semacam ini menghasilkan baris yang tampak hidup tapi menolak
+    // setiap aksi: model lama tidak punya permission "boleh clock-in", jadi
+    // `attendance.self` selalu keluar dengan writeScope NONE.
+    const single = def.scoping === 'self'
+
     // Boleh menulis tapi izin lihatnya tidak ada di model lama? Beri lihat juga —
     // di model lama, aksi tulis selalu dijalankan dari halaman yang sama.
     out.push({
       resource: def.key,
       viewScope: hasView || hasWrite ? 'OWN' : 'NONE',
       viewCompanyIds: [],
-      writeScope: hasWrite ? 'OWN' : 'NONE',
+      writeScope: single || hasWrite ? 'OWN' : 'NONE',
       writeCompanyIds: [],
     })
   }

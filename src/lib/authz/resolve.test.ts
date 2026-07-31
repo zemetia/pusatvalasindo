@@ -261,6 +261,37 @@ describe("mode scope", () => {
     expect(allows(s, "kpi.self", "view")).toBe(true);
   });
 
+  // Regresi: UI Jabatan merender resource "self" sebagai SATU sakelar, jadi
+  // sumbu tulisnya tidak boleh dibaca terpisah. Data produksi hasil backfill
+  // punya viewScope OWN + writeScope NONE untuk `attendance.self`, yang
+  // membuat clock-in/clock-out 403 bagi seluruh jabatan non-global.
+  it("resource self hanya punya satu sumbu — sakelar hidup berarti boleh menulis juga", () => {
+    for (const resource of ["attendance.self", "kpi.self", "payroll.self"]) {
+      const s = subject({ grants: [grant({ resource, viewScope: "OWN" })] });
+      expect(allows(s, resource, "view")).toBe(true);
+      expect(allows(s, resource, "write")).toBe(true);
+    }
+  });
+
+  it("sakelar self yang mati menolak kedua sumbu", () => {
+    const s = subject({ grants: [grant({ resource: "attendance.self" })] });
+    expect(allows(s, "attendance.self", "view")).toBe(false);
+    expect(allows(s, "attendance.self", "write")).toBe(false);
+  });
+
+  it("resource global tetap dua sumbu — hak lihat bukan hak ubah", () => {
+    const s = subject({ grants: [grant({ resource: "kpi.config", viewScope: "ALL" })] });
+    expect(allows(s, "kpi.config", "view")).toBe(true);
+    expect(allows(s, "kpi.config", "write")).toBe(false);
+  });
+
+  it("jabatan belum dimigrasi: izin lama 'lihat presensi sendiri' cukup untuk clock-in", () => {
+    // Model lama tidak punya permission \"boleh clock-in\" — cukup punya sesi.
+    const s = subject({ migrated: false, legacyPermissions: ["attendance.view_own"] });
+    expect(allows(s, "attendance.self", "view")).toBe(true);
+    expect(allows(s, "attendance.self", "write")).toBe(true);
+  });
+
   // `kpi.review` sengaja per-PT, tidak seperti kpi.config/kpi.definitions yang
   // global: yang dinilai adalah entri milik karyawan, dan karyawan dimiliki satu
   // PT lewat cabangnya.

@@ -58,7 +58,7 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={sidebarUser} subject={subject} />
+      <AppSidebar user={sidebarUser} subject={subject} hasBranch={caller.branchId !== null} />
       <SidebarInset className="bg-surface">
         <SiteHeader />
         {/* Padding vertikal halaman hidup di sini saja; tiap halaman cukup
