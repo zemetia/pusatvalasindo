@@ -263,7 +263,7 @@ export const RESOURCES: ResourceDef[] = [
     group: "Laporan",
     description: "Pemantauan pergerakan kurs.",
     page: "/dashboard/watcher-valas",
-    apis: ["/api/watcher-valas"],
+    apis: ["/api/watcher-valas", "/api/watcher-valas/scrape"],
     // Global: yang dipantau adalah kurs pasar (SmartDeal vs Yahoo Finance),
     // bukan data milik satu PT. Peta legacy dipertahankan supaya jabatan yang
     // belum dimigrasi tidak kehilangan akses; untuk resource global, legacy

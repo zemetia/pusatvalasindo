@@ -1,7 +1,7 @@
-// Penyesuaian manual pada satu slip gaji — bonus atau pengurangan tambahan di
-// luar apa pun yang dihasilkan rule reward & denda, dengan alasan wajib
-// tertulis. Hanya HR/admin (`payroll.manage` write di PT slip ini) yang boleh
-// menambahkannya — bukan jalur `payroll.self`, karena ini mengubah gaji.
+// Penyesuaian manual pada satu slip gaji — bonus, denda, atau potongan/utang
+// tambahan di luar apa pun yang dihasilkan rule reward & denda, dengan alasan
+// wajib tertulis. Hanya HR/admin (`payroll.manage` write di PT slip ini) yang
+// boleh menambahkannya — bukan jalur `payroll.self`, karena ini mengubah gaji.
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -18,7 +18,7 @@ import { allowsCompany } from "@/lib/authz/resolve";
 import { serializeSlipDetail } from "@/app/api/payroll/runs/serialize";
 
 const manualEntrySchema = z.object({
-  type: z.enum(["BONUS", "POTONGAN"]),
+  type: z.enum(["BONUS", "DENDA", "POTONGAN"]),
   label: z.string().min(1, "Alasan wajib diisi").max(200),
   amount: z.number().positive("Nominal harus lebih dari 0"),
 });

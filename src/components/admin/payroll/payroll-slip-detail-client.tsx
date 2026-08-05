@@ -25,6 +25,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { MetricBlock, MetricRow } from "@/components/admin/page-shell";
+import { AttendanceMonthCalendar } from "@/components/admin/payroll/attendance-month-calendar";
 import { formatCurrency, formatAmount } from "@/lib/kpi-utils";
 import type { PayrollSlipDetailView } from "@/app/api/payroll/runs/serialize";
 
@@ -82,7 +83,7 @@ export function PayrollSlipDetailClient({
     if (json.data?.slip) queryClient.setQueryData(queryKey, json.data.slip);
   };
 
-  const [type, setType] = useState<"BONUS" | "POTONGAN">("BONUS");
+  const [type, setType] = useState<"BONUS" | "DENDA" | "POTONGAN">("BONUS");
   const [label, setLabel] = useState("");
   const [amount, setAmount] = useState<number | undefined>(undefined);
 
@@ -238,6 +239,18 @@ export function PayrollSlipDetailClient({
         </ul>
       </section>
 
+      {/* ── Kehadiran bulanan ────────────────────────────────────────── */}
+      <section className="space-y-2 border-t pt-6">
+        <h2 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          Kehadiran Bulan Ini
+        </h2>
+        <AttendanceMonthCalendar
+          userId={slip.userId}
+          month={slip.periodMonth}
+          year={slip.periodYear}
+        />
+      </section>
+
       {/* ── Tambah penyesuaian manual ────────────────────────────────── */}
       {canManage && (
         <section className="space-y-3 border-t pt-6">
@@ -261,13 +274,17 @@ export function PayrollSlipDetailClient({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-[140px_1fr_180px_auto] sm:items-end">
               <div className="grid gap-1.5">
                 <Label>Tipe</Label>
-                <Select value={type} onValueChange={(v) => setType(v as "BONUS" | "POTONGAN")}>
+                <Select
+                  value={type}
+                  onValueChange={(v) => setType(v as "BONUS" | "DENDA" | "POTONGAN")}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="BONUS">Bonus</SelectItem>
-                    <SelectItem value="POTONGAN">Pengurangan</SelectItem>
+                    <SelectItem value="DENDA">Denda</SelectItem>
+                    <SelectItem value="POTONGAN">Potongan / Utang</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

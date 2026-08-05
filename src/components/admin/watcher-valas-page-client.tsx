@@ -80,7 +80,7 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
     return data.rows.filter((r) => r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q));
   }, [data.rows, search]);
 
-  async function refresh() {
+  async function poll() {
     setLoading(true);
     try {
       const res = await fetch("/api/watcher-valas", { cache: "no-store" });
@@ -93,17 +93,33 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
     }
   }
 
-  // SmartDeal rates are DB-cached and refreshed by whatever external
-  // scheduler hits src/app/api/scrape/smartdeal/route.ts, not scraped on
-  // every request — so polling this endpoint every 30s is cheap and just
-  // picks up whatever the last scrape wrote, giving a near-live view
-  // without the user having to click Refresh. Ref avoids recreating the interval on every
-  // render (refresh() closes over loading/data state that changes often).
-  const refreshRef = useRef(refresh);
-  refreshRef.current = refresh;
+  // The Refresh button forces a live SmartDeal scrape (not just a DB read) —
+  // the whole point of pressing it is to see numbers actually change instead
+  // of re-reading whatever the last cron/manual scrape happened to leave
+  // cached. A failed scrape still comes back with fresh data (see the route),
+  // so the "Down" badge updates instead of the button silently doing nothing.
+  async function refreshAndScrape() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/watcher-valas/scrape", { method: "POST", cache: "no-store" });
+      const json = await res.json();
+      if (json.success) {
+        setData(json.data as WatcherValasData);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Passive poll every 30s picks up whatever the last scrape (cron or manual
+  // Refresh click) wrote, without hitting smartdeal.co.id itself on every
+  // tick. Ref avoids recreating the interval on every render (poll() closes
+  // over loading/data state that changes often).
+  const pollRef = useRef(poll);
+  pollRef.current = poll;
 
   useEffect(() => {
-    const id = setInterval(() => refreshRef.current(), 30_000);
+    const id = setInterval(() => pollRef.current(), 30_000);
     return () => clearInterval(id);
   }, []);
 
@@ -138,7 +154,7 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
                 : "—"}{" "}
               · dicek {formatUpdatedAt(data.updatedAt)} (auto tiap 30 detik)
             </span>
-            <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
+            <Button variant="outline" size="sm" onClick={refreshAndScrape} disabled={loading}>
               <IconRefresh className={loading ? "size-4 animate-spin" : "size-4"} />
               Refresh
             </Button>

@@ -12,12 +12,10 @@ import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import {
   IconAlertTriangle,
-  IconCalendarStats,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
   IconCoin,
-  IconReceipt,
   IconRefresh,
 } from "@tabler/icons-react";
 
@@ -43,7 +41,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MetricBlock, MetricRow, EmptyState } from "@/components/admin/page-shell";
 import { MONTH_NAMES, formatCurrency } from "@/lib/kpi-utils";
 import type { PayrollRunView, PayrollSlipView } from "@/app/api/payroll/runs/serialize";
-import type { AttendanceSummaryRow } from "@/app/api/payroll/attendance-summary/route";
 import type { Attendance } from "@src/generated/prisma";
 
 type CompanyOption = { id: string; name: string; code: string };
@@ -67,15 +64,6 @@ const STATUS_LABEL: Record<string, string> = {
   VOID: "Digantikan",
 };
 
-/** Label & pengelompokan kolom rekap kehadiran — dijaga tetap ringkas, sisanya digabung ke "Lainnya". */
-const ATTENDANCE_COLUMNS: { key: string; label: string }[] = [
-  { key: "PRESENT", label: "Hadir" },
-  { key: "LATE", label: "Telat" },
-  { key: "SICK", label: "Sakit" },
-  { key: "PERMISSION", label: "Izin" },
-  { key: "ABSENT", label: "Alpha" },
-];
-
 function periodeSekarang() {
   const now = new Date();
   return { month: now.getMonth() + 1, year: now.getFullYear() };
@@ -85,104 +73,6 @@ function periodeSekarang() {
 function geser(month: number, year: number, arah: -1 | 1) {
   const i = month - 1 + arah;
   return { month: ((i % 12) + 12) % 12 + 1, year: year + Math.floor(i / 12) };
-}
-
-/**
- * Rekap kehadiran satu bulan untuk seluruh karyawan aktif PT terpilih.
- *
- * Ditampilkan terlepas dari sudah ada run gaji atau belum — gunanya justru
- * supaya HR bisa memeriksa kehadiran periode itu SEBELUM menekan Hitung.
- */
-function AttendanceSummarySection({
-  companyId,
-  month,
-  year,
-}: {
-  companyId: string;
-  month: number;
-  year: number;
-}) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["payroll-attendance-summary", companyId, month, year],
-    enabled: Boolean(companyId),
-    queryFn: async () => {
-      const res = await fetch(
-        `/api/payroll/attendance-summary?companyId=${encodeURIComponent(companyId)}&month=${month}&year=${year}`
-      );
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message ?? "Gagal memuat rekap kehadiran");
-      return json.data as { rows: AttendanceSummaryRow[]; statuses: string[] };
-    },
-  });
-
-  return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2">
-        <IconCalendarStats className="text-muted-foreground size-4" />
-        <h3 className="text-sm font-medium">
-          Kehadiran {MONTH_NAMES[month - 1]} {year}
-        </h3>
-      </div>
-
-      {isLoading ? (
-        <Skeleton className="h-32 w-full" />
-      ) : !data || data.rows.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Belum ada karyawan aktif atau catatan kehadiran untuk periode ini.
-        </p>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Karyawan</TableHead>
-                {ATTENDANCE_COLUMNS.map((c) => (
-                  <TableHead key={c.key} className="text-right">
-                    {c.label}
-                  </TableHead>
-                ))}
-                <TableHead className="text-right">Lainnya</TableHead>
-                <TableHead className="text-right">Tercatat</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.rows.map((r) => {
-                const known = ATTENDANCE_COLUMNS.reduce(
-                  (s, c) => s + (r.counts[c.key] ?? 0),
-                  0
-                );
-                const lainnya = r.totalLogged - known;
-                return (
-                  <TableRow key={r.userId}>
-                    <TableCell>
-                      <span className="font-medium">{r.name}</span>
-                      <div className="text-muted-foreground text-xs">
-                        {r.roleName} · {r.branchName}
-                      </div>
-                    </TableCell>
-                    {ATTENDANCE_COLUMNS.map((c) => {
-                      const n = r.counts[c.key] ?? 0;
-                      return (
-                        <TableCell key={c.key} className="tabular text-right">
-                          {n > 0 ? n : <span className="text-muted-foreground">—</span>}
-                        </TableCell>
-                      );
-                    })}
-                    <TableCell className="tabular text-right">
-                      {lainnya > 0 ? lainnya : <span className="text-muted-foreground">—</span>}
-                    </TableCell>
-                    <TableCell className="tabular text-right font-medium">
-                      {r.totalLogged}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </section>
-  );
 }
 
 export function PayrollRunPanel({
@@ -228,7 +118,7 @@ export function PayrollRunPanel({
       return json;
     },
     onSuccess: () => {
-      toast.success(`Gaji ${MONTH_NAMES[month - 1]} ${year} selesai dihitung`);
+      toast.success(`Gaji ${MONTH_NAMES[month]} ${year} selesai dihitung`);
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -256,7 +146,7 @@ export function PayrollRunPanel({
   // perlu terjadi dulu baru terlihat.
   const adaYangSudahDibayar = run?.slips.some((s) => s.paidAt) ?? false;
 
-  const label = `${MONTH_NAMES[month - 1]} ${year}`;
+  const label = `${MONTH_NAMES[month]} ${year}`;
 
   return (
     <section className="space-y-6">
@@ -333,9 +223,6 @@ export function PayrollRunPanel({
           )}
         </div>
       </div>
-
-      {/* ── Kehadiran bulanan ────────────────────────────────────────── */}
-      {companyId && <AttendanceSummarySection companyId={companyId} month={month} year={year} />}
 
       {/* ── Isi ──────────────────────────────────────────────────────── */}
       {isLoading ? (
@@ -561,7 +448,13 @@ function SlipRow({
       <TableRow className="cursor-pointer" onClick={() => setTerbuka((v) => !v)}>
         <TableCell>
           <div className="flex items-center gap-2">
-            <span className="font-medium">{slip.employeeName}</span>
+            <Link
+              href={`/${locale}/dashboard/payroll/slip/${slip.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="hover:text-primary font-medium hover:underline"
+            >
+              {slip.employeeName}
+            </Link>
             {slip.needsReview && (
               <IconAlertTriangle
                 className="text-warning size-3.5 shrink-0"
@@ -665,12 +558,6 @@ function SlipRow({
               )}
 
               <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                <Link href={`/${locale}/dashboard/payroll/slip/${slip.id}`}>
-                  <Button variant="outline" size="sm">
-                    <IconReceipt className="size-4" />
-                    Detail &amp; penyesuaian manual
-                  </Button>
-                </Link>
                 {!slip.paidAt && !runTerkunci && (
                   <>
                     <Button
