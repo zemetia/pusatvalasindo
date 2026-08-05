@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/select";
 import { IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
 import { MetricBlock } from "@/components/admin/page-shell";
+import { PayrollSlipDetailClient } from "@/components/admin/payroll/payroll-slip-detail-client";
+import type { PayrollSlipDetailView } from "@/app/api/payroll/runs/serialize";
 import {
   MONTH_NAMES,
   SCORING_TYPE_LABELS,
@@ -291,6 +293,33 @@ export function PayrollPageClient({
     (u) => u.isActive && (companyId === "all" || u.companyId === companyId)
   );
 
+  /**
+   * Begitu karyawan+periode dipilih, periksa dulu apakah gajinya SUDAH pernah
+   * dihitung & tersimpan (lewat Run PT). Kalau sudah, langsung tampilkan —
+   * tidak perlu menekan "Hitung" untuk sesuatu yang sudah punya jawaban.
+   * Hanya kalau belum ada yang tersimpan, kalkulator ad hoc di bawah dipakai.
+   */
+  const savedSlipQuery = useQuery<PayrollSlipDetailView | null>({
+    queryKey: ["payroll-saved-slip", userId, month, year],
+    enabled: Boolean(userId && month && year),
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/payroll/slip?employeeId=${encodeURIComponent(userId)}&month=${month}&year=${year}`
+      );
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.message ?? "Gagal memeriksa slip tersimpan");
+      return json.data.slip as PayrollSlipDetailView | null;
+    },
+  });
+  const hasSavedSlip = Boolean(userId && savedSlipQuery.data);
+  // Menambah/menghapus penyesuaian manual dan menghitung ulang butuh
+  // `payroll.manage` write di PT karyawan itu. `companies` yang diteruskan ke
+  // komponen ini sudah disaring server ke PT yang boleh dikelola pemanggil,
+  // jadi keanggotaan di situ sudah cukup — tidak perlu cek izin terpisah.
+  const canManageSelected = Boolean(
+    selectedUser && companies.some((c) => c.id === selectedUser.companyId)
+  );
+
   const kpiScore = result ? result.kpi.score : 0;
   const grade = getGrade(kpiScore);
   // Bonus/potongan seluruhnya berasal dari rule engine — modul KPI hanya
@@ -405,18 +434,44 @@ export function PayrollPageClient({
             }}
           />
         </div>
-        <div className="sm:col-span-4">
-          <Button
-            onClick={handleCalculate}
-            disabled={!userId || calculateMutation.isPending}
-          >
-            {calculateMutation.isPending ? "Menghitung..." : "Hitung Gaji & KPI"}
-          </Button>
-        </div>
+        {/* Tombol Hitung cuma relevan kalau belum ada slip tersimpan untuk
+            periode ini — kalau sudah, dia langsung tampil di bawah tanpa
+            perlu ditekan. */}
+        {!hasSavedSlip && !(userId && savedSlipQuery.isLoading) && (
+          <div className="sm:col-span-4">
+            <Button
+              onClick={handleCalculate}
+              disabled={!userId || calculateMutation.isPending}
+            >
+              {calculateMutation.isPending ? "Menghitung..." : "Hitung Gaji & KPI"}
+            </Button>
+          </div>
+        )}
       </div>
 
+      {/* Memeriksa apakah periode ini sudah pernah dihitung & tersimpan */}
+      {userId && savedSlipQuery.isLoading && (
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-48 w-full rounded-lg" />
+        </div>
+      )}
+
+      {/* Sudah pernah dihitung — tampilkan slip tersimpan apa adanya, termasuk
+          penyesuaian manual. "Hitung ulang" ada di dalamnya sendiri (kalau
+          berwenang), bukan lewat kalkulator ad hoc di atas. */}
+      {hasSavedSlip && savedSlipQuery.data && selectedUser && (
+        <div className="space-y-3">
+          <p className="text-muted-foreground text-sm text-pretty">
+            Gaji {selectedUser.name} periode {MONTH_NAMES[Number(month)]} {year} sudah pernah
+            dihitung dan tersimpan — ini hasilnya.
+          </p>
+          <PayrollSlipDetailClient slip={savedSlipQuery.data} canManage={canManageSelected} />
+        </div>
+      )}
+
       {/* Loading skeleton */}
-      {calculateMutation.isPending && (
+      {!hasSavedSlip && calculateMutation.isPending && (
         <div className="flex flex-col gap-3">
           <Skeleton className="h-24 w-full rounded-lg" />
           <Skeleton className="h-48 w-full rounded-lg" />
@@ -424,7 +479,7 @@ export function PayrollPageClient({
         </div>
       )}
 
-      {result && selectedUser && !calculateMutation.isPending && (
+      {!hasSavedSlip && result && selectedUser && !calculateMutation.isPending && (
         <>
           {/* Sorotan hasil perhitungan — blok data editorial, bukan kartu */}
           <section className="border-border border-y py-8">

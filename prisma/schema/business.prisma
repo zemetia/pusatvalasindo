@@ -140,3 +140,22 @@ model SmartdealRate {
   prevSell  Float?
   fetchedAt DateTime @default(now())
 }
+
+// Health/status of the SmartDeal scrape itself, for Watcher Valas to show
+// whether SmartDeal is currently reachable ("aktif"/"down") — separate from
+// SmartdealRate, which only ever holds the last-known-good rates and has no
+// notion of a failed attempt. Singleton table (`id` always "singleton"), same
+// pattern as CurrencyPriceSyncSetting.
+model SmartdealScrapeStatus {
+  id              String    @id @default("singleton")
+  // SmartDeal's own self-reported "Kurs diperbarui" timestamp (their
+  // `LIVE_UPDATED` field) from the last successful scrape — distinct from
+  // lastSuccessAt below, which is when WE last scraped successfully.
+  sourceUpdatedAt DateTime?
+  lastAttemptAt   DateTime?
+  lastSuccessAt   DateTime?
+  // Set on the most recent failed attempt, cleared on the next success —
+  // non-null here means SmartDeal is currently considered "down".
+  lastError       String?
+  updatedAt       DateTime  @updatedAt
+}

@@ -162,6 +162,19 @@ JOIN "PayrollRuleTier" t ON t."ruleId" = s.rule_id;
 -- perbandingan tanggal di dalam rule mudah ditulis salah, dan aturannya sama
 -- untuk semua PT. PKWT yang tanggal habisnya sudah lewat dihitung TIDAK
 -- berkontrak.
+--
+-- DROP dulu, bukan CREATE OR REPLACE saja. Postgres hanya mengizinkan
+-- `CREATE OR REPLACE VIEW` MENAMBAH kolom di AKHIR daftar; kolom baru di sini
+-- disisipkan setelah `join_date` — tepat sebelum `base_salary` — sehingga
+-- Postgres membacanya sebagai upaya MENGGANTI NAMA kolom dan menolak dengan
+-- 42P16 ("cannot change name of view column"). Urutan kolom sengaja
+-- dipertahankan supaya status kontrak berkelompok dengan data kepegawaian
+-- lain, bukan terlempar ke ujung view.
+--
+-- Aman di-drop: tidak ada view lain yang dibangun di atas hv_employees. GRANT
+-- ikut hilang saat DROP dan dikembalikan di blok terakhir migrasi ini.
+DROP VIEW IF EXISTS hv_employees;
+
 CREATE OR REPLACE VIEW hv_employees AS
 SELECT u.id,
     u.name,

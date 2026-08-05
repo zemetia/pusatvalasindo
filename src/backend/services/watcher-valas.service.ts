@@ -1,5 +1,5 @@
 import YahooFinance from "yahoo-finance2";
-import { smartdealRateService } from "@/backend/services/smartdeal-rate.service";
+import { smartdealRateService, type SmartdealStatus } from "@/backend/services/smartdeal-rate.service";
 
 // Currency-rate watcher: cross-references SmartDeal's public counter rates
 // (banknote buy/sell) against Yahoo Finance's market mid-rate. SmartDeal
@@ -32,6 +32,9 @@ export interface WatcherValasData {
   // fetched it) — distinct from `updatedAt`, which is when this response
   // itself was assembled. Null if the cron hasn't populated the table yet.
   smartdealFetchedAt: string | null;
+  // Whether the SmartDeal scrape is currently reachable ("aktif"/"down"),
+  // plus SmartDeal's own self-reported "Kurs diperbarui" timestamp.
+  smartdealStatus: SmartdealStatus;
   rows: WatcherValasRow[];
   errors: { source: string; message: string }[];
 }
@@ -108,6 +111,8 @@ export async function getWatcherValasData(): Promise<WatcherValasData> {
     errors.push({ source: "SmartDeal", message: e instanceof Error ? e.message : String(e) });
   }
 
+  const smartdealStatus = await smartdealRateService.getStatus();
+
   const codes = smartdeal.length > 0 ? smartdeal.map((r) => r.code) : DEFAULT_CODES;
   let yahoo: Record<string, number> = {};
   try {
@@ -142,5 +147,5 @@ export async function getWatcherValasData(): Promise<WatcherValasData> {
       };
     });
 
-  return { updatedAt: new Date().toISOString(), smartdealFetchedAt, rows, errors };
+  return { updatedAt: new Date().toISOString(), smartdealFetchedAt, smartdealStatus, rows, errors };
 }

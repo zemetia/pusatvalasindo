@@ -99,6 +99,11 @@ export type PriceBenchmark = $Result.DefaultSelection<Prisma.$PriceBenchmarkPayl
  */
 export type SmartdealRate = $Result.DefaultSelection<Prisma.$SmartdealRatePayload>
 /**
+ * Model SmartdealScrapeStatus
+ * 
+ */
+export type SmartdealScrapeStatus = $Result.DefaultSelection<Prisma.$SmartdealScrapeStatusPayload>
+/**
  * Model CompanyStockItem
  * 
  */
@@ -1039,6 +1044,16 @@ export class PrismaClient<
   get smartdealRate(): Prisma.SmartdealRateDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.smartdealScrapeStatus`: Exposes CRUD operations for the **SmartdealScrapeStatus** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SmartdealScrapeStatuses
+    * const smartdealScrapeStatuses = await prisma.smartdealScrapeStatus.findMany()
+    * ```
+    */
+  get smartdealScrapeStatus(): Prisma.SmartdealScrapeStatusDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.companyStockItem`: Exposes CRUD operations for the **CompanyStockItem** model.
     * Example usage:
     * ```ts
@@ -1838,6 +1853,7 @@ export namespace Prisma {
     CurrencyPriceSyncSetting: 'CurrencyPriceSyncSetting',
     PriceBenchmark: 'PriceBenchmark',
     SmartdealRate: 'SmartdealRate',
+    SmartdealScrapeStatus: 'SmartdealScrapeStatus',
     CompanyStockItem: 'CompanyStockItem',
     KpiDefinition: 'KpiDefinition',
     RoleKpi: 'RoleKpi',
@@ -1888,7 +1904,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
+      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3147,6 +3163,80 @@ export namespace Prisma {
           count: {
             args: Prisma.SmartdealRateCountArgs<ExtArgs>
             result: $Utils.Optional<SmartdealRateCountAggregateOutputType> | number
+          }
+        }
+      }
+      SmartdealScrapeStatus: {
+        payload: Prisma.$SmartdealScrapeStatusPayload<ExtArgs>
+        fields: Prisma.SmartdealScrapeStatusFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SmartdealScrapeStatusFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SmartdealScrapeStatusFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          findFirst: {
+            args: Prisma.SmartdealScrapeStatusFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SmartdealScrapeStatusFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          findMany: {
+            args: Prisma.SmartdealScrapeStatusFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>[]
+          }
+          create: {
+            args: Prisma.SmartdealScrapeStatusCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          createMany: {
+            args: Prisma.SmartdealScrapeStatusCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SmartdealScrapeStatusCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>[]
+          }
+          delete: {
+            args: Prisma.SmartdealScrapeStatusDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          update: {
+            args: Prisma.SmartdealScrapeStatusUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          deleteMany: {
+            args: Prisma.SmartdealScrapeStatusDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SmartdealScrapeStatusUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SmartdealScrapeStatusUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>[]
+          }
+          upsert: {
+            args: Prisma.SmartdealScrapeStatusUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SmartdealScrapeStatusPayload>
+          }
+          aggregate: {
+            args: Prisma.SmartdealScrapeStatusAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSmartdealScrapeStatus>
+          }
+          groupBy: {
+            args: Prisma.SmartdealScrapeStatusGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SmartdealScrapeStatusGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SmartdealScrapeStatusCountArgs<ExtArgs>
+            result: $Utils.Optional<SmartdealScrapeStatusCountAggregateOutputType> | number
           }
         }
       }
@@ -5865,6 +5955,7 @@ export namespace Prisma {
     currencyPriceSyncSetting?: CurrencyPriceSyncSettingOmit
     priceBenchmark?: PriceBenchmarkOmit
     smartdealRate?: SmartdealRateOmit
+    smartdealScrapeStatus?: SmartdealScrapeStatusOmit
     companyStockItem?: CompanyStockItemOmit
     kpiDefinition?: KpiDefinitionOmit
     roleKpi?: RoleKpiOmit
@@ -6048,6 +6139,7 @@ export namespace Prisma {
     attendances: number
     attendancesEdited: number
     payrollSlips: number
+    payrollSlipsPaid: number
     payrollRunsGenerated: number
     payrollRunsFinalized: number
     payrollRulesCreated: number
@@ -6067,6 +6159,7 @@ export namespace Prisma {
     attendances?: boolean | UserCountOutputTypeCountAttendancesArgs
     attendancesEdited?: boolean | UserCountOutputTypeCountAttendancesEditedArgs
     payrollSlips?: boolean | UserCountOutputTypeCountPayrollSlipsArgs
+    payrollSlipsPaid?: boolean | UserCountOutputTypeCountPayrollSlipsPaidArgs
     payrollRunsGenerated?: boolean | UserCountOutputTypeCountPayrollRunsGeneratedArgs
     payrollRunsFinalized?: boolean | UserCountOutputTypeCountPayrollRunsFinalizedArgs
     payrollRulesCreated?: boolean | UserCountOutputTypeCountPayrollRulesCreatedArgs
@@ -6153,6 +6246,13 @@ export namespace Prisma {
    * UserCountOutputType without action
    */
   export type UserCountOutputTypeCountPayrollSlipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PayrollSlipWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountPayrollSlipsPaidArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PayrollSlipWhereInput
   }
 
@@ -12208,6 +12308,7 @@ export namespace Prisma {
     attendances?: boolean | user$attendancesArgs<ExtArgs>
     attendancesEdited?: boolean | user$attendancesEditedArgs<ExtArgs>
     payrollSlips?: boolean | user$payrollSlipsArgs<ExtArgs>
+    payrollSlipsPaid?: boolean | user$payrollSlipsPaidArgs<ExtArgs>
     payrollRunsGenerated?: boolean | user$payrollRunsGeneratedArgs<ExtArgs>
     payrollRunsFinalized?: boolean | user$payrollRunsFinalizedArgs<ExtArgs>
     payrollRulesCreated?: boolean | user$payrollRulesCreatedArgs<ExtArgs>
@@ -12304,6 +12405,7 @@ export namespace Prisma {
     attendances?: boolean | user$attendancesArgs<ExtArgs>
     attendancesEdited?: boolean | user$attendancesEditedArgs<ExtArgs>
     payrollSlips?: boolean | user$payrollSlipsArgs<ExtArgs>
+    payrollSlipsPaid?: boolean | user$payrollSlipsPaidArgs<ExtArgs>
     payrollRunsGenerated?: boolean | user$payrollRunsGeneratedArgs<ExtArgs>
     payrollRunsFinalized?: boolean | user$payrollRunsFinalizedArgs<ExtArgs>
     payrollRulesCreated?: boolean | user$payrollRulesCreatedArgs<ExtArgs>
@@ -12336,6 +12438,7 @@ export namespace Prisma {
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       attendancesEdited: Prisma.$AttendancePayload<ExtArgs>[]
       payrollSlips: Prisma.$PayrollSlipPayload<ExtArgs>[]
+      payrollSlipsPaid: Prisma.$PayrollSlipPayload<ExtArgs>[]
       payrollRunsGenerated: Prisma.$PayrollRunPayload<ExtArgs>[]
       payrollRunsFinalized: Prisma.$PayrollRunPayload<ExtArgs>[]
       payrollRulesCreated: Prisma.$PayrollRulePayload<ExtArgs>[]
@@ -12784,6 +12887,7 @@ export namespace Prisma {
     attendances<T extends user$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, user$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendancesEdited<T extends user$attendancesEditedArgs<ExtArgs> = {}>(args?: Subset<T, user$attendancesEditedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollSlips<T extends user$payrollSlipsArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollSlipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    payrollSlipsPaid<T extends user$payrollSlipsPaidArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollSlipsPaidArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRunsGenerated<T extends user$payrollRunsGeneratedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRunsGeneratedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRunsFinalized<T extends user$payrollRunsFinalizedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRunsFinalizedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRulesCreated<T extends user$payrollRulesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRulesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13461,6 +13565,30 @@ export namespace Prisma {
    * user.payrollSlips
    */
   export type user$payrollSlipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayrollSlip
+     */
+    select?: PayrollSlipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PayrollSlip
+     */
+    omit?: PayrollSlipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayrollSlipInclude<ExtArgs> | null
+    where?: PayrollSlipWhereInput
+    orderBy?: PayrollSlipOrderByWithRelationInput | PayrollSlipOrderByWithRelationInput[]
+    cursor?: PayrollSlipWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PayrollSlipScalarFieldEnum | PayrollSlipScalarFieldEnum[]
+  }
+
+  /**
+   * user.payrollSlipsPaid
+   */
+  export type user$payrollSlipsPaidArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the PayrollSlip
      */
@@ -27778,6 +27906,1019 @@ export namespace Prisma {
 
 
   /**
+   * Model SmartdealScrapeStatus
+   */
+
+  export type AggregateSmartdealScrapeStatus = {
+    _count: SmartdealScrapeStatusCountAggregateOutputType | null
+    _min: SmartdealScrapeStatusMinAggregateOutputType | null
+    _max: SmartdealScrapeStatusMaxAggregateOutputType | null
+  }
+
+  export type SmartdealScrapeStatusMinAggregateOutputType = {
+    id: string | null
+    sourceUpdatedAt: Date | null
+    lastAttemptAt: Date | null
+    lastSuccessAt: Date | null
+    lastError: string | null
+    updatedAt: Date | null
+  }
+
+  export type SmartdealScrapeStatusMaxAggregateOutputType = {
+    id: string | null
+    sourceUpdatedAt: Date | null
+    lastAttemptAt: Date | null
+    lastSuccessAt: Date | null
+    lastError: string | null
+    updatedAt: Date | null
+  }
+
+  export type SmartdealScrapeStatusCountAggregateOutputType = {
+    id: number
+    sourceUpdatedAt: number
+    lastAttemptAt: number
+    lastSuccessAt: number
+    lastError: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SmartdealScrapeStatusMinAggregateInputType = {
+    id?: true
+    sourceUpdatedAt?: true
+    lastAttemptAt?: true
+    lastSuccessAt?: true
+    lastError?: true
+    updatedAt?: true
+  }
+
+  export type SmartdealScrapeStatusMaxAggregateInputType = {
+    id?: true
+    sourceUpdatedAt?: true
+    lastAttemptAt?: true
+    lastSuccessAt?: true
+    lastError?: true
+    updatedAt?: true
+  }
+
+  export type SmartdealScrapeStatusCountAggregateInputType = {
+    id?: true
+    sourceUpdatedAt?: true
+    lastAttemptAt?: true
+    lastSuccessAt?: true
+    lastError?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SmartdealScrapeStatusAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SmartdealScrapeStatus to aggregate.
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SmartdealScrapeStatuses to fetch.
+     */
+    orderBy?: SmartdealScrapeStatusOrderByWithRelationInput | SmartdealScrapeStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SmartdealScrapeStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SmartdealScrapeStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SmartdealScrapeStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SmartdealScrapeStatuses
+    **/
+    _count?: true | SmartdealScrapeStatusCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SmartdealScrapeStatusMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SmartdealScrapeStatusMaxAggregateInputType
+  }
+
+  export type GetSmartdealScrapeStatusAggregateType<T extends SmartdealScrapeStatusAggregateArgs> = {
+        [P in keyof T & keyof AggregateSmartdealScrapeStatus]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSmartdealScrapeStatus[P]>
+      : GetScalarType<T[P], AggregateSmartdealScrapeStatus[P]>
+  }
+
+
+
+
+  export type SmartdealScrapeStatusGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SmartdealScrapeStatusWhereInput
+    orderBy?: SmartdealScrapeStatusOrderByWithAggregationInput | SmartdealScrapeStatusOrderByWithAggregationInput[]
+    by: SmartdealScrapeStatusScalarFieldEnum[] | SmartdealScrapeStatusScalarFieldEnum
+    having?: SmartdealScrapeStatusScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SmartdealScrapeStatusCountAggregateInputType | true
+    _min?: SmartdealScrapeStatusMinAggregateInputType
+    _max?: SmartdealScrapeStatusMaxAggregateInputType
+  }
+
+  export type SmartdealScrapeStatusGroupByOutputType = {
+    id: string
+    sourceUpdatedAt: Date | null
+    lastAttemptAt: Date | null
+    lastSuccessAt: Date | null
+    lastError: string | null
+    updatedAt: Date
+    _count: SmartdealScrapeStatusCountAggregateOutputType | null
+    _min: SmartdealScrapeStatusMinAggregateOutputType | null
+    _max: SmartdealScrapeStatusMaxAggregateOutputType | null
+  }
+
+  type GetSmartdealScrapeStatusGroupByPayload<T extends SmartdealScrapeStatusGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SmartdealScrapeStatusGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SmartdealScrapeStatusGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SmartdealScrapeStatusGroupByOutputType[P]>
+            : GetScalarType<T[P], SmartdealScrapeStatusGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SmartdealScrapeStatusSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sourceUpdatedAt?: boolean
+    lastAttemptAt?: boolean
+    lastSuccessAt?: boolean
+    lastError?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["smartdealScrapeStatus"]>
+
+  export type SmartdealScrapeStatusSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sourceUpdatedAt?: boolean
+    lastAttemptAt?: boolean
+    lastSuccessAt?: boolean
+    lastError?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["smartdealScrapeStatus"]>
+
+  export type SmartdealScrapeStatusSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sourceUpdatedAt?: boolean
+    lastAttemptAt?: boolean
+    lastSuccessAt?: boolean
+    lastError?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["smartdealScrapeStatus"]>
+
+  export type SmartdealScrapeStatusSelectScalar = {
+    id?: boolean
+    sourceUpdatedAt?: boolean
+    lastAttemptAt?: boolean
+    lastSuccessAt?: boolean
+    lastError?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SmartdealScrapeStatusOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sourceUpdatedAt" | "lastAttemptAt" | "lastSuccessAt" | "lastError" | "updatedAt", ExtArgs["result"]["smartdealScrapeStatus"]>
+
+  export type $SmartdealScrapeStatusPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SmartdealScrapeStatus"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sourceUpdatedAt: Date | null
+      lastAttemptAt: Date | null
+      lastSuccessAt: Date | null
+      lastError: string | null
+      updatedAt: Date
+    }, ExtArgs["result"]["smartdealScrapeStatus"]>
+    composites: {}
+  }
+
+  type SmartdealScrapeStatusGetPayload<S extends boolean | null | undefined | SmartdealScrapeStatusDefaultArgs> = $Result.GetResult<Prisma.$SmartdealScrapeStatusPayload, S>
+
+  type SmartdealScrapeStatusCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SmartdealScrapeStatusFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SmartdealScrapeStatusCountAggregateInputType | true
+    }
+
+  export interface SmartdealScrapeStatusDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SmartdealScrapeStatus'], meta: { name: 'SmartdealScrapeStatus' } }
+    /**
+     * Find zero or one SmartdealScrapeStatus that matches the filter.
+     * @param {SmartdealScrapeStatusFindUniqueArgs} args - Arguments to find a SmartdealScrapeStatus
+     * @example
+     * // Get one SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SmartdealScrapeStatusFindUniqueArgs>(args: SelectSubset<T, SmartdealScrapeStatusFindUniqueArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SmartdealScrapeStatus that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SmartdealScrapeStatusFindUniqueOrThrowArgs} args - Arguments to find a SmartdealScrapeStatus
+     * @example
+     * // Get one SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SmartdealScrapeStatusFindUniqueOrThrowArgs>(args: SelectSubset<T, SmartdealScrapeStatusFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SmartdealScrapeStatus that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusFindFirstArgs} args - Arguments to find a SmartdealScrapeStatus
+     * @example
+     * // Get one SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SmartdealScrapeStatusFindFirstArgs>(args?: SelectSubset<T, SmartdealScrapeStatusFindFirstArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SmartdealScrapeStatus that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusFindFirstOrThrowArgs} args - Arguments to find a SmartdealScrapeStatus
+     * @example
+     * // Get one SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SmartdealScrapeStatusFindFirstOrThrowArgs>(args?: SelectSubset<T, SmartdealScrapeStatusFindFirstOrThrowArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SmartdealScrapeStatuses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SmartdealScrapeStatuses
+     * const smartdealScrapeStatuses = await prisma.smartdealScrapeStatus.findMany()
+     * 
+     * // Get first 10 SmartdealScrapeStatuses
+     * const smartdealScrapeStatuses = await prisma.smartdealScrapeStatus.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const smartdealScrapeStatusWithIdOnly = await prisma.smartdealScrapeStatus.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SmartdealScrapeStatusFindManyArgs>(args?: SelectSubset<T, SmartdealScrapeStatusFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SmartdealScrapeStatus.
+     * @param {SmartdealScrapeStatusCreateArgs} args - Arguments to create a SmartdealScrapeStatus.
+     * @example
+     * // Create one SmartdealScrapeStatus
+     * const SmartdealScrapeStatus = await prisma.smartdealScrapeStatus.create({
+     *   data: {
+     *     // ... data to create a SmartdealScrapeStatus
+     *   }
+     * })
+     * 
+     */
+    create<T extends SmartdealScrapeStatusCreateArgs>(args: SelectSubset<T, SmartdealScrapeStatusCreateArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SmartdealScrapeStatuses.
+     * @param {SmartdealScrapeStatusCreateManyArgs} args - Arguments to create many SmartdealScrapeStatuses.
+     * @example
+     * // Create many SmartdealScrapeStatuses
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SmartdealScrapeStatusCreateManyArgs>(args?: SelectSubset<T, SmartdealScrapeStatusCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SmartdealScrapeStatuses and returns the data saved in the database.
+     * @param {SmartdealScrapeStatusCreateManyAndReturnArgs} args - Arguments to create many SmartdealScrapeStatuses.
+     * @example
+     * // Create many SmartdealScrapeStatuses
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SmartdealScrapeStatuses and only return the `id`
+     * const smartdealScrapeStatusWithIdOnly = await prisma.smartdealScrapeStatus.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SmartdealScrapeStatusCreateManyAndReturnArgs>(args?: SelectSubset<T, SmartdealScrapeStatusCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SmartdealScrapeStatus.
+     * @param {SmartdealScrapeStatusDeleteArgs} args - Arguments to delete one SmartdealScrapeStatus.
+     * @example
+     * // Delete one SmartdealScrapeStatus
+     * const SmartdealScrapeStatus = await prisma.smartdealScrapeStatus.delete({
+     *   where: {
+     *     // ... filter to delete one SmartdealScrapeStatus
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SmartdealScrapeStatusDeleteArgs>(args: SelectSubset<T, SmartdealScrapeStatusDeleteArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SmartdealScrapeStatus.
+     * @param {SmartdealScrapeStatusUpdateArgs} args - Arguments to update one SmartdealScrapeStatus.
+     * @example
+     * // Update one SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SmartdealScrapeStatusUpdateArgs>(args: SelectSubset<T, SmartdealScrapeStatusUpdateArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SmartdealScrapeStatuses.
+     * @param {SmartdealScrapeStatusDeleteManyArgs} args - Arguments to filter SmartdealScrapeStatuses to delete.
+     * @example
+     * // Delete a few SmartdealScrapeStatuses
+     * const { count } = await prisma.smartdealScrapeStatus.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SmartdealScrapeStatusDeleteManyArgs>(args?: SelectSubset<T, SmartdealScrapeStatusDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SmartdealScrapeStatuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SmartdealScrapeStatuses
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SmartdealScrapeStatusUpdateManyArgs>(args: SelectSubset<T, SmartdealScrapeStatusUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SmartdealScrapeStatuses and returns the data updated in the database.
+     * @param {SmartdealScrapeStatusUpdateManyAndReturnArgs} args - Arguments to update many SmartdealScrapeStatuses.
+     * @example
+     * // Update many SmartdealScrapeStatuses
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SmartdealScrapeStatuses and only return the `id`
+     * const smartdealScrapeStatusWithIdOnly = await prisma.smartdealScrapeStatus.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SmartdealScrapeStatusUpdateManyAndReturnArgs>(args: SelectSubset<T, SmartdealScrapeStatusUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SmartdealScrapeStatus.
+     * @param {SmartdealScrapeStatusUpsertArgs} args - Arguments to update or create a SmartdealScrapeStatus.
+     * @example
+     * // Update or create a SmartdealScrapeStatus
+     * const smartdealScrapeStatus = await prisma.smartdealScrapeStatus.upsert({
+     *   create: {
+     *     // ... data to create a SmartdealScrapeStatus
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SmartdealScrapeStatus we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SmartdealScrapeStatusUpsertArgs>(args: SelectSubset<T, SmartdealScrapeStatusUpsertArgs<ExtArgs>>): Prisma__SmartdealScrapeStatusClient<$Result.GetResult<Prisma.$SmartdealScrapeStatusPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SmartdealScrapeStatuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusCountArgs} args - Arguments to filter SmartdealScrapeStatuses to count.
+     * @example
+     * // Count the number of SmartdealScrapeStatuses
+     * const count = await prisma.smartdealScrapeStatus.count({
+     *   where: {
+     *     // ... the filter for the SmartdealScrapeStatuses we want to count
+     *   }
+     * })
+    **/
+    count<T extends SmartdealScrapeStatusCountArgs>(
+      args?: Subset<T, SmartdealScrapeStatusCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SmartdealScrapeStatusCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SmartdealScrapeStatus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SmartdealScrapeStatusAggregateArgs>(args: Subset<T, SmartdealScrapeStatusAggregateArgs>): Prisma.PrismaPromise<GetSmartdealScrapeStatusAggregateType<T>>
+
+    /**
+     * Group by SmartdealScrapeStatus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SmartdealScrapeStatusGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SmartdealScrapeStatusGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SmartdealScrapeStatusGroupByArgs['orderBy'] }
+        : { orderBy?: SmartdealScrapeStatusGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SmartdealScrapeStatusGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSmartdealScrapeStatusGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SmartdealScrapeStatus model
+   */
+  readonly fields: SmartdealScrapeStatusFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SmartdealScrapeStatus.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SmartdealScrapeStatusClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SmartdealScrapeStatus model
+   */
+  interface SmartdealScrapeStatusFieldRefs {
+    readonly id: FieldRef<"SmartdealScrapeStatus", 'String'>
+    readonly sourceUpdatedAt: FieldRef<"SmartdealScrapeStatus", 'DateTime'>
+    readonly lastAttemptAt: FieldRef<"SmartdealScrapeStatus", 'DateTime'>
+    readonly lastSuccessAt: FieldRef<"SmartdealScrapeStatus", 'DateTime'>
+    readonly lastError: FieldRef<"SmartdealScrapeStatus", 'String'>
+    readonly updatedAt: FieldRef<"SmartdealScrapeStatus", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SmartdealScrapeStatus findUnique
+   */
+  export type SmartdealScrapeStatusFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter, which SmartdealScrapeStatus to fetch.
+     */
+    where: SmartdealScrapeStatusWhereUniqueInput
+  }
+
+  /**
+   * SmartdealScrapeStatus findUniqueOrThrow
+   */
+  export type SmartdealScrapeStatusFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter, which SmartdealScrapeStatus to fetch.
+     */
+    where: SmartdealScrapeStatusWhereUniqueInput
+  }
+
+  /**
+   * SmartdealScrapeStatus findFirst
+   */
+  export type SmartdealScrapeStatusFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter, which SmartdealScrapeStatus to fetch.
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SmartdealScrapeStatuses to fetch.
+     */
+    orderBy?: SmartdealScrapeStatusOrderByWithRelationInput | SmartdealScrapeStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SmartdealScrapeStatuses.
+     */
+    cursor?: SmartdealScrapeStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SmartdealScrapeStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SmartdealScrapeStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SmartdealScrapeStatuses.
+     */
+    distinct?: SmartdealScrapeStatusScalarFieldEnum | SmartdealScrapeStatusScalarFieldEnum[]
+  }
+
+  /**
+   * SmartdealScrapeStatus findFirstOrThrow
+   */
+  export type SmartdealScrapeStatusFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter, which SmartdealScrapeStatus to fetch.
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SmartdealScrapeStatuses to fetch.
+     */
+    orderBy?: SmartdealScrapeStatusOrderByWithRelationInput | SmartdealScrapeStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SmartdealScrapeStatuses.
+     */
+    cursor?: SmartdealScrapeStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SmartdealScrapeStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SmartdealScrapeStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SmartdealScrapeStatuses.
+     */
+    distinct?: SmartdealScrapeStatusScalarFieldEnum | SmartdealScrapeStatusScalarFieldEnum[]
+  }
+
+  /**
+   * SmartdealScrapeStatus findMany
+   */
+  export type SmartdealScrapeStatusFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter, which SmartdealScrapeStatuses to fetch.
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SmartdealScrapeStatuses to fetch.
+     */
+    orderBy?: SmartdealScrapeStatusOrderByWithRelationInput | SmartdealScrapeStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SmartdealScrapeStatuses.
+     */
+    cursor?: SmartdealScrapeStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SmartdealScrapeStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SmartdealScrapeStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SmartdealScrapeStatuses.
+     */
+    distinct?: SmartdealScrapeStatusScalarFieldEnum | SmartdealScrapeStatusScalarFieldEnum[]
+  }
+
+  /**
+   * SmartdealScrapeStatus create
+   */
+  export type SmartdealScrapeStatusCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SmartdealScrapeStatus.
+     */
+    data: XOR<SmartdealScrapeStatusCreateInput, SmartdealScrapeStatusUncheckedCreateInput>
+  }
+
+  /**
+   * SmartdealScrapeStatus createMany
+   */
+  export type SmartdealScrapeStatusCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SmartdealScrapeStatuses.
+     */
+    data: SmartdealScrapeStatusCreateManyInput | SmartdealScrapeStatusCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SmartdealScrapeStatus createManyAndReturn
+   */
+  export type SmartdealScrapeStatusCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * The data used to create many SmartdealScrapeStatuses.
+     */
+    data: SmartdealScrapeStatusCreateManyInput | SmartdealScrapeStatusCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SmartdealScrapeStatus update
+   */
+  export type SmartdealScrapeStatusUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SmartdealScrapeStatus.
+     */
+    data: XOR<SmartdealScrapeStatusUpdateInput, SmartdealScrapeStatusUncheckedUpdateInput>
+    /**
+     * Choose, which SmartdealScrapeStatus to update.
+     */
+    where: SmartdealScrapeStatusWhereUniqueInput
+  }
+
+  /**
+   * SmartdealScrapeStatus updateMany
+   */
+  export type SmartdealScrapeStatusUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SmartdealScrapeStatuses.
+     */
+    data: XOR<SmartdealScrapeStatusUpdateManyMutationInput, SmartdealScrapeStatusUncheckedUpdateManyInput>
+    /**
+     * Filter which SmartdealScrapeStatuses to update
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * Limit how many SmartdealScrapeStatuses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SmartdealScrapeStatus updateManyAndReturn
+   */
+  export type SmartdealScrapeStatusUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * The data used to update SmartdealScrapeStatuses.
+     */
+    data: XOR<SmartdealScrapeStatusUpdateManyMutationInput, SmartdealScrapeStatusUncheckedUpdateManyInput>
+    /**
+     * Filter which SmartdealScrapeStatuses to update
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * Limit how many SmartdealScrapeStatuses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SmartdealScrapeStatus upsert
+   */
+  export type SmartdealScrapeStatusUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SmartdealScrapeStatus to update in case it exists.
+     */
+    where: SmartdealScrapeStatusWhereUniqueInput
+    /**
+     * In case the SmartdealScrapeStatus found by the `where` argument doesn't exist, create a new SmartdealScrapeStatus with this data.
+     */
+    create: XOR<SmartdealScrapeStatusCreateInput, SmartdealScrapeStatusUncheckedCreateInput>
+    /**
+     * In case the SmartdealScrapeStatus was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SmartdealScrapeStatusUpdateInput, SmartdealScrapeStatusUncheckedUpdateInput>
+  }
+
+  /**
+   * SmartdealScrapeStatus delete
+   */
+  export type SmartdealScrapeStatusDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+    /**
+     * Filter which SmartdealScrapeStatus to delete.
+     */
+    where: SmartdealScrapeStatusWhereUniqueInput
+  }
+
+  /**
+   * SmartdealScrapeStatus deleteMany
+   */
+  export type SmartdealScrapeStatusDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SmartdealScrapeStatuses to delete
+     */
+    where?: SmartdealScrapeStatusWhereInput
+    /**
+     * Limit how many SmartdealScrapeStatuses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SmartdealScrapeStatus without action
+   */
+  export type SmartdealScrapeStatusDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SmartdealScrapeStatus
+     */
+    select?: SmartdealScrapeStatusSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SmartdealScrapeStatus
+     */
+    omit?: SmartdealScrapeStatusOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model CompanyStockItem
    */
 
@@ -39405,6 +40546,8 @@ export namespace Prisma {
     netPay: Decimal | null
     needsReview: boolean | null
     note: string | null
+    paidAt: Date | null
+    paidById: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -39428,6 +40571,8 @@ export namespace Prisma {
     netPay: Decimal | null
     needsReview: boolean | null
     note: string | null
+    paidAt: Date | null
+    paidById: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -39451,6 +40596,8 @@ export namespace Prisma {
     netPay: number
     needsReview: number
     note: number
+    paidAt: number
+    paidById: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -39504,6 +40651,8 @@ export namespace Prisma {
     netPay?: true
     needsReview?: true
     note?: true
+    paidAt?: true
+    paidById?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -39527,6 +40676,8 @@ export namespace Prisma {
     netPay?: true
     needsReview?: true
     note?: true
+    paidAt?: true
+    paidById?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -39550,6 +40701,8 @@ export namespace Prisma {
     netPay?: true
     needsReview?: true
     note?: true
+    paidAt?: true
+    paidById?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -39660,6 +40813,8 @@ export namespace Prisma {
     netPay: Decimal
     needsReview: boolean
     note: string | null
+    paidAt: Date | null
+    paidById: string | null
     createdAt: Date
     updatedAt: Date
     _count: PayrollSlipCountAggregateOutputType | null
@@ -39702,12 +40857,15 @@ export namespace Prisma {
     netPay?: boolean
     needsReview?: boolean
     note?: boolean
+    paidAt?: boolean
+    paidById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     run?: boolean | PayrollRunDefaultArgs<ExtArgs>
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
     entries?: boolean | PayrollSlip$entriesArgs<ExtArgs>
     _count?: boolean | PayrollSlipCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payrollSlip"]>
@@ -39731,12 +40889,15 @@ export namespace Prisma {
     netPay?: boolean
     needsReview?: boolean
     note?: boolean
+    paidAt?: boolean
+    paidById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     run?: boolean | PayrollRunDefaultArgs<ExtArgs>
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
   }, ExtArgs["result"]["payrollSlip"]>
 
   export type PayrollSlipSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -39758,12 +40919,15 @@ export namespace Prisma {
     netPay?: boolean
     needsReview?: boolean
     note?: boolean
+    paidAt?: boolean
+    paidById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     run?: boolean | PayrollRunDefaultArgs<ExtArgs>
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
   }, ExtArgs["result"]["payrollSlip"]>
 
   export type PayrollSlipSelectScalar = {
@@ -39785,16 +40949,19 @@ export namespace Prisma {
     netPay?: boolean
     needsReview?: boolean
     note?: boolean
+    paidAt?: boolean
+    paidById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PayrollSlipOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "runId" | "userId" | "branchId" | "customRoleId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "totalBonus" | "totalPenalty" | "totalDeduction" | "totalAllowance" | "grossPay" | "netPay" | "needsReview" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["payrollSlip"]>
+  export type PayrollSlipOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "runId" | "userId" | "branchId" | "customRoleId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "totalBonus" | "totalPenalty" | "totalDeduction" | "totalAllowance" | "grossPay" | "netPay" | "needsReview" | "note" | "paidAt" | "paidById" | "createdAt" | "updatedAt", ExtArgs["result"]["payrollSlip"]>
   export type PayrollSlipInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     run?: boolean | PayrollRunDefaultArgs<ExtArgs>
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
     entries?: boolean | PayrollSlip$entriesArgs<ExtArgs>
     _count?: boolean | PayrollSlipCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -39803,12 +40970,14 @@ export namespace Prisma {
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
   }
   export type PayrollSlipIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     run?: boolean | PayrollRunDefaultArgs<ExtArgs>
     user?: boolean | userDefaultArgs<ExtArgs>
     branch?: boolean | PayrollSlip$branchArgs<ExtArgs>
     customRole?: boolean | PayrollSlip$customRoleArgs<ExtArgs>
+    paidBy?: boolean | PayrollSlip$paidByArgs<ExtArgs>
   }
 
   export type $PayrollSlipPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -39818,6 +40987,7 @@ export namespace Prisma {
       user: Prisma.$userPayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs> | null
       customRole: Prisma.$custom_rolePayload<ExtArgs> | null
+      paidBy: Prisma.$userPayload<ExtArgs> | null
       entries: Prisma.$PayrollSlipEntryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -39860,6 +41030,15 @@ export namespace Prisma {
        */
       needsReview: boolean
       note: string | null
+      /**
+       * Terisi saat slip INI ditandai dibayar — baik lewat "Bayar" per orang
+       * maupun ikut terbawa saat seluruh run dibayar sekaligus. Berbeda dari
+       * PayrollRun.paidAt: run baru berstatus PAID setelah SEMUA slipnya
+       * terbayar, sehingga karyawan bisa dibayar satu-satu tanpa menunggu yang
+       * lain.
+       */
+      paidAt: Date | null
+      paidById: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["payrollSlip"]>
@@ -40260,6 +41439,7 @@ export namespace Prisma {
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends PayrollSlip$branchArgs<ExtArgs> = {}>(args?: Subset<T, PayrollSlip$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     customRole<T extends PayrollSlip$customRoleArgs<ExtArgs> = {}>(args?: Subset<T, PayrollSlip$customRoleArgs<ExtArgs>>): Prisma__custom_roleClient<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    paidBy<T extends PayrollSlip$paidByArgs<ExtArgs> = {}>(args?: Subset<T, PayrollSlip$paidByArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     entries<T extends PayrollSlip$entriesArgs<ExtArgs> = {}>(args?: Subset<T, PayrollSlip$entriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -40308,6 +41488,8 @@ export namespace Prisma {
     readonly netPay: FieldRef<"PayrollSlip", 'Decimal'>
     readonly needsReview: FieldRef<"PayrollSlip", 'Boolean'>
     readonly note: FieldRef<"PayrollSlip", 'String'>
+    readonly paidAt: FieldRef<"PayrollSlip", 'DateTime'>
+    readonly paidById: FieldRef<"PayrollSlip", 'String'>
     readonly createdAt: FieldRef<"PayrollSlip", 'DateTime'>
     readonly updatedAt: FieldRef<"PayrollSlip", 'DateTime'>
   }
@@ -40746,6 +41928,25 @@ export namespace Prisma {
      */
     include?: custom_roleInclude<ExtArgs> | null
     where?: custom_roleWhereInput
+  }
+
+  /**
+   * PayrollSlip.paidBy
+   */
+  export type PayrollSlip$paidByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the user
+     */
+    select?: userSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the user
+     */
+    omit?: userOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: userInclude<ExtArgs> | null
+    where?: userWhereInput
   }
 
   /**
@@ -70717,6 +71918,18 @@ export namespace Prisma {
   export type SmartdealRateScalarFieldEnum = (typeof SmartdealRateScalarFieldEnum)[keyof typeof SmartdealRateScalarFieldEnum]
 
 
+  export const SmartdealScrapeStatusScalarFieldEnum: {
+    id: 'id',
+    sourceUpdatedAt: 'sourceUpdatedAt',
+    lastAttemptAt: 'lastAttemptAt',
+    lastSuccessAt: 'lastSuccessAt',
+    lastError: 'lastError',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SmartdealScrapeStatusScalarFieldEnum = (typeof SmartdealScrapeStatusScalarFieldEnum)[keyof typeof SmartdealScrapeStatusScalarFieldEnum]
+
+
   export const CompanyStockItemScalarFieldEnum: {
     id: 'id',
     companyId: 'companyId',
@@ -70916,6 +72129,8 @@ export namespace Prisma {
     netPay: 'netPay',
     needsReview: 'needsReview',
     note: 'note',
+    paidAt: 'paidAt',
+    paidById: 'paidById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -72355,6 +73570,7 @@ export namespace Prisma {
     attendances?: AttendanceListRelationFilter
     attendancesEdited?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
+    payrollSlipsPaid?: PayrollSlipListRelationFilter
     payrollRunsGenerated?: PayrollRunListRelationFilter
     payrollRunsFinalized?: PayrollRunListRelationFilter
     payrollRulesCreated?: PayrollRuleListRelationFilter
@@ -72396,6 +73612,7 @@ export namespace Prisma {
     attendances?: AttendanceOrderByRelationAggregateInput
     attendancesEdited?: AttendanceOrderByRelationAggregateInput
     payrollSlips?: PayrollSlipOrderByRelationAggregateInput
+    payrollSlipsPaid?: PayrollSlipOrderByRelationAggregateInput
     payrollRunsGenerated?: PayrollRunOrderByRelationAggregateInput
     payrollRunsFinalized?: PayrollRunOrderByRelationAggregateInput
     payrollRulesCreated?: PayrollRuleOrderByRelationAggregateInput
@@ -72440,6 +73657,7 @@ export namespace Prisma {
     attendances?: AttendanceListRelationFilter
     attendancesEdited?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
+    payrollSlipsPaid?: PayrollSlipListRelationFilter
     payrollRunsGenerated?: PayrollRunListRelationFilter
     payrollRunsFinalized?: PayrollRunListRelationFilter
     payrollRulesCreated?: PayrollRuleListRelationFilter
@@ -73467,6 +74685,63 @@ export namespace Prisma {
     fetchedAt?: DateTimeWithAggregatesFilter<"SmartdealRate"> | Date | string
   }
 
+  export type SmartdealScrapeStatusWhereInput = {
+    AND?: SmartdealScrapeStatusWhereInput | SmartdealScrapeStatusWhereInput[]
+    OR?: SmartdealScrapeStatusWhereInput[]
+    NOT?: SmartdealScrapeStatusWhereInput | SmartdealScrapeStatusWhereInput[]
+    id?: StringFilter<"SmartdealScrapeStatus"> | string
+    sourceUpdatedAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastSuccessAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastError?: StringNullableFilter<"SmartdealScrapeStatus"> | string | null
+    updatedAt?: DateTimeFilter<"SmartdealScrapeStatus"> | Date | string
+  }
+
+  export type SmartdealScrapeStatusOrderByWithRelationInput = {
+    id?: SortOrder
+    sourceUpdatedAt?: SortOrderInput | SortOrder
+    lastAttemptAt?: SortOrderInput | SortOrder
+    lastSuccessAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SmartdealScrapeStatusWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SmartdealScrapeStatusWhereInput | SmartdealScrapeStatusWhereInput[]
+    OR?: SmartdealScrapeStatusWhereInput[]
+    NOT?: SmartdealScrapeStatusWhereInput | SmartdealScrapeStatusWhereInput[]
+    sourceUpdatedAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastSuccessAt?: DateTimeNullableFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastError?: StringNullableFilter<"SmartdealScrapeStatus"> | string | null
+    updatedAt?: DateTimeFilter<"SmartdealScrapeStatus"> | Date | string
+  }, "id">
+
+  export type SmartdealScrapeStatusOrderByWithAggregationInput = {
+    id?: SortOrder
+    sourceUpdatedAt?: SortOrderInput | SortOrder
+    lastAttemptAt?: SortOrderInput | SortOrder
+    lastSuccessAt?: SortOrderInput | SortOrder
+    lastError?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: SmartdealScrapeStatusCountOrderByAggregateInput
+    _max?: SmartdealScrapeStatusMaxOrderByAggregateInput
+    _min?: SmartdealScrapeStatusMinOrderByAggregateInput
+  }
+
+  export type SmartdealScrapeStatusScalarWhereWithAggregatesInput = {
+    AND?: SmartdealScrapeStatusScalarWhereWithAggregatesInput | SmartdealScrapeStatusScalarWhereWithAggregatesInput[]
+    OR?: SmartdealScrapeStatusScalarWhereWithAggregatesInput[]
+    NOT?: SmartdealScrapeStatusScalarWhereWithAggregatesInput | SmartdealScrapeStatusScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SmartdealScrapeStatus"> | string
+    sourceUpdatedAt?: DateTimeNullableWithAggregatesFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastAttemptAt?: DateTimeNullableWithAggregatesFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastSuccessAt?: DateTimeNullableWithAggregatesFilter<"SmartdealScrapeStatus"> | Date | string | null
+    lastError?: StringNullableWithAggregatesFilter<"SmartdealScrapeStatus"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"SmartdealScrapeStatus"> | Date | string
+  }
+
   export type CompanyStockItemWhereInput = {
     AND?: CompanyStockItemWhereInput | CompanyStockItemWhereInput[]
     OR?: CompanyStockItemWhereInput[]
@@ -74463,12 +75738,15 @@ export namespace Prisma {
     netPay?: DecimalFilter<"PayrollSlip"> | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFilter<"PayrollSlip"> | boolean
     note?: StringNullableFilter<"PayrollSlip"> | string | null
+    paidAt?: DateTimeNullableFilter<"PayrollSlip"> | Date | string | null
+    paidById?: StringNullableFilter<"PayrollSlip"> | string | null
     createdAt?: DateTimeFilter<"PayrollSlip"> | Date | string
     updatedAt?: DateTimeFilter<"PayrollSlip"> | Date | string
     run?: XOR<PayrollRunScalarRelationFilter, PayrollRunWhereInput>
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     customRole?: XOR<Custom_roleNullableScalarRelationFilter, custom_roleWhereInput> | null
+    paidBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     entries?: PayrollSlipEntryListRelationFilter
   }
 
@@ -74491,12 +75769,15 @@ export namespace Prisma {
     netPay?: SortOrder
     needsReview?: SortOrder
     note?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    paidById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     run?: PayrollRunOrderByWithRelationInput
     user?: userOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     customRole?: custom_roleOrderByWithRelationInput
+    paidBy?: userOrderByWithRelationInput
     entries?: PayrollSlipEntryOrderByRelationAggregateInput
   }
 
@@ -74523,12 +75804,15 @@ export namespace Prisma {
     netPay?: DecimalFilter<"PayrollSlip"> | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFilter<"PayrollSlip"> | boolean
     note?: StringNullableFilter<"PayrollSlip"> | string | null
+    paidAt?: DateTimeNullableFilter<"PayrollSlip"> | Date | string | null
+    paidById?: StringNullableFilter<"PayrollSlip"> | string | null
     createdAt?: DateTimeFilter<"PayrollSlip"> | Date | string
     updatedAt?: DateTimeFilter<"PayrollSlip"> | Date | string
     run?: XOR<PayrollRunScalarRelationFilter, PayrollRunWhereInput>
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     customRole?: XOR<Custom_roleNullableScalarRelationFilter, custom_roleWhereInput> | null
+    paidBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     entries?: PayrollSlipEntryListRelationFilter
   }, "id" | "runId_userId">
 
@@ -74551,6 +75835,8 @@ export namespace Prisma {
     netPay?: SortOrder
     needsReview?: SortOrder
     note?: SortOrderInput | SortOrder
+    paidAt?: SortOrderInput | SortOrder
+    paidById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PayrollSlipCountOrderByAggregateInput
@@ -74582,6 +75868,8 @@ export namespace Prisma {
     netPay?: DecimalWithAggregatesFilter<"PayrollSlip"> | Decimal | DecimalJsLike | number | string
     needsReview?: BoolWithAggregatesFilter<"PayrollSlip"> | boolean
     note?: StringNullableWithAggregatesFilter<"PayrollSlip"> | string | null
+    paidAt?: DateTimeNullableWithAggregatesFilter<"PayrollSlip"> | Date | string | null
+    paidById?: StringNullableWithAggregatesFilter<"PayrollSlip"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PayrollSlip"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PayrollSlip"> | Date | string
   }
@@ -77223,6 +78511,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -77264,6 +78553,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -77301,6 +78591,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -77342,6 +78633,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -78502,6 +79794,69 @@ export namespace Prisma {
     fetchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SmartdealScrapeStatusCreateInput = {
+    id?: string
+    sourceUpdatedAt?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    lastSuccessAt?: Date | string | null
+    lastError?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type SmartdealScrapeStatusUncheckedCreateInput = {
+    id?: string
+    sourceUpdatedAt?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    lastSuccessAt?: Date | string | null
+    lastError?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type SmartdealScrapeStatusUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSuccessAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SmartdealScrapeStatusUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSuccessAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SmartdealScrapeStatusCreateManyInput = {
+    id?: string
+    sourceUpdatedAt?: Date | string | null
+    lastAttemptAt?: Date | string | null
+    lastSuccessAt?: Date | string | null
+    lastError?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type SmartdealScrapeStatusUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSuccessAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SmartdealScrapeStatusUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSuccessAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CompanyStockItemCreateInput = {
     id?: string
     name: string
@@ -79607,12 +80962,14 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     run: PayrollRunCreateNestedOneWithoutSlipsInput
     user: userCreateNestedOneWithoutPayrollSlipsInput
     branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
     customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
     entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
   }
 
@@ -79635,6 +80992,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
@@ -79655,12 +81014,14 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
     user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
     branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
     customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
     entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
   }
 
@@ -79683,6 +81044,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
@@ -79707,6 +81070,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -79726,6 +81091,7 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -79749,6 +81115,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -83680,6 +85048,33 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type SmartdealScrapeStatusCountOrderByAggregateInput = {
+    id?: SortOrder
+    sourceUpdatedAt?: SortOrder
+    lastAttemptAt?: SortOrder
+    lastSuccessAt?: SortOrder
+    lastError?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SmartdealScrapeStatusMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sourceUpdatedAt?: SortOrder
+    lastAttemptAt?: SortOrder
+    lastSuccessAt?: SortOrder
+    lastError?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SmartdealScrapeStatusMinOrderByAggregateInput = {
+    id?: SortOrder
+    sourceUpdatedAt?: SortOrder
+    lastAttemptAt?: SortOrder
+    lastSuccessAt?: SortOrder
+    lastError?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type EnumCompanyStockItemTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.CompanyStockItemType | EnumCompanyStockItemTypeFieldRefInput<$PrismaModel>
     in?: $Enums.CompanyStockItemType[] | ListEnumCompanyStockItemTypeFieldRefInput<$PrismaModel>
@@ -84656,6 +86051,8 @@ export namespace Prisma {
     netPay?: SortOrder
     needsReview?: SortOrder
     note?: SortOrder
+    paidAt?: SortOrder
+    paidById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -84693,6 +86090,8 @@ export namespace Prisma {
     netPay?: SortOrder
     needsReview?: SortOrder
     note?: SortOrder
+    paidAt?: SortOrder
+    paidById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -84716,6 +86115,8 @@ export namespace Prisma {
     netPay?: SortOrder
     needsReview?: SortOrder
     note?: SortOrder
+    paidAt?: SortOrder
+    paidById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -86772,6 +88173,13 @@ export namespace Prisma {
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
   }
 
+  export type PayrollSlipCreateNestedManyWithoutPaidByInput = {
+    create?: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput> | PayrollSlipCreateWithoutPaidByInput[] | PayrollSlipUncheckedCreateWithoutPaidByInput[]
+    connectOrCreate?: PayrollSlipCreateOrConnectWithoutPaidByInput | PayrollSlipCreateOrConnectWithoutPaidByInput[]
+    createMany?: PayrollSlipCreateManyPaidByInputEnvelope
+    connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+  }
+
   export type PayrollRunCreateNestedManyWithoutGeneratedByInput = {
     create?: XOR<PayrollRunCreateWithoutGeneratedByInput, PayrollRunUncheckedCreateWithoutGeneratedByInput> | PayrollRunCreateWithoutGeneratedByInput[] | PayrollRunUncheckedCreateWithoutGeneratedByInput[]
     connectOrCreate?: PayrollRunCreateOrConnectWithoutGeneratedByInput | PayrollRunCreateOrConnectWithoutGeneratedByInput[]
@@ -86893,6 +88301,13 @@ export namespace Prisma {
     create?: XOR<PayrollSlipCreateWithoutUserInput, PayrollSlipUncheckedCreateWithoutUserInput> | PayrollSlipCreateWithoutUserInput[] | PayrollSlipUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutUserInput | PayrollSlipCreateOrConnectWithoutUserInput[]
     createMany?: PayrollSlipCreateManyUserInputEnvelope
+    connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+  }
+
+  export type PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput = {
+    create?: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput> | PayrollSlipCreateWithoutPaidByInput[] | PayrollSlipUncheckedCreateWithoutPaidByInput[]
+    connectOrCreate?: PayrollSlipCreateOrConnectWithoutPaidByInput | PayrollSlipCreateOrConnectWithoutPaidByInput[]
+    createMany?: PayrollSlipCreateManyPaidByInputEnvelope
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
   }
 
@@ -87087,6 +88502,20 @@ export namespace Prisma {
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
     update?: PayrollSlipUpdateWithWhereUniqueWithoutUserInput | PayrollSlipUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PayrollSlipUpdateManyWithWhereWithoutUserInput | PayrollSlipUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
+  }
+
+  export type PayrollSlipUpdateManyWithoutPaidByNestedInput = {
+    create?: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput> | PayrollSlipCreateWithoutPaidByInput[] | PayrollSlipUncheckedCreateWithoutPaidByInput[]
+    connectOrCreate?: PayrollSlipCreateOrConnectWithoutPaidByInput | PayrollSlipCreateOrConnectWithoutPaidByInput[]
+    upsert?: PayrollSlipUpsertWithWhereUniqueWithoutPaidByInput | PayrollSlipUpsertWithWhereUniqueWithoutPaidByInput[]
+    createMany?: PayrollSlipCreateManyPaidByInputEnvelope
+    set?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    disconnect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    delete?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    update?: PayrollSlipUpdateWithWhereUniqueWithoutPaidByInput | PayrollSlipUpdateWithWhereUniqueWithoutPaidByInput[]
+    updateMany?: PayrollSlipUpdateManyWithWhereWithoutPaidByInput | PayrollSlipUpdateManyWithWhereWithoutPaidByInput[]
     deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
   }
 
@@ -87331,6 +88760,20 @@ export namespace Prisma {
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
     update?: PayrollSlipUpdateWithWhereUniqueWithoutUserInput | PayrollSlipUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: PayrollSlipUpdateManyWithWhereWithoutUserInput | PayrollSlipUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
+  }
+
+  export type PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput = {
+    create?: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput> | PayrollSlipCreateWithoutPaidByInput[] | PayrollSlipUncheckedCreateWithoutPaidByInput[]
+    connectOrCreate?: PayrollSlipCreateOrConnectWithoutPaidByInput | PayrollSlipCreateOrConnectWithoutPaidByInput[]
+    upsert?: PayrollSlipUpsertWithWhereUniqueWithoutPaidByInput | PayrollSlipUpsertWithWhereUniqueWithoutPaidByInput[]
+    createMany?: PayrollSlipCreateManyPaidByInputEnvelope
+    set?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    disconnect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    delete?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+    update?: PayrollSlipUpdateWithWhereUniqueWithoutPaidByInput | PayrollSlipUpdateWithWhereUniqueWithoutPaidByInput[]
+    updateMany?: PayrollSlipUpdateManyWithWhereWithoutPaidByInput | PayrollSlipUpdateManyWithWhereWithoutPaidByInput[]
     deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
   }
 
@@ -89444,6 +90887,12 @@ export namespace Prisma {
     connect?: custom_roleWhereUniqueInput
   }
 
+  export type userCreateNestedOneWithoutPayrollSlipsPaidInput = {
+    create?: XOR<userCreateWithoutPayrollSlipsPaidInput, userUncheckedCreateWithoutPayrollSlipsPaidInput>
+    connectOrCreate?: userCreateOrConnectWithoutPayrollSlipsPaidInput
+    connect?: userWhereUniqueInput
+  }
+
   export type PayrollSlipEntryCreateNestedManyWithoutSlipInput = {
     create?: XOR<PayrollSlipEntryCreateWithoutSlipInput, PayrollSlipEntryUncheckedCreateWithoutSlipInput> | PayrollSlipEntryCreateWithoutSlipInput[] | PayrollSlipEntryUncheckedCreateWithoutSlipInput[]
     connectOrCreate?: PayrollSlipEntryCreateOrConnectWithoutSlipInput | PayrollSlipEntryCreateOrConnectWithoutSlipInput[]
@@ -89492,6 +90941,16 @@ export namespace Prisma {
     delete?: custom_roleWhereInput | boolean
     connect?: custom_roleWhereUniqueInput
     update?: XOR<XOR<custom_roleUpdateToOneWithWhereWithoutPayrollSlipsInput, custom_roleUpdateWithoutPayrollSlipsInput>, custom_roleUncheckedUpdateWithoutPayrollSlipsInput>
+  }
+
+  export type userUpdateOneWithoutPayrollSlipsPaidNestedInput = {
+    create?: XOR<userCreateWithoutPayrollSlipsPaidInput, userUncheckedCreateWithoutPayrollSlipsPaidInput>
+    connectOrCreate?: userCreateOrConnectWithoutPayrollSlipsPaidInput
+    upsert?: userUpsertWithoutPayrollSlipsPaidInput
+    disconnect?: userWhereInput | boolean
+    delete?: userWhereInput | boolean
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutPayrollSlipsPaidInput, userUpdateWithoutPayrollSlipsPaidInput>, userUncheckedUpdateWithoutPayrollSlipsPaidInput>
   }
 
   export type PayrollSlipEntryUpdateManyWithoutSlipNestedInput = {
@@ -91403,6 +92862,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -91443,6 +92903,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -91484,6 +92945,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -91524,6 +92986,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -91619,6 +93082,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -91659,6 +93123,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -91706,6 +93171,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -91746,6 +93212,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -91832,6 +93299,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -91872,6 +93340,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -91924,6 +93393,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -91964,6 +93434,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -92000,6 +93471,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -92040,6 +93512,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -92092,6 +93565,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -92132,6 +93606,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -92271,6 +93746,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -92310,6 +93786,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -92375,11 +93852,13 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     run: PayrollRunCreateNestedOneWithoutSlipsInput
     user: userCreateNestedOneWithoutPayrollSlipsInput
     branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
     entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
   }
 
@@ -92401,6 +93880,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
@@ -92625,6 +94106,8 @@ export namespace Prisma {
     netPay?: DecimalFilter<"PayrollSlip"> | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFilter<"PayrollSlip"> | boolean
     note?: StringNullableFilter<"PayrollSlip"> | string | null
+    paidAt?: DateTimeNullableFilter<"PayrollSlip"> | Date | string | null
+    paidById?: StringNullableFilter<"PayrollSlip"> | string | null
     createdAt?: DateTimeFilter<"PayrollSlip"> | Date | string
     updatedAt?: DateTimeFilter<"PayrollSlip"> | Date | string
   }
@@ -93026,11 +94509,13 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     run: PayrollRunCreateNestedOneWithoutSlipsInput
     branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
     customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
     entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
   }
 
@@ -93052,6 +94537,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
@@ -93064,6 +94551,66 @@ export namespace Prisma {
 
   export type PayrollSlipCreateManyUserInputEnvelope = {
     data: PayrollSlipCreateManyUserInput | PayrollSlipCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PayrollSlipCreateWithoutPaidByInput = {
+    id?: string
+    baseSalary?: Decimal | DecimalJsLike | number | string
+    mealAllowance?: Decimal | DecimalJsLike | number | string
+    transportAllowance?: Decimal | DecimalJsLike | number | string
+    positionAllowance?: Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string
+    totalBonus?: Decimal | DecimalJsLike | number | string
+    totalPenalty?: Decimal | DecimalJsLike | number | string
+    totalDeduction?: Decimal | DecimalJsLike | number | string
+    totalAllowance?: Decimal | DecimalJsLike | number | string
+    grossPay?: Decimal | DecimalJsLike | number | string
+    netPay?: Decimal | DecimalJsLike | number | string
+    needsReview?: boolean
+    note?: string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    run: PayrollRunCreateNestedOneWithoutSlipsInput
+    user: userCreateNestedOneWithoutPayrollSlipsInput
+    branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
+    customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
+  }
+
+  export type PayrollSlipUncheckedCreateWithoutPaidByInput = {
+    id?: string
+    runId: string
+    userId: string
+    branchId?: string | null
+    customRoleId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string
+    mealAllowance?: Decimal | DecimalJsLike | number | string
+    transportAllowance?: Decimal | DecimalJsLike | number | string
+    positionAllowance?: Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string
+    totalBonus?: Decimal | DecimalJsLike | number | string
+    totalPenalty?: Decimal | DecimalJsLike | number | string
+    totalDeduction?: Decimal | DecimalJsLike | number | string
+    totalAllowance?: Decimal | DecimalJsLike | number | string
+    grossPay?: Decimal | DecimalJsLike | number | string
+    netPay?: Decimal | DecimalJsLike | number | string
+    needsReview?: boolean
+    note?: string | null
+    paidAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
+  }
+
+  export type PayrollSlipCreateOrConnectWithoutPaidByInput = {
+    where: PayrollSlipWhereUniqueInput
+    create: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput>
+  }
+
+  export type PayrollSlipCreateManyPaidByInputEnvelope = {
+    data: PayrollSlipCreateManyPaidByInput | PayrollSlipCreateManyPaidByInput[]
     skipDuplicates?: boolean
   }
 
@@ -93667,6 +95214,22 @@ export namespace Prisma {
   export type PayrollSlipUpdateManyWithWhereWithoutUserInput = {
     where: PayrollSlipScalarWhereInput
     data: XOR<PayrollSlipUpdateManyMutationInput, PayrollSlipUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PayrollSlipUpsertWithWhereUniqueWithoutPaidByInput = {
+    where: PayrollSlipWhereUniqueInput
+    update: XOR<PayrollSlipUpdateWithoutPaidByInput, PayrollSlipUncheckedUpdateWithoutPaidByInput>
+    create: XOR<PayrollSlipCreateWithoutPaidByInput, PayrollSlipUncheckedCreateWithoutPaidByInput>
+  }
+
+  export type PayrollSlipUpdateWithWhereUniqueWithoutPaidByInput = {
+    where: PayrollSlipWhereUniqueInput
+    data: XOR<PayrollSlipUpdateWithoutPaidByInput, PayrollSlipUncheckedUpdateWithoutPaidByInput>
+  }
+
+  export type PayrollSlipUpdateManyWithWhereWithoutPaidByInput = {
+    where: PayrollSlipScalarWhereInput
+    data: XOR<PayrollSlipUpdateManyMutationInput, PayrollSlipUncheckedUpdateManyWithoutPaidByInput>
   }
 
   export type PayrollRunUpsertWithWhereUniqueWithoutGeneratedByInput = {
@@ -94684,6 +96247,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -94723,6 +96287,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -94810,11 +96375,13 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     run: PayrollRunCreateNestedOneWithoutSlipsInput
     user: userCreateNestedOneWithoutPayrollSlipsInput
     customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
     entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
   }
 
@@ -94836,6 +96403,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
@@ -97238,6 +98807,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -97278,6 +98848,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -97319,6 +98890,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -97359,6 +98931,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -97400,6 +98973,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -97440,6 +99014,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -97537,6 +99112,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -97577,6 +99153,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -97624,6 +99201,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -97664,6 +99242,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -97711,6 +99290,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -97751,6 +99331,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -97838,6 +99419,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -97878,6 +99460,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -97919,6 +99502,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -97959,6 +99543,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -98011,6 +99596,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -98051,6 +99637,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -98098,6 +99685,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -98138,6 +99726,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -98174,6 +99763,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -98214,6 +99804,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -98266,6 +99857,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -98306,6 +99898,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -98343,6 +99936,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
@@ -98383,6 +99977,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
@@ -98575,6 +100170,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
@@ -98615,6 +100211,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
@@ -98960,6 +100557,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
@@ -99000,6 +100598,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
@@ -99041,6 +100640,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
@@ -99081,6 +100681,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
@@ -99108,11 +100709,13 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: userCreateNestedOneWithoutPayrollSlipsInput
     branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
     customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
     entries?: PayrollSlipEntryCreateNestedManyWithoutSlipInput
   }
 
@@ -99134,6 +100737,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     entries?: PayrollSlipEntryUncheckedCreateNestedManyWithoutSlipInput
@@ -99248,6 +100853,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
@@ -99288,6 +100894,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
@@ -99335,6 +100942,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
@@ -99375,6 +100983,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
@@ -99473,6 +101082,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -99513,6 +101123,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -99602,6 +101213,89 @@ export namespace Prisma {
   export type custom_roleCreateOrConnectWithoutPayrollSlipsInput = {
     where: custom_roleWhereUniqueInput
     create: XOR<custom_roleCreateWithoutPayrollSlipsInput, custom_roleUncheckedCreateWithoutPayrollSlipsInput>
+  }
+
+  export type userCreateWithoutPayrollSlipsPaidInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    kpiEntries?: KpiEntryCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
+    attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    samples?: SampleCreateNestedManyWithoutTechnicianInput
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    branch?: BranchCreateNestedOneWithoutUsersInput
+    customRole?: custom_roleCreateNestedOneWithoutUsersInput
+  }
+
+  export type userUncheckedCreateWithoutPayrollSlipsPaidInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    branchId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    customRoleId?: string | null
+    kpiEntries?: KpiEntryUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryUncheckedCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutPayrollSlipsPaidInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutPayrollSlipsPaidInput, userUncheckedCreateWithoutPayrollSlipsPaidInput>
   }
 
   export type PayrollSlipEntryCreateWithoutSlipInput = {
@@ -99742,6 +101436,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -99782,6 +101477,7 @@ export namespace Prisma {
     salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -99880,6 +101576,95 @@ export namespace Prisma {
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
 
+  export type userUpsertWithoutPayrollSlipsPaidInput = {
+    update: XOR<userUpdateWithoutPayrollSlipsPaidInput, userUncheckedUpdateWithoutPayrollSlipsPaidInput>
+    create: XOR<userCreateWithoutPayrollSlipsPaidInput, userUncheckedCreateWithoutPayrollSlipsPaidInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutPayrollSlipsPaidInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutPayrollSlipsPaidInput, userUncheckedUpdateWithoutPayrollSlipsPaidInput>
+  }
+
+  export type userUpdateWithoutPayrollSlipsPaidInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    kpiEntries?: KpiEntryUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    samples?: SampleUpdateManyWithoutTechnicianNestedInput
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    branch?: BranchUpdateOneWithoutUsersNestedInput
+    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutPayrollSlipsPaidInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    kpiEntries?: KpiEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type PayrollSlipEntryUpsertWithWhereUniqueWithoutSlipInput = {
     where: PayrollSlipEntryWhereUniqueInput
     update: XOR<PayrollSlipEntryUpdateWithoutSlipInput, PayrollSlipEntryUncheckedUpdateWithoutSlipInput>
@@ -99933,12 +101718,14 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     run: PayrollRunCreateNestedOneWithoutSlipsInput
     user: userCreateNestedOneWithoutPayrollSlipsInput
     branch?: BranchCreateNestedOneWithoutPayrollSlipsInput
     customRole?: custom_roleCreateNestedOneWithoutPayrollSlipsInput
+    paidBy?: userCreateNestedOneWithoutPayrollSlipsPaidInput
   }
 
   export type PayrollSlipUncheckedCreateWithoutEntriesInput = {
@@ -99960,6 +101747,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -100026,12 +101815,14 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
     user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
     branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
     customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
   }
 
   export type PayrollSlipUncheckedUpdateWithoutEntriesInput = {
@@ -100053,6 +101844,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100338,6 +102131,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -100378,6 +102172,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -100461,6 +102256,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -100501,6 +102297,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -100767,6 +102564,7 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
@@ -100807,6 +102605,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
     attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
@@ -100905,6 +102704,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -100945,6 +102745,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -103600,6 +105401,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -103692,6 +105495,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -103731,6 +105535,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -103809,11 +105614,13 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
     user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
     branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
     entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
   }
 
@@ -103835,6 +105642,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
@@ -103858,6 +105667,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -104026,6 +105837,32 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PayrollSlipCreateManyPaidByInput = {
+    id?: string
+    runId: string
+    userId: string
+    branchId?: string | null
+    customRoleId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string
+    mealAllowance?: Decimal | DecimalJsLike | number | string
+    transportAllowance?: Decimal | DecimalJsLike | number | string
+    positionAllowance?: Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: Decimal | DecimalJsLike | number | string
+    totalBonus?: Decimal | DecimalJsLike | number | string
+    totalPenalty?: Decimal | DecimalJsLike | number | string
+    totalDeduction?: Decimal | DecimalJsLike | number | string
+    totalAllowance?: Decimal | DecimalJsLike | number | string
+    grossPay?: Decimal | DecimalJsLike | number | string
+    netPay?: Decimal | DecimalJsLike | number | string
+    needsReview?: boolean
+    note?: string | null
+    paidAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -104584,11 +106421,13 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
     branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
     customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
     entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
   }
 
@@ -104610,6 +106449,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
@@ -104633,6 +106474,82 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PayrollSlipUpdateWithoutPaidByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    baseSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    mealAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    transportAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    positionAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalBonus?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPenalty?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grossPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    needsReview?: BoolFieldUpdateOperationsInput | boolean
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
+    user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
+    branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
+    customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
+  }
+
+  export type PayrollSlipUncheckedUpdateWithoutPaidByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    runId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    mealAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    transportAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    positionAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalBonus?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPenalty?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grossPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    needsReview?: BoolFieldUpdateOperationsInput | boolean
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
+  }
+
+  export type PayrollSlipUncheckedUpdateManyWithoutPaidByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    runId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    mealAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    transportAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    positionAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    bpjsKesehatan?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalBonus?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPenalty?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalAllowance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    grossPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    needsReview?: BoolFieldUpdateOperationsInput | boolean
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -105141,6 +107058,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -105275,6 +107194,7 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
@@ -105314,6 +107234,7 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
     attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -105425,11 +107346,13 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     run?: PayrollRunUpdateOneRequiredWithoutSlipsNestedInput
     user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
     customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
     entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
   }
 
@@ -105451,6 +107374,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
@@ -105474,6 +107399,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -106926,6 +108853,8 @@ export namespace Prisma {
     netPay?: Decimal | DecimalJsLike | number | string
     needsReview?: boolean
     note?: string | null
+    paidAt?: Date | string | null
+    paidById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -106945,11 +108874,13 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutPayrollSlipsNestedInput
     branch?: BranchUpdateOneWithoutPayrollSlipsNestedInput
     customRole?: custom_roleUpdateOneWithoutPayrollSlipsNestedInput
+    paidBy?: userUpdateOneWithoutPayrollSlipsPaidNestedInput
     entries?: PayrollSlipEntryUpdateManyWithoutSlipNestedInput
   }
 
@@ -106971,6 +108902,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     entries?: PayrollSlipEntryUncheckedUpdateManyWithoutSlipNestedInput
@@ -106994,6 +108927,8 @@ export namespace Prisma {
     netPay?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     needsReview?: BoolFieldUpdateOperationsInput | boolean
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paidById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

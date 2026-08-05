@@ -28,6 +28,17 @@
 -- dipakai menghitung uang. Rule omzet memakai hv_kpi_logs + kpi_code.
 -- ═══════════════════════════════════════════════════════════════════════════
 
+-- DROP dulu, bukan CREATE OR REPLACE saja. Postgres hanya mengizinkan
+-- `CREATE OR REPLACE VIEW` MENAMBAH kolom di AKHIR daftar; `branch_id`,
+-- `role_id`, dan `kpi_code` di sini disisipkan di TENGAH (berpasangan dengan
+-- branch_name / role_name / kpi_name supaya view tetap terbaca), sehingga
+-- Postgres membacanya sebagai upaya mengganti nama kolom dan menolak dengan
+-- 42P16 ("cannot change name of view column").
+--
+-- Aman di-drop: tidak ada view lain yang dibangun di atas hv_kpi_logs. GRANT
+-- ikut hilang saat DROP dan dikembalikan di blok terakhir migrasi ini.
+DROP VIEW IF EXISTS hv_kpi_logs;
+
 CREATE OR REPLACE VIEW hv_kpi_logs AS
 SELECT
   ke.id,

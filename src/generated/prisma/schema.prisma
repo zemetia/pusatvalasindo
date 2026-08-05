@@ -149,6 +149,7 @@ model user {
   attendances          Attendance[]          @relation("AttendanceEmployee")
   attendancesEdited    Attendance[]          @relation("AttendanceEditedBy")
   payrollSlips         PayrollSlip[]
+  payrollSlipsPaid     PayrollSlip[]         @relation("PayrollSlipPaidBy")
   payrollRunsGenerated PayrollRun[]          @relation("PayrollRunGeneratedBy")
   payrollRunsFinalized PayrollRun[]          @relation("PayrollRunFinalizedBy")
   payrollRulesCreated  PayrollRule[]         @relation("PayrollRuleCreatedBy")
@@ -420,6 +421,25 @@ model SmartdealRate {
   prevBuy   Float?
   prevSell  Float?
   fetchedAt DateTime @default(now())
+}
+
+// Health/status of the SmartDeal scrape itself, for Watcher Valas to show
+// whether SmartDeal is currently reachable ("aktif"/"down") — separate from
+// SmartdealRate, which only ever holds the last-known-good rates and has no
+// notion of a failed attempt. Singleton table (`id` always "singleton"), same
+// pattern as CurrencyPriceSyncSetting.
+model SmartdealScrapeStatus {
+  id              String    @id @default("singleton")
+  // SmartDeal's own self-reported "Kurs diperbarui" timestamp (their
+  // `LIVE_UPDATED` field) from the last successful scrape — distinct from
+  // lastSuccessAt below, which is when WE last scraped successfully.
+  sourceUpdatedAt DateTime?
+  lastAttemptAt   DateTime?
+  lastSuccessAt   DateTime?
+  // Set on the most recent failed attempt, cleared on the next success —
+  // non-null here means SmartDeal is currently considered "down".
+  lastError       String?
+  updatedAt       DateTime  @updatedAt
 }
 
 // Stock Management (PT): mata uang & logam mulia yang dimiliki 1 PT (Company) secara
@@ -1042,6 +1062,14 @@ model PayrollSlip {
 
   note String?
 
+  /// Terisi saat slip INI ditandai dibayar — baik lewat "Bayar" per orang
+  /// maupun ikut terbawa saat seluruh run dibayar sekaligus. Berbeda dari
+  /// PayrollRun.paidAt: run baru berstatus PAID setelah SEMUA slipnya
+  /// terbayar, sehingga karyawan bisa dibayar satu-satu tanpa menunggu yang
+  /// lain.
+  paidAt   DateTime?
+  paidById String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1049,9 +1077,11 @@ model PayrollSlip {
   user       user               @relation(fields: [userId], references: [id], onDelete: Cascade)
   branch     Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
   customRole custom_role?       @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
+  paidBy     user?              @relation("PayrollSlipPaidBy", fields: [paidById], references: [id], onDelete: SetNull)
   entries    PayrollSlipEntry[]
 
   @@unique([runId, userId])
+  @@index([paidAt])
   @@index([runId])
   @@index([userId])
   @@index([branchId])

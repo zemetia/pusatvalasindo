@@ -150,25 +150,41 @@ export function buildSlipEntries(
   return entries;
 }
 
+/** Bentuk minimal sebuah entri yang dibutuhkan untuk menjumlahkan totalnya. */
+type EntryLike = { type: EntryType; status: EntryStatus; amount: number; flag?: string | null };
+
+/**
+ * Jumlahkan total per tipe dari sekumpulan entri — dipakai baik saat menyusun
+ * slip baru (`summarize`) maupun saat menambah/menghapus entri MANUAL di slip
+ * yang sudah ada, supaya kedua jalur itu tidak punya rumus penjumlahan yang
+ * bisa menyimpang satu sama lain.
+ */
+export function computeTotals(entries: EntryLike[]) {
+  const sum = (pred: (e: EntryLike) => boolean) =>
+    entries.filter((e) => e.status === "APPLIED" && pred(e)).reduce((s, e) => s + e.amount, 0);
+
+  return {
+    totalBonus: sum((e) => e.type === "BONUS"),
+    totalPenalty: Math.abs(sum((e) => e.type === "DENDA")),
+    totalDeduction: Math.abs(sum((e) => e.type === "POTONGAN")),
+    totalAllowance: sum((e) => e.type === "TUNJANGAN"),
+    needsReview: entries.some((e) => e.status !== "APPLIED" || e.flag != null),
+  };
+}
+
 /** Ringkasan slip, diturunkan dari entri — bukan diketik ulang. */
 export function summarize(
   calc: Awaited<ReturnType<typeof payrollService.calculateMonthlyPayroll>>,
   entries: EntryDraft[]
 ) {
-  const sum = (pred: (e: EntryDraft) => boolean) =>
-    entries.filter((e) => e.status === "APPLIED" && pred(e)).reduce((s, e) => s + e.amount, 0);
-
-  const totalBonus = sum((e) => e.type === "BONUS");
-  const totalPenalty = Math.abs(sum((e) => e.type === "DENDA"));
-  const totalDeduction = Math.abs(sum((e) => e.type === "POTONGAN"));
-  const totalAllowance = sum((e) => e.type === "TUNJANGAN");
+  const totals = computeTotals(entries);
 
   const c = calc.components;
   // Gaji kotor = komponen tetap + tunjangan tambahan. `totalGrossFixed` dari
   // perhitungan sudah memuat keduanya; dihitung ulang di sini akan menggandakan
   // tunjangan, jadi dipakai apa adanya.
   const grossPay = c.totalGrossFixed;
-  const netPay = grossPay - totalDeduction - totalPenalty + totalBonus;
+  const netPay = grossPay - totals.totalDeduction - totals.totalPenalty + totals.totalBonus;
 
   return {
     baseSalary: c.baseSalary,
@@ -176,13 +192,9 @@ export function summarize(
     transportAllowance: c.transportAllowance,
     positionAllowance: c.positionAllowance,
     bpjsKesehatan: c.bpjsKesehatan,
-    totalBonus,
-    totalPenalty,
-    totalDeduction,
-    totalAllowance,
+    ...totals,
     grossPay,
     netPay,
-    needsReview: entries.some((e) => e.status !== "APPLIED" || e.flag != null),
   };
 }
 
@@ -204,6 +216,7 @@ export const payrollRunService = {
             user: { select: { id: true, name: true } },
             branch: { select: { name: true } },
             customRole: { select: { name: true } },
+            paidBy: { select: { name: true } },
             entries: { orderBy: { id: "asc" } },
           },
         },
@@ -257,13 +270,23 @@ export const payrollRunService = {
     // ulang memanggil KPI service, yang menulis ulang KpiMonthlyResult bulan
     // itu dari data terkini. Dasar gaji yang sudah dibayar akan bergeser di
     // belakang layar.
-    const sudahDibayar = await prisma.payrollRun.findFirst({
-      where: { companyId, periodYear: year, periodMonth: month, status: "PAID" },
-      select: { id: true },
+    //
+    // Ini juga berlaku kalau BARU SEBAGIAN karyawan dibayar (lewat "Bayar" per
+    // orang): generate ulang men-VOID run yang sedang berjalan dan membuat run
+    // baru, yang akan membuat slip karyawan yang sudah dibayar itu tidak lagi
+    // muncul di run aktif — riwayat pembayarannya jadi tidak terlacak dari
+    // halaman ini. Jadi begitu ada satu slip saja yang paidAt-nya terisi,
+    // periode itu dikunci sama seperti run yang berstatus PAID.
+    const runAktif = await prisma.payrollRun.findFirst({
+      where: { companyId, periodYear: year, periodMonth: month, status: { not: "VOID" } },
+      select: {
+        status: true,
+        slips: { where: { paidAt: { not: null } }, select: { id: true }, take: 1 },
+      },
     });
-    if (sudahDibayar) {
+    if (runAktif && (runAktif.status === "PAID" || runAktif.slips.length > 0)) {
       throw new ValidationError(
-        "Gaji periode ini sudah dibayar dan tidak bisa dihitung ulang. " +
+        "Gaji periode ini sudah ada yang dibayar dan tidak bisa dihitung ulang seluruhnya. " +
           "Angkanya tersimpan lengkap beserta alasannya di slip."
       );
     }
@@ -383,12 +406,16 @@ export const payrollRunService = {
   },
 
   /**
-   * Tandai run sudah dibayar.
+   * Tandai run sudah dibayar — SEMUA slip yang belum dibayar ikut ditandai.
    *
    * `finalizedAt` ikut diisi kalau belum: alur di halaman payroll hanya punya
    * satu tombol (Bayar), tapi kolom itu tetap harus terisi supaya riwayatnya
    * lengkap. Setelah PAID, isi run tidak boleh berubah lagi — generate ulang
    * membuat run baru dan tidak menyentuh yang ini.
+   *
+   * Slip yang sudah dibayar duluan (lewat "Bayar" per orang) TIDAK ditimpa
+   * `paidAt`/`paidById`-nya — orang yang membayarkannya tetap tercatat siapa
+   * apa adanya.
    */
   markPaid: async (runId: string, userId: string | null) => {
     const run = await prisma.payrollRun.findUnique({
@@ -402,14 +429,352 @@ export const payrollRunService = {
     }
 
     const now = new Date();
-    return prisma.payrollRun.update({
-      where: { id: runId },
-      data: {
-        status: "PAID",
-        paidAt: now,
-        finalizedAt: run.finalizedAt ?? now,
-        finalizedById: run.finalizedAt ? undefined : userId,
+    return prisma.$transaction(async (tx) => {
+      await tx.payrollSlip.updateMany({
+        where: { runId, paidAt: null },
+        data: { paidAt: now, paidById: userId },
+      });
+
+      return tx.payrollRun.update({
+        where: { id: runId },
+        data: {
+          status: "PAID",
+          paidAt: now,
+          finalizedAt: run.finalizedAt ?? now,
+          finalizedById: run.finalizedAt ? undefined : userId,
+        },
+      });
+    });
+  },
+
+  /**
+   * Tandai SATU slip sudah dibayar, tanpa menunggu rekan sejawatnya.
+   *
+   * Kalau ini slip terakhir yang belum dibayar di runnya, run ikut ditandai
+   * PAID — supaya statusnya selalu konsisten dengan slip-slip di dalamnya,
+   * dan supaya guard di `generateRun` (yang mengunci run berstatus PAID)
+   * tetap berlaku begitu semua orang sudah menerima gajinya.
+   */
+  markSlipPaid: async (slipId: string, userId: string | null) => {
+    const slip = await prisma.payrollSlip.findUnique({
+      where: { id: slipId },
+      select: { id: true, runId: true, paidAt: true, run: { select: { status: true, finalizedAt: true } } },
+    });
+    if (!slip) throw new NotFoundError("Slip gaji tidak ditemukan");
+    if (slip.run.status === "VOID") {
+      throw new ValidationError("Run ini sudah digantikan perhitungan yang lebih baru");
+    }
+    if (slip.paidAt) throw new ValidationError("Slip ini sudah dibayar");
+
+    const now = new Date();
+    return prisma.$transaction(async (tx) => {
+      const updatedSlip = await tx.payrollSlip.update({
+        where: { id: slipId },
+        data: { paidAt: now, paidById: userId },
+      });
+
+      const belumDibayar = await tx.payrollSlip.count({
+        where: { runId: slip.runId, paidAt: null },
+      });
+
+      if (belumDibayar === 0) {
+        await tx.payrollRun.update({
+          where: { id: slip.runId },
+          data: {
+            status: "PAID",
+            paidAt: now,
+            finalizedAt: slip.run.finalizedAt ?? now,
+            finalizedById: slip.run.finalizedAt ? undefined : userId,
+          },
+        });
+      }
+
+      return updatedSlip;
+    });
+  },
+
+  /**
+   * Hitung ulang SATU slip di dalam run yang sedang berjalan, tanpa menyentuh
+   * slip karyawan lain dan tanpa membuat run/attempt baru.
+   *
+   * Beda dari `generateRun`: itu untuk seluruh PT (dan men-VOID run lama),
+   * ini untuk satu orang saat datanya baru saja dikoreksi (mis. presensi
+   * baru diperbaiki) dan HR ingin melihat dampaknya ke satu slip itu saja
+   * sebelum membayar.
+   *
+   * Entri MANUAL (penyesuaian HR di luar rule engine) sengaja TIDAK ikut
+   * dihapus — hanya entri RULE/COMPONENT/SISTEM yang disusun ulang dari hasil
+   * perhitungan terbaru. Kalau ikut terhapus, mengoreksi satu rule akan diam-
+   * diam menghapus bonus/potongan manual yang sudah dicatat HR beserta
+   * alasannya.
+   */
+  recalculateSlip: async (slipId: string) => {
+    const slip = await prisma.payrollSlip.findUnique({
+      where: { id: slipId },
+      select: {
+        id: true,
+        userId: true,
+        runId: true,
+        paidAt: true,
+        run: { select: { status: true, periodMonth: true, periodYear: true } },
+        entries: { where: { source: "MANUAL" }, select: { type: true, status: true, amount: true, flag: true } },
       },
+    });
+    if (!slip) throw new NotFoundError("Slip gaji tidak ditemukan");
+    if (slip.paidAt) throw new ValidationError("Slip yang sudah dibayar tidak bisa dihitung ulang");
+    if (slip.run.status === "PAID" || slip.run.status === "VOID") {
+      throw new ValidationError("Run ini tidak bisa dihitung ulang lagi");
+    }
+
+    const calc = await payrollService.calculateMonthlyPayroll(
+      slip.userId,
+      slip.run.periodMonth,
+      slip.run.periodYear
+    );
+    const entries = buildSlipEntries(calc);
+    const baseSummary = summarize(calc, entries);
+
+    // Gabungkan hasil rule engine dengan entri MANUAL yang tetap dipertahankan
+    // — totalnya harus mencerminkan KEDUANYA, bukan cuma hasil rule terbaru.
+    const manualTotals = computeTotals(
+      slip.entries.map((e) => ({ ...e, amount: Number(e.amount) }))
+    );
+    const totalBonus = baseSummary.totalBonus + manualTotals.totalBonus;
+    const totalDeduction = baseSummary.totalDeduction + manualTotals.totalDeduction;
+    const totalPenalty = baseSummary.totalPenalty + manualTotals.totalPenalty;
+    const netPay = baseSummary.grossPay - totalDeduction - totalPenalty + totalBonus;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.payrollSlipEntry.deleteMany({ where: { slipId, source: { not: "MANUAL" } } });
+      await tx.payrollSlip.update({
+        where: { id: slipId },
+        data: {
+          baseSalary: baseSummary.baseSalary,
+          mealAllowance: baseSummary.mealAllowance,
+          transportAllowance: baseSummary.transportAllowance,
+          positionAllowance: baseSummary.positionAllowance,
+          bpjsKesehatan: baseSummary.bpjsKesehatan,
+          totalBonus,
+          totalPenalty,
+          totalDeduction,
+          totalAllowance: baseSummary.totalAllowance,
+          grossPay: baseSummary.grossPay,
+          netPay,
+          needsReview: baseSummary.needsReview || manualTotals.needsReview,
+          entries: {
+            create: entries.map((e) => ({
+              source: e.source,
+              type: e.type,
+              status: e.status,
+              ruleId: e.ruleId ?? null,
+              ruleVersion: e.ruleVersion ?? null,
+              salaryComponentId: e.salaryComponentId ?? null,
+              tier: e.tier ?? null,
+              label: e.label,
+              amount: e.amount,
+              inputs: e.inputs,
+              breakdown: e.breakdown,
+              formula: e.formula ?? null,
+              flag: e.flag ?? null,
+            })),
+          },
+        },
+      });
+    });
+
+    return slip.runId;
+  },
+
+  /**
+   * Slip yang SUDAH tersimpan untuk satu karyawan pada satu periode, kalau
+   * ada — dipakai kalkulator cepat di halaman Payroll supaya begitu periode
+   * itu sudah pernah dihitung lewat Run, angkanya langsung tampil tanpa
+   * pemakainya perlu menekan "Hitung" lagi. Run VOID sengaja tidak ikut,
+   * sama seperti `getRun`: sudah digantikan run yang lebih baru.
+   */
+  findSlipDetailFor: async (userId: string, month: number, year: number) => {
+    const slip = await prisma.payrollSlip.findFirst({
+      where: { userId, run: { periodMonth: month, periodYear: year, status: { not: "VOID" } } },
+      orderBy: { run: { attempt: "desc" } },
+      select: { id: true },
+    });
+    if (!slip) return null;
+    return payrollRunService.getSlipDetail(slip.id);
+  },
+
+  /** Slip satu karyawan beserta seluruh rincian, PT, dan periode runnya. */
+  getSlipDetail: async (slipId: string) => {
+    return prisma.payrollSlip.findUnique({
+      where: { id: slipId },
+      include: {
+        user: { select: { id: true, name: true } },
+        branch: { select: { name: true } },
+        customRole: { select: { name: true } },
+        paidBy: { select: { name: true } },
+        entries: { orderBy: { id: "asc" } },
+        run: {
+          select: {
+            id: true,
+            companyId: true,
+            periodMonth: true,
+            periodYear: true,
+            status: true,
+            company: { select: { name: true } },
+          },
+        },
+      },
+    });
+  },
+
+  /**
+   * Boleh diubah (entri manual ditambah/dihapus, atau dihitung ulang) selama
+   * slip dan runnya belum dibayar/digantikan. Satu aturan, dipakai di dua
+   * tempat (`addManualEntry`, `removeManualEntry`) supaya guard-nya tidak
+   * bisa berbeda.
+   */
+  assertSlipEditable(slip: { paidAt: Date | null; run: { status: string } }) {
+    if (slip.paidAt) throw new ValidationError("Slip yang sudah dibayar tidak bisa diubah");
+    if (slip.run.status === "PAID" || slip.run.status === "VOID") {
+      throw new ValidationError("Run ini sudah tidak bisa diubah");
+    }
+  },
+
+  /**
+   * Tambah SATU entri penyesuaian manual (bonus atau pengurangan) ke sebuah
+   * slip, di luar apa pun yang dihasilkan rule engine — mis. bonus
+   * proyek khusus atau potongan yang tidak tercakup rule reward/denda mana pun.
+   * `label` adalah alasannya, dan wajib diisi: entri manual harus bisa
+   * menjelaskan dirinya sendiri persis seperti entri rule.
+   */
+  addManualEntry: async (params: {
+    slipId: string;
+    type: "BONUS" | "POTONGAN";
+    label: string;
+    amount: number;
+  }) => {
+    const { slipId, type, amount } = params;
+    const label = params.label.trim();
+    if (!label) throw new ValidationError("Alasan wajib diisi");
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new ValidationError("Nominal harus lebih dari 0");
+    }
+
+    const slip = await prisma.payrollSlip.findUnique({
+      where: { id: slipId },
+      select: {
+        paidAt: true,
+        baseSalary: true,
+        mealAllowance: true,
+        transportAllowance: true,
+        positionAllowance: true,
+        bpjsKesehatan: true,
+        run: { select: { status: true } },
+        entries: { select: { type: true, status: true, amount: true, flag: true } },
+      },
+    });
+    if (!slip) throw new NotFoundError("Slip gaji tidak ditemukan");
+    payrollRunService.assertSlipEditable(slip);
+
+    // Bonus manual selalu menambah, pengurangan manual selalu mengurangi —
+    // arahnya ditentukan oleh tipe yang dipilih, bukan oleh tanda nominal yang
+    // diketik.
+    const signedAmount = type === "BONUS" ? Math.abs(amount) : -Math.abs(amount);
+
+    return prisma.$transaction(async (tx) => {
+      const created = await tx.payrollSlipEntry.create({
+        data: { slipId, source: "MANUAL", type, status: "APPLIED", label, amount: signedAmount },
+      });
+
+      const allEntries = [
+        ...slip.entries.map((e) => ({ ...e, amount: Number(e.amount) })),
+        { type, status: "APPLIED" as const, amount: signedAmount, flag: null },
+      ];
+      const totals = computeTotals(allEntries);
+      const grossPay =
+        Number(slip.baseSalary) +
+        Number(slip.mealAllowance) +
+        Number(slip.transportAllowance) +
+        Number(slip.positionAllowance) +
+        Number(slip.bpjsKesehatan) +
+        totals.totalAllowance;
+      const netPay = grossPay - totals.totalDeduction - totals.totalPenalty + totals.totalBonus;
+
+      await tx.payrollSlip.update({
+        where: { id: slipId },
+        data: {
+          totalBonus: totals.totalBonus,
+          totalPenalty: totals.totalPenalty,
+          totalDeduction: totals.totalDeduction,
+          totalAllowance: totals.totalAllowance,
+          grossPay,
+          netPay,
+          needsReview: totals.needsReview,
+        },
+      });
+
+      return created;
+    });
+  },
+
+  /** Hapus satu entri manual. Entri dari rule engine tidak boleh dihapus lewat sini. */
+  removeManualEntry: async (entryId: string) => {
+    const entry = await prisma.payrollSlipEntry.findUnique({
+      where: { id: entryId },
+      select: {
+        slipId: true,
+        source: true,
+        slip: {
+          select: {
+            paidAt: true,
+            baseSalary: true,
+            mealAllowance: true,
+            transportAllowance: true,
+            positionAllowance: true,
+            bpjsKesehatan: true,
+            run: { select: { status: true } },
+          },
+        },
+      },
+    });
+    if (!entry) throw new NotFoundError("Entri tidak ditemukan");
+    if (entry.source !== "MANUAL") {
+      throw new ValidationError("Hanya penyesuaian manual yang bisa dihapus di sini");
+    }
+    payrollRunService.assertSlipEditable(entry.slip);
+
+    const slipId = entry.slipId;
+    return prisma.$transaction(async (tx) => {
+      await tx.payrollSlipEntry.delete({ where: { id: entryId } });
+
+      const remaining = await tx.payrollSlipEntry.findMany({
+        where: { slipId },
+        select: { type: true, status: true, amount: true, flag: true },
+      });
+      const totals = computeTotals(remaining.map((e) => ({ ...e, amount: Number(e.amount) })));
+      const s = entry.slip;
+      const grossPay =
+        Number(s.baseSalary) +
+        Number(s.mealAllowance) +
+        Number(s.transportAllowance) +
+        Number(s.positionAllowance) +
+        Number(s.bpjsKesehatan) +
+        totals.totalAllowance;
+      const netPay = grossPay - totals.totalDeduction - totals.totalPenalty + totals.totalBonus;
+
+      await tx.payrollSlip.update({
+        where: { id: slipId },
+        data: {
+          totalBonus: totals.totalBonus,
+          totalPenalty: totals.totalPenalty,
+          totalDeduction: totals.totalDeduction,
+          totalAllowance: totals.totalAllowance,
+          grossPay,
+          netPay,
+          needsReview: totals.needsReview,
+        },
+      });
+
+      return slipId;
     });
   },
 };

@@ -146,6 +146,8 @@ Each gated by the matching web permission; PT-scoped automatically. Common args:
 | `record_stockist_mutation` | stockist (TOP_UP / WITHDRAWAL / ADJUSTMENT / OPENING, or TRANSFER_OUT to another pocket; updates balance) | `stockist.manage` |
 | `record_kas_entry` | kas daily entry (upsert a pocket's cash balance for a date) | `stockist.manage` |
 | `fill_stockist_daily_check` | stockist opname (today's physical count per pocket/item) | `stockist.manage` |
+| `get_payroll_rules` | Rule Reward & Denda (payroll-rule.service) — versioned bonus/penalty rules with tiers, guards, targets, validation state; optional `rule_key` / `only_active` / `only_latest` filters | `payroll.view_all` / `payroll.view_company` |
+| `save_payroll_rule` | Rule Reward & Denda — saves a rule as a **new version** (never overwrites); direction is per-tier/guard sign, not per-rule | `payroll.manage` |
 
 Every operate tool is a thin wrapper over an existing service, so it inherits that
 service's validation and scope guards (e.g. `assertCompanyAccess`, today-only opname,

@@ -115,6 +115,14 @@ model PayrollSlip {
 
   note String?
 
+  /// Terisi saat slip INI ditandai dibayar — baik lewat "Bayar" per orang
+  /// maupun ikut terbawa saat seluruh run dibayar sekaligus. Berbeda dari
+  /// PayrollRun.paidAt: run baru berstatus PAID setelah SEMUA slipnya
+  /// terbayar, sehingga karyawan bisa dibayar satu-satu tanpa menunggu yang
+  /// lain.
+  paidAt   DateTime?
+  paidById String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -122,7 +130,10 @@ model PayrollSlip {
   user       user               @relation(fields: [userId], references: [id], onDelete: Cascade)
   branch     Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
   customRole custom_role?       @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
+  paidBy     user?              @relation("PayrollSlipPaidBy", fields: [paidById], references: [id], onDelete: SetNull)
   entries    PayrollSlipEntry[]
+
+  @@index([paidAt])
 
   @@unique([runId, userId])
   @@index([runId])

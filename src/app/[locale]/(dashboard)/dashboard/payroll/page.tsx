@@ -100,7 +100,9 @@ export default async function PayrollPage({
       {/* Penggajian per bulan — hanya untuk yang berwenang mengelola gaji
           orang lain. Karyawan yang cuma melihat slipnya sendiri langsung ke
           kalkulator di bawah. */}
-      {manage.allowed && companies.length > 0 && <PayrollRunPanel companies={companies} />}
+      {manage.allowed && companies.length > 0 && (
+        <PayrollRunPanel companies={companies} locale={locale} />
+      )}
 
       <PayrollPageClient users={serializedUsers} companies={companies} />
     </PageShell>

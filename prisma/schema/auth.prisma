@@ -96,6 +96,7 @@ model user {
   attendances        Attendance[]       @relation("AttendanceEmployee")
   attendancesEdited  Attendance[]       @relation("AttendanceEditedBy")
   payrollSlips       PayrollSlip[]
+  payrollSlipsPaid   PayrollSlip[]      @relation("PayrollSlipPaidBy")
   payrollRunsGenerated PayrollRun[]     @relation("PayrollRunGeneratedBy")
   payrollRunsFinalized PayrollRun[]     @relation("PayrollRunFinalizedBy")
   payrollRulesCreated  PayrollRule[]    @relation("PayrollRuleCreatedBy")

@@ -7,6 +7,7 @@ import {
   SectionCard,
   EmptyState,
 } from "@/components/admin/page-shell";
+import { cn } from "@/lib/utils";
 import { SearchInput } from "@/components/admin/search-input";
 import { TradingViewMiniChart } from "@/components/admin/tradingview-mini-chart";
 import { Button } from "@/components/ui/button";
@@ -114,10 +115,28 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
         icon={<IconChartCandle className="size-5" />}
         action={
           <>
+            <Badge
+              variant="outline"
+              className={
+                data.smartdealStatus.active
+                  ? "border-success/40 text-success gap-1.5"
+                  : "border-destructive/40 text-destructive gap-1.5"
+              }
+              title={data.smartdealStatus.lastError ?? undefined}
+            >
+              <span
+                className={`size-1.5 rounded-full ${
+                  data.smartdealStatus.active ? "bg-success" : "bg-destructive"
+                }`}
+              />
+              SmartDeal {data.smartdealStatus.active ? "Aktif" : "Down"}
+            </Badge>
             <span className="text-muted-foreground hidden text-xs sm:inline">
-              Kurs SmartDeal per{" "}
-              {data.smartdealFetchedAt ? formatUpdatedAt(data.smartdealFetchedAt) : "—"} · halaman
-              dicek {formatUpdatedAt(data.updatedAt)} (auto tiap 30 detik)
+              Kurs diperbarui SmartDeal jam{" "}
+              {data.smartdealStatus.sourceUpdatedAt
+                ? formatUpdatedAt(data.smartdealStatus.sourceUpdatedAt)
+                : "—"}{" "}
+              · dicek {formatUpdatedAt(data.updatedAt)} (auto tiap 30 detik)
             </span>
             <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
               <IconRefresh className={loading ? "size-4 animate-spin" : "size-4"} />
@@ -197,10 +216,26 @@ export function WatcherValasPageClient({ initialData }: WatcherValasPageClientPr
                           <span className="text-muted-foreground truncate">{r.name}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="tabular text-right">
+                      <TableCell
+                        className={cn(
+                          "tabular text-right",
+                          r.smartdealBuy != null &&
+                            r.smartdealPrevBuy != null &&
+                            r.smartdealBuy !== r.smartdealPrevBuy &&
+                            "bg-warning-muted"
+                        )}
+                      >
                         <RateCell value={r.smartdealBuy} prev={r.smartdealPrevBuy} />
                       </TableCell>
-                      <TableCell className="tabular text-right">
+                      <TableCell
+                        className={cn(
+                          "tabular text-right",
+                          r.smartdealSell != null &&
+                            r.smartdealPrevSell != null &&
+                            r.smartdealSell !== r.smartdealPrevSell &&
+                            "bg-warning-muted"
+                        )}
+                      >
                         <RateCell value={r.smartdealSell} prev={r.smartdealPrevSell} />
                       </TableCell>
                       <TableCell className="tabular text-right">

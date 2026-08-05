@@ -43,8 +43,69 @@ export type PayrollSlipView = {
   grossPay: number;
   netPay: number;
   needsReview: boolean;
+  paidAt: string | null;
+  paidByName: string | null;
   entries: PayrollEntryView[];
 };
+
+type SlipDetailRecord = NonNullable<Awaited<ReturnType<typeof payrollRunService.getSlipDetail>>>;
+
+export type PayrollSlipDetailView = PayrollSlipView & {
+  runId: string;
+  runStatus: string;
+  companyName: string;
+  periodMonth: number;
+  periodYear: number;
+  /** Boleh ditambah/dihapus entri manual atau dihitung ulang. */
+  canEdit: boolean;
+};
+
+export function serializeSlipDetail(slip: SlipDetailRecord): PayrollSlipDetailView {
+  const canEdit = !slip.paidAt && slip.run.status !== "PAID" && slip.run.status !== "VOID";
+
+  return {
+    id: slip.id,
+    userId: slip.userId,
+    employeeName: slip.user.name,
+    branchName: slip.branch?.name ?? "—",
+    roleName: slip.customRole?.name ?? "Karyawan",
+    baseSalary: n(slip.baseSalary),
+    mealAllowance: n(slip.mealAllowance),
+    transportAllowance: n(slip.transportAllowance),
+    positionAllowance: n(slip.positionAllowance),
+    bpjsKesehatan: n(slip.bpjsKesehatan),
+    totalBonus: n(slip.totalBonus),
+    totalPenalty: n(slip.totalPenalty),
+    totalDeduction: n(slip.totalDeduction),
+    totalAllowance: n(slip.totalAllowance),
+    grossPay: n(slip.grossPay),
+    netPay: n(slip.netPay),
+    needsReview: slip.needsReview,
+    paidAt: slip.paidAt?.toISOString() ?? null,
+    paidByName: slip.paidBy?.name ?? null,
+    entries: slip.entries.map((e) => ({
+      id: e.id,
+      source: e.source,
+      type: e.type,
+      status: e.status,
+      ruleId: e.ruleId,
+      ruleVersion: e.ruleVersion,
+      tier: e.tier,
+      label: e.label,
+      amount: n(e.amount),
+      inputs: e.inputs,
+      breakdown: e.breakdown,
+      formula: e.formula,
+      flag: e.flag,
+    })),
+    runId: slip.run.id,
+    runStatus: slip.run.status,
+    companyName: slip.run.company.name,
+    periodMonth: slip.run.periodMonth,
+    periodYear: slip.run.periodYear,
+    canEdit,
+  };
+}
 
 export type PayrollRunView = {
   id: string;
@@ -83,6 +144,8 @@ export function serializeRun(run: RunRecord): PayrollRunView {
     grossPay: n(s.grossPay),
     netPay: n(s.netPay),
     needsReview: s.needsReview,
+    paidAt: s.paidAt?.toISOString() ?? null,
+    paidByName: s.paidBy?.name ?? null,
     entries: s.entries.map((e) => ({
       id: e.id,
       source: e.source,

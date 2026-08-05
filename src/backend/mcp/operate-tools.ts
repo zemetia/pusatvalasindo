@@ -10,6 +10,13 @@ import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket
 import { kasPocketRepository } from "@/backend/repositories/kas-pocket.repository";
 import { kasDailyEntryRepository } from "@/backend/repositories/kas-daily-entry.repository";
 import { priceBenchmarkService } from "@/backend/services/price-benchmark.service";
+import {
+  listRulesForUi,
+  saveRuleVersion,
+  type RuleInput,
+  type RuleTierInput,
+} from "@/backend/services/payroll-rule.service";
+import type { RuleGuard, RuleTarget } from "@/backend/payroll-rules/types";
 import { BankMutationType, type StockistMutationType } from "@src/generated/prisma/client";
 import type { McpCaller } from "@/backend/mcp/auth";
 
@@ -63,6 +70,50 @@ function assertCompanyScope(caller: McpCaller, companyId: string) {
     throw new ForbiddenError("Tidak punya akses ke PT lain");
   }
 }
+
+// ── Rule Reward & Denda (payroll-rule.service) ──────────────────────────────
+//
+// Mirrors the Zod schema in src/app/api/payroll-rules/route.ts so an agent's
+// save goes through the exact same shape validation as the web UI, ahead of
+// the deeper checks in saveRuleVersion (signature, tier overlap, targets).
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+const ruleTargetSchema = z.object({
+  company: z.union([z.literal("*"), z.array(z.string().min(1))]).optional(),
+  branch: z.union([z.literal("*"), z.array(z.string().min(1))]).optional(),
+  roles: z.union([z.literal("*"), z.array(z.string().min(1))]).optional(),
+});
+
+const ruleTierSchema = z.object({
+  min: z.number().nullable(),
+  max: z.number().nullable(),
+  nominal: z.number().nullable().describe("Signed: positive adds to salary, negative deducts."),
+  per_unit: z.number().nullable(),
+  unit_field: z.string().max(60).nullable().describe("Result column multiplied by per_unit; required alongside it."),
+  formula: z.string().max(500).nullable(),
+  label: z.string().min(1).max(200).describe("Reason shown on the payslip."),
+  mandatory_saturday: z.boolean().optional().describe("Non-money sanction: mandatory Saturday attendance next period."),
+  warning_letter: z.boolean().optional().describe("Non-money sanction: accompanied by a Surat Peringatan."),
+});
+
+const ruleGuardSchema = z.object({
+  if: z.string().min(1).max(300).describe('Comparison expression evaluated before tiers, e.g. "hari_tercatat == 0"'),
+  aksi: z.enum(["skip", "terapkan"]).describe('"skip" cancels the rule (no money); "terapkan" pays/deducts directly, bypassing tiers.'),
+  flag: z.string().min(1).max(60),
+  nominal: z.number().optional().describe("Only for aksi=terapkan, exactly one of nominal/formula."),
+  formula: z.string().max(500).optional(),
+  label: z.string().max(200).optional().describe("Required for aksi=terapkan."),
+  mandatory_saturday: z.boolean().optional(),
+  warning_letter: z.boolean().optional(),
+});
+
+const ruleDefaultsSchema = z.object({
+  nominal: z.number().optional(),
+  formula: z.string().max(500).optional(),
+  label: z.string().max(200).optional(),
+  flag: z.string().max(60).optional(),
+});
 
 export const OPERATE_TOOLS: OperateTool[] = [
   {
@@ -370,6 +421,76 @@ export const OPERATE_TOOLS: OperateTool[] = [
         quantity: num(args, "quantity"),
         filledBy: caller.id,
       });
+    },
+  },
+  {
+    name: "get_payroll_rules",
+    description:
+      "List Rule Reward & Denda: the versioned bonus/penalty/deduction rules the payroll engine evaluates against hv_* views. Each rule has tiers (nominal/per_unit/formula keyed by a range on tier_field), guards (pre-tier conditions), targets/excepts (PT/branch/role), and validation errors/warnings. Saving never overwrites — only the latest version per rule_key (isLatest) is editable via save_payroll_rule. Global, not PT-scoped: targets decide which PT a rule applies to, not who can see it.",
+    permission: [PERMISSIONS.PAYROLL_VIEW_ALL, PERMISSIONS.PAYROLL_VIEW_COMPANY],
+    inputSchema: {
+      rule_key: z.string().optional().describe("Filter to one rule's versions, e.g. denda_keterlambatan"),
+      only_active: z.boolean().optional().describe("Only versions currently in effect and error-free"),
+      only_latest: z.boolean().optional().describe("Only the latest (editable) version per rule_key"),
+    },
+    handler: async (args) => {
+      const set = await listRulesForUi();
+      let rules = set.rules;
+      const ruleKey = str(args, "rule_key", false);
+      if (ruleKey) rules = rules.filter((r) => r.id === ruleKey);
+      if (args.only_active === true) rules = rules.filter((r) => r.aktif);
+      if (args.only_latest === true) rules = rules.filter((r) => r.isLatest);
+      return { rules, broken: set.broken, setup: set.setup };
+    },
+  },
+  {
+    name: "save_payroll_rule",
+    description:
+      "Save a Rule Reward & Denda as a NEW VERSION (create if rule_key is new, otherwise version the existing rule). Never overwrites: paid payslips keep referencing the old version, which stays byte-identical for its signature. effective_from must be strictly after the previous version's effective_from; the previous version's effective_to is closed automatically the day before. Direction is per-tier/guard, not per-rule: a positive nominal/formula adds to salary, negative deducts — one rule can both reward and penalize via different tiers. sql runs read-only against hv_* views; the MCP owner key always has SQL-edit capability. Because MCP saves have no human user record, createdBy is left null — put who/why in change_note.",
+    permission: [PERMISSIONS.PAYROLL_MANAGE],
+    inputSchema: {
+      rule_key: z
+        .string()
+        .min(1)
+        .max(60)
+        .describe("Stable rule identity, lowercase/digits/underscore starting with a letter, e.g. denda_keterlambatan"),
+      effective_from: z.string().regex(ISO_DATE, "YYYY-MM-DD"),
+      effective_to: z.string().regex(ISO_DATE, "YYYY-MM-DD").nullable().describe("null = still in effect"),
+      mode: z
+        .enum(["AGREGAT", "PER_BARIS"])
+        .describe("AGREGAT: sql returns one row, tier matched once. PER_BARIS: sql returns many rows, each evaluated and summed."),
+      sql: z.string().min(1).max(8000).describe("SELECT-only query over hv_* views."),
+      tier_field: z.string().min(1).max(60).describe("Result column matched against each tier's min/max."),
+      constants: z.record(z.string(), z.number()).nullable().optional().describe('Named numbers usable in formulas, e.g. { "hari_kerja_standar": 24 }'),
+      guards: z.array(ruleGuardSchema).nullable().optional(),
+      defaults: ruleDefaultsSchema.describe("Used when no tier matches. Required."),
+      targets: z.array(ruleTargetSchema).min(1).describe('Groups the rule applies to ("for"). At least one required.'),
+      excepts: z.array(ruleTargetSchema).nullable().optional().describe('Exclusions ("except"); always wins over targets.'),
+      note: z.string().max(2000).nullable().optional().describe("Human note: policy basis, source sheet, etc."),
+      change_note: z.string().max(500).nullable().optional().describe("Why THIS version changed — the audit trail for this save."),
+      tiers: z.array(ruleTierSchema).min(1).describe("At least one tier required."),
+    },
+    handler: async (args) => {
+      const input: RuleInput = {
+        ruleKey: str(args, "rule_key"),
+        effectiveFrom: str(args, "effective_from"),
+        effectiveTo: (args.effective_to as string | null | undefined) ?? null,
+        mode: str(args, "mode") as "AGREGAT" | "PER_BARIS",
+        sql: str(args, "sql"),
+        tierField: str(args, "tier_field"),
+        constants: (args.constants as Record<string, number> | null | undefined) ?? null,
+        guards: (args.guards as RuleGuard[] | null | undefined) ?? null,
+        defaults: args.defaults as RuleInput["defaults"],
+        targets: args.targets as RuleTarget[],
+        excepts: (args.excepts as RuleTarget[] | null | undefined) ?? null,
+        note: (args.note as string | null | undefined) ?? null,
+        changeNote: (args.change_note as string | null | undefined) ?? null,
+        tiers: args.tiers as RuleTierInput[],
+      };
+      // MCP saves carry no user row to attach as createdBy (FK, onDelete SetNull —
+      // see prisma/schema/payroll-rule.prisma), and the owner key always holds the
+      // separate payroll.rules.sql capability, unlike a human caller in the UI.
+      return saveRuleVersion(input, { userId: null, canEditSql: true });
     },
   },
 ];

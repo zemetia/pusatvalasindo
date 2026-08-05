@@ -340,37 +340,12 @@ export async function saveRuleVersion(input: RuleInput, ctx: SaveContext) {
 
   try {
     return await prisma.$transaction(async (tx) => {
-      const created = await tx.payrollRule.create({
-        data: {
-          ruleKey: input.ruleKey,
-          version,
-          effectiveFrom: utcDate(input.effectiveFrom),
-          effectiveTo: input.effectiveTo ? utcDate(input.effectiveTo) : null,
-          mode: input.mode,
-          sql,
-          tierField: input.tierField,
-          constants: input.constants ?? undefined,
-          guards: (input.guards ?? undefined) as unknown as
-            | Prisma.InputJsonValue
-            | undefined,
-          defaults: input.defaults,
-          // Prisma mengetik kolom Json sebagai objek; array sah sebagai JSON tapi
-          // tidak lolos tipe `InputJsonObject`, jadi perlu cast di sini.
-          targets: input.targets as unknown as Prisma.InputJsonValue,
-          excepts: (input.excepts ?? undefined) as unknown as Prisma.InputJsonValue | undefined,
-          note: input.note,
-          changeNote: input.changeNote,
-          signature,
-          createdById: ctx.userId,
-          supersedesId: previous?.id ?? null,
-          tiers: { create: tiers },
-        },
-        include: { tiers: true },
-      });
-
-      // Menutup masa berlaku versi sebelumnya. Sehari sebelum versi baru mulai,
-      // kalau versi lama sudah punya `effectiveTo` yang lebih awal, memakainya
-      // — batas yang sudah ditetapkan manusia tidak boleh dimundurkan diam-diam.
+      // Menutup masa berlaku versi sebelumnya DULU, sebelum versi baru dibuat.
+      // Constraint `payroll_rule_no_overlap` bukan DEFERRABLE, jadi diperiksa
+      // langsung tiap statement — kalau baris baru dibuat lebih dulu selagi
+      // versi lama masih terbuka (effectiveTo null = tak terbatas), rentang
+      // keduanya PASTI beririsan dan INSERT-nya sendiri yang ditolak, sebelum
+      // sempat sampai ke UPDATE yang harusnya menutupnya.
       const closedTo = previous
         ? minIso(
             previous.effectiveTo ? isoOf(previous.effectiveTo) : null,
@@ -419,6 +394,34 @@ export async function saveRuleVersion(input: RuleInput, ctx: SaveContext) {
           },
         });
       }
+
+      const created = await tx.payrollRule.create({
+        data: {
+          ruleKey: input.ruleKey,
+          version,
+          effectiveFrom: utcDate(input.effectiveFrom),
+          effectiveTo: input.effectiveTo ? utcDate(input.effectiveTo) : null,
+          mode: input.mode,
+          sql,
+          tierField: input.tierField,
+          constants: input.constants ?? undefined,
+          guards: (input.guards ?? undefined) as unknown as
+            | Prisma.InputJsonValue
+            | undefined,
+          defaults: input.defaults,
+          // Prisma mengetik kolom Json sebagai objek; array sah sebagai JSON tapi
+          // tidak lolos tipe `InputJsonObject`, jadi perlu cast di sini.
+          targets: input.targets as unknown as Prisma.InputJsonValue,
+          excepts: (input.excepts ?? undefined) as unknown as Prisma.InputJsonValue | undefined,
+          note: input.note,
+          changeNote: input.changeNote,
+          signature,
+          createdById: ctx.userId,
+          supersedesId: previous?.id ?? null,
+          tiers: { create: tiers },
+        },
+        include: { tiers: true },
+      });
 
       return created;
     });

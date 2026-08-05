@@ -40,3 +40,38 @@ export const smartdealRateRepository = {
       )
     ),
 };
+
+const STATUS_SINGLETON_ID = "singleton";
+
+export const smartdealScrapeStatusRepository = {
+  find: () => prisma.smartdealScrapeStatus.findUnique({ where: { id: STATUS_SINGLETON_ID } }),
+
+  recordSuccess: (sourceUpdatedAt: Date | null) => {
+    const now = new Date();
+    return prisma.smartdealScrapeStatus.upsert({
+      where: { id: STATUS_SINGLETON_ID },
+      create: {
+        id: STATUS_SINGLETON_ID,
+        sourceUpdatedAt,
+        lastAttemptAt: now,
+        lastSuccessAt: now,
+        lastError: null,
+      },
+      update: {
+        sourceUpdatedAt,
+        lastAttemptAt: now,
+        lastSuccessAt: now,
+        lastError: null,
+      },
+    });
+  },
+
+  recordFailure: (message: string) => {
+    const now = new Date();
+    return prisma.smartdealScrapeStatus.upsert({
+      where: { id: STATUS_SINGLETON_ID },
+      create: { id: STATUS_SINGLETON_ID, lastAttemptAt: now, lastError: message },
+      update: { lastAttemptAt: now, lastError: message },
+    });
+  },
+};

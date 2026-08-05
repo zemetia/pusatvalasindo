@@ -345,6 +345,15 @@ exports.Prisma.SmartdealRateScalarFieldEnum = {
   fetchedAt: 'fetchedAt'
 };
 
+exports.Prisma.SmartdealScrapeStatusScalarFieldEnum = {
+  id: 'id',
+  sourceUpdatedAt: 'sourceUpdatedAt',
+  lastAttemptAt: 'lastAttemptAt',
+  lastSuccessAt: 'lastSuccessAt',
+  lastError: 'lastError',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.CompanyStockItemScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -517,6 +526,8 @@ exports.Prisma.PayrollSlipScalarFieldEnum = {
   netPay: 'netPay',
   needsReview: 'needsReview',
   note: 'note',
+  paidAt: 'paidAt',
+  paidById: 'paidById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1121,6 +1132,7 @@ exports.Prisma.ModelName = {
   CurrencyPriceSyncSetting: 'CurrencyPriceSyncSetting',
   PriceBenchmark: 'PriceBenchmark',
   SmartdealRate: 'SmartdealRate',
+  SmartdealScrapeStatus: 'SmartdealScrapeStatus',
   CompanyStockItem: 'CompanyStockItem',
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
