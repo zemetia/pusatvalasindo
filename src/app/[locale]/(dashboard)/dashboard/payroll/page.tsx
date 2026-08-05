@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { PayrollPageClient } from "@/components/admin/payroll/payroll-page-client";
+import { PayrollRunPanel } from "@/components/admin/payroll/payroll-run-panel";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconCoin } from "@tabler/icons-react";
 import { getAuthzSubject } from "@/backend/helpers/authz";
@@ -96,6 +97,11 @@ export default async function PayrollPage({
         description="Hitung gaji bulanan karyawan berdasarkan gaji pokok dan hasil KPI."
         icon={<IconCoin className="size-5" />}
       />
+      {/* Penggajian per bulan — hanya untuk yang berwenang mengelola gaji
+          orang lain. Karyawan yang cuma melihat slipnya sendiri langsung ke
+          kalkulator di bawah. */}
+      {manage.allowed && companies.length > 0 && <PayrollRunPanel companies={companies} />}
+
       <PayrollPageClient users={serializedUsers} companies={companies} />
     </PageShell>
   );

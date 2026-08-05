@@ -146,7 +146,7 @@ export async function getCompanyOverview(params: {
     highPerformersThisMonth,
     highPerformersPrevMonth,
     prevRateMutations,
-    dailyBankEntriesRaw,
+    dailyBankBalances,
   ] = await Promise.all([
     flags.suspicious
       ? prisma.attendance.findMany({
@@ -348,15 +348,10 @@ export async function getCompanyOverview(params: {
         })
       : Promise.resolve([]),
 
-    // Saldo bank harian (untuk trend naik/turun saldo per mata uang)
-    flags.bank
-      ? prisma.dailyBankEntry.findMany({
-          where: { bankAccount: { ...(global ? {} : { companyId: scopedCompanyId }) } },
-          orderBy: { date: "desc" },
-          take: 200,
-          select: { date: true, balance: true, bankAccount: { select: { currencyId: true } } },
-        })
-      : Promise.resolve([]),
+    // Saldo bank = input Saldo Bank Harian, BUKAN BankAccount.balance (yang cuma
+    // buku besar mutasi dan sering ketinggalan dari angka real rekening). Diambil
+    // dua isian terakhir per rekening: rn=1 saldo berjalan, rn=2 pembanding trend.
+    flags.bank ? fetchLatestDailyBankBalances(global ? null : scopedCompanyId, todayDate) : Promise.resolve([]),
   ]);
 
   const attendancePct = totalUsers > 0 ? (todayAttendanceCount / totalUsers) * 100 : null;
@@ -394,8 +389,59 @@ export async function getCompanyOverview(params: {
     highPerformersThisMonth,
     highPerformerTrendPct,
     prevRateMutations,
-    dailyBankEntriesRaw,
+    dailyBankBalances,
   };
+}
+
+// ── Saldo bank harian ────────────────────────────────────────────────────────
+
+/** Dua isian Saldo Bank Harian terakhir per rekening aktif (rn 1 = terbaru). */
+export type DailyBankBalanceRow = {
+  bankAccountId: string;
+  currencyId: string;
+  balance: string;
+  rn: number;
+};
+
+async function fetchLatestDailyBankBalances(companyId: string | null, todayDate: Date): Promise<DailyBankBalanceRow[]> {
+  // `date` bertipe DATE murni, jadi dibandingkan sebagai string YYYY-MM-DD lokal —
+  // kalau Date JS dikirim apa adanya, konversi timezone bisa membuang isian hari ini.
+  const today = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(
+    todayDate.getDate()
+  ).padStart(2, "0")}`;
+
+  const rows = companyId
+    ? await prisma.$queryRaw<DailyBankBalanceRow[]>`
+        SELECT * FROM (
+          SELECT e."bankAccountId" AS "bankAccountId",
+                 a."currencyId"    AS "currencyId",
+                 e."balance"::text AS "balance",
+                 (ROW_NUMBER() OVER (PARTITION BY e."bankAccountId" ORDER BY e."date" DESC))::int AS "rn"
+          FROM "DailyBankEntry" e
+          JOIN "BankAccount" a ON a."id" = e."bankAccountId"
+          WHERE a."isActive" = true AND a."companyId" = ${companyId} AND e."date" <= ${today}::date
+        ) t WHERE t."rn" <= 2`
+    : await prisma.$queryRaw<DailyBankBalanceRow[]>`
+        SELECT * FROM (
+          SELECT e."bankAccountId" AS "bankAccountId",
+                 a."currencyId"    AS "currencyId",
+                 e."balance"::text AS "balance",
+                 (ROW_NUMBER() OVER (PARTITION BY e."bankAccountId" ORDER BY e."date" DESC))::int AS "rn"
+          FROM "DailyBankEntry" e
+          JOIN "BankAccount" a ON a."id" = e."bankAccountId"
+          WHERE a."isActive" = true AND e."date" <= ${today}::date
+        ) t WHERE t."rn" <= 2`;
+
+  return rows;
+}
+
+/** Saldo terbaru per rekening (id rekening → nominal), dari isian harian. */
+export function latestBalanceByAccount(rows: DailyBankBalanceRow[]): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const r of rows) {
+    if (r.rn === 1) m.set(r.bankAccountId, Number(r.balance));
+  }
+  return m;
 }
 
 // ── Perhitungan turunan murni (tanpa I/O) dipakai oleh komponen dashboard ────
@@ -473,34 +519,64 @@ export function buildCurrencyCards(currencyStocks: CurrencyStockRow[], prevRateM
     .sort((a, b) => a.code.localeCompare(b.code));
 }
 
-export type BankCurrencyGroup = { currencyId: string; code: string; total: number; count: number };
-type BankAccountRow = { currencyId: string; balance: DecimalLike; currency: { code: string } };
+export type BankCurrencyGroup = {
+  currencyId: string;
+  code: string;
+  total: number;
+  count: number;
+  /** Rekening yang sudah punya isian saldo harian — sisanya belum menyumbang total. */
+  filledCount: number;
+};
+type BankAccountRow = { id: string; currencyId: string; currency: { code: string } };
 
-export function buildBankGroups(bankAccounts: BankAccountRow[]): BankCurrencyGroup[] {
+/**
+ * Total saldo bank per mata uang dari isian **Saldo Bank Harian** terakhir tiap
+ * rekening. Sengaja tidak memakai `BankAccount.balance`: kolom itu hasil akumulasi
+ * BankMutation dan bukan angka yang diinput kasir tiap hari, jadi dulu ringkasan
+ * dashboard bisa jauh meleset dari halaman Saldo Bank Harian.
+ * Rekening yang belum pernah diisi dihitung 0 (tapi tetap masuk `count`).
+ */
+export function buildBankGroups(bankAccounts: BankAccountRow[], dailyBalances: DailyBankBalanceRow[]): BankCurrencyGroup[] {
+  const latest = latestBalanceByAccount(dailyBalances);
   const bankAcc = new Map<string, BankCurrencyGroup>();
   for (const acc of bankAccounts) {
-    const g = bankAcc.get(acc.currencyId) ?? { currencyId: acc.currencyId, code: acc.currency.code, total: 0, count: 0 };
-    g.total += Number(acc.balance.toString());
+    const g =
+      bankAcc.get(acc.currencyId) ??
+      { currencyId: acc.currencyId, code: acc.currency.code, total: 0, count: 0, filledCount: 0 };
+    const bal = latest.get(acc.id);
+    if (bal != null) {
+      g.total += bal;
+      g.filledCount += 1;
+    }
     g.count += 1;
     bankAcc.set(acc.currencyId, g);
   }
   return Array.from(bankAcc.values()).sort((a, b) => b.total - a.total);
 }
 
-type DailyBankEntryRow = { date: Date; balance: DecimalLike; bankAccount: { currencyId: string } };
-
-/** Trend saldo bank (%) untuk mata uang utama, dibandingkan hari terakhir sebelumnya. */
-export function computeBankTrend(dailyEntries: DailyBankEntryRow[], primaryGroup: BankCurrencyGroup | null): number | null {
+/**
+ * Trend saldo bank (%) untuk mata uang utama: total isian terakhir vs isian
+ * sebelumnya, dibandingkan **per rekening**. Rekening yang baru punya satu isian
+ * dianggap tidak berubah, supaya rekening yang telat input tidak bikin trend meledak.
+ */
+export function computeBankTrend(dailyBalances: DailyBankBalanceRow[], primaryGroup: BankCurrencyGroup | null): number | null {
   if (!primaryGroup) return null;
-  const sumByDate = new Map<string, number>();
-  for (const e of dailyEntries) {
-    if (e.bankAccount.currencyId !== primaryGroup.currencyId) continue;
-    const key = e.date.toISOString().slice(0, 10);
-    sumByDate.set(key, (sumByDate.get(key) ?? 0) + Number(e.balance.toString()));
+  const current = new Map<string, number>();
+  const previous = new Map<string, number>();
+  for (const r of dailyBalances) {
+    if (r.currencyId !== primaryGroup.currencyId) continue;
+    (r.rn === 1 ? current : previous).set(r.bankAccountId, Number(r.balance));
   }
-  const sortedEntries = Array.from(sumByDate.entries()).sort((a, b) => (a[0] < b[0] ? 1 : -1));
-  if (sortedEntries.length < 2) return null;
-  const [, latest] = sortedEntries[0];
-  const [, prevVal] = sortedEntries[1];
-  return prevVal !== 0 ? ((latest - prevVal) / prevVal) * 100 : null;
+  if (current.size === 0) return null;
+  let latestTotal = 0;
+  let prevTotal = 0;
+  let hasHistory = false;
+  for (const [accountId, bal] of current) {
+    latestTotal += bal;
+    const prev = previous.get(accountId);
+    if (prev != null) hasHistory = true;
+    prevTotal += prev ?? bal;
+  }
+  if (!hasHistory || prevTotal === 0) return null;
+  return ((latestTotal - prevTotal) / prevTotal) * 100;
 }

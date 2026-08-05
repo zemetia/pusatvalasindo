@@ -198,6 +198,9 @@ exports.Prisma.UserScalarFieldEnum = {
   positionAllowance: 'positionAllowance',
   bpjsKesehatan: 'bpjsKesehatan',
   joinDate: 'joinDate',
+  employmentStatus: 'employmentStatus',
+  contractStartDate: 'contractStartDate',
+  contractEndDate: 'contractEndDate',
   isActive: 'isActive',
   customRoleId: 'customRoleId'
 };
@@ -383,8 +386,6 @@ exports.Prisma.RoleKpiScalarFieldEnum = {
   pointPerUnit: 'pointPerUnit',
   toleranceLimit: 'toleranceLimit',
   toleranceScope: 'toleranceScope',
-  maxAchievement: 'maxAchievement',
-  minAchievement: 'minAchievement',
   inputSource: 'inputSource',
   requiresApproval: 'requiresApproval',
   requiresEvidence: 'requiresEvidence',
@@ -439,28 +440,104 @@ exports.Prisma.KpiMonthlyResultScalarFieldEnum = {
   calculatedAt: 'calculatedAt'
 };
 
-exports.Prisma.PayrollIncentiveMatrixScalarFieldEnum = {
+exports.Prisma.PayrollRuleScalarFieldEnum = {
+  id: 'id',
+  ruleKey: 'ruleKey',
+  version: 'version',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  mode: 'mode',
+  sql: 'sql',
+  tierField: 'tierField',
+  constants: 'constants',
+  guards: 'guards',
+  defaults: 'defaults',
+  targets: 'targets',
+  excepts: 'excepts',
+  note: 'note',
+  changeNote: 'changeNote',
+  signature: 'signature',
+  createdAt: 'createdAt',
+  createdById: 'createdById',
+  supersedesId: 'supersedesId'
+};
+
+exports.Prisma.PayrollRuleTierScalarFieldEnum = {
+  id: 'id',
+  ruleId: 'ruleId',
+  sortOrder: 'sortOrder',
+  min: 'min',
+  max: 'max',
+  nominal: 'nominal',
+  perUnit: 'perUnit',
+  formula: 'formula',
+  unitField: 'unitField',
+  label: 'label',
+  mandatorySaturday: 'mandatorySaturday',
+  warningLetter: 'warningLetter'
+};
+
+exports.Prisma.PayrollRunScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
-  customRoleId: 'customRoleId',
-  name: 'name',
-  isActive: 'isActive',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  periodMonth: 'periodMonth',
+  periodYear: 'periodYear',
+  attempt: 'attempt',
+  status: 'status',
+  rulesetHash: 'rulesetHash',
+  rulesetVersion: 'rulesetVersion',
+  generatedAt: 'generatedAt',
+  generatedById: 'generatedById',
+  finalizedAt: 'finalizedAt',
+  finalizedById: 'finalizedById',
+  paidAt: 'paidAt',
+  note: 'note',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PayrollIncentiveTierScalarFieldEnum = {
+exports.Prisma.PayrollSlipScalarFieldEnum = {
   id: 'id',
-  matrixId: 'matrixId',
-  minScore: 'minScore',
-  maxScore: 'maxScore',
-  outcome: 'outcome',
-  cashAmount: 'cashAmount',
-  mandatorySaturday: 'mandatorySaturday',
-  topRank: 'topRank',
+  runId: 'runId',
+  userId: 'userId',
+  branchId: 'branchId',
+  customRoleId: 'customRoleId',
+  baseSalary: 'baseSalary',
+  mealAllowance: 'mealAllowance',
+  transportAllowance: 'transportAllowance',
+  positionAllowance: 'positionAllowance',
+  bpjsKesehatan: 'bpjsKesehatan',
+  totalBonus: 'totalBonus',
+  totalPenalty: 'totalPenalty',
+  totalDeduction: 'totalDeduction',
+  totalAllowance: 'totalAllowance',
+  grossPay: 'grossPay',
+  netPay: 'netPay',
+  needsReview: 'needsReview',
   note: 'note',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PayrollSlipEntryScalarFieldEnum = {
+  id: 'id',
+  slipId: 'slipId',
+  source: 'source',
+  type: 'type',
+  status: 'status',
+  ruleId: 'ruleId',
+  ruleVersion: 'ruleVersion',
+  salaryComponentId: 'salaryComponentId',
+  tier: 'tier',
+  label: 'label',
+  amount: 'amount',
+  inputs: 'inputs',
+  breakdown: 'breakdown',
+  formula: 'formula',
+  flag: 'flag',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SalaryComponentScalarFieldEnum = {
@@ -820,6 +897,13 @@ exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
   HOLIDAY: 'HOLIDAY'
 };
 
+exports.EmploymentStatus = exports.$Enums.EmploymentStatus = {
+  BELUM_KONTRAK: 'BELUM_KONTRAK',
+  PROBATION: 'PROBATION',
+  PKWT: 'PKWT',
+  PKWTT: 'PKWTT'
+};
+
 exports.ScopeMode = exports.$Enums.ScopeMode = {
   NONE: 'NONE',
   OWN: 'OWN',
@@ -894,11 +978,36 @@ exports.KpiPeriodStatus = exports.$Enums.KpiPeriodStatus = {
   LOCKED: 'LOCKED'
 };
 
-exports.PayrollIncentiveOutcome = exports.$Enums.PayrollIncentiveOutcome = {
-  BONUS_CASH: 'BONUS_CASH',
-  SAFE_ZONE: 'SAFE_ZONE',
-  DEDUCTION: 'DEDUCTION',
-  TOP_PERFORMER: 'TOP_PERFORMER'
+exports.PayrollRuleMode = exports.$Enums.PayrollRuleMode = {
+  AGREGAT: 'AGREGAT',
+  PER_BARIS: 'PER_BARIS'
+};
+
+exports.PayrollRunStatus = exports.$Enums.PayrollRunStatus = {
+  DRAFT: 'DRAFT',
+  FINALIZED: 'FINALIZED',
+  PAID: 'PAID',
+  VOID: 'VOID'
+};
+
+exports.PayrollEntrySource = exports.$Enums.PayrollEntrySource = {
+  RULE: 'RULE',
+  COMPONENT: 'COMPONENT',
+  SISTEM: 'SISTEM',
+  MANUAL: 'MANUAL'
+};
+
+exports.PayrollEntryType = exports.$Enums.PayrollEntryType = {
+  BONUS: 'BONUS',
+  DENDA: 'DENDA',
+  POTONGAN: 'POTONGAN',
+  TUNJANGAN: 'TUNJANGAN'
+};
+
+exports.PayrollEntryStatus = exports.$Enums.PayrollEntryStatus = {
+  APPLIED: 'APPLIED',
+  SKIPPED: 'SKIPPED',
+  ERROR: 'ERROR'
 };
 
 exports.SalaryComponentKind = exports.$Enums.SalaryComponentKind = {
@@ -1018,8 +1127,11 @@ exports.Prisma.ModelName = {
   KpiEntry: 'KpiEntry',
   KpiPeriod: 'KpiPeriod',
   KpiMonthlyResult: 'KpiMonthlyResult',
-  PayrollIncentiveMatrix: 'PayrollIncentiveMatrix',
-  PayrollIncentiveTier: 'PayrollIncentiveTier',
+  PayrollRule: 'PayrollRule',
+  PayrollRuleTier: 'PayrollRuleTier',
+  PayrollRun: 'PayrollRun',
+  PayrollSlip: 'PayrollSlip',
+  PayrollSlipEntry: 'PayrollSlipEntry',
   SalaryComponent: 'SalaryComponent',
   UserSalaryComponent: 'UserSalaryComponent',
   HeldFund: 'HeldFund',

@@ -28,8 +28,6 @@ export type KpiScoringConfig = {
   pointPerUnit: number | null;
   toleranceLimit: number | null;
   toleranceScope: KpiToleranceScope | null;
-  maxAchievement: number;
-  minAchievement: number;
 };
 
 /** Satu entri KPI yang sudah disetujui, dipakai sebagai bahan perhitungan. */
@@ -42,7 +40,7 @@ export type ScoringEntry = {
 };
 
 export type KpiItemScore = {
-  /** Rasio pencapaian setelah dibatasi min/maxAchievement. 1 = 100%. */
+  /** Rasio pencapaian apa adanya, tanpa plafon maupun lantai. 1 = 100%. */
   achievement: number;
   /** Kontribusi ke skor akhir: achievement × weight. */
   weightedScore: number;
@@ -103,8 +101,6 @@ export function scoreKpiItem(
 ): KpiItemScore {
   const weeks = weeklyTotals(entries);
   const noData = entries.length === 0;
-  const min = config.minAchievement;
-  const max = config.maxAchievement;
 
   const finish = (
     achievement: number,
@@ -112,10 +108,13 @@ export function scoreKpiItem(
     reference: number,
     explanation: string
   ): KpiItemScore => {
-    const clamped = clamp(achievement, min, max);
+    // Tidak ada plafon maupun lantai: 150% tetap 150%, penalti berlebih tetap
+    // negatif. Satu-satunya pengaman adalah pembagian nol/NaN, yang tidak bisa
+    // disimpan sebagai Decimal.
+    const value = Number.isFinite(achievement) ? achievement : 0;
     return {
-      achievement: clamped,
-      weightedScore: clamped * config.weight,
+      achievement: value,
+      weightedScore: value * config.weight,
       actual,
       reference,
       weeklyTotals: weeks,
@@ -133,10 +132,12 @@ export function scoreKpiItem(
         return finish(0, actual, 0, "Target belum disetel — pencapaian tidak dapat dihitung");
       }
       if (config.direction === "LOWER_BETTER") {
-        // Makin kecil makin baik (mis. tingkat resiko): tepat di target = 100%.
-        const achievement = actual <= 0 ? max : target / actual;
+        // Makin kecil makin baik (mis. tingkat resiko): tepat di batas = 100%,
+        // nihil = 200%, dua kali batas = 0%, lebih dari itu negatif. Bentuk
+        // selisih dipakai — bukan target/actual — karena tanpa plafon rasio
+        // meledak tak terhingga saat realisasi mendekati nol.
         return finish(
-          achievement,
+          2 - actual / target,
           actual,
           target,
           `Realisasi ${formatNumber(actual)} terhadap batas ${formatNumber(target)} (makin kecil makin baik)`

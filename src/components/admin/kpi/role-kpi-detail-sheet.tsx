@@ -38,7 +38,6 @@ export type RoleKpiDetailRow = {
   pointPerUnit: string | null;
   toleranceLimit: string | null;
   toleranceScope: string | null;
-  maxAchievement: string;
   inputSource: string | null;
   requiresApproval: boolean | null;
   requiresEvidence: boolean | null;
@@ -74,7 +73,6 @@ const empty = {
   pointPerUnit: "",
   toleranceLimit: "",
   toleranceScope: "DAILY",
-  maxAchievement: "120",
   inputSource: "",
   requiresApproval: "",
   requiresEvidence: "",
@@ -155,7 +153,6 @@ export function RoleKpiDetailSheet({
         pointPerUnit: roleKpi.pointPerUnit ? String(Number(roleKpi.pointPerUnit)) : "",
         toleranceLimit: roleKpi.toleranceLimit ? String(Number(roleKpi.toleranceLimit)) : "",
         toleranceScope: roleKpi.toleranceScope ?? "DAILY",
-        maxAchievement: String(Math.round(Number(roleKpi.maxAchievement) * 100)),
         inputSource: roleKpi.inputSource ?? "",
         requiresApproval:
           roleKpi.requiresApproval === null ? "" : roleKpi.requiresApproval ? "YES" : "NO",
@@ -228,7 +225,6 @@ export function RoleKpiDetailSheet({
       pointPerUnit: fields.perUnit ? numOrNull(form.pointPerUnit) : null,
       toleranceLimit: fields.tolerance ? numOrNull(form.toleranceLimit) : null,
       toleranceScope: fields.tolerance ? form.toleranceScope : null,
-      maxAchievement: (parseFloat(form.maxAchievement) || 120) / 100,
       inputSource: form.inputSource === "" ? null : form.inputSource,
       requiresApproval: boolOrNull(form.requiresApproval),
       requiresEvidence: boolOrNull(form.requiresEvidence),
@@ -432,21 +428,6 @@ export function RoleKpiDetailSheet({
               </div>
             </>
           )}
-
-          <div className="grid gap-1.5">
-            <FieldLabel tooltip="Plafon pencapaian. 120% berarti kelebihan di atas itu tidak menambah skor.">
-              Plafon Pencapaian (%)
-            </FieldLabel>
-            <Input
-              type="number"
-              min="100"
-              max="300"
-              step="10"
-              value={form.maxAchievement}
-              onChange={(e) => setForm((f) => ({ ...f, maxAchievement: e.target.value }))}
-              className="w-28"
-            />
-          </div>
 
           {/* ── Kebijakan pengisian khusus jabatan ini ── */}
           <div className="grid gap-3 rounded-lg border p-3">

@@ -65,9 +65,9 @@ export async function DashboardKepalaCabang({
   }
 
   const currencyCards = buildCurrencyCards(overview.currencyStocks, overview.prevRateMutations);
-  const bankGroups = buildBankGroups(overview.bankAccounts);
+  const bankGroups = buildBankGroups(overview.bankAccounts, overview.dailyBankBalances);
   const primaryBankGroup = bankGroups.find((g) => g.code === "IDR") ?? bankGroups[0] ?? null;
-  const bankTrendPct = computeBankTrend(overview.dailyBankEntriesRaw, primaryBankGroup);
+  const bankTrendPct = computeBankTrend(overview.dailyBankBalances, primaryBankGroup);
 
   return (
     <PageShell>

@@ -2,9 +2,9 @@
 // KPI — penilaian kinerja karyawan.
 //
 // Modul ini SENGAJA independen dari payroll: keluarannya hanya SKOR (rasio
-// pencapaian tertimbang, 0..maxAchievement). Konversi skor menjadi bonus,
-// potongan, atau kewajiban masuk Sabtu ada di payroll.prisma
-// (PayrollIncentiveMatrix) dan dihitung oleh payroll.service.
+// pencapaian tertimbang, tanpa plafon maupun lantai). Konversi skor menjadi
+// bonus, potongan, atau kewajiban masuk Sabtu ada di rule engine
+// (payroll-rule.prisma), yang membacanya lewat view hv_kpi_monthly.
 //
 // Struktur mengikuti sheet KPI perusahaan (docs/PVI Data/PUSAT KPI SEMUA_.xlsx):
 //   KpiDefinition  = katalog "Key Results" beserta cara menilainya
@@ -76,10 +76,6 @@ model RoleKpi {
   toleranceLimit  Decimal?
   /// Cakupan perhitungan toleransi.
   toleranceScope  KpiToleranceScope? @default(DAILY)
-  /// Plafon pencapaian, 1.2 = maksimal 120%. Menahan satu KPI menutupi KPI lain.
-  maxAchievement  Decimal            @default(1.2)
-  /// Lantai pencapaian; 0 = nilai tidak pernah negatif.
-  minAchievement  Decimal            @default(0)
 
   // ── Override kebijakan pengisian (null = ikut KpiDefinition) ──
   inputSource      KpiInputSource?

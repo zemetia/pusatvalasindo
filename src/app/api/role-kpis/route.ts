@@ -20,8 +20,6 @@ export const roleKpiScoringSchema = {
   pointPerUnit: z.number().nullish(),
   toleranceLimit: z.number().nullish(),
   toleranceScope: z.enum(["DAILY", "WEEKLY", "MONTHLY"]).nullish(),
-  maxAchievement: z.number().min(1).max(3).optional(),
-  minAchievement: z.number().min(0).max(1).optional(),
   inputSource: z.enum(["SELF", "SUPERVISOR", "SYSTEM"]).nullish(),
   requiresApproval: z.boolean().nullish(),
   requiresEvidence: z.boolean().nullish(),

@@ -1,15 +1,13 @@
 import prisma from "@/lib/prisma";
 import { kpiService } from "./kpi.service";
-import { payrollIncentiveService } from "./payroll-incentive.service";
 import { salaryComponentService } from "./salary-component.service";
 import { NotFoundError, ForbiddenError } from "@/backend/errors/app-error";
 import type { KpiBreakdown } from "@/lib/kpi-utils";
 import { allows, allowsCompany, type AuthzSubject } from "@/lib/authz/resolve";
 import {
-  WORK_START_HOUR,
-  WORK_START_MINUTE,
-  jakartaMinutesOfDay,
-} from "@/lib/attendance-rules";
+  evaluateRulesForEmployee,
+  loadEmployeeContext,
+} from "@/backend/payroll-rules/engine";
 
 /**
  * Boleh melihat gaji seorang karyawan? Predikat, bukan guard — supaya halaman
@@ -63,7 +61,7 @@ export const payrollService = {
     // employee, KPI result, attendances, and salary components only depend on
     // employeeId/date range, not on each other — fetch them concurrently
     // instead of round-tripping serially
-    const [employee, kpiResult, attendances, extraComponents] = await Promise.all([
+    const [employee, kpiResult, attendances, extraComponents, employeeCtx] = await Promise.all([
       prisma.user.findUnique({
         where: { id: employeeId },
         select: {
@@ -82,9 +80,10 @@ export const payrollService = {
         where: { userId: employeeId, date: { gte: startDate, lt: endDate } },
       }),
       salaryComponentService.listForUser(employeeId),
+      loadEmployeeContext(employeeId),
     ]);
 
-    if (!employee) throw new NotFoundError("Karyawan tidak ditemukan");
+    if (!employee || !employeeCtx) throw new NotFoundError("Karyawan tidak ditemukan");
 
     const base = Number(employee.baseSalary ?? 0);
     const meal = Number(employee.mealAllowance ?? 0);
@@ -111,19 +110,13 @@ export const payrollService = {
       base + meal + transport + position + bpjs + totalExtraAllowance;
     const dailyRate = totalGrossFixed / 24;
 
-    let totalLateDeduction = 0;
+    // Potongan keterlambatan TIDAK lagi dihitung di sini — ia sekarang menjadi
+    // rule `denda_keterlambatan` di tabel PayrollRule, dengan angka yang
+    // sama persis. Kalau suatu saat blok itu dihidupkan kembali di sini,
+    // karyawan akan dipotong dua kali.
     let totalAbsenceDeduction = 0;
 
     for (const att of attendances) {
-      if (att.status === "LATE" && att.checkIn) {
-        // Menit dihitung menurut WIB, sama seperti saat status LATE ditetapkan.
-        const checkInMinutes = jakartaMinutesOfDay(new Date(att.checkIn));
-        const targetMinutes = WORK_START_HOUR * 60 + WORK_START_MINUTE;
-        if (checkInMinutes > targetMinutes) {
-          totalLateDeduction += (checkInMinutes - targetMinutes) * 1_000;
-        }
-      }
-
       if (att.status === "SICK") {
         totalAbsenceDeduction += dailyRate;
       } else if (att.status === "PERMISSION") {
@@ -134,14 +127,14 @@ export const payrollService = {
       }
     }
 
-    // Konversi skor KPI → rupiah dilakukan di sini, bukan di modul KPI. Harus
-    // menunggu skor tersimpan lebih dulu karena bonus top performer
-    // membandingkan karyawan ini dengan rekan sejabatannya.
-    const incentive = await payrollIncentiveService.resolveForEmployee(employeeId, month, year);
+    // Reward & punishment dari rule engine (prisma/seeds/payroll-rules/). Dijalankan
+    // setelah KPI tersimpan karena rule boleh membandingkan karyawan dengan
+    // rekan sejawatnya lewat KpiMonthlyResult.
+    const rules = await evaluateRulesForEmployee(employeeCtx, month, year);
 
-    const totalDeductions =
-      totalLateDeduction + totalAbsenceDeduction + totalExtraDeduction;
-    const takeHomePay = totalGrossFixed - totalDeductions + incentive.netAmount;
+    const totalDeductions = totalAbsenceDeduction + totalExtraDeduction;
+    const takeHomePay =
+      totalGrossFixed - totalDeductions + rules.netAmount;
 
     return {
       employee: {
@@ -155,7 +148,13 @@ export const payrollService = {
         transportAllowance: transport,
         positionAllowance: position,
         bpjsKesehatan: bpjs,
-        extraAllowances: extraAllowances.map((c) => ({ name: c.name, amount: c.amount })),
+        // `componentId` ikut dibawa keluar supaya entri slip bisa menunjuk
+        // balik ke komponen gajinya (PayrollSlipEntry.salaryComponentId).
+        extraAllowances: extraAllowances.map((c) => ({
+          componentId: c.componentId,
+          name: c.name,
+          amount: c.amount,
+        })),
         totalExtraAllowance,
         totalGrossFixed,
         dailyRate,
@@ -166,11 +165,27 @@ export const payrollService = {
         breakdownJson: kpiResult.breakdownJson as unknown as KpiBreakdown,
         calculatedAt: kpiResult.calculatedAt.toISOString(),
       },
-      incentive,
+      rules: {
+        entries: rules.entries,
+        totalBonus: rules.totalBonus,
+        totalPenalty: rules.totalPenalty,
+        netAmount: rules.netAmount,
+        needsReview: rules.needsReview,
+        mandatorySaturday: rules.mandatorySaturday,
+        warningLetter: rules.warningLetter,
+        rulesetVersions: rules.rulesetVersions,
+        // Gabungan tanda tangan seluruh rule yang dimuat. Disimpan di
+        // PayrollRun supaya dua run dengan angka berbeda bisa dibedakan antara
+        // "datanya berubah" dan "rule-nya berubah".
+        rulesetHash: rules.rulesetHash,
+      },
       deductions: {
-        late: totalLateDeduction,
         absence: totalAbsenceDeduction,
-        components: extraDeductionItems.map((c) => ({ name: c.name, amount: c.amount })),
+        components: extraDeductionItems.map((c) => ({
+          componentId: c.componentId,
+          name: c.name,
+          amount: c.amount,
+        })),
         totalComponents: totalExtraDeduction,
         total: totalDeductions,
       },

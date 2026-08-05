@@ -10,6 +10,7 @@ import {
   IconDatabase,
   IconListDetails,
   IconReport,
+  IconScale,
   IconSettings,
   IconUserCircle,
   IconUsers,
@@ -163,6 +164,14 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
       title: "Komponen Gaji",
       url: "/dashboard/payroll/komponen",
       icon: IconListDetails,
+    });
+  }
+
+  if (show("payroll.rules", "view")) {
+    navPayroll.push({
+      title: "Rule Reward & Denda",
+      url: "/dashboard/payroll/rules",
+      icon: IconScale,
     });
   }
 

@@ -1,0 +1,224 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// PAYROLL RUN — hasil eksekusi rule engine slip gaji.
+//
+// Spesifikasi rule: docs/tasks/spesifikasi-rule-slip-gaji.md
+// Rule-nya sendiri TIDAK disimpan di sini — rule hidup sebagai file .json di
+// prisma/seeds/payroll-rules/ supaya setiap perubahan kebijakan gaji melewati review
+// kode dan tercatat di git. Yang disimpan di database hanya hasilnya.
+//
+// Prinsip yang menentukan bentuk tabel ini: slip harus bisa menjelaskan dirinya
+// sendiri bertahun-tahun kemudian, tanpa perlu menjalankan ulang perhitungan.
+// Karena itu setiap entri membawa `inputs` — nilai-nilai yang dipakai engine
+// saat itu — bukan sekadar angka akhirnya.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Satu eksekusi payroll untuk satu PT pada satu periode.
+///
+/// Boleh ada lebih dari satu run untuk periode yang sama: generate ulang
+/// membuat run baru, tidak menimpa yang lama. `attempt` membedakannya. Run lama
+/// tetap utuh supaya slip yang sudah dibayar masih bisa ditunjukkan apa adanya,
+/// meskipun data sumbernya sudah berubah sejak itu.
+model PayrollRun {
+  id        String @id @default(cuid())
+  companyId String
+
+  /// Periode gaji. Disimpan sebagai rentang tanggal, bukan sekadar bulan,
+  /// supaya periode gaji yang tidak mengikuti kalender (mis. 26–25) tetap bisa
+  /// diwakili. `periodMonth`/`periodYear` ikut disimpan untuk pencarian.
+  periodStart DateTime @db.Date
+  periodEnd   DateTime @db.Date
+  periodMonth Int
+  periodYear  Int
+
+  /// Nomor percobaan untuk periode yang sama. 1 = generate pertama.
+  attempt Int @default(1)
+
+  status PayrollRunStatus @default(DRAFT)
+
+  /// Ringkasan konfigurasi yang dipakai run ini: daftar `id@versi` rule yang
+  /// dievaluasi, plus hash isi file. Tanpa ini, dua run dengan angka berbeda
+  /// tidak bisa dibedakan antara "datanya berubah" dan "rule-nya berubah".
+  rulesetHash    String?
+  rulesetVersion Json?
+
+  generatedAt   DateTime  @default(now())
+  generatedById String?
+  finalizedAt   DateTime?
+  finalizedById String?
+  /// Terisi saat run ditandai dibayar. Setelah ini isi run tidak boleh diubah.
+  paidAt DateTime?
+
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  generatedBy user?         @relation("PayrollRunGeneratedBy", fields: [generatedById], references: [id], onDelete: SetNull)
+  finalizedBy user?         @relation("PayrollRunFinalizedBy", fields: [finalizedById], references: [id], onDelete: SetNull)
+  slips       PayrollSlip[]
+
+  @@unique([companyId, periodYear, periodMonth, attempt])
+  @@index([companyId, periodYear, periodMonth])
+  @@index([status])
+}
+
+enum PayrollRunStatus {
+  /// Baru di-generate, masih boleh dihapus dan digenerate ulang.
+  DRAFT
+  /// Sudah diperiksa HR, angkanya dianggap benar.
+  FINALIZED
+  /// Sudah dibayar. Tidak boleh diubah lagi.
+  PAID
+  /// Dibatalkan — digantikan run lain untuk periode yang sama.
+  VOID
+}
+
+/// Slip satu karyawan dalam satu run.
+///
+/// Semua kolom nominal adalah SNAPSHOT saat run dibuat. Kalau gaji pokok
+/// karyawan naik bulan depan, slip bulan ini tidak ikut berubah.
+model PayrollSlip {
+  id     String @id @default(cuid())
+  runId  String
+  userId String
+
+  /// Penempatan karyawan saat run dibuat — dipakai untuk pengelompokan laporan
+  /// dan tetap benar walaupun karyawan pindah cabang setelahnya.
+  branchId     String?
+  customRoleId String?
+
+  // ── Komponen tetap (snapshot dari data karyawan) ────────────────────────
+  baseSalary         Decimal @default(0)
+  mealAllowance      Decimal @default(0)
+  transportAllowance Decimal @default(0)
+  positionAllowance  Decimal @default(0)
+  bpjsKesehatan      Decimal @default(0)
+
+  // ── Ringkasan hasil rule ────────────────────────────────────────────────
+  /// Total entri bertipe BONUS. Bisa negatif (bonus yang hangus sebagian).
+  totalBonus Decimal @default(0)
+  /// Total entri bertipe DENDA. Disimpan positif.
+  totalPenalty Decimal @default(0)
+  /// Total entri bertipe POTONGAN ditambah komponen gaji bertipe DEDUCTION.
+  totalDeduction Decimal @default(0)
+  /// Total komponen gaji tambahan bertipe ALLOWANCE.
+  totalAllowance Decimal @default(0)
+
+  grossPay Decimal @default(0)
+  netPay   Decimal @default(0)
+
+  /// Ada entri berstatus SKIPPED atau berflag di slip ini — perlu dilihat
+  /// manusia sebelum difinalkan. Diturunkan dari entri, disimpan supaya daftar
+  /// slip bisa menyaring tanpa menghitung ulang.
+  needsReview Boolean @default(false)
+
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  run        PayrollRun         @relation(fields: [runId], references: [id], onDelete: Cascade)
+  user       user               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch     Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  customRole custom_role?       @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
+  entries    PayrollSlipEntry[]
+
+  @@unique([runId, userId])
+  @@index([runId])
+  @@index([userId])
+  @@index([branchId])
+  @@index([needsReview])
+}
+
+/// Satu baris alasan di slip: satu rule yang dievaluasi, atau satu komponen
+/// gaji tetap. Inilah yang tampil ke karyawan sebagai rincian.
+///
+/// Entri juga dibuat untuk rule yang TIDAK menghasilkan uang (status SKIPPED).
+/// Slip harus bisa menjelaskan kenapa sebuah rule tidak jalan, bukan diam saja.
+model PayrollSlipEntry {
+  id     String @id @default(cuid())
+  slipId String
+
+  source PayrollEntrySource
+  type   PayrollEntryType
+  status PayrollEntryStatus @default(APPLIED)
+
+  /// `id` rule dari file .json. Null untuk entri komponen gaji tetap.
+  ruleId String?
+  /// `versi` rule saat run dijalankan. Bersama ruleId inilah kunci untuk
+  /// menemukan kembali definisi rule di git.
+  ruleVersion Int?
+  /// Komponen gaji tetap yang menjadi sumber entri, kalau source = COMPONENT.
+  salaryComponentId String?
+
+  /// Tier yang cocok, mis. "min:23" atau "min:1,max:3". Null kalau memakai
+  /// `default` atau kalau rule di-skip.
+  tier String?
+  /// Alasan yang tampil di slip. Disalin dari `label` tier — tidak pernah
+  /// disusun ulang di sisi tampilan, supaya angka dan alasan tidak bisa
+  /// berbeda.
+  label String
+
+  /// Selalu ditandatangani sesuai arah aslinya: bonus positif, denda dan
+  /// potongan negatif. Ringkasan di PayrollSlip yang menormalkannya.
+  amount Decimal @default(0)
+
+  /// Semua nilai yang dipakai untuk sampai ke `amount`: kolom hasil query,
+  /// konstanta rule, dan field karyawan yang dirujuk formula. Ini yang membuat
+  /// slip menjelaskan dirinya sendiri, dan yang membuat generate ulang bisa
+  /// dibandingkan dengan yang sudah dibayar.
+  inputs Json?
+  /// Rincian per kejadian untuk rule mode per_baris (tanggal, tier, nominal).
+  breakdown Json?
+  /// Formula yang dievaluasi, apa adanya — supaya bisa dibaca tanpa membuka
+  /// file rule. Null kalau tier memakai nominal tetap.
+  formula String?
+
+  /// Penanda dari guard atau default, mis. "data_kosong", "butuh_review".
+  flag String?
+
+  createdAt DateTime @default(now())
+
+  slip            PayrollSlip      @relation(fields: [slipId], references: [id], onDelete: Cascade)
+  salaryComponent SalaryComponent? @relation(fields: [salaryComponentId], references: [id], onDelete: SetNull)
+
+  @@index([slipId])
+  @@index([ruleId])
+  @@index([status])
+}
+
+enum PayrollEntrySource {
+  /// Dihasilkan rule engine dari tabel PayrollRule.
+  RULE
+  /// Komponen gaji tetap dari UserSalaryComponent.
+  COMPONENT
+  /// Dihitung langsung oleh payroll.service, di luar rule engine — saat ini
+  /// hanya potongan ketidakhadiran (sakit/izin/alpha). Dibedakan dari MANUAL
+  /// karena tidak ada manusia yang memutuskannya, dan dari RULE karena tidak
+  /// punya `ruleId` yang bisa ditelusuri ke tabel PayrollRule. Begitu potongan
+  /// itu dipindahkan menjadi rule — seperti yang sudah dilakukan pada denda
+  /// keterlambatan — sumber ini tidak akan dipakai lagi.
+  SISTEM
+  /// Penyesuaian manual oleh HR, dengan alasan tertulis di `label`.
+  MANUAL
+}
+
+enum PayrollEntryType {
+  BONUS
+  DENDA
+  POTONGAN
+  TUNJANGAN
+}
+
+enum PayrollEntryStatus {
+  /// Nominalnya ikut dihitung.
+  APPLIED
+  /// Guard kena — rule tidak menghasilkan uang, tapi tetap dicatat beserta
+  /// alasannya dan masuk antrian review.
+  SKIPPED
+  /// Query atau formula gagal dievaluasi. Sama seperti SKIPPED tidak
+  /// menghasilkan uang, tapi ini menandakan konfigurasi yang perlu diperbaiki,
+  /// bukan data karyawan yang belum lengkap.
+  ERROR
+}

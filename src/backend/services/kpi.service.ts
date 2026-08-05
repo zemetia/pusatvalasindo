@@ -435,8 +435,6 @@ export const kpiService = {
           pointPerUnit: toNullableNumber(rk.pointPerUnit),
           toleranceLimit: toNullableNumber(rk.toleranceLimit),
           toleranceScope: rk.toleranceScope,
-          maxAchievement: toNumber(rk.maxAchievement),
-          minAchievement: toNumber(rk.minAchievement),
         },
         entriesByRoleKpi.get(rk.id) ?? []
       );

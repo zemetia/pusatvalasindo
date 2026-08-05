@@ -193,6 +193,42 @@ export const RESOURCES: ResourceDef[] = [
     // Admin sebelum didelegasikan lewat matriks izin.
   },
 
+  {
+    key: "payroll.rules",
+    label: "Rule Reward & Denda",
+    group: "Payroll",
+    description:
+      "Aturan bonus, denda, dan potongan yang dipakai engine slip gaji, beserta hasil validasinya.",
+    page: "/dashboard/payroll/rules",
+    apis: ["/api/payroll-rules"],
+    // `global` disengaja: rule berlaku lintas PT, dan sasaran per PT ditentukan
+    // DI DALAM rule (`targets`), bukan oleh siapa yang boleh membuka halamannya.
+    // Memecah izin ini per PT akan menjanjikan penyaringan yang tidak ada —
+    // pemegangnya tetap melihat dan menyunting rule yang mengenai PT lain.
+    //
+    // Tulis di sini berarti: tier, nominal, sasaran, masa berlaku. TIDAK
+    // termasuk SQL — itu `payroll.rules.sql` di bawah.
+    scoping: "global",
+  },
+
+  {
+    key: "payroll.rules.sql",
+    label: "Ubah SQL Rule Gaji",
+    group: "Payroll",
+    description:
+      "Menyunting query pengambil data di dalam rule gaji. Terpisah dari izin mengubah nominalnya — SQL menentukan APA yang diukur, tier menentukan BERAPA harganya, dan keduanya butuh keahlian yang berbeda.",
+    // `capability`, bukan halaman: ia tidak membuka apa pun, ia membuka satu
+    // field di halaman yang sudah dijaga `payroll.rules`.
+    capability: true,
+    // Sengaja TIDAK di-scope per PT. SQL rule membaca view lintas PT; memberi
+    // seseorang wewenang menulisnya "hanya untuk PT A" adalah janji kosong,
+    // karena query yang sama tetap bisa membaca baris PT lain.
+    scoping: "global",
+    // Tanpa peta legacy, dan itu inti dari resource ini: sebelum diberikan
+    // eksplisit lewat matriks izin, TIDAK ADA yang bisa menyunting SQL rule —
+    // termasuk pemegang `payroll.rules` dan `payroll.manage`.
+  },
+
   // ── Laporan ────────────────────────────────────────────────────────────────
   // Section "Laporan" di sidebar. Ketiganya `scoping: "global"` — isinya
   // memang laporan lintas PT (peringkat karyawan antar cabang, posisi keuangan

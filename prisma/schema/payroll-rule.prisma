@@ -1,0 +1,187 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// RULE REWARD & DENDA — definisi aturan slip gaji.
+//
+// Spesifikasi: docs/tasks/spesifikasi-rule-slip-gaji.md
+// Hasil eksekusinya: payroll-run.prisma (PayrollRun / PayrollSlip / …Entry)
+//
+// Empat hal menentukan bentuk tabel ini, dan keempatnya disengaja:
+//
+// 0. ARAH UANG MILIK KONDISI, BUKAN MILIK RULE. Sebuah rule TIDAK punya tipe
+//    "bonus" atau "denda". Yang menentukan menambah atau mengurangi adalah
+//    TANDA nominal pada tier/guard yang cocok: positif menambah gaji, negatif
+//    menguranginya. Satu rule karena itu bisa memberi bonus pada skor tinggi
+//    DAN menjatuhkan potongan pada skor rendah — persis seperti sheet
+//    manajemen menuliskannya dalam satu tabel.
+//
+//    Sebelumnya arah ditentukan kolom `type` di tingkat rule, sehingga tiap
+//    jabatan butuh SEPASANG rule (bonus_kpi_* dan denda_kpi_*) yang menyalin
+//    SQL, guard, dan sasaran yang sama persis — dua tempat yang harus diubah
+//    bersamaan setiap kali satu band bergeser. Kolom itu dibuang pada migrasi
+//    20260805040000.
+//
+// 1. APPEND-ONLY. Mengubah rule TIDAK pernah `UPDATE` — ia membuat baris baru
+//    dengan `version` naik, dan mengisi `effectiveTo` pada versi lama. Slip
+//    yang sudah dibayar merujuk `ruleKey@version`, jadi baris lama harus tetap
+//    utuh apa adanya. Inilah pengganti riwayat git saat rule pindah dari file
+//    ke database.
+//
+// 2. DITANDATANGANI. `signature` adalah HMAC-SHA256 atas seluruh isi rule —
+//    termasuk tier-nya. Baris yang disunting langsung lewat klien SQL akan
+//    gagal verifikasi dan DITOLAK engine, bukan dijalankan diam-diam. Yang
+//    dilindungi di sini integritas, bukan kerahasiaan: isi rule memang
+//    ditampilkan di halaman Rule.
+//
+// 3. SQL TERPISAH DARI KEBIJAKAN. `sql` hanya boleh disunting pemegang
+//    capability `payroll.rules.sql`; tier, nominal, sasaran, dan masa berlaku
+//    boleh disunting pemegang `payroll.rules`. Pembagiannya mengikuti siapa
+//    yang berhak: SQL menentukan APA yang diukur, tier menentukan BERAPA
+//    harganya.
+//
+// Query rule dijalankan lewat koneksi read-only (DATABASE_VIEW_ONLY_URL) yang
+// hanya bisa SELECT dari view hv_*. Batas itu ditegakkan database, bukan
+// sekadar validator di aplikasi.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Satu VERSI dari sebuah rule. Baris tidak pernah diubah setelah dibuat.
+model PayrollRule {
+  id String @id @default(cuid())
+
+  /// Identitas rule yang stabil sepanjang umurnya — TIDAK berubah saat versi
+  /// naik. Inilah yang tersimpan di PayrollSlipEntry.ruleId.
+  ruleKey String
+  /// Naik setiap kali isi rule berubah. Ikut tersimpan di entri hasil.
+  version Int
+
+  /// Masa berlaku, keduanya INKLUSIF. Engine memilih versi yang berlaku pada
+  /// periode yang dihitung; `effectiveTo` null berarti masih berlaku.
+  ///
+  /// Dua versi dengan `ruleKey` sama TIDAK BOLEH beririsan — kalau beririsan,
+  /// engine tidak punya jawaban tunggal untuk "rule mana yang berlaku bulan
+  /// ini". Itu ditegakkan DATABASE lewat constraint EXCLUDE
+  /// `payroll_rule_no_overlap` (migrasi 20260805020000), bukan hanya oleh
+  /// pemeriksaan aplikasi: pemeriksaan aplikasi bisa dilewati lewat klien SQL,
+  /// impor, atau dua permintaan yang berjalan bersamaan. Prisma belum bisa
+  /// menyatakan constraint EXCLUDE, jadi ia hidup di SQL migrasi — jangan
+  /// dihapus saat schema ini di-regenerate.
+  effectiveFrom DateTime  @db.Date
+  effectiveTo   DateTime? @db.Date
+
+  mode PayrollRuleMode
+
+  /// Query pengumpul data. Hanya SELECT, hanya dari view `hv_*`.
+  sql String
+  /// Kolom hasil query yang dipakai mencocokkan tier.
+  tierField String
+
+  /// Angka bernama yang dipakai formula: `{ "hari_kerja_standar": 24 }`.
+  constants Json?
+  /// Kondisi bebas yang dinilai SEBELUM tier, berurutan; yang pertama cocok
+  /// menang dan menghentikan sisanya. Dua aksi:
+  ///
+  ///   • `skip`     — batalkan rule, tidak ada uang, catat alasannya:
+  ///     `{ "if": "hari_tercatat == 0", "aksi": "skip", "flag": "data_kosong" }`
+  ///   • `terapkan` — langsung bayarkan/potong tanpa melihat tier:
+  ///     `{ "if": "berkontrak == 0", "aksi": "terapkan", "nominal": -50000,
+  ///        "label": "...", "flag": "belum_berkontrak" }`
+  ///
+  /// `terapkan` memakai `nominal` ATAU `formula` (tepat satu), dan tandanya
+  /// menentukan arah sama seperti pada tier. Ia ada karena tier hanya bisa
+  /// mencocokkan RENTANG pada satu kolom; kondisi yang menyangkut kolom lain
+  /// — atau menggabungkan beberapa kolom — tidak bisa dinyatakan sebagai tier.
+  guards Json?
+  /// Dipakai kalau tidak ada tier yang cocok. Wajib ada — engine tidak boleh
+  /// kehabisan jawaban di tengah perhitungan gaji.
+  defaults Json
+  /// Sasaran rule (`for`): array grup `{ company, branch, roles }`.
+  targets Json
+  /// Pengecualian (`except`). Selalu menang atas `targets`.
+  excepts Json?
+
+  /// Keterangan untuk manusia — dasar kebijakan, sumber sheet, dst.
+  note String?
+  /// Alasan perubahan pada versi INI. Bersama `version` inilah jejak yang
+  /// menggantikan pesan commit.
+  changeNote String?
+
+  /// HMAC-SHA256 atas bentuk kanonik rule + tier-nya, memakai
+  /// PAYROLL_RULE_SIGNING_KEY. Tidak cocok = rule ditolak.
+  signature String
+
+  createdAt   DateTime @default(now())
+  createdById String?
+
+  /// Versi yang digantikan baris ini. Rantai ini yang membuat "siapa mengubah
+  /// apa, kapan" bisa ditelusuri tanpa tabel audit terpisah.
+  supersedesId String? @unique
+
+  createdBy    user?             @relation("PayrollRuleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  supersedes   PayrollRule?      @relation("PayrollRuleVersion", fields: [supersedesId], references: [id], onDelete: SetNull)
+  supersededBy PayrollRule?      @relation("PayrollRuleVersion")
+  tiers        PayrollRuleTier[]
+
+  @@unique([ruleKey, version])
+  @@index([ruleKey])
+  @@index([effectiveFrom, effectiveTo])
+}
+
+/// Satu baris tier: rentang nilai → nominal, per_unit, atau formula.
+///
+/// Tabel tersendiri (bukan Json di dalam PayrollRule) karena inilah bagian
+/// yang paling sering disunting manusia lewat UI — bentuknya perlu ditegakkan
+/// database, bukan dipercayakan pada isi kolom Json.
+model PayrollRuleTier {
+  id     String @id @default(cuid())
+  ruleId String
+
+  /// Urutan tampil. Pencocokan tetap memakai min/max, bukan urutan ini —
+  /// validator sudah menjamin tier tidak tumpang tindih.
+  sortOrder Int
+
+  /// Batas bawah & atas, keduanya INKLUSIF. Null = tidak terbatas di sisi itu.
+  min Decimal?
+  max Decimal?
+
+  /// Tepat SATU dari ketiganya yang boleh terisi.
+  ///
+  /// BERTANDA. Positif menambah gaji, negatif menguranginya — inilah satu-
+  /// satunya yang menentukan arah, dan berlaku untuk ketiganya (`formula` yang
+  /// menghasilkan angka negatif juga mengurangi). Nol berarti tier itu memang
+  /// tidak berdampak pada gaji, dan tetap ditulis sebagai tier supaya slip bisa
+  /// menyatakan "skor Anda di zona aman" alih-alih diam.
+  nominal Decimal?
+  perUnit Decimal?
+  formula String?
+
+  /// Kolom hasil query yang dikalikan `perUnit`. Wajib menyertai perUnit.
+  unitField String?
+
+  /// Alasan yang tampil di slip gaji. Disalin apa adanya ke
+  /// PayrollSlipEntry.label supaya angka dan alasannya tidak pernah berbeda.
+  label String
+
+  // ── Sanksi non-uang ──────────────────────────────────────────────────────
+  //
+  // Sebagian konsekuensi di sheet manajemen bukan rupiah: "setiap Sabtu wajib
+  // masuk", "pemotongan 300 rb dan sp". Kalau tidak diwakili di sini, satu-
+  // satunya jejaknya adalah teks pada `label` — tidak bisa difilter, tidak
+  // bisa dilaporkan, dan hilang begitu labelnya diedit.
+  //
+  // Keduanya TIDAK memengaruhi nominal; ia menyertai tier yang cocok.
+
+  /// Tier ini mewajibkan karyawan masuk setiap Sabtu selama periode berikutnya.
+  mandatorySaturday Boolean @default(false)
+  /// Tier ini disertai Surat Peringatan.
+  warningLetter     Boolean @default(false)
+
+  rule PayrollRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@unique([ruleId, sortOrder])
+  @@index([ruleId])
+}
+
+enum PayrollRuleMode {
+  /// Query mengembalikan satu baris; tier dicocokkan sekali.
+  AGREGAT
+  /// Query mengembalikan banyak baris; tiap baris dinilai lalu dijumlahkan.
+  PER_BARIS
+}

@@ -1,57 +1,24 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// PAYROLL — konversi skor KPI menjadi uang.
+// PAYROLL — komponen gaji tambahan.
 //
 // Dipisah dari kpi.prisma dengan sengaja: modul KPI hanya menilai kinerja,
-// keputusan bonus/potongan sepenuhnya milik payroll. Sumber aturannya adalah
-// sheet "MATRIX BONUS" di docs/PVI Data/PERHITUNGAN KOMISI KPI_.xlsx.
+// keputusan bonus/potongan sepenuhnya milik payroll.
+//
+// Konversi skor KPI menjadi rupiah SELURUHNYA ada di rule engine
+// (payroll-rule.prisma). Matriks insentif lama (BonusMatrix, lalu
+// PayrollIncentiveMatrix) sudah DIBUANG seluruhnya, termasuk dari riwayat
+// migrasi: terlalu kaku (tier hanya bisa berpatokan pada skor KPI, nominalnya
+// selalu angka tetap, sasarannya terkunci pada satu jabatan di satu PT) dan,
+// selama masih hidup berdampingan dengan rule engine, hasil keduanya ikut
+// dijumlahkan sehingga karyawan dibayar dua kali untuk skor yang sama.
+//
+// Data payroll hasil perhitungan versi lama juga dikosongkan pada migrasi
+// 20260805030000 — periode gaji digenerate ulang lewat rule engine, tidak
+// dikonversi.
+//
+// Yang tersisa di berkas ini hanya komponen gaji yang nominalnya tetap per
+// bulan dan tidak bergantung pada kinerja.
 // ═══════════════════════════════════════════════════════════════════════════
-
-/// Matriks insentif untuk satu jabatan di satu PT. Menggantikan BonusMatrix.
-model PayrollIncentiveMatrix {
-  id           String  @id @default(cuid())
-  companyId    String
-  customRoleId String?
-  name         String?
-  isActive     Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  company    Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customRole custom_role?           @relation(fields: [customRoleId], references: [id])
-  tiers      PayrollIncentiveTier[]
-
-  @@unique([companyId, customRoleId])
-}
-
-/// Satu baris matriks, mis. "80%-100% → bonus 250.000" atau
-/// "10%-60% → potong 150.000 + wajib masuk setiap Sabtu".
-model PayrollIncentiveTier {
-  id       String @id @default(cuid())
-  matrixId String
-
-  /// Batas skor KPI sebagai rasio: 0.8 = 80%. Rentang inklusif di kedua ujung;
-  /// urutan pencocokan dari minScore tertinggi supaya tier >120% menang duluan.
-  minScore Decimal
-  maxScore Decimal
-
-  outcome PayrollIncentiveOutcome
-  /// Selalu positif — arah (tambah/potong) ditentukan `outcome`.
-  cashAmount Decimal?
-  /// Sanksi non-uang yang menyertai tier ini ("setiap Sabtu wajib masuk").
-  mandatorySaturday Boolean @default(false)
-  /// Diisi untuk outcome TOP_PERFORMER: peringkat yang berhak (1 = terbaik
-  /// di jabatan & PT yang sama pada periode itu).
-  topRank Int?
-  note    String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  matrix PayrollIncentiveMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
-
-  @@index([matrixId])
-}
 
 // ───────────────────────────────────────────────────────────────────────────
 // KOMPONEN GAJI TAMBAHAN
@@ -83,6 +50,7 @@ model SalaryComponent {
 
   company     Company?              @relation(fields: [companyId], references: [id], onDelete: Cascade)
   assignments UserSalaryComponent[]
+  slipEntries PayrollSlipEntry[]
 
   @@unique([companyId, name])
   @@index([companyId])
@@ -113,15 +81,4 @@ enum SalaryComponentKind {
   ALLOWANCE
   /// Mengurangi gaji diterima (mis. potongan koperasi, cicilan seragam).
   DEDUCTION
-}
-
-enum PayrollIncentiveOutcome {
-  /// Dapat bonus tunai sebesar cashAmount.
-  BONUS_CASH
-  /// Tidak dapat bonus, tidak kena potongan.
-  SAFE_ZONE
-  /// Kena potongan gaji sebesar cashAmount.
-  DEDUCTION
-  /// Bonus tambahan untuk peringkat teratas, di luar tier reguler.
-  TOP_PERFORMER
 }

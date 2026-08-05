@@ -6,7 +6,9 @@
 -- prisma/migrations (20260627000000_hermes_views onward, including
 -- 20260712120000_hermes_views_stockist_kas, the bank-account-by-company
 -- rescoping, the DailyBankEntry column changes, the user.companyId
--- removal, and 20260722010000_hermes_views_head_confirmation). On an
+-- removal, 20260722010000_hermes_views_head_confirmation, the KPI redesign
+-- 20260728020000, and the payroll rule engine batch 20260805020000 /
+-- 20260805040000 / 20260805050000). On an
 -- existing database that already ran those migrations, running this
 -- script is a safe no-op (CREATE OR REPLACE) other than the reader
 -- role bootstrap in apply_openclaw.ts.
@@ -65,6 +67,14 @@ GROUP BY b.id, b.name, b.address, b.phone, b."isActive",
 -- 3. hv_employees
 --    A user's PT is derived solely from their branch (no more
 --    user.companyId column — dropped in 20260722000000).
+--
+--    `berkontrak` (0/1) ada di sini karena rule gaji HANYA boleh membaca view
+--    hv_*; tanpa kolom ini, aturan "yang masih belum di kontrak belum bisa
+--    mendapatkan bonus tambahan" tidak bisa ditulis sebagai rule sama sekali.
+--    Sengaja sudah berupa 0/1, bukan tanggal mentah — perbandingan tanggal di
+--    dalam rule mudah ditulis salah, dan aturannya sama untuk semua PT. PKWT
+--    yang tanggal habisnya sudah lewat dihitung TIDAK berkontrak.
+--    Ditambahkan migrasi 20260805020000.
 -- ============================================================
 CREATE OR REPLACE VIEW hv_employees AS
 SELECT
@@ -75,6 +85,21 @@ SELECT
   u."isActive"                                                            AS is_active,
   CASE WHEN u."isActive" THEN 'Aktif' ELSE 'Tidak Aktif' END             AS status_label,
   u."joinDate"::date                                                      AS join_date,
+  u."employmentStatus"::text                                              AS employment_status,
+  CASE u."employmentStatus"
+    WHEN 'PKWTT'     THEN 'Karyawan Tetap'
+    WHEN 'PKWT'      THEN 'Kontrak (PKWT)'
+    WHEN 'PROBATION' THEN 'Masa Percobaan'
+    ELSE 'Belum Berkontrak'
+  END                                                                     AS employment_status_label,
+  u."contractStartDate"::date                                             AS contract_start_date,
+  u."contractEndDate"::date                                               AS contract_end_date,
+  CASE
+    WHEN u."employmentStatus" = 'PKWTT' THEN 1
+    WHEN u."employmentStatus" = 'PKWT'
+     AND (u."contractEndDate" IS NULL OR u."contractEndDate"::date >= CURRENT_DATE) THEN 1
+    ELSE 0
+  END                                                                     AS berkontrak,
   COALESCE(u."baseSalary", 0)::numeric                                   AS base_salary,
   COALESCE(u."mealAllowance", 0)::numeric                                AS meal_allowance,
   COALESCE(u."transportAllowance", 0)::numeric                           AS transport_allowance,
@@ -105,6 +130,13 @@ SELECT
         + COALESCE(u."transportAllowance", 0))::numeric,
       'FM999,999,999'
     ),
+    ' | ',
+    CASE u."employmentStatus"
+      WHEN 'PKWTT'     THEN 'Karyawan Tetap'
+      WHEN 'PKWT'      THEN 'Kontrak (PKWT)'
+      WHEN 'PROBATION' THEN 'Masa Percobaan'
+      ELSE 'Belum Berkontrak'
+    END,
     CASE WHEN u."isActive" THEN ' | Aktif' ELSE ' | Tidak Aktif' END
   )                                                                       AS context_summary,
   u."createdAt"                                                           AS created_at
@@ -217,64 +249,106 @@ CREATE OR REPLACE VIEW hv_kpi_definitions AS
 SELECT
   rk.id,
   kd.id                                                                   AS kpi_id,
+  kd.code                                                                 AS kpi_code,
   kd.name                                                                 AS kpi_name,
-  kd.type                                                                 AS kpi_type,
-  CASE kd.type
-    WHEN 'EVENT'  THEN 'Event / Kejadian'
-    WHEN 'TARGET' THEN 'Target Nilai'
-    ELSE kd.type::text
-  END                                                                     AS kpi_type_label,
+  COALESCE(kd.objective, '')                                              AS objective,
+  COALESCE(kd.description, '')                                            AS description,
+  kd."scoringType"                                                        AS scoring_type,
+  CASE kd."scoringType"
+    WHEN 'TARGET_VALUE'    THEN 'Target Nilai'
+    WHEN 'PENALTY_POINT'   THEN 'Penalti Poin per Kejadian'
+    WHEN 'REWARD_POINT'    THEN 'Reward Poin per Kejadian'
+    WHEN 'PENALTY_PERCENT' THEN 'Penalti Persen per Kejadian'
+    WHEN 'TOLERANCE_LIMIT' THEN 'Batas Toleransi'
+    WHEN 'BOOLEAN_DAILY'   THEN 'Checklist Harian'
+    ELSE kd."scoringType"::text
+  END                                                                     AS scoring_type_label,
+  kd.unit                                                                 AS unit,
+  COALESCE(rk."inputSource", kd."defaultInputSource")                     AS input_source,
+  CASE COALESCE(rk."inputSource", kd."defaultInputSource")
+    WHEN 'SELF'       THEN 'Diisi karyawan sendiri'
+    WHEN 'SUPERVISOR' THEN 'Hanya atasan/HR'
+    WHEN 'SYSTEM'     THEN 'Otomatis dari sistem'
+  END                                                                     AS input_source_label,
+  COALESCE(rk."requiresApproval", kd."defaultRequiresApproval")           AS requires_approval,
+  COALESCE(rk."requiresEvidence", kd."defaultRequiresEvidence")           AS requires_evidence,
   rk."companyId"                                                          AS company_id,
   COALESCE(co.name, '')                                                   AS company_name,
   COALESCE(co.code, '')                                                   AS company_code,
   rk."customRoleId"                                                       AS role_id,
   COALESCE(cr.name, '')                                                   AS role_name,
-  rk."maxScore"::numeric                                                  AS max_score,
-  rk."targetValue"::numeric                                               AS target_value,
-  rk."threshold"::numeric                                                 AS threshold,
   rk.weight::numeric                                                      AS weight,
   ROUND(
     rk.weight::numeric
     / NULLIF(SUM(rk.weight::numeric) OVER (PARTITION BY rk."companyId", rk."customRoleId"), 0)
     * 100, 2
   )                                                                       AS weight_pct,
+  rk."targetValue"::numeric                                               AS target_value,
+  rk."basePoint"::numeric                                                 AS base_point,
+  rk."pointPerUnit"::numeric                                              AS point_per_unit,
+  rk."toleranceLimit"::numeric                                            AS tolerance_limit,
+  rk."maxAchievement"::numeric                                            AS max_achievement,
+  rk."isActive"                                                           AS is_active,
   kd."createdAt"                                                          AS created_at
 FROM "RoleKpi" rk
 JOIN  "KpiDefinition"  kd ON kd.id = rk."kpiId"
-JOIN  "Company"        co ON co.id = rk."companyId"
+LEFT JOIN "Company"    co ON co.id = rk."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = rk."customRoleId";
 
 
 -- ============================================================
 -- 7. hv_kpi_logs
+--    Sumbernya KpiEntry (redesain KPI 20260728020000), bukan KpiLog yang lama.
+--
+--    `kpi_code`, `branch_id`, dan `role_id` ditambahkan migrasi
+--    20260805050000 untuk rule gaji per TIM (cabang + jabatan yang sama), dan
+--    tidak satu pun bisa digantikan kolom yang sudah ada:
+--
+--    • kpi_code — menyaring omzet lewat `kpi_name` berarti mengganti nama KPI
+--      di halaman admin diam-diam mematikan rule gaji: query tetap jalan,
+--      hasilnya nol, tidak ada error di mana pun. `code` dijamin unik & stabil.
+--    • branch_id / role_id — engine menyuntikkan ID, bukan nama. Nama cabang
+--      boleh berubah dan nama jabatan berulang di beberapa PT ("Marketing" ada
+--      di PVI, PTU, dan PKD), jadi mencocokkan lewat nama akan menggabungkan
+--      tim yang bukan satu tim.
 -- ============================================================
 CREATE OR REPLACE VIEW hv_kpi_logs AS
 SELECT
-  kl.id,
-  kl."employeeId"                                                         AS employee_id,
+  ke.id,
+  ke."employeeId"                                                         AS employee_id,
   u.name                                                                  AS employee_name,
   b."companyId"                                                           AS company_id,
   COALESCE(co.name, '')                                                   AS company_name,
   COALESCE(co.code, '')                                                   AS company_code,
+  u."branchId"                                                            AS branch_id,
   COALESCE(b.name, '')                                                    AS branch_name,
+  u."customRoleId"                                                        AS role_id,
   COALESCE(cr.name, '')                                                   AS role_name,
-  kl."kpiId"                                                              AS kpi_id,
+  kd.id                                                                   AS kpi_id,
+  kd.code                                                                 AS kpi_code,
   kd.name                                                                 AS kpi_name,
-  kd.type                                                                 AS kpi_type,
-  CASE kd.type
-    WHEN 'EVENT'  THEN 'Event / Kejadian'
-    WHEN 'TARGET' THEN 'Target Nilai'
-    ELSE kd.type::text
-  END                                                                     AS kpi_type_label,
-  kl.value::numeric                                                       AS value,
-  COALESCE(kl.note, '')                                                   AS note,
-  kl."createdAt"                                                          AS created_at,
-  EXTRACT(YEAR  FROM kl."createdAt")::int                                 AS year,
-  EXTRACT(MONTH FROM kl."createdAt")::int                                 AS month,
-  TO_CHAR(kl."createdAt", 'YYYY-MM')                                      AS period_label
-FROM "KpiLog" kl
-JOIN  "user"           u  ON u.id = kl."employeeId"
-JOIN  "KpiDefinition"  kd ON kd.id = kl."kpiId"
+  kd."scoringType"                                                        AS scoring_type,
+  kd.unit                                                                 AS unit,
+  ke.quantity::numeric                                                    AS value,
+  ke.quantity::numeric                                                    AS quantity,
+  COALESCE(ke.note, '')                                                   AS note,
+  ke.source                                                               AS input_source,
+  ke.status                                                               AS status,
+  CASE ke.status
+    WHEN 'PENDING'  THEN 'Menunggu Persetujuan'
+    WHEN 'APPROVED' THEN 'Disetujui'
+    WHEN 'REJECTED' THEN 'Ditolak'
+  END                                                                     AS status_label,
+  ke."occurredAt"                                                         AS occurred_at,
+  ke."weekOfMonth"                                                        AS week_of_month,
+  ke."createdAt"                                                          AS created_at,
+  ke."periodYear"                                                         AS year,
+  ke."periodMonth"                                                        AS month,
+  TO_CHAR(MAKE_DATE(ke."periodYear", ke."periodMonth", 1), 'YYYY-MM')     AS period_label
+FROM "KpiEntry" ke
+JOIN  "user"           u  ON u.id = ke."employeeId"
+JOIN  "RoleKpi"        rk ON rk.id = ke."roleKpiId"
+JOIN  "KpiDefinition"  kd ON kd.id = rk."kpiId"
 LEFT JOIN "Branch"     b  ON b.id = u."branchId"
 LEFT JOIN "Company"    co ON co.id = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
@@ -282,6 +356,11 @@ LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
 
 -- ============================================================
 -- 8. hv_kpi_monthly
+--    `total_score` adalah PECAHAN (0.86 = 86%), bukan angka 0-100 — rule gaji
+--    mencocokkannya sebagai persen bulat lewat ROUND(total_score * 100).
+--    Nominal bonus TIDAK ada di sini lagi: konversi skor → uang dilakukan rule
+--    engine (PayrollRule), yang butuh peringkat antar-karyawan sehingga tidak
+--    bisa diringkas per baris view.
 -- ============================================================
 CREATE OR REPLACE VIEW hv_kpi_monthly AS
 SELECT
@@ -296,59 +375,28 @@ SELECT
   COALESCE(cr.name, '')                                                   AS role_name,
   km.month,
   km.year,
-  TO_CHAR(
-    TO_DATE(km.year::text || '-' || LPAD(km.month::text, 2, '0') || '-01', 'YYYY-MM-DD'),
-    'YYYY-MM'
-  )                                                                       AS period_label,
+  TO_CHAR(MAKE_DATE(km.year, km.month, 1), 'YYYY-MM')                     AS period_label,
   km."totalScore"::numeric                                                AS total_score,
-  CASE
-    WHEN km."totalScore" >= 90 THEN 'A'
-    WHEN km."totalScore" >= 75 THEN 'B'
-    WHEN km."totalScore" >= 60 THEN 'C'
-    ELSE 'D'
-  END                                                                     AS grade,
-  CASE
-    WHEN km."totalScore" >= 90 THEN 'Sangat Baik'
-    WHEN km."totalScore" >= 75 THEN 'Baik'
-    WHEN km."totalScore" >= 60 THEN 'Cukup'
+  ROUND(km."totalScore"::numeric * 100, 2)                                AS total_score_pct,
+  km.grade                                                                AS grade,
+  CASE km.grade
+    WHEN 'A' THEN 'Sangat Baik'
+    WHEN 'B' THEN 'Baik'
+    WHEN 'C' THEN 'Cukup'
     ELSE 'Perlu Peningkatan'
   END                                                                     AS grade_label,
-  COALESCE(km."bonusAmount", 0)::numeric                                 AS bonus_amount,
-  km."bonusResult"                                                        AS bonus_result,
-  CASE km."bonusResult"
-    WHEN 'BONUS_CASH'        THEN 'Bonus Cash'
-    WHEN 'SAFE_ZONE'         THEN 'Aman (Tidak Bonus/Denda)'
-    WHEN 'PENALTY_SATURDAY'  THEN 'Denda Masuk Sabtu'
-    WHEN 'PENALTY_DEDUCTION' THEN 'Potongan Gaji'
-    WHEN 'TOP_PERFORMER'     THEN 'Top Performer'
-    ELSE 'Belum Dihitung'
-  END                                                                     AS bonus_result_label,
+  kp.status                                                               AS period_status,
   km."breakdownJson"                                                      AS breakdown_json,
   km."calculatedAt"                                                       AS calculated_at,
   CONCAT(
     u.name, ' (', COALESCE(cr.name, '-'), ')',
-    ' | KPI ', TO_CHAR(
-      TO_DATE(km.year::text || '-' || LPAD(km.month::text, 2, '0') || '-01', 'YYYY-MM-DD'),
-      'Mon YYYY'
-    ),
-    ' | Skor: ', km."totalScore"::numeric,
-    ' | Grade: ',
-    CASE WHEN km."totalScore" >= 90 THEN 'A'
-         WHEN km."totalScore" >= 75 THEN 'B'
-         WHEN km."totalScore" >= 60 THEN 'C'
-         ELSE 'D' END,
-    ' | ',
-    CASE km."bonusResult"
-      WHEN 'BONUS_CASH'        THEN 'Bonus Cash Rp ' || TO_CHAR(COALESCE(km."bonusAmount", 0)::numeric, 'FM999,999,999')
-      WHEN 'SAFE_ZONE'         THEN 'Aman'
-      WHEN 'PENALTY_SATURDAY'  THEN 'Denda Sabtu'
-      WHEN 'PENALTY_DEDUCTION' THEN 'Potongan Rp ' || TO_CHAR(COALESCE(km."bonusAmount", 0)::numeric, 'FM999,999,999')
-      WHEN 'TOP_PERFORMER'     THEN 'Top Performer!'
-      ELSE 'Belum Ada Hasil'
-    END
+    ' | KPI ', TO_CHAR(MAKE_DATE(km.year, km.month, 1), 'Mon YYYY'),
+    ' | Skor: ', ROUND(km."totalScore"::numeric * 100, 1), '%',
+    ' | Grade: ', km.grade
   )                                                                       AS context_summary
 FROM "KpiMonthlyResult" km
 JOIN  "user"           u  ON u.id = km."employeeId"
+LEFT JOIN "KpiPeriod"  kp ON kp."employeeId" = km."employeeId" AND kp.month = km.month AND kp.year = km.year
 LEFT JOIN "Branch"     b  ON b.id = u."branchId"
 LEFT JOIN "Company"    co ON co.id = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
@@ -356,11 +404,14 @@ LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
 
 -- ============================================================
 -- 9. hv_revenue
+--    Tabel "Revenue" sudah tidak ada — omzet kini sekadar entri KPI ber-unit
+--    CURRENCY (redesain 20260728020000). Nama view dipertahankan supaya tool
+--    MCP tidak perlu berubah.
 -- ============================================================
 CREATE OR REPLACE VIEW hv_revenue AS
 SELECT
-  r.id,
-  r."employeeId"                                                          AS employee_id,
+  ke.id,
+  ke."employeeId"                                                         AS employee_id,
   u.name                                                                  AS employee_name,
   b."companyId"                                                           AS company_id,
   COALESCE(co.name, '')                                                   AS company_name,
@@ -368,26 +419,35 @@ SELECT
   u."branchId"                                                            AS branch_id,
   COALESCE(b.name, '')                                                    AS branch_name,
   COALESCE(cr.name, '')                                                   AS role_name,
-  r.amount::numeric                                                       AS amount,
-  r.date,
-  EXTRACT(YEAR  FROM r.date)::int                                         AS year,
-  EXTRACT(MONTH FROM r.date)::int                                         AS month,
-  TO_CHAR(r.date, 'YYYY-MM')                                              AS period_label,
-  COALESCE(r.note, '')                                                    AS note,
-  r."createdAt"                                                           AS created_at
-FROM "Revenue" r
-JOIN  "user"           u  ON u.id = r."employeeId"
+  kd.name                                                                 AS kpi_name,
+  ke.quantity::numeric                                                    AS amount,
+  ke."occurredAt"                                                         AS date,
+  ke."periodYear"                                                         AS year,
+  ke."periodMonth"                                                        AS month,
+  TO_CHAR(MAKE_DATE(ke."periodYear", ke."periodMonth", 1), 'YYYY-MM')     AS period_label,
+  COALESCE(ke.note, '')                                                   AS note,
+  ke."createdAt"                                                          AS created_at
+FROM "KpiEntry" ke
+JOIN  "RoleKpi"        rk ON rk.id = ke."roleKpiId"
+JOIN  "KpiDefinition"  kd ON kd.id = rk."kpiId" AND kd.unit = 'CURRENCY'
+JOIN  "user"           u  ON u.id = ke."employeeId"
 LEFT JOIN "Branch"     b  ON b.id = u."branchId"
 LEFT JOIN "Company"    co ON co.id = b."companyId"
-LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId";
+LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId"
+WHERE ke.status = 'APPROVED';
 
 
 -- ============================================================
 -- 10. hv_revenue_monthly
+--     PERINGATAN: `total_revenue` adalah SUM SELURUH KpiEntry ber-unit
+--     CURRENCY, sehingga ia mencampur "Jumlah Omzet", "Net Profit Margin", dan
+--     "Kesesuaian Jumlah Kas" — yang terakhir itu SELISIH KAS, bukan omzet.
+--     Cukup untuk ringkasan dashboard, TAPI TIDAK BOLEH dipakai menghitung
+--     uang. Rule gaji omzet memakai hv_kpi_logs + kpi_code.
 -- ============================================================
 CREATE OR REPLACE VIEW hv_revenue_monthly AS
 SELECT
-  r."employeeId"                                                          AS employee_id,
+  ke."employeeId"                                                         AS employee_id,
   u.name                                                                  AS employee_name,
   b."companyId"                                                           AS company_id,
   COALESCE(co.name, '')                                                   AS company_name,
@@ -395,24 +455,26 @@ SELECT
   u."branchId"                                                            AS branch_id,
   COALESCE(b.name, '')                                                    AS branch_name,
   COALESCE(cr.name, '')                                                   AS role_name,
-  EXTRACT(YEAR  FROM r.date)::int                                         AS year,
-  EXTRACT(MONTH FROM r.date)::int                                         AS month,
-  TO_CHAR(DATE_TRUNC('month', r.date), 'YYYY-MM')                        AS period_label,
+  ke."periodYear"                                                         AS year,
+  ke."periodMonth"                                                        AS month,
+  TO_CHAR(MAKE_DATE(ke."periodYear", ke."periodMonth", 1), 'YYYY-MM')     AS period_label,
   COUNT(*)                                                                AS transaction_count,
-  SUM(r.amount)::numeric                                                  AS total_revenue,
-  ROUND(AVG(r.amount)::numeric, 0)                                        AS avg_revenue_per_entry,
-  MAX(r.amount)::numeric                                                  AS max_single_entry,
-  MIN(r.amount)::numeric                                                  AS min_single_entry
-FROM "Revenue" r
-JOIN  "user"           u  ON u.id = r."employeeId"
+  SUM(ke.quantity)::numeric                                               AS total_revenue,
+  ROUND(AVG(ke.quantity)::numeric, 0)                                     AS avg_revenue_per_entry,
+  MAX(ke.quantity)::numeric                                               AS max_single_entry,
+  MIN(ke.quantity)::numeric                                               AS min_single_entry
+FROM "KpiEntry" ke
+JOIN  "RoleKpi"        rk ON rk.id = ke."roleKpiId"
+JOIN  "KpiDefinition"  kd ON kd.id = rk."kpiId" AND kd.unit = 'CURRENCY'
+JOIN  "user"           u  ON u.id = ke."employeeId"
 LEFT JOIN "Branch"     b  ON b.id = u."branchId"
 LEFT JOIN "Company"    co ON co.id = b."companyId"
 LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId"
+WHERE ke.status = 'APPROVED'
 GROUP BY
-  r."employeeId", u.name, u."branchId", b."companyId",
+  ke."employeeId", u.name, u."branchId", b."companyId",
   co.name, co.code, b.name, cr.name,
-  EXTRACT(YEAR FROM r.date), EXTRACT(MONTH FROM r.date),
-  DATE_TRUNC('month', r.date);
+  ke."periodYear", ke."periodMonth";
 
 
 -- ============================================================
@@ -422,142 +484,74 @@ CREATE OR REPLACE VIEW hv_payroll_monthly AS
 WITH att AS (
   SELECT
     a."userId",
-    EXTRACT(YEAR  FROM a.date)::int                                       AS year,
-    EXTRACT(MONTH FROM a.date)::int                                       AS month,
-    COUNT(*) FILTER (WHERE a.status = 'PRESENT')                         AS present_days,
-    COUNT(*) FILTER (WHERE a.status = 'LATE')                            AS late_days,
-    COUNT(*) FILTER (WHERE a.status = 'ABSENT')                          AS absent_days,
-    COUNT(*) FILTER (WHERE a.status = 'SICK')                            AS sick_days,
-    COUNT(*) FILTER (WHERE a.status = 'PERMISSION')                      AS permission_days,
-    COUNT(*) FILTER (WHERE a.status = 'HOLIDAY')                         AS holiday_days,
-    COUNT(*) FILTER (WHERE a."isLocationSuspect")                        AS suspect_location_days
+    EXTRACT(YEAR  FROM a.date)::int AS year,
+    EXTRACT(MONTH FROM a.date)::int AS month,
+    COUNT(*) FILTER (WHERE a.status = 'PRESENT')    AS present_days,
+    COUNT(*) FILTER (WHERE a.status = 'LATE')       AS late_days,
+    COUNT(*) FILTER (WHERE a.status = 'ABSENT')     AS absent_days,
+    COUNT(*) FILTER (WHERE a.status = 'SICK')       AS sick_days,
+    COUNT(*) FILTER (WHERE a.status = 'PERMISSION') AS permission_days,
+    COUNT(*) FILTER (WHERE a.status = 'HOLIDAY')    AS holiday_days,
+    COUNT(*) FILTER (WHERE a."isLocationSuspect")   AS suspect_location_days
   FROM "Attendance" a
-  GROUP BY a."userId",
-           EXTRACT(YEAR FROM a.date),
-           EXTRACT(MONTH FROM a.date)
-),
-base AS (
+  GROUP BY a."userId", EXTRACT(YEAR FROM a.date), EXTRACT(MONTH FROM a.date)
+), base AS (
   SELECT
-    u.id                                                                  AS employee_id,
-    u.name                                                                AS employee_name,
-    b."companyId"                                                         AS company_id,
-    COALESCE(co.name, '')                                                 AS company_name,
-    COALESCE(co.code, '')                                                 AS company_code,
-    u."branchId"                                                          AS branch_id,
-    COALESCE(b.name, '')                                                  AS branch_name,
-    COALESCE(cr.name, '')                                                 AS role_name,
+    u.id                                     AS employee_id,
+    u.name                                   AS employee_name,
+    b."companyId"                            AS company_id,
+    COALESCE(co.name, '')                    AS company_name,
+    COALESCE(co.code, '')                    AS company_code,
+    u."branchId"                             AS branch_id,
+    COALESCE(b.name, '')                     AS branch_name,
+    COALESCE(cr.name, '')                    AS role_name,
     att.month,
     att.year,
-    COALESCE(u."baseSalary", 0)::numeric                                 AS base_salary,
-    COALESCE(u."mealAllowance", 0)::numeric                              AS meal_allowance,
-    COALESCE(u."transportAllowance", 0)::numeric                         AS transport_allowance,
-    (COALESCE(u."baseSalary", 0)
-      + COALESCE(u."mealAllowance", 0)
-      + COALESCE(u."transportAllowance", 0))::numeric                    AS total_gross_fixed,
-    COALESCE(att.present_days, 0)::int                                   AS present_days,
-    COALESCE(att.late_days, 0)::int                                      AS late_days,
-    COALESCE(att.absent_days, 0)::int                                    AS absent_days,
-    COALESCE(att.sick_days, 0)::int                                      AS sick_days,
-    COALESCE(att.permission_days, 0)::int                                AS permission_days,
-    COALESCE(att.holiday_days, 0)::int                                   AS holiday_days,
-    COALESCE(att.suspect_location_days, 0)::int                          AS suspect_location_days,
-    COALESCE(km."totalScore", 0)::numeric                                AS kpi_score,
-    COALESCE(km."bonusAmount", 0)::numeric                               AS kpi_bonus_raw,
-    km."bonusResult"                                                      AS kpi_bonus_type
+    COALESCE(u."baseSalary", 0)              AS base_salary,
+    COALESCE(u."mealAllowance", 0)           AS meal_allowance,
+    COALESCE(u."transportAllowance", 0)      AS transport_allowance,
+    COALESCE(u."baseSalary", 0) + COALESCE(u."mealAllowance", 0) + COALESCE(u."transportAllowance", 0) AS total_gross_fixed,
+    COALESCE(att.present_days, 0)::int          AS present_days,
+    COALESCE(att.late_days, 0)::int             AS late_days,
+    COALESCE(att.absent_days, 0)::int           AS absent_days,
+    COALESCE(att.sick_days, 0)::int             AS sick_days,
+    COALESCE(att.permission_days, 0)::int       AS permission_days,
+    COALESCE(att.holiday_days, 0)::int          AS holiday_days,
+    COALESCE(att.suspect_location_days, 0)::int AS suspect_location_days,
+    COALESCE(km."totalScore", 0)::numeric    AS kpi_score,
+    COALESCE(km.grade, '-')                  AS kpi_grade
   FROM "user" u
   JOIN att ON att."userId" = u.id
-  LEFT JOIN "Branch"           b  ON b.id = u."branchId"
-  LEFT JOIN "Company"          co ON co.id = b."companyId"
-  LEFT JOIN "custom_role"      cr ON cr.id = u."customRoleId"
-  LEFT JOIN "KpiMonthlyResult" km ON km."employeeId" = u.id
-                                  AND km.month = att.month
-                                  AND km.year  = att.year
+  LEFT JOIN "Branch" b       ON b.id = u."branchId"
+  LEFT JOIN "Company" co     ON co.id = b."companyId"
+  LEFT JOIN "custom_role" cr ON cr.id = u."customRoleId"
+  LEFT JOIN "KpiMonthlyResult" km ON km."employeeId" = u.id AND km.month = att.month AND km.year = att.year
 )
 SELECT
-  employee_id,
-  employee_name,
-  company_id,
-  company_name,
-  company_code,
-  branch_id,
-  branch_name,
-  role_name,
-  month,
-  year,
-  TO_CHAR(
-    TO_DATE(year::text || '-' || LPAD(month::text, 2, '0') || '-01', 'YYYY-MM-DD'),
-    'YYYY-MM'
-  )                                                                       AS period_label,
-  base_salary,
-  meal_allowance,
-  transport_allowance,
-  total_gross_fixed,
-  ROUND(total_gross_fixed / 24, 0)                                        AS daily_rate,
-  present_days,
-  late_days,
-  absent_days,
-  sick_days,
-  permission_days,
-  holiday_days,
-  suspect_location_days,
-  0::numeric                                                              AS late_deduction,
-  ROUND(
-    (absent_days * 2 + sick_days * 1 + permission_days * 1)
-    * (total_gross_fixed / 24), 0
-  )                                                                       AS absence_deduction,
-  ROUND(
-    (absent_days * 2 + sick_days * 1 + permission_days * 1)
-    * (total_gross_fixed / 24), 0
-  )                                                                       AS total_deductions,
+  employee_id, employee_name, company_id, company_name, company_code,
+  branch_id, branch_name, role_name, month, year,
+  TO_CHAR(MAKE_DATE(year, month, 1), 'YYYY-MM') AS period_label,
+  base_salary, meal_allowance, transport_allowance, total_gross_fixed,
+  ROUND(total_gross_fixed / 24, 0)              AS daily_rate,
+  present_days, late_days, absent_days, sick_days, permission_days,
+  holiday_days, suspect_location_days,
+  0::numeric                                    AS late_deduction,
+  ROUND((absent_days * 2 + sick_days + permission_days)::numeric * (total_gross_fixed / 24), 0) AS absence_deduction,
+  ROUND((absent_days * 2 + sick_days + permission_days)::numeric * (total_gross_fixed / 24), 0) AS total_deductions,
   kpi_score,
-  kpi_bonus_raw                                                           AS kpi_bonus,
-  kpi_bonus_type,
-  CASE kpi_bonus_type
-    WHEN 'BONUS_CASH'        THEN 'Bonus Cash'
-    WHEN 'SAFE_ZONE'         THEN 'Aman'
-    WHEN 'PENALTY_SATURDAY'  THEN 'Denda Sabtu'
-    WHEN 'PENALTY_DEDUCTION' THEN 'Potongan'
-    WHEN 'TOP_PERFORMER'     THEN 'Top Performer'
-    ELSE 'Belum Ada KPI'
-  END                                                                     AS kpi_bonus_type_label,
-  CASE
-    WHEN kpi_bonus_type IN ('PENALTY_DEDUCTION', 'PENALTY_SATURDAY')
-    THEN -kpi_bonus_raw
-    ELSE kpi_bonus_raw
-  END                                                                     AS kpi_net_effect,
-  ROUND(
-    total_gross_fixed
-    - (absent_days * 2 + sick_days * 1 + permission_days * 1) * (total_gross_fixed / 24)
-    + CASE
-        WHEN kpi_bonus_type IN ('PENALTY_DEDUCTION', 'PENALTY_SATURDAY')
-        THEN -kpi_bonus_raw
-        ELSE kpi_bonus_raw
-      END
-  , 0)                                                                    AS estimated_take_home_pay,
+  ROUND(kpi_score * 100, 2)                     AS kpi_score_pct,
+  kpi_grade,
+  ROUND(total_gross_fixed - (absent_days * 2 + sick_days + permission_days)::numeric * (total_gross_fixed / 24), 0) AS estimated_take_home_pay,
   CONCAT(
     employee_name, ' (', role_name, ')',
-    ' | Periode ', TO_CHAR(
-      TO_DATE(year::text || '-' || LPAD(month::text, 2, '0') || '-01', 'YYYY-MM-DD'),
-      'Mon YYYY'
-    ),
-    ' | Hadir ', present_days, ' hari, Terlambat ', late_days,
-    ', Absent ', absent_days, ', Sakit ', sick_days,
+    ' | Periode ', TO_CHAR(MAKE_DATE(year, month, 1), 'Mon YYYY'),
+    ' | Hadir ', present_days, ' hari, Terlambat ', late_days, ', Absent ', absent_days, ', Sakit ', sick_days,
     ' | Gaji bruto Rp ', TO_CHAR(total_gross_fixed, 'FM999,999,999'),
-    ' | Potongan Rp ', TO_CHAR(
-      ROUND((absent_days * 2 + sick_days * 1 + permission_days * 1) * (total_gross_fixed / 24), 0),
-      'FM999,999,999'
-    ),
-    ' | KPI ', kpi_score, ' (', COALESCE(kpi_bonus_type::text, '-'), ')',
-    ' | Take-home ≈ Rp ', TO_CHAR(
-      ROUND(
-        total_gross_fixed
-        - (absent_days * 2 + sick_days * 1 + permission_days * 1) * (total_gross_fixed / 24)
-        + CASE WHEN kpi_bonus_type IN ('PENALTY_DEDUCTION', 'PENALTY_SATURDAY')
-               THEN -kpi_bonus_raw ELSE kpi_bonus_raw END
-      , 0),
-      'FM999,999,999'
-    )
-  )                                                                       AS context_summary
+    ' | Potongan Rp ', TO_CHAR(ROUND((absent_days * 2 + sick_days + permission_days)::numeric * (total_gross_fixed / 24), 0), 'FM999,999,999'),
+    ' | KPI ', ROUND(kpi_score * 100, 1), '% (grade ', kpi_grade, ')',
+    ' | Take-home sebelum insentif ≈ Rp ',
+    TO_CHAR(ROUND(total_gross_fixed - (absent_days * 2 + sick_days + permission_days)::numeric * (total_gross_fixed / 24), 0), 'FM999,999,999')
+  )                                             AS context_summary
 FROM base;
 
 
@@ -783,44 +777,93 @@ LEFT JOIN "Company" co ON co.id = b."companyId";
 -- ============================================================
 -- 19. hv_bonus_tiers
 -- ============================================================
+-- Sumbernya PayrollRule + PayrollRuleTier (rule engine). Matriks bonus lama
+-- (BonusMatrix/BonusTier, lalu PayrollIncentiveMatrix/Tier) sudah tidak ada;
+-- nama kolom kunci dipertahankan supaya MCP tool `get_bonus_tiers` tetap jalan.
+--
+-- Rule TIDAK punya kolom `type` lagi (dibuang migrasi 20260805040000): arah
+-- uang dibaca dari TANDA nominal tiap tier, sama seperti engine
+-- (`entryTypeOf`: negatif → denda, selain itu → bonus). Tier bernominal 0
+-- diberi label sendiri ("Safe Zone") alih-alih ikut dihitung bonus — band aman
+-- adalah kategori nyata di sheet manajemen, dan menampilkannya sebagai
+-- "Bonus Rp 0" menyesatkan pembacanya.
 CREATE OR REPLACE VIEW hv_bonus_tiers AS
+WITH grup AS (
+  SELECT r.id            AS rule_id,
+         r."ruleKey"     AS rule_key,
+         r.version       AS rule_version,
+         r.note          AS note,
+         r."effectiveFrom"::date AS effective_from,
+         r."effectiveTo"::date   AS effective_to,
+         g.value         AS grp
+  FROM "PayrollRule" r
+  CROSS JOIN LATERAL jsonb_array_elements(r.targets::jsonb) AS g(value)
+  WHERE r."effectiveTo" IS NULL OR r."effectiveTo"::date >= CURRENT_DATE
+),
+sasaran AS (
+  SELECT gr.*,
+         co.id   AS company_id,
+         co.name AS company_name,
+         co.code AS company_code,
+         cr.id   AS role_id,
+         cr.name AS role_name
+  FROM grup gr
+  JOIN "Company" co
+    ON (gr.grp -> 'company') = '"*"'::jsonb
+    OR (jsonb_typeof(gr.grp -> 'company') = 'array' AND (gr.grp -> 'company') ? co.code)
+  JOIN custom_role cr
+    ON cr."companyId" = co.id
+   AND ((gr.grp -> 'roles') = '"*"'::jsonb
+     OR (jsonb_typeof(gr.grp -> 'roles') = 'array' AND (gr.grp -> 'roles') ? cr.name))
+)
 SELECT
-  bm.id                                                                   AS matrix_id,
-  bm."companyId"                                                          AS company_id,
-  COALESCE(co.name, '')                                                   AS company_name,
-  COALESCE(co.code, '')                                                   AS company_code,
-  bm."customRoleId"                                                       AS role_id,
-  COALESCE(cr.name, '')                                                   AS role_name,
-  bt.id                                                                   AS tier_id,
-  bt."minScore"::numeric                                                  AS min_score,
-  bt."maxScore"::numeric                                                  AS max_score,
-  bt."resultType"                                                         AS result_type,
-  CASE bt."resultType"
-    WHEN 'BONUS_CASH'        THEN 'Bonus Cash'
-    WHEN 'SAFE_ZONE'         THEN 'Aman (Tidak Bonus/Denda)'
-    WHEN 'PENALTY_SATURDAY'  THEN 'Denda Masuk Sabtu'
-    WHEN 'PENALTY_DEDUCTION' THEN 'Potongan Gaji'
-    WHEN 'TOP_PERFORMER'     THEN 'Top Performer'
-    ELSE bt."resultType"::text
-  END                                                                     AS result_type_label,
-  COALESCE(bt.amount, 0)::numeric                                        AS amount,
-  bt."isTopPerformer"                                                     AS is_top_performer,
+  s.rule_id                                 AS matrix_id,
+  s.rule_key,
+  s.rule_version,
+  s.company_id,
+  s.company_name,
+  s.company_code,
+  s.role_id,
+  s.role_name,
+  t.id                                      AS tier_id,
+  t.min::numeric                            AS min_score,
+  t.max::numeric                            AS max_score,
+  CASE
+    WHEN COALESCE(t.nominal, t."perUnit", 0) < 0 THEN 'DENDA'
+    WHEN COALESCE(t.nominal, t."perUnit", 0) > 0 THEN 'BONUS'
+    WHEN t.formula IS NOT NULL              THEN 'FORMULA'
+    ELSE 'SAFE_ZONE'
+  END                                       AS result_type,
+  CASE
+    WHEN COALESCE(t.nominal, t."perUnit", 0) < 0 THEN 'Denda / Potongan'
+    WHEN COALESCE(t.nominal, t."perUnit", 0) > 0 THEN 'Bonus'
+    WHEN t.formula IS NOT NULL              THEN 'Dihitung Formula'
+    ELSE 'Safe Zone'
+  END                                       AS result_label,
+  COALESCE(t.nominal, 0)::numeric           AS cash_amount,
+  t."perUnit"::numeric                      AS per_unit,
+  t."unitField"                             AS unit_field,
+  t.formula                                 AS formula,
+  t."mandatorySaturday"                     AS mandatory_saturday,
+  t."warningLetter"                         AS warning_letter,
+  t.label                                   AS tier_label,
+  s.effective_from,
+  s.effective_to,
+  s.note,
   CONCAT(
-    'Skor ', bt."minScore"::numeric, '–', bt."maxScore"::numeric,
+    COALESCE(s.company_code, '-'), ' | ', COALESCE(s.role_name, '-'),
+    ' | ', s.rule_key, '@v', s.rule_version,
+    ' | ', COALESCE(t.min::text, '-∞'), '–', COALESCE(t.max::text, '∞'),
     ' → ',
-    CASE bt."resultType"
-      WHEN 'BONUS_CASH'        THEN 'Bonus Cash Rp ' || TO_CHAR(COALESCE(bt.amount, 0)::numeric, 'FM999,999,999')
-      WHEN 'SAFE_ZONE'         THEN 'Aman (tidak ada bonus/denda)'
-      WHEN 'PENALTY_SATURDAY'  THEN 'Denda masuk Sabtu Rp ' || TO_CHAR(COALESCE(bt.amount, 0)::numeric, 'FM999,999,999')
-      WHEN 'PENALTY_DEDUCTION' THEN 'Potongan gaji Rp ' || TO_CHAR(COALESCE(bt.amount, 0)::numeric, 'FM999,999,999')
-      WHEN 'TOP_PERFORMER'     THEN 'Top Performer!'
-      ELSE bt."resultType"::text
-    END
-  )                                                                       AS tier_description
-FROM "BonusMatrix" bm
-JOIN  "BonusTier"    bt ON bt."matrixId" = bm.id
-JOIN  "Company"      co ON co.id = bm."companyId"
-LEFT JOIN "custom_role" cr ON cr.id = bm."customRoleId";
+    CASE
+      WHEN t.formula IS NOT NULL   THEN 'formula ' || t.formula
+      WHEN t."perUnit" IS NOT NULL THEN 'Rp ' || to_char(t."perUnit", 'FM999,999,999') || ' per ' || COALESCE(t."unitField", 'unit')
+      ELSE 'Rp ' || to_char(COALESCE(t.nominal, 0), 'FM999,999,999')
+    END,
+    ' | ', t.label
+  )                                         AS context_summary
+FROM sasaran s
+JOIN "PayrollRuleTier" t ON t."ruleId" = s.rule_id;
 
 
 -- ============================================================

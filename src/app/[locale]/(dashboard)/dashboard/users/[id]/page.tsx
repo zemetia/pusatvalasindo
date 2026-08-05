@@ -12,7 +12,10 @@ import {
 import prisma from "@/lib/prisma";
 import { canViewPayrollOf } from "@/backend/services/payroll.service";
 import { requireResource } from "@/backend/helpers/authz";
-import { payrollIncentiveService } from "@/backend/services/payroll-incentive.service";
+import {
+  evaluateRulesForEmployee,
+  loadEmployeeContext,
+} from "@/backend/payroll-rules/engine";
 import { can, PERMISSIONS } from "@/lib/permissions";
 import { toKey, todayKeyJakarta } from "@/lib/finance-period";
 import { formatCount, formatIdr, formatPercent, pctChange } from "@/lib/format";
@@ -363,17 +366,22 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
     (salary.position ?? 0) +
     (salary.bpjs ?? 0);
 
-  // Gelombang kedua: insentif dan rincian KPI sama-sama bergantung pada periode
-  // terakhir, jadi dijalankan berbarengan agar hanya menambah satu putaran ke DB.
+  // Gelombang kedua: reward/denda dan rincian KPI sama-sama bergantung pada
+  // periode terakhir, jadi dijalankan berbarengan agar hanya menambah satu
+  // putaran ke DB.
   //
-  // Insentif dibaca dari hasil KPI yang sudah tersimpan (tanpa menghitung ulang),
-  // jadi membuka halaman ini tidak pernah mengubah data periode mana pun.
-  let incentive: Awaited<ReturnType<typeof payrollIncentiveService.resolveForEmployee>> | null;
+  // Rule dievaluasi dari hasil KPI yang sudah tersimpan (tanpa menghitung ulang
+  // skornya), jadi membuka halaman ini tidak pernah mengubah data periode mana
+  // pun. Angkanya berasal dari rule engine — sumber yang sama dengan halaman
+  // Payroll, supaya kedua halaman tidak pernah menampilkan angka berbeda.
+  let incentive: Awaited<ReturnType<typeof evaluateRulesForEmployee>> | null;
   let breakdown: KpiBreakdown | null;
   try {
     const [resolvedIncentive, latestDetail] = await Promise.all([
       canSeeSalary && latest
-        ? payrollIncentiveService.resolveForEmployee(id, latest.month, latest.year)
+        ? loadEmployeeContext(id).then((emp) =>
+            emp ? evaluateRulesForEmployee(emp, latest.month, latest.year) : null
+          )
         : Promise.resolve(null),
       canSeeKpi && latest
         ? prisma.kpiMonthlyResult.findUnique({
@@ -391,7 +399,23 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
     return <ErrorPanel source="users/[id]/page (rincian)" message={msg} />;
   }
 
-  /* ── Susunan metrik ────────────────────────────────────────────────────── */
+  /**
+ * Ringkasan alasan reward/denda untuk ditampilkan di samping angkanya.
+ *
+ * Labelnya diambil dari tier yang benar-benar dipakai, bukan disusun ulang —
+ * itu yang membuat alasan pada slip tidak pernah berbeda dari angkanya.
+ */
+function ringkasanRule(
+  hasil: Awaited<ReturnType<typeof evaluateRulesForEmployee>>
+): string {
+  const berdampak = hasil.entries.filter((e) => e.status === "APPLIED" && e.amount !== 0);
+  if (berdampak.length > 0) {
+    return [...new Set(berdampak.map((e) => e.label))].join(" · ");
+  }
+  return hasil.needsReview ? "Perlu diperiksa HR" : "Tanpa bonus maupun potongan";
+}
+
+/* ── Susunan metrik ────────────────────────────────────────────────────── */
 
   const joinYear = employee.joinDate ? Number(toKey(employee.joinDate).slice(0, 4)) : currentYear;
   // Tahun yang sedang dibuka selalu ikut terdaftar, meski karyawannya baru
@@ -467,7 +491,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
               ? "success"
               : "destructive"
         }
-        meta={incentive ? `${incentive.outcomeLabel} · ${periodLabel}` : "Belum ada hasil KPI"}
+        meta={incentive ? `${ringkasanRule(incentive)} · ${periodLabel}` : "Belum ada hasil KPI"}
       />
     );
   }
@@ -778,37 +802,37 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
 
             <div className="divide-y">
               <AmountRow
-                label={`Insentif KPI — ${periodLabel}`}
-                note={incentive?.outcomeLabel}
+                label={`Reward KPI — ${periodLabel}`}
+                note={incentive ? ringkasanRule(incentive) : undefined}
                 value={
                   incentive
-                    ? incentive.tierAmount === 0
+                    ? incentive.totalBonus === 0
                       ? "Rp 0"
-                      : `${incentive.tierAmount > 0 ? "+" : "−"}Rp ${formatIdr(Math.abs(incentive.tierAmount))}`
+                      : `+Rp ${formatIdr(incentive.totalBonus)}`
+                    : "—"
+                }
+                tone={incentive && incentive.totalBonus > 0 ? "success" : "muted"}
+              />
+              <AmountRow
+                label="Denda & Potongan"
+                note={
+                  incentive?.mandatorySaturday
+                    ? "Disertai kewajiban masuk setiap Sabtu"
+                    : incentive?.warningLetter
+                      ? "Disertai Surat Peringatan"
+                      : undefined
+                }
+                value={
+                  incentive
+                    ? incentive.totalPenalty === 0
+                      ? "Rp 0"
+                      : `−Rp ${formatIdr(incentive.totalPenalty)}`
                     : "—"
                 }
                 tone={
-                  !incentive || incentive.tierAmount === 0
-                    ? "muted"
-                    : incentive.tierAmount > 0
-                      ? "success"
-                      : "destructive"
-                }
-              />
-              <AmountRow
-                label="Bonus Top Performer"
-                note={
-                  incentive?.rank
-                    ? `Peringkat ${incentive.rank} dari ${incentive.peerCount} rekan sejabatan`
-                    : undefined
-                }
-                value={
-                  incentive && incentive.topPerformerBonus > 0
-                    ? `+Rp ${formatIdr(incentive.topPerformerBonus)}`
-                    : "Rp 0"
-                }
-                tone={
-                  incentive && incentive.topPerformerBonus > 0 ? "success" : "muted"
+                  incentive && incentive.totalPenalty > 0
+                    ? "destructive"
+                    : "muted"
                 }
               />
               <AmountRow
@@ -819,7 +843,7 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
               />
               {incentive && (
                 <p className="text-muted-foreground pt-3 text-xs leading-relaxed">
-                  {incentive.reason}
+                  {ringkasanRule(incentive)}
                   {incentive.mandatorySaturday && (
                     <> — karyawan wajib masuk setiap Sabtu pada periode ini.</>
                   )}

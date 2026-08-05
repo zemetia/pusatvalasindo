@@ -117,8 +117,6 @@ async function main() {
       pointPerUnit: Number(roleKpi.pointPerUnit),
       toleranceLimit: null,
       toleranceScope: null,
-      maxAchievement: Number(roleKpi.maxAchievement),
-      minAchievement: Number(roleKpi.minAchievement),
     },
     output.entries.map((e) => ({
       occurredAt: e.occurredAt.toISOString().slice(0, 10),

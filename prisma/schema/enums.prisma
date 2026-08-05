@@ -4,3 +4,19 @@ enum StockItemType {
   CASH
   SILVER
 }
+
+/// Status ikatan kerja karyawan.
+///
+/// Yang membedakan hanya satu hal untuk payroll: sudah terikat kontrak atau
+/// belum. PKWT dan PKWTT dipisah karena masa berlakunya berbeda — PKWT punya
+/// tanggal habis, PKWTT tidak.
+enum EmploymentStatus {
+  /// Belum diikat kontrak apa pun. Tidak berhak atas bonus tambahan.
+  BELUM_KONTRAK
+  /// Masa percobaan. Belum berkontrak, jadi diperlakukan sama seperti di atas.
+  PROBATION
+  /// Perjanjian Kerja Waktu Tertentu — kontrak dengan tanggal habis.
+  PKWT
+  /// Perjanjian Kerja Waktu Tidak Tertentu — karyawan tetap.
+  PKWTT
+}

@@ -5,20 +5,20 @@ config()
 import { PrismaClient } from '../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
-import { seedCurrencies } from './seeds/currencies'
-import { seedCompanies } from './seeds/companies'
-import { seedBranches } from './seeds/branches'
-import { seedStockItems } from './seeds/stock-items'
-import { seedCompanyStockItems } from './seeds/company-stock-items'
-import { seedBankAccounts } from './seeds/bank-accounts'
-import { seedStockistPockets } from './seeds/stockist-pockets'
-import { seedKasPockets } from './seeds/kas-pockets'
-import { seedKpi } from './seeds/kpi'
-import { seedRoleKpis } from './seeds/role-kpi'
-import { seedPayrollIncentives } from './seeds/payroll-incentive'
-import { seedUsers } from './seeds/users'
-import { seedPriceBenchmarks } from './seeds/price-benchmarks'
-import { seedRoles } from './seeds/roles'
+import { seedCurrencies } from './seeds/currencies.seeder'
+import { seedCompanies } from './seeds/companies.seeder'
+import { seedBranches } from './seeds/branches.seeder'
+import { seedStockItems } from './seeds/stock-items.seeder'
+import { seedCompanyStockItems } from './seeds/company-stock-items.seeder'
+import { seedBankAccounts } from './seeds/bank-accounts.seeder'
+import { seedStockistPockets } from './seeds/stockist-pockets.seeder'
+import { seedKasPockets } from './seeds/kas-pockets.seeder'
+import { seedKpi } from './seeds/kpi/kpi.seeder'
+import { seedRoleKpis } from './seeds/role-kpi/role-kpi.seeder'
+import { seedPayrollRules } from './seeds/payroll-rules/payroll-rules.seeder'
+import { seedUsers } from './seeds/users/users.seeder'
+import { seedPriceBenchmarks } from './seeds/price-benchmarks.seeder'
+import { seedRoles } from './seeds/roles.seeder'
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -64,7 +64,9 @@ async function main() {
   await seedRoleKpis(prisma, companyIds)
 
   console.log('🌱 Seeding matriks insentif payroll...')
-  await seedPayrollIncentives(prisma, companyIds)
+
+  console.log('🌱 Seeding rule reward/denda slip gaji...')
+  await seedPayrollRules(prisma)
 
   console.log('🌱 Seeding patokan harga (penyesuaian jual/beli)...')
   await seedPriceBenchmarks(prisma)

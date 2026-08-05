@@ -34,19 +34,29 @@ import { IconChartHistogram } from "@tabler/icons-react";
 import { MONTH_NAMES, formatPercent } from "@/lib/kpi-utils";
 import type { PerformanceOverview } from "@/backend/services/kpi-analytics.service";
 
-/* ── Skala tetap untuk sparkline ────────────────────────────────────────────
- * Domain dipatok 0–120% (bukan min–max tiap baris) supaya garis di baris yang
- * berbeda bisa dibandingkan langsung: karyawan yang datar di 50% harus terlihat
- * lebih rendah daripada yang datar di 95%, bukan sama-sama garis lurus.
+/* ── Skala bersama untuk sparkline ──────────────────────────────────────────
+ * Domain sama untuk semua baris (bukan min–max tiap baris) supaya garisnya bisa
+ * dibandingkan langsung: karyawan yang datar di 50% harus terlihat lebih rendah
+ * daripada yang datar di 95%, bukan sama-sama garis lurus. Puncaknya 120%, tapi
+ * ikut naik bila ada yang melampaui — skor tidak berplafon, jadi mematoknya
+ * membuat 180% dan 120% tergambar sama tinggi.
  */
-const SPARK_MAX = 1.2;
+const SPARK_BASE_MAX = 1.2;
 const SPARK_W = 72;
 const SPARK_H = 20;
 
-function Sparkline({ values, labels }: { values: (number | null)[]; labels: string[] }) {
+function Sparkline({
+  values,
+  labels,
+  max,
+}: {
+  values: (number | null)[];
+  labels: string[];
+  max: number;
+}) {
   const points = values.map((v, i) => ({
     x: values.length <= 1 ? SPARK_W / 2 : (i / (values.length - 1)) * SPARK_W,
-    y: v === null ? null : SPARK_H - Math.min(Math.max(v, 0), SPARK_MAX) / SPARK_MAX * SPARK_H,
+    y: v === null ? null : SPARK_H - (Math.max(v, 0) / max) * SPARK_H,
   }));
 
   // Bulan tanpa hasil memutus garis, bukan digambar sebagai nol — nol berarti
@@ -153,6 +163,17 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
     () => [...new Set(rows.map((r) => r.roleName))].sort(),
     [rows]
   );
+
+  /**
+   * Puncak skala sparkline: 120% kecuali ada yang melampauinya. Dihitung dari
+   * seluruh baris (bukan hasil filter) supaya skalanya tidak bergeser saat
+   * memfilter, dan diturunkan sebagai satu angka ke semua baris supaya tetap
+   * bisa dibandingkan antar karyawan.
+   */
+  const sparkMax = useMemo(() => {
+    const scores = rows.flatMap((r) => r.history.filter((v): v is number => v !== null));
+    return Math.max(SPARK_BASE_MAX, ...scores);
+  }, [rows]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -472,7 +493,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
                       )}
                     </TableCell>
                     <TableCell>
-                      <Sparkline values={r.history} labels={historyLabels} />
+                      <Sparkline values={r.history} labels={historyLabels} max={sparkMax} />
                     </TableCell>
                     <TableCell className="text-sm">
                       {r.weakest ? (

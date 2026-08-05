@@ -24,8 +24,6 @@ const baseConfig: KpiScoringConfig = {
   pointPerUnit: 1,
   toleranceLimit: null,
   toleranceScope: "DAILY",
-  maxAchievement: 1.2,
-  minAchievement: 0,
 };
 
 const cfg = (over: Partial<KpiScoringConfig>): KpiScoringConfig => ({ ...baseConfig, ...over });
@@ -48,9 +46,9 @@ describe("TARGET_VALUE", () => {
     expect(result.achievement).toBeCloseTo(750 / 700, 6);
   });
 
-  it("dibatasi maxAchievement supaya satu KPI tidak menutupi KPI lain", () => {
-    const result = scoreKpiItem(target, [entry("2026-07-02", 7_000_000_000)]);
-    expect(result.achievement).toBe(1.2);
+  it("melampaui target tidak dipotong plafon", () => {
+    const result = scoreKpiItem(target, [entry("2026-07-02", 1_050_000_000)]);
+    expect(result.achievement).toBeCloseTo(1.5, 6);
   });
 
   it("tanpa entri berarti belum tercapai", () => {
@@ -62,7 +60,9 @@ describe("TARGET_VALUE", () => {
   it("LOWER_BETTER menilai realisasi kecil sebagai baik", () => {
     const risk = cfg({ scoringType: "TARGET_VALUE", direction: "LOWER_BETTER", targetValue: 10 });
     expect(scoreKpiItem(risk, [entry("2026-07-02", 10)]).achievement).toBe(1);
-    expect(scoreKpiItem(risk, [entry("2026-07-02", 20)]).achievement).toBeCloseTo(0.5, 6);
+    expect(scoreKpiItem(risk, [entry("2026-07-02", 5)]).achievement).toBeCloseTo(1.5, 6);
+    expect(scoreKpiItem(risk, [entry("2026-07-02", 20)]).achievement).toBe(0);
+    expect(scoreKpiItem(risk, [entry("2026-07-02", 30)]).achievement).toBe(-1);
   });
 
   it("target belum disetel tidak menghasilkan Infinity", () => {
@@ -88,9 +88,10 @@ describe("PENALTY_POINT", () => {
     expect(scoreKpiItem(teliti, []).achievement).toBe(1);
   });
 
-  it("tidak pernah negatif karena dibatasi minAchievement", () => {
+  it("penalti melebihi poin awal menghasilkan nilai negatif", () => {
+    // 50 kejadian × 3 poin = 150 poin dari 100 → -50%
     const result = scoreKpiItem(teliti, [entry("2026-07-03", 50)]);
-    expect(result.achievement).toBe(0);
+    expect(result.achievement).toBeCloseTo(-0.5, 6);
   });
 });
 
@@ -105,8 +106,9 @@ describe("REWARD_POINT", () => {
     expect(result.achievement).toBeCloseTo(0.6, 6);
   });
 
-  it("melampaui target tetap dibatasi plafon", () => {
-    expect(scoreKpiItem(review, [entry("2026-07-05", 100)]).achievement).toBe(1.2);
+  it("melampaui target dihitung apa adanya", () => {
+    // 100 review × 2 poin = 200 dari target 50 → 400%
+    expect(scoreKpiItem(review, [entry("2026-07-05", 100)]).achievement).toBe(4);
   });
 });
 

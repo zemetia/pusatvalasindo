@@ -43,7 +43,6 @@ model custom_role {
   usesResourcePerms Boolean       @default(false)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
-  incentiveMatrices PayrollIncentiveMatrix[]
   roleKpis          RoleKpi[]
   company           Company?      @relation(fields: [companyId], references: [id])
   users             user[]
@@ -51,6 +50,7 @@ model custom_role {
   // `permissions` di atas adalah model lama yang masih dibaca selama migrasi
   // bertahap (lihat src/lib/authz/resolve.ts).
   resourcePerms     RoleResourcePermission[]
+  payrollSlips      PayrollSlip[]
 
   @@unique([name, companyId])
 }
@@ -71,6 +71,19 @@ model user {
   positionAllowance  Decimal?
   bpjsKesehatan      Decimal?
   joinDate           DateTime?
+
+  /// Status ikatan kerja. Dipakai rule payroll untuk menegakkan aturan
+  /// manajemen "yang masih belum di kontrak belum bisa mendapatkan bonus
+  /// tambahan" — tanpa kolom ini aturan itu tidak punya data untuk dicek.
+  /// Default sengaja BELUM_KONTRAK: menganggap karyawan sudah berkontrak
+  /// padahal belum berarti membayar bonus yang tidak berhak.
+  employmentStatus   EmploymentStatus   @default(BELUM_KONTRAK)
+  /// Tanggal mulai kontrak yang sedang berjalan. Null untuk BELUM_KONTRAK.
+  contractStartDate  DateTime?
+  /// Tanggal berakhir kontrak. Null berarti tidak berbatas waktu — benar untuk
+  /// PKWTT, dan pada PKWT berarti tanggal habisnya belum diisi.
+  contractEndDate    DateTime?
+
   isActive           Boolean            @default(true)
   customRoleId       String?
   kpiEntries         KpiEntry[]         @relation("KpiEntryEmployee")
@@ -82,6 +95,10 @@ model user {
   salaryComponents   UserSalaryComponent[]
   attendances        Attendance[]       @relation("AttendanceEmployee")
   attendancesEdited  Attendance[]       @relation("AttendanceEditedBy")
+  payrollSlips       PayrollSlip[]
+  payrollRunsGenerated PayrollRun[]     @relation("PayrollRunGeneratedBy")
+  payrollRunsFinalized PayrollRun[]     @relation("PayrollRunFinalizedBy")
+  payrollRulesCreated  PayrollRule[]    @relation("PayrollRuleCreatedBy")
   samples            Sample[]
   account            account[]
   session            session[]

@@ -9,7 +9,7 @@ config()
 import { PrismaClient } from '../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
-import { seedPriceBenchmarks } from './seeds/price-benchmarks'
+import { seedPriceBenchmarks } from './seeds/price-benchmarks.seeder'
 
 const connectionString = process.env.SEED_DATABASE_URL || process.env.DATABASE_URL
 if (!connectionString) {

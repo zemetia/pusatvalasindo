@@ -17,6 +17,7 @@ model Branch {
   stockMutations    StockMutation[]
   users             user[]
   attendances       Attendance[]
+  payrollSlips      PayrollSlip[]
 }
 
 model Company {
@@ -26,7 +27,6 @@ model Company {
   isActive                  Boolean                         @default(true)
   createdAt                 DateTime                        @default(now())
   updatedAt                 DateTime                        @updatedAt
-  incentiveMatrices         PayrollIncentiveMatrix[]
   salaryComponents          SalaryComponent[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
@@ -42,6 +42,7 @@ model Company {
   headConfirmationTotals    CompanyHeadConfirmationTotal[]
   correctionRequests        CorrectionRequest[]
   heldFunds                 HeldFund[]
+  payrollRuns               PayrollRun[]
 }
 
 model Currency {

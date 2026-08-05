@@ -33,7 +33,7 @@ Auth-sensitive data (passwords, session tokens, verification codes) is **never**
 | `hv_currency_stock` | Current foreign-currency stock per branch with IDR value estimates |
 | `hv_currency_stock_by_company` | Currency stock totals with potential gross profit per company |
 | `hv_stock_daily` | Daily stock entry records — legacy per-branch module (all asset types: valas, emas, perak, kas) |
-| `hv_bonus_tiers` | Bonus matrix tier rules per company and role |
+| `hv_bonus_tiers` | Payroll rule tiers per company and role (dibangun dari `PayrollRule` + `PayrollRuleTier`; matriks insentif lama sudah dibuang) |
 | `hv_company_stock_items` | Stockist stock item catalog (mata uang / logam mulia) per PT |
 | `hv_stockist_pockets` | Stockist pocket list per PT (Kas Kecil, Finance Blue, Kurir A, dst), incl. auto "Total" pocket |
 | `hv_stockist_balances` | Current stockist balance matrix (pocket × stock item); Total pocket never appears here |

@@ -62,6 +62,172 @@ function scoringTone(scoringType: string) {
 
 type CompanyOption = { id: string; name: string; code: string };
 
+const ENTRY_TYPE_LABEL: Record<string, string> = {
+  bonus: "Reward",
+  denda: "Denda",
+  potongan: "Potongan",
+};
+
+/**
+ * Reward & punishment dari rule engine.
+ *
+ * Entri yang TIDAK menghasilkan uang ikut ditampilkan — itu bukan kelalaian.
+ * Slip harus bisa menjelaskan kenapa sebuah rule tidak jalan (data presensi
+ * belum lengkap, karyawan baru masuk, query rule error), bukan diam saja dan
+ * membuat orang menebak. `inputs` yang menyertainya adalah angka-angka yang
+ * dipakai engine, jadi selisih apa pun bisa ditunjukkan, bukan diperdebatkan.
+ */
+function RewardPunishmentSection({ rules }: { rules: PayrollResult["rules"] }) {
+  if (rules.entries.length === 0) {
+    return (
+      <section className="border-border border-y py-8">
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          Reward & Punishment
+        </p>
+        <p className="text-muted-foreground mt-3 max-w-2xl text-sm text-pretty">
+          Belum ada rule yang menyasar karyawan ini pada periode tersebut. Rule reward
+          dan denda diatur lewat file di <code>config/payroll-rules/</code> dan bisa
+          dilihat di halaman <strong>Rule Reward &amp; Denda</strong>.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="border-border border-y py-8">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+        <MetricBlock
+          label="Reward"
+          prefix="Rp"
+          tone={rules.totalBonus > 0 ? "success" : "muted"}
+          value={formatAmount(rules.totalBonus)}
+          meta="menambah gaji"
+        />
+        <MetricBlock
+          label="Denda"
+          prefix="Rp"
+          tone={rules.totalPenalty > 0 ? "destructive" : "muted"}
+          value={formatAmount(rules.totalPenalty)}
+          meta="mengurangi gaji"
+        />
+        <MetricBlock
+          label="Potongan"
+          prefix="Rp"
+          tone={rules.totalDeduction > 0 ? "destructive" : "muted"}
+          value={formatAmount(rules.totalDeduction)}
+          meta="mengurangi gaji"
+        />
+        <MetricBlock
+          label="Dampak Bersih"
+          prefix="Rp"
+          tone={rules.netAmount > 0 ? "success" : rules.netAmount < 0 ? "destructive" : "muted"}
+          value={formatAmount(rules.netAmount)}
+          meta={`${rules.entries.length} rule dievaluasi`}
+        />
+      </div>
+
+      {rules.needsReview && (
+        <Alert className="mt-6">
+          <IconAlertCircle className="size-4" />
+          <AlertDescription>
+            Ada rule yang tidak bisa dihitung penuh pada periode ini. Slip belum layak
+            difinalkan sebelum baris bertanda di bawah diperiksa.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <ul className="mt-6 divide-y">
+        {rules.entries.map((e) => (
+          <li key={`${e.ruleId}@${e.ruleVersion}`} className="py-4">
+            <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium">{e.label}</span>
+                  <Badge variant={e.tipe === "bonus" ? "success" : "warning"}>
+                    {ENTRY_TYPE_LABEL[e.tipe] ?? e.tipe}
+                  </Badge>
+                  {e.status !== "APPLIED" && (
+                    <Badge variant={e.status === "ERROR" ? "danger" : "soft"}>
+                      {e.status === "ERROR" ? "Gagal dihitung" : "Dilewati"}
+                    </Badge>
+                  )}
+                  {e.flag && (
+                    <Badge variant="soft" className="font-mono text-[11px]">
+                      {e.flag}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-muted-foreground mt-1 font-mono text-[11px]">
+                  {e.ruleId} v{e.ruleVersion}
+                  {e.tier ? ` · tier ${e.tier}` : ""}
+                  {e.formula ? ` · ${e.formula}` : ""}
+                </p>
+              </div>
+              <span
+                className={`tabular text-sm font-medium ${
+                  e.status !== "APPLIED" || e.amount === 0
+                    ? "text-muted-foreground"
+                    : e.amount > 0
+                      ? "text-success"
+                      : "text-destructive"
+                }`}
+              >
+                {e.status !== "APPLIED"
+                  ? "—"
+                  : `${e.amount >= 0 ? "+" : "−"}${formatCurrency(Math.abs(e.amount))}`}
+              </span>
+            </div>
+
+            {(Object.keys(e.inputs).length > 0 || (e.breakdown?.length ?? 0) > 0) && (
+              <details className="group mt-2">
+                <summary className="text-muted-foreground hover:text-foreground cursor-pointer list-none text-xs">
+                  <span className="group-open:hidden">Lihat angka yang dipakai</span>
+                  <span className="hidden group-open:inline">Sembunyikan angka</span>
+                </summary>
+
+                <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-1">
+                  {Object.entries(e.inputs).map(([k, v]) => (
+                    <div key={k} className="flex items-baseline gap-1.5">
+                      <dt className="text-muted-foreground font-mono text-[11px]">{k}</dt>
+                      <dd className="tabular text-xs font-medium">{String(v ?? "—")}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {e.breakdown && e.breakdown.length > 0 && (
+                  <ul className="mt-3 divide-y border-t">
+                    {e.breakdown.map((b, i) => (
+                      <li
+                        key={i}
+                        className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-1.5 text-xs"
+                      >
+                        <span className="tabular text-muted-foreground">{b.keterangan}</span>
+                        <span className="min-w-0 flex-1 truncate px-2">{b.label}</span>
+                        <span
+                          className={`tabular font-medium ${
+                            b.nominal === 0
+                              ? "text-muted-foreground"
+                              : b.nominal > 0
+                                ? "text-success"
+                                : "text-destructive"
+                          }`}
+                        >
+                          {b.nominal >= 0 ? "+" : "−"}
+                          {formatCurrency(Math.abs(b.nominal))}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </details>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function PayrollPageClient({
   users,
   companies,
@@ -127,10 +293,26 @@ export function PayrollPageClient({
 
   const kpiScore = result ? result.kpi.score : 0;
   const grade = getGrade(kpiScore);
-  // Bonus/potongan berasal dari matriks insentif payroll — modul KPI hanya
-  // memberi skornya (lihat payroll-incentive.service.ts).
-  const incentive = result?.incentive ?? null;
-  const netIncentive = incentive?.netAmount ?? 0;
+  // Bonus/potongan seluruhnya berasal dari rule engine — modul KPI hanya
+  // memberi skornya. Matriks insentif lama sudah dibuang (migrasi
+  // 20260805020000), jadi tidak ada lagi dua sumber angka untuk hal yang sama.
+
+  // Entri rule yang benar-benar mengubah angka. Yang bernilai 0 atau di-skip
+  // tetap ditampilkan, tapi di bagian Reward & Punishment beserta alasannya —
+  // bukan di rincian gaji, supaya rincian tetap terbaca sebagai daftar uang.
+  const appliedRuleEntries = (result?.rules.entries ?? []).filter(
+    (e) => e.status === "APPLIED" && e.amount !== 0
+  );
+
+  // Ringkasan konsekuensi KPI, menggantikan outcomeLabel matriks lama. Labelnya
+  // diambil dari tier yang benar-benar dipakai, bukan disusun ulang — supaya
+  // alasan yang tampil selalu cocok dengan angkanya.
+  const ruleOutcomeLabel =
+    appliedRuleEntries.length > 0
+      ? [...new Set(appliedRuleEntries.map((e) => e.label))].join(" · ")
+      : result
+        ? "Tanpa bonus maupun potongan"
+        : "Belum ada hasil";
 
   return (
     <div className="flex flex-col gap-6">
@@ -248,7 +430,7 @@ export function PayrollPageClient({
           <section className="border-border border-y py-8">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
               <MetricBlock
-                label="Total Gaji Diterima"
+                label="Total Gaji Bulan Ini"
                 size="hero"
                 prefix="Rp"
                 value={formatAmount(result.final.takeHomePay)}
@@ -272,7 +454,7 @@ export function PayrollPageClient({
                 size="secondary"
                 tone={grade.tone}
                 value={grade.letter}
-                meta={incentive?.outcomeLabel ?? "Belum ada hasil"}
+                meta={ruleOutcomeLabel}
               />
               <MetricBlock
                 label="Hari Tercatat"
@@ -296,7 +478,7 @@ export function PayrollPageClient({
           )}
 
           {/* Sanksi non-uang yang menyertai tier */}
-          {incentive?.mandatorySaturday && (
+          {result.rules.mandatorySaturday && (
             <Alert>
               <IconInfoCircle className="size-4" />
               <AlertDescription>
@@ -304,6 +486,18 @@ export function PayrollPageClient({
               </AlertDescription>
             </Alert>
           )}
+
+          {result.rules.warningLetter && (
+            <Alert variant="destructive">
+              <IconAlertCircle className="size-4" />
+              <AlertDescription>
+                Skor KPI bulan ini disertai Surat Peringatan.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Reward & punishment dari rule engine (config/payroll-rules/) */}
+          <RewardPunishmentSection rules={result.rules} />
 
           {/* Salary breakdown */}
           <Card>
@@ -380,16 +574,6 @@ export function PayrollPageClient({
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                     Potongan
                   </p>
-                  {result.deductions.late > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">
-                        Potongan Terlambat
-                      </span>
-                      <span className="tabular text-destructive">
-                        −{formatCurrency(result.deductions.late)}
-                      </span>
-                    </div>
-                  )}
                   {result.deductions.absence > 0 && (
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-muted-foreground">
@@ -411,56 +595,31 @@ export function PayrollPageClient({
                 </>
               )}
 
-              {/* Insentif KPI — hasil pemetaan skor ke matriks payroll */}
-              {incentive && (
+              {/* Reward & punishment dari rule engine — satu baris per rule yang
+                  benar-benar berdampak. Rincian lengkapnya ada di bagian
+                  Reward & Punishment di atas. */}
+              {appliedRuleEntries.length > 0 && (
                 <>
                   <Separator />
-                  {incentive.tierAmount !== 0 && (
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{incentive.outcomeLabel}</span>
-                        <Badge
-                          variant={incentive.tierAmount >= 0 ? "success" : "danger"}
-                          className="text-xs"
-                        >
-                          {incentive.tierAmount >= 0 ? "Bonus" : "Potongan"}
-                        </Badge>
-                      </div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                    Reward & Punishment
+                  </p>
+                  {appliedRuleEntries.map((e) => (
+                    <div
+                      key={`${e.ruleId}@${e.ruleVersion}`}
+                      className="flex justify-between items-center text-sm"
+                    >
+                      <span className="text-muted-foreground">{e.label}</span>
                       <span
-                        className={`tabular font-medium ${
-                          incentive.tierAmount >= 0 ? "text-success" : "text-destructive"
+                        className={`tabular ${
+                          e.amount >= 0 ? "text-success" : "text-destructive"
                         }`}
                       >
-                        {incentive.tierAmount >= 0 ? "+" : "−"}
-                        {formatCurrency(Math.abs(incentive.tierAmount))}
+                        {e.amount >= 0 ? "+" : "−"}
+                        {formatCurrency(Math.abs(e.amount))}
                       </span>
                     </div>
-                  )}
-
-                  {incentive.topPerformerBonus > 0 && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">
-                        Bonus Top Performer
-                        {incentive.rank && (
-                          <span className="ml-1 text-xs">
-                            (peringkat {incentive.rank} dari {incentive.peerCount})
-                          </span>
-                        )}
-                      </span>
-                      <span className="tabular text-success font-medium">
-                        +{formatCurrency(incentive.topPerformerBonus)}
-                      </span>
-                    </div>
-                  )}
-
-                  {netIncentive === 0 && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">KPI — {incentive.outcomeLabel}</span>
-                      <span className="tabular text-muted-foreground">± Rp 0</span>
-                    </div>
-                  )}
-
-                  <p className="text-muted-foreground text-xs">{incentive.reason}</p>
+                  ))}
                 </>
               )}
 

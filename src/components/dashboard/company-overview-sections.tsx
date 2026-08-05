@@ -15,6 +15,7 @@ import {
   fmtCurrency,
   fmtAmount,
   currencySymbol,
+  latestBalanceByAccount,
   statusLabel,
   type CompanyOverviewFlags,
   type CurrencyCard,
@@ -47,6 +48,10 @@ export function CompanyOverviewSections({
   global: boolean;
   now: Date;
 }) {
+  // Saldo yang ditampilkan = isian Saldo Bank Harian terakhir, sumber yang sama
+  // dengan metrik "Saldo Bank" di atas. `BankAccount.balance` (buku mutasi) tidak dipakai.
+  const dailyBalanceByAccount = latestBalanceByAccount(overview.dailyBankBalances);
+
   const showBentoOverview = flags.usersCount || flags.branchesCount || flags.attendanceAll || flags.kpiAll || flags.bank || flags.payrollTeam;
 
   return (
@@ -143,10 +148,12 @@ export function CompanyOverviewSections({
               prefix={currencySymbol(primaryBankGroup.code)}
               value={fmtAmount(primaryBankGroup.total)}
               delta={bankTrendPct}
-              period="vs hari sebelumnya"
+              period="vs isian sebelumnya"
               meta={
                 <>
-                  {primaryBankGroup.count} rekening {primaryBankGroup.code}
+                  {primaryBankGroup.filledCount < primaryBankGroup.count
+                    ? `${primaryBankGroup.filledCount} dari ${primaryBankGroup.count} rekening ${primaryBankGroup.code} terisi`
+                    : `${primaryBankGroup.count} rekening ${primaryBankGroup.code}`}
                   {bankGroups.length > 1 && (
                     <span className="text-muted-foreground">
                       {" · "}
@@ -441,7 +448,13 @@ export function CompanyOverviewSections({
                           {acc.currency.code}
                         </Badge>
                       </TableCell>
-                      <TableCell className="tabular text-right font-medium">{fmtCurrency(acc.balance, acc.currency.code)}</TableCell>
+                      <TableCell className="tabular text-right font-medium">
+                        {dailyBalanceByAccount.has(acc.id) ? (
+                          fmtCurrency(dailyBalanceByAccount.get(acc.id), acc.currency.code)
+                        ) : (
+                          <span className="text-muted-foreground font-normal">Belum diisi</span>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

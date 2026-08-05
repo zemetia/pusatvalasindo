@@ -9,7 +9,8 @@
 --   * KpiEntry harian menggantikan KpiLog & Revenue, dan menempel ke RoleKpi
 --     sehingga dua KPI target pada jabatan yang sama tidak lagi berbagi angka
 --   * KpiPeriod untuk mengunci periode yang sudah dipakai payroll
---   * bonus/denda dipindah ke domain payroll (PayrollIncentiveMatrix)
+--   * bonus/denda tidak lagi urusan modul KPI — konversinya menjadi uang
+--     dipegang rule engine payroll (PayrollRule, migrasi 20260805000000)
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- ── 1. Lepas view yang bergantung pada tabel/kolom lama ────────────────────
@@ -32,7 +33,6 @@ CREATE TYPE "KpiInputSource" AS ENUM ('SELF', 'SUPERVISOR', 'SYSTEM');
 CREATE TYPE "KpiEntryStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 CREATE TYPE "KpiPeriodStatus" AS ENUM ('OPEN', 'LOCKED');
 CREATE TYPE "KpiToleranceScope" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY');
-CREATE TYPE "PayrollIncentiveOutcome" AS ENUM ('BONUS_CASH', 'SAFE_ZONE', 'DEDUCTION', 'TOP_PERFORMER');
 
 -- ── 3. KpiDefinition: tipe lama → scoring type + kebijakan pengisian ───────
 ALTER TABLE "KpiDefinition"
@@ -237,68 +237,14 @@ DELETE FROM "KpiMonthlyResult";
 DROP TABLE "KpiLog";
 DROP TABLE "Revenue";
 
--- ── 9. BonusMatrix → PayrollIncentiveMatrix (domain payroll) ──────────────
-CREATE TABLE "PayrollIncentiveMatrix" (
-  "id"           TEXT NOT NULL,
-  "companyId"    TEXT NOT NULL,
-  "customRoleId" TEXT,
-  "name"         TEXT,
-  "isActive"     BOOLEAN NOT NULL DEFAULT true,
-  "createdAt"    TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt"    TIMESTAMP(3) NOT NULL,
-  CONSTRAINT "PayrollIncentiveMatrix_pkey" PRIMARY KEY ("id")
-);
-
-CREATE UNIQUE INDEX "PayrollIncentiveMatrix_companyId_customRoleId_key"
-  ON "PayrollIncentiveMatrix"("companyId", "customRoleId");
-
-ALTER TABLE "PayrollIncentiveMatrix"
-  ADD CONSTRAINT "PayrollIncentiveMatrix_companyId_fkey"    FOREIGN KEY ("companyId")    REFERENCES "Company"("id")     ON DELETE CASCADE  ON UPDATE CASCADE,
-  ADD CONSTRAINT "PayrollIncentiveMatrix_customRoleId_fkey" FOREIGN KEY ("customRoleId") REFERENCES "custom_role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
-CREATE TABLE "PayrollIncentiveTier" (
-  "id"                TEXT NOT NULL,
-  "matrixId"          TEXT NOT NULL,
-  "minScore"          DECIMAL(65,30) NOT NULL,
-  "maxScore"          DECIMAL(65,30) NOT NULL,
-  "outcome"           "PayrollIncentiveOutcome" NOT NULL,
-  "cashAmount"        DECIMAL(65,30),
-  "mandatorySaturday" BOOLEAN NOT NULL DEFAULT false,
-  "topRank"           INTEGER,
-  "note"              TEXT,
-  "createdAt"         TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt"         TIMESTAMP(3) NOT NULL,
-  CONSTRAINT "PayrollIncentiveTier_pkey" PRIMARY KEY ("id")
-);
-
-CREATE INDEX "PayrollIncentiveTier_matrixId_idx" ON "PayrollIncentiveTier"("matrixId");
-
-ALTER TABLE "PayrollIncentiveTier"
-  ADD CONSTRAINT "PayrollIncentiveTier_matrixId_fkey" FOREIGN KEY ("matrixId") REFERENCES "PayrollIncentiveMatrix"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-INSERT INTO "PayrollIncentiveMatrix" ("id", "companyId", "customRoleId", "isActive", "createdAt", "updatedAt")
-SELECT bm.id, bm."companyId", bm."customRoleId", true, bm."createdAt", bm."updatedAt"
-FROM "BonusMatrix" bm;
-
--- PENALTY_SATURDAY lama menggabungkan dua hal (potongan + wajib masuk Sabtu);
--- di model baru keduanya dipisah jadi outcome + flag.
-INSERT INTO "PayrollIncentiveTier" ("id", "matrixId", "minScore", "maxScore", "outcome", "cashAmount", "mandatorySaturday", "topRank")
-SELECT
-  bt.id,
-  bt."matrixId",
-  bt."minScore",
-  bt."maxScore",
-  CASE bt."resultType"
-    WHEN 'BONUS_CASH'        THEN 'BONUS_CASH'::"PayrollIncentiveOutcome"
-    WHEN 'SAFE_ZONE'         THEN 'SAFE_ZONE'::"PayrollIncentiveOutcome"
-    WHEN 'TOP_PERFORMER'     THEN 'TOP_PERFORMER'::"PayrollIncentiveOutcome"
-    ELSE 'DEDUCTION'::"PayrollIncentiveOutcome"
-  END,
-  ABS(COALESCE(bt.amount, 0)),
-  bt."resultType" = 'PENALTY_SATURDAY',
-  CASE WHEN bt."isTopPerformer" OR bt."resultType" = 'TOP_PERFORMER' THEN 1 END
-FROM "BonusTier" bt;
-
+-- ── 9. Buang matriks bonus lama ───────────────────────────────────────────
+-- BonusMatrix/BonusTier tidak dipindahkan ke mana pun. Penggantinya adalah
+-- rule engine (PayrollRule, migrasi 20260805000000), dan tier-nya ditulis
+-- ulang dari nol lewat prisma/seeds/payroll-rules/ — bukan hasil konversi.
+-- Riwayat ini sengaja dirapikan: matriks insentif perantara
+-- (PayrollIncentiveMatrix/Tier) pernah ada di sini, lalu dibuang seluruhnya
+-- sebelum dipakai produksi, jadi membiarkannya di migrasi hanya membuat
+-- database baru membangun tabel yang langsung dihancurkan lagi.
 DROP TABLE "BonusTier";
 DROP TABLE "BonusMatrix";
 DROP TYPE "BonusResultType";
@@ -493,47 +439,10 @@ WHERE ke.status = 'APPROVED'
 GROUP BY ke."employeeId", u.name, u."branchId", b."companyId", co.name, co.code,
          b.name, cr.name, ke."periodYear", ke."periodMonth";
 
-CREATE OR REPLACE VIEW hv_bonus_tiers AS
-SELECT
-  pm.id                                     AS matrix_id,
-  pm."companyId"                            AS company_id,
-  COALESCE(co.name, '')                     AS company_name,
-  COALESCE(co.code, '')                     AS company_code,
-  pm."customRoleId"                         AS role_id,
-  COALESCE(cr.name, '')                     AS role_name,
-  pt.id                                     AS tier_id,
-  pt."minScore"::numeric                    AS min_score,
-  pt."maxScore"::numeric                    AS max_score,
-  pt.outcome                                AS result_type,
-  CASE pt.outcome
-    WHEN 'BONUS_CASH'    THEN 'Bonus Cash'
-    WHEN 'SAFE_ZONE'     THEN 'Aman (Tidak Bonus/Denda)'
-    WHEN 'DEDUCTION'     THEN 'Potongan Gaji'
-    WHEN 'TOP_PERFORMER' THEN 'Top Performer'
-  END                                       AS result_type_label,
-  COALESCE(pt."cashAmount", 0)::numeric     AS amount,
-  pt."mandatorySaturday"                    AS mandatory_saturday,
-  pt."topRank"                              AS top_rank,
-  CONCAT(
-    'Skor ', ROUND(pt."minScore"::numeric * 100, 0), '%–', ROUND(pt."maxScore"::numeric * 100, 0), '%',
-    ' → ',
-    CASE pt.outcome
-      WHEN 'BONUS_CASH'    THEN 'Bonus Cash Rp ' || TO_CHAR(COALESCE(pt."cashAmount", 0)::numeric, 'FM999,999,999')
-      WHEN 'SAFE_ZONE'     THEN 'Aman (tidak ada bonus/denda)'
-      WHEN 'DEDUCTION'     THEN 'Potongan gaji Rp ' || TO_CHAR(COALESCE(pt."cashAmount", 0)::numeric, 'FM999,999,999')
-      WHEN 'TOP_PERFORMER' THEN 'Bonus top performer Rp ' || TO_CHAR(COALESCE(pt."cashAmount", 0)::numeric, 'FM999,999,999')
-    END,
-    CASE WHEN pt."mandatorySaturday" THEN ' + wajib masuk setiap Sabtu' ELSE '' END
-  )                                         AS tier_description
-FROM "PayrollIncentiveTier" pt
-JOIN "PayrollIncentiveMatrix" pm ON pm.id = pt."matrixId"
-LEFT JOIN "Company" co     ON co.id = pm."companyId"
-LEFT JOIN "custom_role" cr ON cr.id = pm."customRoleId";
-
 -- Estimasi payroll: skor & grade KPI ikut ditampilkan, tapi nominal bonus tidak
--- lagi ada di sini — konversi skor → uang dilakukan payroll.service memakai
--- PayrollIncentiveMatrix, yang butuh peringkat antar-karyawan (top performer)
--- sehingga tidak bisa diringkas per baris view.
+-- ada di sini — konversi skor → uang dilakukan rule engine (PayrollRule,
+-- migrasi 20260805000000), yang butuh peringkat antar-karyawan sehingga tidak
+-- bisa diringkas per baris view.
 CREATE OR REPLACE VIEW hv_payroll_monthly AS
 WITH att AS (
   SELECT
@@ -617,7 +526,6 @@ BEGIN
     GRANT SELECT ON hv_kpi_monthly     TO oc_pvi_reader;
     GRANT SELECT ON hv_revenue         TO oc_pvi_reader;
     GRANT SELECT ON hv_revenue_monthly TO oc_pvi_reader;
-    GRANT SELECT ON hv_bonus_tiers     TO oc_pvi_reader;
     GRANT SELECT ON hv_payroll_monthly TO oc_pvi_reader;
   END IF;
 END $$;

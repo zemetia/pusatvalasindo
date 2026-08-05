@@ -1,4 +1,4 @@
-import type { IncentiveResult } from "@/backend/services/payroll-incentive.service";
+import type { RuleEntry } from "@/backend/payroll-rules/types";
 import type { ScoredKpiItem } from "@/lib/kpi-scoring";
 
 export const MONTH_NAMES = [
@@ -163,10 +163,29 @@ export type PayrollResult = {
     breakdownJson: KpiBreakdown;
     calculatedAt: string;
   };
-  /** Hasil konversi skor KPI → rupiah (bonus, potongan, top performer). */
-  incentive: IncentiveResult;
+
+  /**
+   * Hasil rule engine slip gaji. Setiap entri membawa
+   * label, nominal, dan `inputs` yang dipakai untuk sampai ke nominal itu —
+   * inilah yang membuat bagian reward/punishment di slip bisa menjelaskan
+   * dirinya sendiri, bukan sekadar menampilkan angka.
+   */
+  rules: {
+    entries: RuleEntry[];
+    totalBonus: number;
+    totalPenalty: number;
+    totalDeduction: number;
+    /** totalBonus − totalPenalty − totalDeduction. */
+    netAmount: number;
+    /** Ada entri SKIPPED/ERROR atau berflag — perlu dilihat manusia. */
+    needsReview: boolean;
+    /** Ada tier APPLIED yang mewajibkan masuk setiap Sabtu. */
+    mandatorySaturday: boolean;
+    /** Ada tier APPLIED yang disertai Surat Peringatan. */
+    warningLetter: boolean;
+    rulesetVersions: string[];
+  };
   deductions: {
-    late: number;
     absence: number;
     /** Potongan dari komponen gaji custom (koperasi, cicilan, dst.). */
     components: SalaryLineItem[];
