@@ -69,9 +69,27 @@ interface RowState {
   error: string | null;
 }
 
-/** Angka → isi input. Titik desimal dipakai apa adanya supaya mudah diketik ulang. */
+/** Angka mentah → tampilan Indonesia (`16250.5` → `16.250,5`). */
 function toInput(value: number | null): string {
-  return value == null ? "" : String(value);
+  if (value == null) return "";
+  const [intPart, decPart] = String(value).split(".");
+  const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return decPart ? `${withThousands},${decPart}` : withThousands;
+}
+
+/**
+ * Isi input mentah dari pengguna → tampilan berpemisah ribu, dievaluasi
+ * ulang setiap ketukan supaya "." muncul otomatis sambil mengetik.
+ */
+function formatThousands(raw: string): string {
+  const cleaned = raw.replace(/[^0-9,]/g, "");
+  const commaIndex = cleaned.indexOf(",");
+  const intPart = commaIndex >= 0 ? cleaned.slice(0, commaIndex) : cleaned;
+  const decPart = commaIndex >= 0 ? cleaned.slice(commaIndex + 1).replace(/,/g, "") : null;
+  const withThousands = intPart
+    .replace(/^0+(?=\d)/, "")
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return decPart !== null ? `${withThousands},${decPart}` : withThousands;
 }
 
 /**
@@ -129,31 +147,36 @@ export function HargaValasPageClient({
   const [syncing, setSyncing] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Mata uang nonaktif tidak lagi dipakai untuk transaksi — sembunyikan dari
+  // halaman ini sepenuhnya, jangan cuma diredupkan.
+  const activeRows = useMemo(() => initialRows.filter((r) => r.isActive), [initialRows]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return initialRows;
-    return initialRows.filter(
+    if (!q) return activeRows;
+    return activeRows.filter(
       (r) => r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
     );
-  }, [initialRows, search]);
+  }, [activeRows, search]);
 
-  // Ringkasan dihitung dari state, bukan dari `initialRows`, supaya angkanya
+  // Ringkasan dihitung dari state, bukan dari `activeRows`, supaya angkanya
   // ikut bergerak begitu satu baris disimpan atau sync jalan — tanpa reload.
   const summary = useMemo(() => {
-    const states = initialRows.map((r) => rows[r.currencyId]).filter(Boolean);
+    const states = activeRows.map((r) => rows[r.currencyId]).filter(Boolean);
     const priced = states.filter((s) => s.savedBuyPrice !== "" && s.savedSellPrice !== "");
     const spreads = priced.map((s) => s.spread).filter((v): v is number => v != null);
 
     return {
-      total: initialRows.length,
+      total: activeRows.length,
       priced: priced.length,
       locked: states.filter((s) => s.isLocked).length,
       avgSpread: spreads.length ? spreads.reduce((a, b) => a + b, 0) / spreads.length : null,
     };
-  }, [initialRows, rows]);
+  }, [activeRows, rows]);
 
   function updateField(id: string, field: "buyPrice" | "sellPrice", value: string) {
-    setRows((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value, error: null } }));
+    const formatted = formatThousands(value);
+    setRows((prev) => ({ ...prev, [id]: { ...prev[id], [field]: formatted, error: null } }));
   }
 
   function isDirty(state: RowState) {
@@ -380,16 +403,16 @@ export function HargaValasPageClient({
               placeholder="Cari kode atau nama mata uang..."
             />
             <span className="text-muted-foreground ml-auto text-xs">
-              {filtered.length} dari {initialRows.length} mata uang
+              {filtered.length} dari {activeRows.length} mata uang
             </span>
           </>
         }
       >
-        {initialRows.length === 0 ? (
+        {activeRows.length === 0 ? (
           <EmptyState
             icon={<IconCoins className="size-5" />}
             title="Belum ada mata uang"
-            description="Tambahkan mata uang di halaman Mata Uang terlebih dahulu, lalu isi harganya di sini."
+            description="Tambahkan mata uang aktif di halaman Mata Uang terlebih dahulu, lalu isi harganya di sini."
             action={
               currencyPageHref && (
                 <Button asChild>
@@ -433,18 +456,13 @@ export function HargaValasPageClient({
                     priced && !state?.isLocked && state?.source === "MANUAL";
 
                   return (
-                    <TableRow key={r.currencyId} className={!r.isActive ? "opacity-60" : ""}>
+                    <TableRow key={r.currencyId}>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="font-mono">
                             {r.code}
                           </Badge>
                           <span className="text-muted-foreground truncate">{r.name}</span>
-                          {!r.isActive && (
-                            <Badge variant="soft" className="shrink-0">
-                              Nonaktif
-                            </Badge>
-                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -455,7 +473,7 @@ export function HargaValasPageClient({
                             if (e.key === "Enter") saveRow(r.currencyId);
                           }}
                           inputMode="decimal"
-                          placeholder="mis. 16250"
+                          placeholder="mis. 16.250"
                           disabled={!canManage}
                           className="tabular h-8 max-w-36 font-mono"
                         />
@@ -468,7 +486,7 @@ export function HargaValasPageClient({
                             if (e.key === "Enter") saveRow(r.currencyId);
                           }}
                           inputMode="decimal"
-                          placeholder="mis. 16400"
+                          placeholder="mis. 16.400"
                           disabled={!canManage}
                           className="tabular h-8 max-w-36 font-mono"
                         />
