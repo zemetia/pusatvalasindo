@@ -42,3 +42,6 @@ next-env.d.ts
 
 # credentials
 docs/openclaw/credentials.md
+
+# scratch pad lokal (script debug & dump sementara)
+/scratch/
