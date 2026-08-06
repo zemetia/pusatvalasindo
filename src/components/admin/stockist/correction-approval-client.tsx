@@ -7,13 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
   Table,
   TableBody,
   TableCell,
@@ -22,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Combobox } from "@/components/ui/combobox"
 import { IconCheck, IconLoader2, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
@@ -142,19 +136,16 @@ export function CorrectionApprovalClient({
         {canSelectCompany && (
           <div className="grid gap-1.5">
             <label className="text-muted-foreground text-xs font-medium">PT</label>
-            <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="h-9 w-52">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL}>Semua PT</SelectItem>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={companyId}
+              onValueChange={setCompanyId}
+              options={[
+                { value: ALL, label: "Semua PT" },
+                ...companies.map((c) => ({ value: c.id, label: c.name })),
+              ]}
+              searchPlaceholder="Cari PT..."
+              className="w-52"
+            />
           </div>
         )}
         {!canSelectCompany && (
@@ -167,31 +158,31 @@ export function CorrectionApprovalClient({
         )}
         <div className="grid gap-1.5">
           <label className="text-muted-foreground text-xs font-medium">Status</label>
-          <Select value={status} onValueChange={(v) => setStatus(v as Status | typeof ALL)}>
-            <SelectTrigger className="h-9 w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="PENDING">Menunggu</SelectItem>
-              <SelectItem value="APPROVED">Disetujui</SelectItem>
-              <SelectItem value="REJECTED">Ditolak</SelectItem>
-              <SelectItem value={ALL}>Semua</SelectItem>
-            </SelectContent>
-          </Select>
+          <Combobox
+            value={status}
+            onValueChange={(v) => setStatus(v as Status | typeof ALL)}
+            options={[
+              { value: "PENDING", label: "Menunggu" },
+              { value: "APPROVED", label: "Disetujui" },
+              { value: "REJECTED", label: "Ditolak" },
+              { value: ALL, label: "Semua" },
+            ]}
+            className="w-44"
+          />
         </div>
         <div className="grid gap-1.5">
           <label className="text-muted-foreground text-xs font-medium">Jenis</label>
-          <Select value={target} onValueChange={(v) => setTarget(v as Target | typeof ALL)}>
-            <SelectTrigger className="h-9 w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>Semua jenis</SelectItem>
-              <SelectItem value="STOCKIST">Stock Mata Uang</SelectItem>
-              <SelectItem value="KAS">Tunai (Kas)</SelectItem>
-              <SelectItem value="BANK">Bank Harian</SelectItem>
-            </SelectContent>
-          </Select>
+          <Combobox
+            value={target}
+            onValueChange={(v) => setTarget(v as Target | typeof ALL)}
+            options={[
+              { value: ALL, label: "Semua jenis" },
+              { value: "STOCKIST", label: "Stock Mata Uang" },
+              { value: "KAS", label: "Tunai (Kas)" },
+              { value: "BANK", label: "Bank Harian" },
+            ]}
+            className="w-44"
+          />
         </div>
         {status === "PENDING" && pendingCount > 0 && (
           <Badge variant="warning">

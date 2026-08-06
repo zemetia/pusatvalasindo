@@ -5,13 +5,7 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Combobox } from "@/components/ui/combobox"
 import { BankGridClient } from "@/components/admin/stockist/bank-grid-client"
 import { SectionCard, EmptyState } from "@/components/admin/page-shell"
 import { IconDownload, IconLoader2 } from "@tabler/icons-react"
@@ -135,18 +129,14 @@ export function BankPageClient({
         {canSelectCompany && (
           <div className="grid gap-1.5">
             <label className="text-muted-foreground text-xs font-medium">Pilih PT</label>
-            <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="h-9 w-52">
-                <SelectValue placeholder="Pilih PT" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={companyId}
+              onValueChange={setCompanyId}
+              options={companies.map((c) => ({ value: c.id, label: c.name }))}
+              placeholder="Pilih PT"
+              searchPlaceholder="Cari PT..."
+              className="w-52"
+            />
           </div>
         )}
         {!canSelectCompany && companies.length > 0 && (

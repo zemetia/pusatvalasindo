@@ -39,13 +39,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -53,6 +46,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Combobox } from "@/components/ui/combobox";
 import {
   SectionCard,
   EmptyState,
@@ -66,6 +60,7 @@ import {
   AdminFormSidebar,
   AdminFormFooter,
 } from "@/components/admin/admin-form-sidebar";
+import { WORK_START_LABEL } from "@/lib/attendance-time";
 
 /* ── Tipe ─────────────────────────────────────────────────────────────────── */
 
@@ -566,26 +561,24 @@ export function PresensiPageClient({
               }}
               placeholder="Cari nama, cabang, atau jabatan..."
             />
-            <Select
+            <Combobox
               value={statusFilter}
               onValueChange={(value) => {
                 setStatusFilter(value as typeof statusFilter);
                 setPage(1);
               }}
-            >
-              <SelectTrigger className="h-9 w-[10rem]">
-                <SelectValue placeholder="Semua status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua status</SelectItem>
-                <SelectItem value="NONE">Belum absen</SelectItem>
-                {STATUS_ORDER.map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {STATUS_META[key].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={[
+                { value: "all", label: "Semua status" },
+                { value: "NONE", label: "Belum absen" },
+                ...STATUS_ORDER.map((key) => ({
+                  value: key,
+                  label: STATUS_META[key].label,
+                })),
+              ]}
+              placeholder="Semua status"
+              searchPlaceholder="Cari status..."
+              className="w-[10rem]"
+            />
             <ToolbarSpacer />
             <span className="text-muted-foreground text-xs">
               {filtered.length} dari {rows.length} karyawan
@@ -829,7 +822,7 @@ export function PresensiPageClient({
             className="tabular h-14 text-center text-2xl font-semibold"
           />
           <p className="text-muted-foreground text-xs">
-            Waktu WIB. Jam masuk lewat 17.40 otomatis dicatat terlambat.
+            Waktu WIB. Jam masuk lewat {WORK_START_LABEL} otomatis dicatat terlambat.
           </p>
 
           <AlertDialogFooter>
@@ -860,7 +853,8 @@ export function PresensiPageClient({
         >
           <div className="space-y-2">
             <Label htmlFor="att-status">Status kehadiran</Label>
-            <Select
+            <Combobox
+              id="att-status"
               value={draft.status}
               onValueChange={(value) => {
                 const status = value as AttendanceStatusKey;
@@ -877,18 +871,12 @@ export function PresensiPageClient({
                     : prev
                 );
               }}
-            >
-              <SelectTrigger id="att-status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_ORDER.map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {STATUS_META[key].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={STATUS_ORDER.map((key) => ({
+                value: key,
+                label: STATUS_META[key].label,
+              }))}
+              searchPlaceholder="Cari status..."
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -921,7 +909,7 @@ export function PresensiPageClient({
           </div>
 
           <p className="text-muted-foreground text-xs">
-            Kosongkan jam untuk menghapusnya. Jam masuk yang lewat batas 17.40 otomatis
+            Kosongkan jam untuk menghapusnya. Jam masuk yang lewat batas {WORK_START_LABEL} otomatis
             dinilai terlambat kecuali Anda memilih status lain.
           </p>
 

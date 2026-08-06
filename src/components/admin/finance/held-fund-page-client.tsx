@@ -14,13 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Combobox } from "@/components/ui/combobox"
 import {
   Table,
   TableBody,
@@ -426,18 +420,14 @@ export function HeldFundPageClient({
         {canSelectCompany ? (
           <div className="grid gap-1.5">
             <label className="text-muted-foreground text-xs font-medium">Pilih PT</label>
-            <Select value={companyId} onValueChange={selectCompany}>
-              <SelectTrigger className="h-9 w-52">
-                <SelectValue placeholder="Pilih PT" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={companyId}
+              onValueChange={selectCompany}
+              options={companies.map((c) => ({ value: c.id, label: c.name }))}
+              placeholder="Pilih PT"
+              searchPlaceholder="Cari PT..."
+              className="w-52"
+            />
           </div>
         ) : (
           companies.length > 0 && (

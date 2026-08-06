@@ -4,13 +4,7 @@ import { useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { PERIOD_PRESETS, type PeriodRange } from "@/lib/finance-period";
 import { formatDate } from "@/lib/format";
 import { IconCalendar, IconLoader2 } from "@tabler/icons-react";
@@ -103,22 +97,20 @@ export function FinancePeriodPicker({
         </div>
 
         {companies.length > 1 && (
-          <Select
+          <Combobox
             value={activeCompanyId ?? "semua"}
             onValueChange={(value) => apply({ pt: value === "semua" ? null : value })}
-          >
-            <SelectTrigger className="h-9 w-48" aria-label="Filter PT">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="semua">Semua PT</SelectItem>
-              {companies.map((company) => (
-                <SelectItem key={company.id} value={company.id}>
-                  {company.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={[
+              { value: "semua", label: "Semua PT" },
+              ...companies.map((company) => ({
+                value: company.id,
+                label: company.name,
+              })),
+            ]}
+            searchPlaceholder="Cari PT..."
+            aria-label="Filter PT"
+            className="w-48"
+          />
         )}
 
         <p className="text-muted-foreground ml-auto flex items-center gap-1.5 text-xs">

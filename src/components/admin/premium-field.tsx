@@ -4,13 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 
 // ─── Labeled Input ─────────────────────────────────────────────────────────
 
@@ -63,6 +57,8 @@ PremiumField.displayName = "PremiumField";
 export interface PremiumSelectOption {
   value: string;
   label: string;
+  /** Baris kedua di daftar — ikut dicari. */
+  description?: string;
   disabled?: boolean;
 }
 
@@ -73,6 +69,7 @@ export interface PremiumNativeSelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
   placeholder?: string;
+  searchPlaceholder?: string;
   disabled?: boolean;
   options: PremiumSelectOption[];
   className?: string;
@@ -85,6 +82,7 @@ export function PremiumNativeSelect({
   value,
   onValueChange,
   placeholder,
+  searchPlaceholder,
   disabled,
   options,
   className,
@@ -96,19 +94,17 @@ export function PremiumNativeSelect({
       <Label htmlFor={fieldId} className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
         {label}
       </Label>
-      <Select value={value} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger id={fieldId} aria-invalid={!!error} className="w-full">
-          {icon && <span className="text-muted-foreground">{icon}</span>}
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value} disabled={opt.disabled}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Combobox
+        id={fieldId}
+        value={value}
+        onValueChange={onValueChange ?? (() => {})}
+        disabled={disabled}
+        aria-invalid={!!error}
+        icon={icon}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder ?? `Cari ${label.toLowerCase()}...`}
+        options={options}
+      />
       {error && <p className="text-xs font-medium text-destructive">{error}</p>}
     </div>
   );
