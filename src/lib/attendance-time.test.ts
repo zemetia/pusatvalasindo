@@ -73,8 +73,8 @@ describe("ambang untuk SQL rule", () => {
     // yang benar-benar dikirim ke Postgres bernilai sama dengan yang dipakai
     // TypeScript, bukan sekadar cocok sebagai string.
     const cocok = workStartSqlExpr().match(/^\((\d+) \* 60 \+ (\d+)\)$/);
-    expect(cocok).not.toBeNull();
-    const [, jam, menit] = cocok!;
+    if (!cocok) throw new Error(`Bentuk ekspresi berubah: ${workStartSqlExpr()}`);
+    const [, jam, menit] = cocok;
     expect(Number(jam) * 60 + Number(menit)).toBe(WORK_START_MINUTES);
   });
 });

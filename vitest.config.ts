@@ -9,6 +9,11 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
     css: true,
+    // `.claude/worktreesnya` berisi checkout git terpisah milik sesi agent —
+    // salinan penuh src/ termasuk file test versi lama. Tanpa dikecualikan,
+    // vitest menjalankan test dari checkout LAIN dan melaporkan kegagalan yang
+    // tidak berhubungan sama sekali dengan kode di direktori kerja ini.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**', '**/.claude/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
