@@ -18,6 +18,7 @@ import { seedRoleKpis } from './seeds/role-kpi/role-kpi.seeder'
 import { seedPayrollRules } from './seeds/payroll-rules/payroll-rules.seeder'
 import { seedUsers } from './seeds/users/users.seeder'
 import { seedPriceBenchmarks } from './seeds/price-benchmarks.seeder'
+import { seedPublicHolidays } from './seeds/public-holidays.seeder'
 import { seedRoles } from './seeds/roles.seeder'
 
 const pool = new pg.Pool({
@@ -67,6 +68,9 @@ async function main() {
 
   console.log('🌱 Seeding rule reward/denda slip gaji...')
   await seedPayrollRules(prisma)
+
+  console.log('🌱 Seeding tanggal merah (dipakai untuk menentukan hari kerja)...')
+  await seedPublicHolidays(prisma)
 
   console.log('🌱 Seeding patokan harga (penyesuaian jual/beli)...')
   await seedPriceBenchmarks(prisma)

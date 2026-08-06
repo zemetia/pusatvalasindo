@@ -13,6 +13,30 @@ enum AttendanceStatus {
   HOLIDAY
 }
 
+/// Tanggal merah — hari libur nasional & cuti bersama.
+///
+/// Ada karena alpha diturunkan dari KETIADAAN baris presensi: tanpa daftar ini,
+/// setiap tanggal merah yang lewat tanpa presensi akan dihitung alpha dan
+/// dipotong dari gaji. Hari Minggu tidak perlu dicatat di sini — ia sudah
+/// dikecualikan dari hari kerja (lihat src/lib/workday.ts).
+///
+/// Berlaku untuk SEMUA PT: tanggal merah ditetapkan pemerintah, bukan per
+/// perusahaan. Kalau suatu saat satu PT libur sendiri di tanggal yang bukan
+/// tanggal merah, itu bukan baris di sini melainkan presensi berstatus HOLIDAY.
+model PublicHoliday {
+  id   String   @id @default(cuid())
+  date DateTime @unique @db.Date
+  name String
+  /// Cuti bersama (bukan hari libur itu sendiri) — dibedakan hanya untuk
+  /// keterangan, keduanya sama-sama bukan hari kerja.
+  isJointLeave Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}
+
 model Attendance {
   id                String           @id @default(cuid())
   userId            String
