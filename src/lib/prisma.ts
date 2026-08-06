@@ -1,9 +1,13 @@
+import { statSync } from "node:fs";
+import path from "node:path";
+
 import { PrismaClient } from "@src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg"
 import pg from "pg"
 
 declare global {
   var prisma: PrismaClient | undefined;
+  var prismaGeneratedAt: number | undefined;
 }
 
 function createPrismaClient() {
@@ -32,10 +36,38 @@ function createPrismaClient() {
   });
 }
 
+/**
+ * Kapan `prisma generate` terakhir menulis client — dipakai HANYA di dev.
+ *
+ * Instance di bawah disimpan di `global` supaya hot-reload tidak membuka pool
+ * baru tiap modul dimuat ulang. Efek sampingnya: kalau schema ditambah model
+ * baru lalu client di-generate ulang SEMENTARA dev server masih hidup, proses
+ * itu tetap memegang client lama seumur hidupnya. Model barunya lalu muncul
+ * sebagai `prisma.modelBaru` === undefined, dan yang terlihat cuma
+ * "Cannot read properties of undefined (reading 'findMany')" — pesan yang
+ * tidak menyebut-nyebut sebabnya sama sekali. Membandingkan cap waktu file
+ * client membuat instance basi itu dibuang sendiri saat hot-reload berikutnya.
+ */
+function generatedAt(): number {
+  try {
+    return statSync(path.join(process.cwd(), "src/generated/prisma/schema.prisma")).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
+
+const isDev = process.env.NODE_ENV !== "production";
+
+if (isDev && global.prisma && global.prismaGeneratedAt !== generatedAt()) {
+  void global.prisma.$disconnect();
+  global.prisma = undefined;
+}
+
 const prisma = global.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
+if (isDev) {
   global.prisma = prisma;
+  global.prismaGeneratedAt = generatedAt();
 }
 
 export default prisma;
