@@ -14,6 +14,20 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model PublicHoliday
+ * Tanggal merah — hari libur nasional & cuti bersama.
+ * 
+ * Ada karena alpha diturunkan dari KETIADAAN baris presensi: tanpa daftar ini,
+ * setiap tanggal merah yang lewat tanpa presensi akan dihitung alpha dan
+ * dipotong dari gaji. Hari Minggu tidak perlu dicatat di sini — ia sudah
+ * dikecualikan dari hari kerja (lihat src/lib/workday.ts).
+ * 
+ * Berlaku untuk SEMUA PT: tanggal merah ditetapkan pemerintah, bukan per
+ * perusahaan. Kalau suatu saat satu PT libur sendiri di tanggal yang bukan
+ * tanggal merah, itu bukan baris di sini melainkan presensi berstatus HOLIDAY.
+ */
+export type PublicHoliday = $Result.DefaultSelection<Prisma.$PublicHolidayPayload>
+/**
  * Model Attendance
  * 
  */
@@ -305,6 +319,11 @@ export type CompanyHeadConfirmationTotal = $Result.DefaultSelection<Prisma.$Comp
  * 
  */
 export type CorrectionRequest = $Result.DefaultSelection<Prisma.$CorrectionRequestPayload>
+/**
+ * Model ValasTransaction
+ * 
+ */
+export type ValasTransaction = $Result.DefaultSelection<Prisma.$ValasTransactionPayload>
 
 /**
  * Enums
@@ -622,6 +641,42 @@ export const CorrectionStatus: {
 
 export type CorrectionStatus = (typeof CorrectionStatus)[keyof typeof CorrectionStatus]
 
+
+export const ValasTransactionType: {
+  BUY: 'BUY',
+  SELL: 'SELL'
+};
+
+export type ValasTransactionType = (typeof ValasTransactionType)[keyof typeof ValasTransactionType]
+
+
+export const ValasPaymentMethod: {
+  CASH: 'CASH',
+  TRANSFER: 'TRANSFER'
+};
+
+export type ValasPaymentMethod = (typeof ValasPaymentMethod)[keyof typeof ValasPaymentMethod]
+
+
+export const ValasTransactionStatus: {
+  COMPLETED: 'COMPLETED',
+  VOID: 'VOID'
+};
+
+export type ValasTransactionStatus = (typeof ValasTransactionStatus)[keyof typeof ValasTransactionStatus]
+
+
+export const ValasCustomerIdType: {
+  KTP: 'KTP',
+  SIM: 'SIM',
+  PASSPORT: 'PASSPORT',
+  KITAS: 'KITAS',
+  NPWP: 'NPWP',
+  LAINNYA: 'LAINNYA'
+};
+
+export type ValasCustomerIdType = (typeof ValasCustomerIdType)[keyof typeof ValasCustomerIdType]
+
 }
 
 export type AttendanceStatus = $Enums.AttendanceStatus
@@ -752,6 +807,22 @@ export type CorrectionStatus = $Enums.CorrectionStatus
 
 export const CorrectionStatus: typeof $Enums.CorrectionStatus
 
+export type ValasTransactionType = $Enums.ValasTransactionType
+
+export const ValasTransactionType: typeof $Enums.ValasTransactionType
+
+export type ValasPaymentMethod = $Enums.ValasPaymentMethod
+
+export const ValasPaymentMethod: typeof $Enums.ValasPaymentMethod
+
+export type ValasTransactionStatus = $Enums.ValasTransactionStatus
+
+export const ValasTransactionStatus: typeof $Enums.ValasTransactionStatus
+
+export type ValasCustomerIdType = $Enums.ValasCustomerIdType
+
+export const ValasCustomerIdType: typeof $Enums.ValasCustomerIdType
+
 /**
  * ##  Prisma Client ʲˢ
  *
@@ -761,8 +832,8 @@ export const CorrectionStatus: typeof $Enums.CorrectionStatus
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Attendances
- * const attendances = await prisma.attendance.findMany()
+ * // Fetch zero or more PublicHolidays
+ * const publicHolidays = await prisma.publicHoliday.findMany()
  * ```
  *
  *
@@ -784,8 +855,8 @@ export class PrismaClient<
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more Attendances
-   * const attendances = await prisma.attendance.findMany()
+   * // Fetch zero or more PublicHolidays
+   * const publicHolidays = await prisma.publicHoliday.findMany()
    * ```
    *
    *
@@ -874,6 +945,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.publicHoliday`: Exposes CRUD operations for the **PublicHoliday** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PublicHolidays
+    * const publicHolidays = await prisma.publicHoliday.findMany()
+    * ```
+    */
+  get publicHoliday(): Prisma.PublicHolidayDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.attendance`: Exposes CRUD operations for the **Attendance** model.
     * Example usage:
     * ```ts
@@ -1402,6 +1483,16 @@ export class PrismaClient<
     * ```
     */
   get correctionRequest(): Prisma.CorrectionRequestDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.valasTransaction`: Exposes CRUD operations for the **ValasTransaction** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ValasTransactions
+    * const valasTransactions = await prisma.valasTransaction.findMany()
+    * ```
+    */
+  get valasTransaction(): Prisma.ValasTransactionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1836,6 +1927,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    PublicHoliday: 'PublicHoliday',
     Attendance: 'Attendance',
     account: 'account',
     session: 'session',
@@ -1888,7 +1980,8 @@ export namespace Prisma {
     KasHeadConfirmation: 'KasHeadConfirmation',
     BankHeadConfirmation: 'BankHeadConfirmation',
     CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal',
-    CorrectionRequest: 'CorrectionRequest'
+    CorrectionRequest: 'CorrectionRequest',
+    ValasTransaction: 'ValasTransaction'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1904,10 +1997,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest"
+      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      PublicHoliday: {
+        payload: Prisma.$PublicHolidayPayload<ExtArgs>
+        fields: Prisma.PublicHolidayFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublicHolidayFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublicHolidayFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          findFirst: {
+            args: Prisma.PublicHolidayFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublicHolidayFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          findMany: {
+            args: Prisma.PublicHolidayFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>[]
+          }
+          create: {
+            args: Prisma.PublicHolidayCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          createMany: {
+            args: Prisma.PublicHolidayCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PublicHolidayCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>[]
+          }
+          delete: {
+            args: Prisma.PublicHolidayDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          update: {
+            args: Prisma.PublicHolidayUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          deleteMany: {
+            args: Prisma.PublicHolidayDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublicHolidayUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PublicHolidayUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>[]
+          }
+          upsert: {
+            args: Prisma.PublicHolidayUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          aggregate: {
+            args: Prisma.PublicHolidayAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublicHoliday>
+          }
+          groupBy: {
+            args: Prisma.PublicHolidayGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublicHolidayGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublicHolidayCountArgs<ExtArgs>
+            result: $Utils.Optional<PublicHolidayCountAggregateOutputType> | number
+          }
+        }
+      }
       Attendance: {
         payload: Prisma.$AttendancePayload<ExtArgs>
         fields: Prisma.AttendanceFieldRefs
@@ -5830,6 +5997,80 @@ export namespace Prisma {
           }
         }
       }
+      ValasTransaction: {
+        payload: Prisma.$ValasTransactionPayload<ExtArgs>
+        fields: Prisma.ValasTransactionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ValasTransactionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ValasTransactionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          findFirst: {
+            args: Prisma.ValasTransactionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ValasTransactionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          findMany: {
+            args: Prisma.ValasTransactionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>[]
+          }
+          create: {
+            args: Prisma.ValasTransactionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          createMany: {
+            args: Prisma.ValasTransactionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ValasTransactionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>[]
+          }
+          delete: {
+            args: Prisma.ValasTransactionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          update: {
+            args: Prisma.ValasTransactionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          deleteMany: {
+            args: Prisma.ValasTransactionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ValasTransactionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ValasTransactionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>[]
+          }
+          upsert: {
+            args: Prisma.ValasTransactionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ValasTransactionPayload>
+          }
+          aggregate: {
+            args: Prisma.ValasTransactionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateValasTransaction>
+          }
+          groupBy: {
+            args: Prisma.ValasTransactionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ValasTransactionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ValasTransactionCountArgs<ExtArgs>
+            result: $Utils.Optional<ValasTransactionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -5938,6 +6179,7 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    publicHoliday?: PublicHolidayOmit
     attendance?: AttendanceOmit
     account?: accountOmit
     session?: sessionOmit
@@ -5991,6 +6233,7 @@ export namespace Prisma {
     bankHeadConfirmation?: BankHeadConfirmationOmit
     companyHeadConfirmationTotal?: CompanyHeadConfirmationTotalOmit
     correctionRequest?: CorrectionRequestOmit
+    valasTransaction?: ValasTransactionOmit
   }
 
   /* Types for Logging */
@@ -6306,11 +6549,13 @@ export namespace Prisma {
   export type BankAccountCountOutputType = {
     mutations: number
     dailyEntries: number
+    valasTransactions: number
   }
 
   export type BankAccountCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     mutations?: boolean | BankAccountCountOutputTypeCountMutationsArgs
     dailyEntries?: boolean | BankAccountCountOutputTypeCountDailyEntriesArgs
+    valasTransactions?: boolean | BankAccountCountOutputTypeCountValasTransactionsArgs
   }
 
   // Custom InputTypes
@@ -6338,6 +6583,13 @@ export namespace Prisma {
     where?: DailyBankEntryWhereInput
   }
 
+  /**
+   * BankAccountCountOutputType without action
+   */
+  export type BankAccountCountOutputTypeCountValasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ValasTransactionWhereInput
+  }
+
 
   /**
    * Count Type BranchCountOutputType
@@ -6350,6 +6602,7 @@ export namespace Prisma {
     users: number
     attendances: number
     payrollSlips: number
+    valasTransactions: number
   }
 
   export type BranchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6359,6 +6612,7 @@ export namespace Prisma {
     users?: boolean | BranchCountOutputTypeCountUsersArgs
     attendances?: boolean | BranchCountOutputTypeCountAttendancesArgs
     payrollSlips?: boolean | BranchCountOutputTypeCountPayrollSlipsArgs
+    valasTransactions?: boolean | BranchCountOutputTypeCountValasTransactionsArgs
   }
 
   // Custom InputTypes
@@ -6414,6 +6668,13 @@ export namespace Prisma {
     where?: PayrollSlipWhereInput
   }
 
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountValasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ValasTransactionWhereInput
+  }
+
 
   /**
    * Count Type CompanyCountOutputType
@@ -6436,6 +6697,7 @@ export namespace Prisma {
     correctionRequests: number
     heldFunds: number
     payrollRuns: number
+    valasTransactions: number
   }
 
   export type CompanyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6455,6 +6717,7 @@ export namespace Prisma {
     correctionRequests?: boolean | CompanyCountOutputTypeCountCorrectionRequestsArgs
     heldFunds?: boolean | CompanyCountOutputTypeCountHeldFundsArgs
     payrollRuns?: boolean | CompanyCountOutputTypeCountPayrollRunsArgs
+    valasTransactions?: boolean | CompanyCountOutputTypeCountValasTransactionsArgs
   }
 
   // Custom InputTypes
@@ -6580,6 +6843,13 @@ export namespace Prisma {
     where?: PayrollRunWhereInput
   }
 
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountValasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ValasTransactionWhereInput
+  }
+
 
   /**
    * Count Type CurrencyCountOutputType
@@ -6589,12 +6859,14 @@ export namespace Prisma {
     bankAccounts: number
     stocks: number
     stockMutations: number
+    valasTransactions: number
   }
 
   export type CurrencyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bankAccounts?: boolean | CurrencyCountOutputTypeCountBankAccountsArgs
     stocks?: boolean | CurrencyCountOutputTypeCountStocksArgs
     stockMutations?: boolean | CurrencyCountOutputTypeCountStockMutationsArgs
+    valasTransactions?: boolean | CurrencyCountOutputTypeCountValasTransactionsArgs
   }
 
   // Custom InputTypes
@@ -6627,6 +6899,13 @@ export namespace Prisma {
    */
   export type CurrencyCountOutputTypeCountStockMutationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: StockMutationWhereInput
+  }
+
+  /**
+   * CurrencyCountOutputType without action
+   */
+  export type CurrencyCountOutputTypeCountValasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ValasTransactionWhereInput
   }
 
 
@@ -7090,6 +7369,1023 @@ export namespace Prisma {
   /**
    * Models
    */
+
+  /**
+   * Model PublicHoliday
+   */
+
+  export type AggregatePublicHoliday = {
+    _count: PublicHolidayCountAggregateOutputType | null
+    _min: PublicHolidayMinAggregateOutputType | null
+    _max: PublicHolidayMaxAggregateOutputType | null
+  }
+
+  export type PublicHolidayMinAggregateOutputType = {
+    id: string | null
+    date: Date | null
+    name: string | null
+    isJointLeave: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicHolidayMaxAggregateOutputType = {
+    id: string | null
+    date: Date | null
+    name: string | null
+    isJointLeave: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicHolidayCountAggregateOutputType = {
+    id: number
+    date: number
+    name: number
+    isJointLeave: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PublicHolidayMinAggregateInputType = {
+    id?: true
+    date?: true
+    name?: true
+    isJointLeave?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicHolidayMaxAggregateInputType = {
+    id?: true
+    date?: true
+    name?: true
+    isJointLeave?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicHolidayCountAggregateInputType = {
+    id?: true
+    date?: true
+    name?: true
+    isJointLeave?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PublicHolidayAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicHoliday to aggregate.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PublicHolidays
+    **/
+    _count?: true | PublicHolidayCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublicHolidayMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublicHolidayMaxAggregateInputType
+  }
+
+  export type GetPublicHolidayAggregateType<T extends PublicHolidayAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublicHoliday]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublicHoliday[P]>
+      : GetScalarType<T[P], AggregatePublicHoliday[P]>
+  }
+
+
+
+
+  export type PublicHolidayGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicHolidayWhereInput
+    orderBy?: PublicHolidayOrderByWithAggregationInput | PublicHolidayOrderByWithAggregationInput[]
+    by: PublicHolidayScalarFieldEnum[] | PublicHolidayScalarFieldEnum
+    having?: PublicHolidayScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublicHolidayCountAggregateInputType | true
+    _min?: PublicHolidayMinAggregateInputType
+    _max?: PublicHolidayMaxAggregateInputType
+  }
+
+  export type PublicHolidayGroupByOutputType = {
+    id: string
+    date: Date
+    name: string
+    isJointLeave: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: PublicHolidayCountAggregateOutputType | null
+    _min: PublicHolidayMinAggregateOutputType | null
+    _max: PublicHolidayMaxAggregateOutputType | null
+  }
+
+  type GetPublicHolidayGroupByPayload<T extends PublicHolidayGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublicHolidayGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublicHolidayGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublicHolidayGroupByOutputType[P]>
+            : GetScalarType<T[P], PublicHolidayGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublicHolidaySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    name?: boolean
+    isJointLeave?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["publicHoliday"]>
+
+  export type PublicHolidaySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    name?: boolean
+    isJointLeave?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["publicHoliday"]>
+
+  export type PublicHolidaySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    date?: boolean
+    name?: boolean
+    isJointLeave?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["publicHoliday"]>
+
+  export type PublicHolidaySelectScalar = {
+    id?: boolean
+    date?: boolean
+    name?: boolean
+    isJointLeave?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PublicHolidayOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "date" | "name" | "isJointLeave" | "createdAt" | "updatedAt", ExtArgs["result"]["publicHoliday"]>
+
+  export type $PublicHolidayPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PublicHoliday"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      date: Date
+      name: string
+      /**
+       * Cuti bersama (bukan hari libur itu sendiri) — dibedakan hanya untuk
+       * keterangan, keduanya sama-sama bukan hari kerja.
+       */
+      isJointLeave: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["publicHoliday"]>
+    composites: {}
+  }
+
+  type PublicHolidayGetPayload<S extends boolean | null | undefined | PublicHolidayDefaultArgs> = $Result.GetResult<Prisma.$PublicHolidayPayload, S>
+
+  type PublicHolidayCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublicHolidayFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublicHolidayCountAggregateInputType | true
+    }
+
+  export interface PublicHolidayDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PublicHoliday'], meta: { name: 'PublicHoliday' } }
+    /**
+     * Find zero or one PublicHoliday that matches the filter.
+     * @param {PublicHolidayFindUniqueArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublicHolidayFindUniqueArgs>(args: SelectSubset<T, PublicHolidayFindUniqueArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PublicHoliday that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublicHolidayFindUniqueOrThrowArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublicHolidayFindUniqueOrThrowArgs>(args: SelectSubset<T, PublicHolidayFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicHoliday that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindFirstArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublicHolidayFindFirstArgs>(args?: SelectSubset<T, PublicHolidayFindFirstArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicHoliday that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindFirstOrThrowArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublicHolidayFindFirstOrThrowArgs>(args?: SelectSubset<T, PublicHolidayFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PublicHolidays that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PublicHolidays
+     * const publicHolidays = await prisma.publicHoliday.findMany()
+     * 
+     * // Get first 10 PublicHolidays
+     * const publicHolidays = await prisma.publicHoliday.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const publicHolidayWithIdOnly = await prisma.publicHoliday.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PublicHolidayFindManyArgs>(args?: SelectSubset<T, PublicHolidayFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PublicHoliday.
+     * @param {PublicHolidayCreateArgs} args - Arguments to create a PublicHoliday.
+     * @example
+     * // Create one PublicHoliday
+     * const PublicHoliday = await prisma.publicHoliday.create({
+     *   data: {
+     *     // ... data to create a PublicHoliday
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublicHolidayCreateArgs>(args: SelectSubset<T, PublicHolidayCreateArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PublicHolidays.
+     * @param {PublicHolidayCreateManyArgs} args - Arguments to create many PublicHolidays.
+     * @example
+     * // Create many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublicHolidayCreateManyArgs>(args?: SelectSubset<T, PublicHolidayCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PublicHolidays and returns the data saved in the database.
+     * @param {PublicHolidayCreateManyAndReturnArgs} args - Arguments to create many PublicHolidays.
+     * @example
+     * // Create many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PublicHolidays and only return the `id`
+     * const publicHolidayWithIdOnly = await prisma.publicHoliday.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PublicHolidayCreateManyAndReturnArgs>(args?: SelectSubset<T, PublicHolidayCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PublicHoliday.
+     * @param {PublicHolidayDeleteArgs} args - Arguments to delete one PublicHoliday.
+     * @example
+     * // Delete one PublicHoliday
+     * const PublicHoliday = await prisma.publicHoliday.delete({
+     *   where: {
+     *     // ... filter to delete one PublicHoliday
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublicHolidayDeleteArgs>(args: SelectSubset<T, PublicHolidayDeleteArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PublicHoliday.
+     * @param {PublicHolidayUpdateArgs} args - Arguments to update one PublicHoliday.
+     * @example
+     * // Update one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublicHolidayUpdateArgs>(args: SelectSubset<T, PublicHolidayUpdateArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PublicHolidays.
+     * @param {PublicHolidayDeleteManyArgs} args - Arguments to filter PublicHolidays to delete.
+     * @example
+     * // Delete a few PublicHolidays
+     * const { count } = await prisma.publicHoliday.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublicHolidayDeleteManyArgs>(args?: SelectSubset<T, PublicHolidayDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublicHolidayUpdateManyArgs>(args: SelectSubset<T, PublicHolidayUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicHolidays and returns the data updated in the database.
+     * @param {PublicHolidayUpdateManyAndReturnArgs} args - Arguments to update many PublicHolidays.
+     * @example
+     * // Update many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PublicHolidays and only return the `id`
+     * const publicHolidayWithIdOnly = await prisma.publicHoliday.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PublicHolidayUpdateManyAndReturnArgs>(args: SelectSubset<T, PublicHolidayUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PublicHoliday.
+     * @param {PublicHolidayUpsertArgs} args - Arguments to update or create a PublicHoliday.
+     * @example
+     * // Update or create a PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.upsert({
+     *   create: {
+     *     // ... data to create a PublicHoliday
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PublicHoliday we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublicHolidayUpsertArgs>(args: SelectSubset<T, PublicHolidayUpsertArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PublicHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayCountArgs} args - Arguments to filter PublicHolidays to count.
+     * @example
+     * // Count the number of PublicHolidays
+     * const count = await prisma.publicHoliday.count({
+     *   where: {
+     *     // ... the filter for the PublicHolidays we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublicHolidayCountArgs>(
+      args?: Subset<T, PublicHolidayCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublicHolidayCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PublicHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublicHolidayAggregateArgs>(args: Subset<T, PublicHolidayAggregateArgs>): Prisma.PrismaPromise<GetPublicHolidayAggregateType<T>>
+
+    /**
+     * Group by PublicHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublicHolidayGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublicHolidayGroupByArgs['orderBy'] }
+        : { orderBy?: PublicHolidayGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublicHolidayGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublicHolidayGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PublicHoliday model
+   */
+  readonly fields: PublicHolidayFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PublicHoliday.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublicHolidayClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PublicHoliday model
+   */
+  interface PublicHolidayFieldRefs {
+    readonly id: FieldRef<"PublicHoliday", 'String'>
+    readonly date: FieldRef<"PublicHoliday", 'DateTime'>
+    readonly name: FieldRef<"PublicHoliday", 'String'>
+    readonly isJointLeave: FieldRef<"PublicHoliday", 'Boolean'>
+    readonly createdAt: FieldRef<"PublicHoliday", 'DateTime'>
+    readonly updatedAt: FieldRef<"PublicHoliday", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PublicHoliday findUnique
+   */
+  export type PublicHolidayFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday findUniqueOrThrow
+   */
+  export type PublicHolidayFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday findFirst
+   */
+  export type PublicHolidayFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday findFirstOrThrow
+   */
+  export type PublicHolidayFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday findMany
+   */
+  export type PublicHolidayFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which PublicHolidays to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday create
+   */
+  export type PublicHolidayCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PublicHoliday.
+     */
+    data: XOR<PublicHolidayCreateInput, PublicHolidayUncheckedCreateInput>
+  }
+
+  /**
+   * PublicHoliday createMany
+   */
+  export type PublicHolidayCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PublicHolidays.
+     */
+    data: PublicHolidayCreateManyInput | PublicHolidayCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublicHoliday createManyAndReturn
+   */
+  export type PublicHolidayCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * The data used to create many PublicHolidays.
+     */
+    data: PublicHolidayCreateManyInput | PublicHolidayCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublicHoliday update
+   */
+  export type PublicHolidayUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PublicHoliday.
+     */
+    data: XOR<PublicHolidayUpdateInput, PublicHolidayUncheckedUpdateInput>
+    /**
+     * Choose, which PublicHoliday to update.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday updateMany
+   */
+  export type PublicHolidayUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PublicHolidays.
+     */
+    data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicHolidays to update
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * Limit how many PublicHolidays to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicHoliday updateManyAndReturn
+   */
+  export type PublicHolidayUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * The data used to update PublicHolidays.
+     */
+    data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicHolidays to update
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * Limit how many PublicHolidays to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicHoliday upsert
+   */
+  export type PublicHolidayUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PublicHoliday to update in case it exists.
+     */
+    where: PublicHolidayWhereUniqueInput
+    /**
+     * In case the PublicHoliday found by the `where` argument doesn't exist, create a new PublicHoliday with this data.
+     */
+    create: XOR<PublicHolidayCreateInput, PublicHolidayUncheckedCreateInput>
+    /**
+     * In case the PublicHoliday was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublicHolidayUpdateInput, PublicHolidayUncheckedUpdateInput>
+  }
+
+  /**
+   * PublicHoliday delete
+   */
+  export type PublicHolidayDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Filter which PublicHoliday to delete.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday deleteMany
+   */
+  export type PublicHolidayDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicHolidays to delete
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * Limit how many PublicHolidays to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicHoliday without action
+   */
+  export type PublicHolidayDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+  }
+
 
   /**
    * Model Attendance
@@ -11978,18 +13274,10 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     baseSalary: Decimal | null
-    mealAllowance: Decimal | null
-    transportAllowance: Decimal | null
-    positionAllowance: Decimal | null
-    bpjsKesehatan: Decimal | null
   }
 
   export type UserSumAggregateOutputType = {
     baseSalary: Decimal | null
-    mealAllowance: Decimal | null
-    transportAllowance: Decimal | null
-    positionAllowance: Decimal | null
-    bpjsKesehatan: Decimal | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -12003,10 +13291,6 @@ export namespace Prisma {
     phone: string | null
     branchId: string | null
     baseSalary: Decimal | null
-    mealAllowance: Decimal | null
-    transportAllowance: Decimal | null
-    positionAllowance: Decimal | null
-    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     employmentStatus: $Enums.EmploymentStatus | null
     contractStartDate: Date | null
@@ -12026,10 +13310,6 @@ export namespace Prisma {
     phone: string | null
     branchId: string | null
     baseSalary: Decimal | null
-    mealAllowance: Decimal | null
-    transportAllowance: Decimal | null
-    positionAllowance: Decimal | null
-    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     employmentStatus: $Enums.EmploymentStatus | null
     contractStartDate: Date | null
@@ -12049,10 +13329,6 @@ export namespace Prisma {
     phone: number
     branchId: number
     baseSalary: number
-    mealAllowance: number
-    transportAllowance: number
-    positionAllowance: number
-    bpjsKesehatan: number
     joinDate: number
     employmentStatus: number
     contractStartDate: number
@@ -12065,18 +13341,10 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     baseSalary?: true
-    mealAllowance?: true
-    transportAllowance?: true
-    positionAllowance?: true
-    bpjsKesehatan?: true
   }
 
   export type UserSumAggregateInputType = {
     baseSalary?: true
-    mealAllowance?: true
-    transportAllowance?: true
-    positionAllowance?: true
-    bpjsKesehatan?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -12090,10 +13358,6 @@ export namespace Prisma {
     phone?: true
     branchId?: true
     baseSalary?: true
-    mealAllowance?: true
-    transportAllowance?: true
-    positionAllowance?: true
-    bpjsKesehatan?: true
     joinDate?: true
     employmentStatus?: true
     contractStartDate?: true
@@ -12113,10 +13377,6 @@ export namespace Prisma {
     phone?: true
     branchId?: true
     baseSalary?: true
-    mealAllowance?: true
-    transportAllowance?: true
-    positionAllowance?: true
-    bpjsKesehatan?: true
     joinDate?: true
     employmentStatus?: true
     contractStartDate?: true
@@ -12136,10 +13396,6 @@ export namespace Prisma {
     phone?: true
     branchId?: true
     baseSalary?: true
-    mealAllowance?: true
-    transportAllowance?: true
-    positionAllowance?: true
-    bpjsKesehatan?: true
     joinDate?: true
     employmentStatus?: true
     contractStartDate?: true
@@ -12246,10 +13502,6 @@ export namespace Prisma {
     phone: string | null
     branchId: string | null
     baseSalary: Decimal | null
-    mealAllowance: Decimal | null
-    transportAllowance: Decimal | null
-    positionAllowance: Decimal | null
-    bpjsKesehatan: Decimal | null
     joinDate: Date | null
     employmentStatus: $Enums.EmploymentStatus
     contractStartDate: Date | null
@@ -12288,10 +13540,6 @@ export namespace Prisma {
     phone?: boolean
     branchId?: boolean
     baseSalary?: boolean
-    mealAllowance?: boolean
-    transportAllowance?: boolean
-    positionAllowance?: boolean
-    bpjsKesehatan?: boolean
     joinDate?: boolean
     employmentStatus?: boolean
     contractStartDate?: boolean
@@ -12331,10 +13579,6 @@ export namespace Prisma {
     phone?: boolean
     branchId?: boolean
     baseSalary?: boolean
-    mealAllowance?: boolean
-    transportAllowance?: boolean
-    positionAllowance?: boolean
-    bpjsKesehatan?: boolean
     joinDate?: boolean
     employmentStatus?: boolean
     contractStartDate?: boolean
@@ -12356,10 +13600,6 @@ export namespace Prisma {
     phone?: boolean
     branchId?: boolean
     baseSalary?: boolean
-    mealAllowance?: boolean
-    transportAllowance?: boolean
-    positionAllowance?: boolean
-    bpjsKesehatan?: boolean
     joinDate?: boolean
     employmentStatus?: boolean
     contractStartDate?: boolean
@@ -12381,10 +13621,6 @@ export namespace Prisma {
     phone?: boolean
     branchId?: boolean
     baseSalary?: boolean
-    mealAllowance?: boolean
-    transportAllowance?: boolean
-    positionAllowance?: boolean
-    bpjsKesehatan?: boolean
     joinDate?: boolean
     employmentStatus?: boolean
     contractStartDate?: boolean
@@ -12393,7 +13629,7 @@ export namespace Prisma {
     customRoleId?: boolean
   }
 
-  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "mealAllowance" | "transportAllowance" | "positionAllowance" | "bpjsKesehatan" | "joinDate" | "employmentStatus" | "contractStartDate" | "contractEndDate" | "isActive" | "customRoleId", ExtArgs["result"]["user"]>
+  export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "phone" | "branchId" | "baseSalary" | "joinDate" | "employmentStatus" | "contractStartDate" | "contractEndDate" | "isActive" | "customRoleId", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kpiEntries?: boolean | user$kpiEntriesArgs<ExtArgs>
     kpiEntriesCreated?: boolean | user$kpiEntriesCreatedArgs<ExtArgs>
@@ -12459,10 +13695,6 @@ export namespace Prisma {
       phone: string | null
       branchId: string | null
       baseSalary: Prisma.Decimal | null
-      mealAllowance: Prisma.Decimal | null
-      transportAllowance: Prisma.Decimal | null
-      positionAllowance: Prisma.Decimal | null
-      bpjsKesehatan: Prisma.Decimal | null
       joinDate: Date | null
       /**
        * Status ikatan kerja. Dipakai rule payroll untuk menegakkan aturan
@@ -12935,10 +14167,6 @@ export namespace Prisma {
     readonly phone: FieldRef<"user", 'String'>
     readonly branchId: FieldRef<"user", 'String'>
     readonly baseSalary: FieldRef<"user", 'Decimal'>
-    readonly mealAllowance: FieldRef<"user", 'Decimal'>
-    readonly transportAllowance: FieldRef<"user", 'Decimal'>
-    readonly positionAllowance: FieldRef<"user", 'Decimal'>
-    readonly bpjsKesehatan: FieldRef<"user", 'Decimal'>
     readonly joinDate: FieldRef<"user", 'DateTime'>
     readonly employmentStatus: FieldRef<"user", 'EmploymentStatus'>
     readonly contractStartDate: FieldRef<"user", 'DateTime'>
@@ -16202,6 +17430,7 @@ export namespace Prisma {
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
     mutations?: boolean | BankAccount$mutationsArgs<ExtArgs>
     dailyEntries?: boolean | BankAccount$dailyEntriesArgs<ExtArgs>
+    valasTransactions?: boolean | BankAccount$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BankAccountCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["bankAccount"]>
 
@@ -16260,6 +17489,7 @@ export namespace Prisma {
     currency?: boolean | CurrencyDefaultArgs<ExtArgs>
     mutations?: boolean | BankAccount$mutationsArgs<ExtArgs>
     dailyEntries?: boolean | BankAccount$dailyEntriesArgs<ExtArgs>
+    valasTransactions?: boolean | BankAccount$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BankAccountCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BankAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16278,6 +17508,7 @@ export namespace Prisma {
       currency: Prisma.$CurrencyPayload<ExtArgs>
       mutations: Prisma.$BankMutationPayload<ExtArgs>[]
       dailyEntries: Prisma.$DailyBankEntryPayload<ExtArgs>[]
+      valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16690,6 +17921,7 @@ export namespace Prisma {
     currency<T extends CurrencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyDefaultArgs<ExtArgs>>): Prisma__CurrencyClient<$Result.GetResult<Prisma.$CurrencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     mutations<T extends BankAccount$mutationsArgs<ExtArgs> = {}>(args?: Subset<T, BankAccount$mutationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMutationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dailyEntries<T extends BankAccount$dailyEntriesArgs<ExtArgs> = {}>(args?: Subset<T, BankAccount$dailyEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DailyBankEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    valasTransactions<T extends BankAccount$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, BankAccount$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17177,6 +18409,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DailyBankEntryScalarFieldEnum | DailyBankEntryScalarFieldEnum[]
+  }
+
+  /**
+   * BankAccount.valasTransactions
+   */
+  export type BankAccount$valasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    where?: ValasTransactionWhereInput
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    cursor?: ValasTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
   }
 
   /**
@@ -19787,6 +21043,7 @@ export namespace Prisma {
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
+    valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["branch"]>
 
@@ -19843,6 +21100,7 @@ export namespace Prisma {
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
+    valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BranchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -19862,6 +21120,7 @@ export namespace Prisma {
       users: Prisma.$userPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       payrollSlips: Prisma.$PayrollSlipPayload<ExtArgs>[]
+      valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -20276,6 +21535,7 @@ export namespace Prisma {
     users<T extends Branch$usersArgs<ExtArgs> = {}>(args?: Subset<T, Branch$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendances<T extends Branch$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollSlips<T extends Branch$payrollSlipsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$payrollSlipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    valasTransactions<T extends Branch$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20880,6 +22140,30 @@ export namespace Prisma {
   }
 
   /**
+   * Branch.valasTransactions
+   */
+  export type Branch$valasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    where?: ValasTransactionWhereInput
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    cursor?: ValasTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
+  }
+
+  /**
    * Branch without action
    */
   export type BranchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -21086,6 +22370,7 @@ export namespace Prisma {
     correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
     heldFunds?: boolean | Company$heldFundsArgs<ExtArgs>
     payrollRuns?: boolean | Company$payrollRunsArgs<ExtArgs>
+    valasTransactions?: boolean | Company$valasTransactionsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
 
@@ -21134,6 +22419,7 @@ export namespace Prisma {
     correctionRequests?: boolean | Company$correctionRequestsArgs<ExtArgs>
     heldFunds?: boolean | Company$heldFundsArgs<ExtArgs>
     payrollRuns?: boolean | Company$payrollRunsArgs<ExtArgs>
+    valasTransactions?: boolean | Company$valasTransactionsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CompanyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -21158,6 +22444,7 @@ export namespace Prisma {
       correctionRequests: Prisma.$CorrectionRequestPayload<ExtArgs>[]
       heldFunds: Prisma.$HeldFundPayload<ExtArgs>[]
       payrollRuns: Prisma.$PayrollRunPayload<ExtArgs>[]
+      valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -21576,6 +22863,7 @@ export namespace Prisma {
     correctionRequests<T extends Company$correctionRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Company$correctionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CorrectionRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     heldFunds<T extends Company$heldFundsArgs<ExtArgs> = {}>(args?: Subset<T, Company$heldFundsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRuns<T extends Company$payrollRunsArgs<ExtArgs> = {}>(args?: Subset<T, Company$payrollRunsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    valasTransactions<T extends Company$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Company$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -22388,6 +23676,30 @@ export namespace Prisma {
   }
 
   /**
+   * Company.valasTransactions
+   */
+  export type Company$valasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    where?: ValasTransactionWhereInput
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    cursor?: ValasTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
+  }
+
+  /**
    * Company without action
    */
   export type CompanyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -22590,6 +23902,7 @@ export namespace Prisma {
     stocks?: boolean | Currency$stocksArgs<ExtArgs>
     stockMutations?: boolean | Currency$stockMutationsArgs<ExtArgs>
     price?: boolean | Currency$priceArgs<ExtArgs>
+    valasTransactions?: boolean | Currency$valasTransactionsArgs<ExtArgs>
     _count?: boolean | CurrencyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["currency"]>
 
@@ -22629,6 +23942,7 @@ export namespace Prisma {
     stocks?: boolean | Currency$stocksArgs<ExtArgs>
     stockMutations?: boolean | Currency$stockMutationsArgs<ExtArgs>
     price?: boolean | Currency$priceArgs<ExtArgs>
+    valasTransactions?: boolean | Currency$valasTransactionsArgs<ExtArgs>
     _count?: boolean | CurrencyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CurrencyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -22641,6 +23955,7 @@ export namespace Prisma {
       stocks: Prisma.$CurrencyStockPayload<ExtArgs>[]
       stockMutations: Prisma.$StockMutationPayload<ExtArgs>[]
       price: Prisma.$CurrencyPricePayload<ExtArgs> | null
+      valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -23048,6 +24363,7 @@ export namespace Prisma {
     stocks<T extends Currency$stocksArgs<ExtArgs> = {}>(args?: Subset<T, Currency$stocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CurrencyStockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockMutations<T extends Currency$stockMutationsArgs<ExtArgs> = {}>(args?: Subset<T, Currency$stockMutationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMutationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     price<T extends Currency$priceArgs<ExtArgs> = {}>(args?: Subset<T, Currency$priceArgs<ExtArgs>>): Prisma__CurrencyPriceClient<$Result.GetResult<Prisma.$CurrencyPricePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    valasTransactions<T extends Currency$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Currency$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -23565,6 +24881,30 @@ export namespace Prisma {
      */
     include?: CurrencyPriceInclude<ExtArgs> | null
     where?: CurrencyPriceWhereInput
+  }
+
+  /**
+   * Currency.valasTransactions
+   */
+  export type Currency$valasTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    where?: ValasTransactionWhereInput
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    cursor?: ValasTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
   }
 
   /**
@@ -71629,6 +72969,1450 @@ export namespace Prisma {
 
 
   /**
+   * Model ValasTransaction
+   */
+
+  export type AggregateValasTransaction = {
+    _count: ValasTransactionCountAggregateOutputType | null
+    _avg: ValasTransactionAvgAggregateOutputType | null
+    _sum: ValasTransactionSumAggregateOutputType | null
+    _min: ValasTransactionMinAggregateOutputType | null
+    _max: ValasTransactionMaxAggregateOutputType | null
+  }
+
+  export type ValasTransactionAvgAggregateOutputType = {
+    amount: Decimal | null
+    rate: Decimal | null
+    priceRate: Decimal | null
+    totalIdr: Decimal | null
+  }
+
+  export type ValasTransactionSumAggregateOutputType = {
+    amount: Decimal | null
+    rate: Decimal | null
+    priceRate: Decimal | null
+    totalIdr: Decimal | null
+  }
+
+  export type ValasTransactionMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    branchId: string | null
+    invoiceNo: string | null
+    date: Date | null
+    type: $Enums.ValasTransactionType | null
+    currencyId: string | null
+    amount: Decimal | null
+    rate: Decimal | null
+    priceRate: Decimal | null
+    totalIdr: Decimal | null
+    customerName: string | null
+    customerPhone: string | null
+    customerIdType: $Enums.ValasCustomerIdType | null
+    customerIdNumber: string | null
+    customerAddress: string | null
+    paymentMethod: $Enums.ValasPaymentMethod | null
+    bankAccountId: string | null
+    note: string | null
+    status: $Enums.ValasTransactionStatus | null
+    voidedAt: Date | null
+    voidedBy: string | null
+    voidReason: string | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ValasTransactionMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    branchId: string | null
+    invoiceNo: string | null
+    date: Date | null
+    type: $Enums.ValasTransactionType | null
+    currencyId: string | null
+    amount: Decimal | null
+    rate: Decimal | null
+    priceRate: Decimal | null
+    totalIdr: Decimal | null
+    customerName: string | null
+    customerPhone: string | null
+    customerIdType: $Enums.ValasCustomerIdType | null
+    customerIdNumber: string | null
+    customerAddress: string | null
+    paymentMethod: $Enums.ValasPaymentMethod | null
+    bankAccountId: string | null
+    note: string | null
+    status: $Enums.ValasTransactionStatus | null
+    voidedAt: Date | null
+    voidedBy: string | null
+    voidReason: string | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ValasTransactionCountAggregateOutputType = {
+    id: number
+    companyId: number
+    branchId: number
+    invoiceNo: number
+    date: number
+    type: number
+    currencyId: number
+    amount: number
+    rate: number
+    priceRate: number
+    totalIdr: number
+    customerName: number
+    customerPhone: number
+    customerIdType: number
+    customerIdNumber: number
+    customerAddress: number
+    paymentMethod: number
+    bankAccountId: number
+    note: number
+    status: number
+    voidedAt: number
+    voidedBy: number
+    voidReason: number
+    createdBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ValasTransactionAvgAggregateInputType = {
+    amount?: true
+    rate?: true
+    priceRate?: true
+    totalIdr?: true
+  }
+
+  export type ValasTransactionSumAggregateInputType = {
+    amount?: true
+    rate?: true
+    priceRate?: true
+    totalIdr?: true
+  }
+
+  export type ValasTransactionMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    branchId?: true
+    invoiceNo?: true
+    date?: true
+    type?: true
+    currencyId?: true
+    amount?: true
+    rate?: true
+    priceRate?: true
+    totalIdr?: true
+    customerName?: true
+    customerPhone?: true
+    customerIdType?: true
+    customerIdNumber?: true
+    customerAddress?: true
+    paymentMethod?: true
+    bankAccountId?: true
+    note?: true
+    status?: true
+    voidedAt?: true
+    voidedBy?: true
+    voidReason?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ValasTransactionMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    branchId?: true
+    invoiceNo?: true
+    date?: true
+    type?: true
+    currencyId?: true
+    amount?: true
+    rate?: true
+    priceRate?: true
+    totalIdr?: true
+    customerName?: true
+    customerPhone?: true
+    customerIdType?: true
+    customerIdNumber?: true
+    customerAddress?: true
+    paymentMethod?: true
+    bankAccountId?: true
+    note?: true
+    status?: true
+    voidedAt?: true
+    voidedBy?: true
+    voidReason?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ValasTransactionCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    branchId?: true
+    invoiceNo?: true
+    date?: true
+    type?: true
+    currencyId?: true
+    amount?: true
+    rate?: true
+    priceRate?: true
+    totalIdr?: true
+    customerName?: true
+    customerPhone?: true
+    customerIdType?: true
+    customerIdNumber?: true
+    customerAddress?: true
+    paymentMethod?: true
+    bankAccountId?: true
+    note?: true
+    status?: true
+    voidedAt?: true
+    voidedBy?: true
+    voidReason?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ValasTransactionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ValasTransaction to aggregate.
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ValasTransactions to fetch.
+     */
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ValasTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ValasTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ValasTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ValasTransactions
+    **/
+    _count?: true | ValasTransactionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ValasTransactionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ValasTransactionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ValasTransactionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ValasTransactionMaxAggregateInputType
+  }
+
+  export type GetValasTransactionAggregateType<T extends ValasTransactionAggregateArgs> = {
+        [P in keyof T & keyof AggregateValasTransaction]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateValasTransaction[P]>
+      : GetScalarType<T[P], AggregateValasTransaction[P]>
+  }
+
+
+
+
+  export type ValasTransactionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ValasTransactionWhereInput
+    orderBy?: ValasTransactionOrderByWithAggregationInput | ValasTransactionOrderByWithAggregationInput[]
+    by: ValasTransactionScalarFieldEnum[] | ValasTransactionScalarFieldEnum
+    having?: ValasTransactionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ValasTransactionCountAggregateInputType | true
+    _avg?: ValasTransactionAvgAggregateInputType
+    _sum?: ValasTransactionSumAggregateInputType
+    _min?: ValasTransactionMinAggregateInputType
+    _max?: ValasTransactionMaxAggregateInputType
+  }
+
+  export type ValasTransactionGroupByOutputType = {
+    id: string
+    companyId: string
+    branchId: string | null
+    invoiceNo: string
+    date: Date
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal
+    rate: Decimal
+    priceRate: Decimal | null
+    totalIdr: Decimal
+    customerName: string
+    customerPhone: string | null
+    customerIdType: $Enums.ValasCustomerIdType | null
+    customerIdNumber: string | null
+    customerAddress: string | null
+    paymentMethod: $Enums.ValasPaymentMethod
+    bankAccountId: string | null
+    note: string | null
+    status: $Enums.ValasTransactionStatus
+    voidedAt: Date | null
+    voidedBy: string | null
+    voidReason: string | null
+    createdBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ValasTransactionCountAggregateOutputType | null
+    _avg: ValasTransactionAvgAggregateOutputType | null
+    _sum: ValasTransactionSumAggregateOutputType | null
+    _min: ValasTransactionMinAggregateOutputType | null
+    _max: ValasTransactionMaxAggregateOutputType | null
+  }
+
+  type GetValasTransactionGroupByPayload<T extends ValasTransactionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ValasTransactionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ValasTransactionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ValasTransactionGroupByOutputType[P]>
+            : GetScalarType<T[P], ValasTransactionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ValasTransactionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    invoiceNo?: boolean
+    date?: boolean
+    type?: boolean
+    currencyId?: boolean
+    amount?: boolean
+    rate?: boolean
+    priceRate?: boolean
+    totalIdr?: boolean
+    customerName?: boolean
+    customerPhone?: boolean
+    customerIdType?: boolean
+    customerIdNumber?: boolean
+    customerAddress?: boolean
+    paymentMethod?: boolean
+    bankAccountId?: boolean
+    note?: boolean
+    status?: boolean
+    voidedAt?: boolean
+    voidedBy?: boolean
+    voidReason?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }, ExtArgs["result"]["valasTransaction"]>
+
+  export type ValasTransactionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    invoiceNo?: boolean
+    date?: boolean
+    type?: boolean
+    currencyId?: boolean
+    amount?: boolean
+    rate?: boolean
+    priceRate?: boolean
+    totalIdr?: boolean
+    customerName?: boolean
+    customerPhone?: boolean
+    customerIdType?: boolean
+    customerIdNumber?: boolean
+    customerAddress?: boolean
+    paymentMethod?: boolean
+    bankAccountId?: boolean
+    note?: boolean
+    status?: boolean
+    voidedAt?: boolean
+    voidedBy?: boolean
+    voidReason?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }, ExtArgs["result"]["valasTransaction"]>
+
+  export type ValasTransactionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    invoiceNo?: boolean
+    date?: boolean
+    type?: boolean
+    currencyId?: boolean
+    amount?: boolean
+    rate?: boolean
+    priceRate?: boolean
+    totalIdr?: boolean
+    customerName?: boolean
+    customerPhone?: boolean
+    customerIdType?: boolean
+    customerIdNumber?: boolean
+    customerAddress?: boolean
+    paymentMethod?: boolean
+    bankAccountId?: boolean
+    note?: boolean
+    status?: boolean
+    voidedAt?: boolean
+    voidedBy?: boolean
+    voidReason?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }, ExtArgs["result"]["valasTransaction"]>
+
+  export type ValasTransactionSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    invoiceNo?: boolean
+    date?: boolean
+    type?: boolean
+    currencyId?: boolean
+    amount?: boolean
+    rate?: boolean
+    priceRate?: boolean
+    totalIdr?: boolean
+    customerName?: boolean
+    customerPhone?: boolean
+    customerIdType?: boolean
+    customerIdNumber?: boolean
+    customerAddress?: boolean
+    paymentMethod?: boolean
+    bankAccountId?: boolean
+    note?: boolean
+    status?: boolean
+    voidedAt?: boolean
+    voidedBy?: boolean
+    voidReason?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ValasTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "branchId" | "invoiceNo" | "date" | "type" | "currencyId" | "amount" | "rate" | "priceRate" | "totalIdr" | "customerName" | "customerPhone" | "customerIdType" | "customerIdNumber" | "customerAddress" | "paymentMethod" | "bankAccountId" | "note" | "status" | "voidedAt" | "voidedBy" | "voidReason" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["valasTransaction"]>
+  export type ValasTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }
+  export type ValasTransactionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }
+  export type ValasTransactionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    branch?: boolean | ValasTransaction$branchArgs<ExtArgs>
+    currency?: boolean | CurrencyDefaultArgs<ExtArgs>
+    bankAccount?: boolean | ValasTransaction$bankAccountArgs<ExtArgs>
+  }
+
+  export type $ValasTransactionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ValasTransaction"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs> | null
+      currency: Prisma.$CurrencyPayload<ExtArgs>
+      bankAccount: Prisma.$BankAccountPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      branchId: string | null
+      invoiceNo: string
+      date: Date
+      type: $Enums.ValasTransactionType
+      currencyId: string
+      amount: Prisma.Decimal
+      rate: Prisma.Decimal
+      priceRate: Prisma.Decimal | null
+      totalIdr: Prisma.Decimal
+      customerName: string
+      customerPhone: string | null
+      customerIdType: $Enums.ValasCustomerIdType | null
+      customerIdNumber: string | null
+      customerAddress: string | null
+      paymentMethod: $Enums.ValasPaymentMethod
+      bankAccountId: string | null
+      note: string | null
+      status: $Enums.ValasTransactionStatus
+      voidedAt: Date | null
+      voidedBy: string | null
+      voidReason: string | null
+      createdBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["valasTransaction"]>
+    composites: {}
+  }
+
+  type ValasTransactionGetPayload<S extends boolean | null | undefined | ValasTransactionDefaultArgs> = $Result.GetResult<Prisma.$ValasTransactionPayload, S>
+
+  type ValasTransactionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ValasTransactionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ValasTransactionCountAggregateInputType | true
+    }
+
+  export interface ValasTransactionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ValasTransaction'], meta: { name: 'ValasTransaction' } }
+    /**
+     * Find zero or one ValasTransaction that matches the filter.
+     * @param {ValasTransactionFindUniqueArgs} args - Arguments to find a ValasTransaction
+     * @example
+     * // Get one ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ValasTransactionFindUniqueArgs>(args: SelectSubset<T, ValasTransactionFindUniqueArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ValasTransaction that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ValasTransactionFindUniqueOrThrowArgs} args - Arguments to find a ValasTransaction
+     * @example
+     * // Get one ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ValasTransactionFindUniqueOrThrowArgs>(args: SelectSubset<T, ValasTransactionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ValasTransaction that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionFindFirstArgs} args - Arguments to find a ValasTransaction
+     * @example
+     * // Get one ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ValasTransactionFindFirstArgs>(args?: SelectSubset<T, ValasTransactionFindFirstArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ValasTransaction that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionFindFirstOrThrowArgs} args - Arguments to find a ValasTransaction
+     * @example
+     * // Get one ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ValasTransactionFindFirstOrThrowArgs>(args?: SelectSubset<T, ValasTransactionFindFirstOrThrowArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ValasTransactions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ValasTransactions
+     * const valasTransactions = await prisma.valasTransaction.findMany()
+     * 
+     * // Get first 10 ValasTransactions
+     * const valasTransactions = await prisma.valasTransaction.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const valasTransactionWithIdOnly = await prisma.valasTransaction.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ValasTransactionFindManyArgs>(args?: SelectSubset<T, ValasTransactionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ValasTransaction.
+     * @param {ValasTransactionCreateArgs} args - Arguments to create a ValasTransaction.
+     * @example
+     * // Create one ValasTransaction
+     * const ValasTransaction = await prisma.valasTransaction.create({
+     *   data: {
+     *     // ... data to create a ValasTransaction
+     *   }
+     * })
+     * 
+     */
+    create<T extends ValasTransactionCreateArgs>(args: SelectSubset<T, ValasTransactionCreateArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ValasTransactions.
+     * @param {ValasTransactionCreateManyArgs} args - Arguments to create many ValasTransactions.
+     * @example
+     * // Create many ValasTransactions
+     * const valasTransaction = await prisma.valasTransaction.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ValasTransactionCreateManyArgs>(args?: SelectSubset<T, ValasTransactionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ValasTransactions and returns the data saved in the database.
+     * @param {ValasTransactionCreateManyAndReturnArgs} args - Arguments to create many ValasTransactions.
+     * @example
+     * // Create many ValasTransactions
+     * const valasTransaction = await prisma.valasTransaction.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ValasTransactions and only return the `id`
+     * const valasTransactionWithIdOnly = await prisma.valasTransaction.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ValasTransactionCreateManyAndReturnArgs>(args?: SelectSubset<T, ValasTransactionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ValasTransaction.
+     * @param {ValasTransactionDeleteArgs} args - Arguments to delete one ValasTransaction.
+     * @example
+     * // Delete one ValasTransaction
+     * const ValasTransaction = await prisma.valasTransaction.delete({
+     *   where: {
+     *     // ... filter to delete one ValasTransaction
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ValasTransactionDeleteArgs>(args: SelectSubset<T, ValasTransactionDeleteArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ValasTransaction.
+     * @param {ValasTransactionUpdateArgs} args - Arguments to update one ValasTransaction.
+     * @example
+     * // Update one ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ValasTransactionUpdateArgs>(args: SelectSubset<T, ValasTransactionUpdateArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ValasTransactions.
+     * @param {ValasTransactionDeleteManyArgs} args - Arguments to filter ValasTransactions to delete.
+     * @example
+     * // Delete a few ValasTransactions
+     * const { count } = await prisma.valasTransaction.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ValasTransactionDeleteManyArgs>(args?: SelectSubset<T, ValasTransactionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ValasTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ValasTransactions
+     * const valasTransaction = await prisma.valasTransaction.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ValasTransactionUpdateManyArgs>(args: SelectSubset<T, ValasTransactionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ValasTransactions and returns the data updated in the database.
+     * @param {ValasTransactionUpdateManyAndReturnArgs} args - Arguments to update many ValasTransactions.
+     * @example
+     * // Update many ValasTransactions
+     * const valasTransaction = await prisma.valasTransaction.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ValasTransactions and only return the `id`
+     * const valasTransactionWithIdOnly = await prisma.valasTransaction.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ValasTransactionUpdateManyAndReturnArgs>(args: SelectSubset<T, ValasTransactionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ValasTransaction.
+     * @param {ValasTransactionUpsertArgs} args - Arguments to update or create a ValasTransaction.
+     * @example
+     * // Update or create a ValasTransaction
+     * const valasTransaction = await prisma.valasTransaction.upsert({
+     *   create: {
+     *     // ... data to create a ValasTransaction
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ValasTransaction we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ValasTransactionUpsertArgs>(args: SelectSubset<T, ValasTransactionUpsertArgs<ExtArgs>>): Prisma__ValasTransactionClient<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ValasTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionCountArgs} args - Arguments to filter ValasTransactions to count.
+     * @example
+     * // Count the number of ValasTransactions
+     * const count = await prisma.valasTransaction.count({
+     *   where: {
+     *     // ... the filter for the ValasTransactions we want to count
+     *   }
+     * })
+    **/
+    count<T extends ValasTransactionCountArgs>(
+      args?: Subset<T, ValasTransactionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ValasTransactionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ValasTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ValasTransactionAggregateArgs>(args: Subset<T, ValasTransactionAggregateArgs>): Prisma.PrismaPromise<GetValasTransactionAggregateType<T>>
+
+    /**
+     * Group by ValasTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ValasTransactionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ValasTransactionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ValasTransactionGroupByArgs['orderBy'] }
+        : { orderBy?: ValasTransactionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ValasTransactionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetValasTransactionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ValasTransaction model
+   */
+  readonly fields: ValasTransactionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ValasTransaction.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ValasTransactionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends ValasTransaction$branchArgs<ExtArgs> = {}>(args?: Subset<T, ValasTransaction$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    currency<T extends CurrencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CurrencyDefaultArgs<ExtArgs>>): Prisma__CurrencyClient<$Result.GetResult<Prisma.$CurrencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    bankAccount<T extends ValasTransaction$bankAccountArgs<ExtArgs> = {}>(args?: Subset<T, ValasTransaction$bankAccountArgs<ExtArgs>>): Prisma__BankAccountClient<$Result.GetResult<Prisma.$BankAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ValasTransaction model
+   */
+  interface ValasTransactionFieldRefs {
+    readonly id: FieldRef<"ValasTransaction", 'String'>
+    readonly companyId: FieldRef<"ValasTransaction", 'String'>
+    readonly branchId: FieldRef<"ValasTransaction", 'String'>
+    readonly invoiceNo: FieldRef<"ValasTransaction", 'String'>
+    readonly date: FieldRef<"ValasTransaction", 'DateTime'>
+    readonly type: FieldRef<"ValasTransaction", 'ValasTransactionType'>
+    readonly currencyId: FieldRef<"ValasTransaction", 'String'>
+    readonly amount: FieldRef<"ValasTransaction", 'Decimal'>
+    readonly rate: FieldRef<"ValasTransaction", 'Decimal'>
+    readonly priceRate: FieldRef<"ValasTransaction", 'Decimal'>
+    readonly totalIdr: FieldRef<"ValasTransaction", 'Decimal'>
+    readonly customerName: FieldRef<"ValasTransaction", 'String'>
+    readonly customerPhone: FieldRef<"ValasTransaction", 'String'>
+    readonly customerIdType: FieldRef<"ValasTransaction", 'ValasCustomerIdType'>
+    readonly customerIdNumber: FieldRef<"ValasTransaction", 'String'>
+    readonly customerAddress: FieldRef<"ValasTransaction", 'String'>
+    readonly paymentMethod: FieldRef<"ValasTransaction", 'ValasPaymentMethod'>
+    readonly bankAccountId: FieldRef<"ValasTransaction", 'String'>
+    readonly note: FieldRef<"ValasTransaction", 'String'>
+    readonly status: FieldRef<"ValasTransaction", 'ValasTransactionStatus'>
+    readonly voidedAt: FieldRef<"ValasTransaction", 'DateTime'>
+    readonly voidedBy: FieldRef<"ValasTransaction", 'String'>
+    readonly voidReason: FieldRef<"ValasTransaction", 'String'>
+    readonly createdBy: FieldRef<"ValasTransaction", 'String'>
+    readonly createdAt: FieldRef<"ValasTransaction", 'DateTime'>
+    readonly updatedAt: FieldRef<"ValasTransaction", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ValasTransaction findUnique
+   */
+  export type ValasTransactionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which ValasTransaction to fetch.
+     */
+    where: ValasTransactionWhereUniqueInput
+  }
+
+  /**
+   * ValasTransaction findUniqueOrThrow
+   */
+  export type ValasTransactionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which ValasTransaction to fetch.
+     */
+    where: ValasTransactionWhereUniqueInput
+  }
+
+  /**
+   * ValasTransaction findFirst
+   */
+  export type ValasTransactionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which ValasTransaction to fetch.
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ValasTransactions to fetch.
+     */
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ValasTransactions.
+     */
+    cursor?: ValasTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ValasTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ValasTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ValasTransactions.
+     */
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * ValasTransaction findFirstOrThrow
+   */
+  export type ValasTransactionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which ValasTransaction to fetch.
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ValasTransactions to fetch.
+     */
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ValasTransactions.
+     */
+    cursor?: ValasTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ValasTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ValasTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ValasTransactions.
+     */
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * ValasTransaction findMany
+   */
+  export type ValasTransactionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which ValasTransactions to fetch.
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ValasTransactions to fetch.
+     */
+    orderBy?: ValasTransactionOrderByWithRelationInput | ValasTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ValasTransactions.
+     */
+    cursor?: ValasTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ValasTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ValasTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ValasTransactions.
+     */
+    distinct?: ValasTransactionScalarFieldEnum | ValasTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * ValasTransaction create
+   */
+  export type ValasTransactionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ValasTransaction.
+     */
+    data: XOR<ValasTransactionCreateInput, ValasTransactionUncheckedCreateInput>
+  }
+
+  /**
+   * ValasTransaction createMany
+   */
+  export type ValasTransactionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ValasTransactions.
+     */
+    data: ValasTransactionCreateManyInput | ValasTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ValasTransaction createManyAndReturn
+   */
+  export type ValasTransactionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * The data used to create many ValasTransactions.
+     */
+    data: ValasTransactionCreateManyInput | ValasTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ValasTransaction update
+   */
+  export type ValasTransactionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ValasTransaction.
+     */
+    data: XOR<ValasTransactionUpdateInput, ValasTransactionUncheckedUpdateInput>
+    /**
+     * Choose, which ValasTransaction to update.
+     */
+    where: ValasTransactionWhereUniqueInput
+  }
+
+  /**
+   * ValasTransaction updateMany
+   */
+  export type ValasTransactionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ValasTransactions.
+     */
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyInput>
+    /**
+     * Filter which ValasTransactions to update
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * Limit how many ValasTransactions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ValasTransaction updateManyAndReturn
+   */
+  export type ValasTransactionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * The data used to update ValasTransactions.
+     */
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyInput>
+    /**
+     * Filter which ValasTransactions to update
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * Limit how many ValasTransactions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ValasTransaction upsert
+   */
+  export type ValasTransactionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ValasTransaction to update in case it exists.
+     */
+    where: ValasTransactionWhereUniqueInput
+    /**
+     * In case the ValasTransaction found by the `where` argument doesn't exist, create a new ValasTransaction with this data.
+     */
+    create: XOR<ValasTransactionCreateInput, ValasTransactionUncheckedCreateInput>
+    /**
+     * In case the ValasTransaction was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ValasTransactionUpdateInput, ValasTransactionUncheckedUpdateInput>
+  }
+
+  /**
+   * ValasTransaction delete
+   */
+  export type ValasTransactionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+    /**
+     * Filter which ValasTransaction to delete.
+     */
+    where: ValasTransactionWhereUniqueInput
+  }
+
+  /**
+   * ValasTransaction deleteMany
+   */
+  export type ValasTransactionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ValasTransactions to delete
+     */
+    where?: ValasTransactionWhereInput
+    /**
+     * Limit how many ValasTransactions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ValasTransaction.branch
+   */
+  export type ValasTransaction$branchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
+  }
+
+  /**
+   * ValasTransaction.bankAccount
+   */
+  export type ValasTransaction$bankAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankAccount
+     */
+    select?: BankAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BankAccount
+     */
+    omit?: BankAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankAccountInclude<ExtArgs> | null
+    where?: BankAccountWhereInput
+  }
+
+  /**
+   * ValasTransaction without action
+   */
+  export type ValasTransactionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ValasTransaction
+     */
+    select?: ValasTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ValasTransaction
+     */
+    omit?: ValasTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ValasTransactionInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -71640,6 +74424,18 @@ export namespace Prisma {
   };
 
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+  export const PublicHolidayScalarFieldEnum: {
+    id: 'id',
+    date: 'date',
+    name: 'name',
+    isJointLeave: 'isJointLeave',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PublicHolidayScalarFieldEnum = (typeof PublicHolidayScalarFieldEnum)[keyof typeof PublicHolidayScalarFieldEnum]
 
 
   export const AttendanceScalarFieldEnum: {
@@ -71727,10 +74523,6 @@ export namespace Prisma {
     phone: 'phone',
     branchId: 'branchId',
     baseSalary: 'baseSalary',
-    mealAllowance: 'mealAllowance',
-    transportAllowance: 'transportAllowance',
-    positionAllowance: 'positionAllowance',
-    bpjsKesehatan: 'bpjsKesehatan',
     joinDate: 'joinDate',
     employmentStatus: 'employmentStatus',
     contractStartDate: 'contractStartDate',
@@ -72549,6 +75341,38 @@ export namespace Prisma {
   export type CorrectionRequestScalarFieldEnum = (typeof CorrectionRequestScalarFieldEnum)[keyof typeof CorrectionRequestScalarFieldEnum]
 
 
+  export const ValasTransactionScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    branchId: 'branchId',
+    invoiceNo: 'invoiceNo',
+    date: 'date',
+    type: 'type',
+    currencyId: 'currencyId',
+    amount: 'amount',
+    rate: 'rate',
+    priceRate: 'priceRate',
+    totalIdr: 'totalIdr',
+    customerName: 'customerName',
+    customerPhone: 'customerPhone',
+    customerIdType: 'customerIdType',
+    customerIdNumber: 'customerIdNumber',
+    customerAddress: 'customerAddress',
+    paymentMethod: 'paymentMethod',
+    bankAccountId: 'bankAccountId',
+    note: 'note',
+    status: 'status',
+    voidedAt: 'voidedAt',
+    voidedBy: 'voidedBy',
+    voidReason: 'voidReason',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ValasTransactionScalarFieldEnum = (typeof ValasTransactionScalarFieldEnum)[keyof typeof ValasTransactionScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -72631,6 +75455,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -72641,13 +75472,6 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -73139,10 +75963,123 @@ export namespace Prisma {
    */
   export type ListEnumCorrectionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CorrectionStatus[]'>
     
+
+
+  /**
+   * Reference to a field of type 'ValasTransactionType'
+   */
+  export type EnumValasTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasTransactionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasTransactionType[]'
+   */
+  export type ListEnumValasTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasTransactionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasCustomerIdType'
+   */
+  export type EnumValasCustomerIdTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasCustomerIdType'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasCustomerIdType[]'
+   */
+  export type ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasCustomerIdType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasPaymentMethod'
+   */
+  export type EnumValasPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasPaymentMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasPaymentMethod[]'
+   */
+  export type ListEnumValasPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasPaymentMethod[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasTransactionStatus'
+   */
+  export type EnumValasTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasTransactionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ValasTransactionStatus[]'
+   */
+  export type ListEnumValasTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ValasTransactionStatus[]'>
+    
   /**
    * Deep Input Types
    */
 
+
+  export type PublicHolidayWhereInput = {
+    AND?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    OR?: PublicHolidayWhereInput[]
+    NOT?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    id?: StringFilter<"PublicHoliday"> | string
+    date?: DateTimeFilter<"PublicHoliday"> | Date | string
+    name?: StringFilter<"PublicHoliday"> | string
+    isJointLeave?: BoolFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+  }
+
+  export type PublicHolidayOrderByWithRelationInput = {
+    id?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    isJointLeave?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidayWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    date?: Date | string
+    AND?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    OR?: PublicHolidayWhereInput[]
+    NOT?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    name?: StringFilter<"PublicHoliday"> | string
+    isJointLeave?: BoolFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+  }, "id" | "date">
+
+  export type PublicHolidayOrderByWithAggregationInput = {
+    id?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    isJointLeave?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PublicHolidayCountOrderByAggregateInput
+    _max?: PublicHolidayMaxOrderByAggregateInput
+    _min?: PublicHolidayMinOrderByAggregateInput
+  }
+
+  export type PublicHolidayScalarWhereWithAggregatesInput = {
+    AND?: PublicHolidayScalarWhereWithAggregatesInput | PublicHolidayScalarWhereWithAggregatesInput[]
+    OR?: PublicHolidayScalarWhereWithAggregatesInput[]
+    NOT?: PublicHolidayScalarWhereWithAggregatesInput | PublicHolidayScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PublicHoliday"> | string
+    date?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+    name?: StringWithAggregatesFilter<"PublicHoliday"> | string
+    isJointLeave?: BoolWithAggregatesFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+  }
 
   export type AttendanceWhereInput = {
     AND?: AttendanceWhereInput | AttendanceWhereInput[]
@@ -73550,10 +76487,6 @@ export namespace Prisma {
     phone?: StringNullableFilter<"user"> | string | null
     branchId?: StringNullableFilter<"user"> | string | null
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     employmentStatus?: EnumEmploymentStatusFilter<"user"> | $Enums.EmploymentStatus
     contractStartDate?: DateTimeNullableFilter<"user"> | Date | string | null
@@ -73592,10 +76525,6 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     branchId?: SortOrderInput | SortOrder
     baseSalary?: SortOrderInput | SortOrder
-    mealAllowance?: SortOrderInput | SortOrder
-    transportAllowance?: SortOrderInput | SortOrder
-    positionAllowance?: SortOrderInput | SortOrder
-    bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     employmentStatus?: SortOrder
     contractStartDate?: SortOrderInput | SortOrder
@@ -73637,10 +76566,6 @@ export namespace Prisma {
     phone?: StringNullableFilter<"user"> | string | null
     branchId?: StringNullableFilter<"user"> | string | null
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     employmentStatus?: EnumEmploymentStatusFilter<"user"> | $Enums.EmploymentStatus
     contractStartDate?: DateTimeNullableFilter<"user"> | Date | string | null
@@ -73679,10 +76604,6 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     branchId?: SortOrderInput | SortOrder
     baseSalary?: SortOrderInput | SortOrder
-    mealAllowance?: SortOrderInput | SortOrder
-    transportAllowance?: SortOrderInput | SortOrder
-    positionAllowance?: SortOrderInput | SortOrder
-    bpjsKesehatan?: SortOrderInput | SortOrder
     joinDate?: SortOrderInput | SortOrder
     employmentStatus?: SortOrder
     contractStartDate?: SortOrderInput | SortOrder
@@ -73710,10 +76631,6 @@ export namespace Prisma {
     phone?: StringNullableWithAggregatesFilter<"user"> | string | null
     branchId?: StringNullableWithAggregatesFilter<"user"> | string | null
     baseSalary?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: DecimalNullableWithAggregatesFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableWithAggregatesFilter<"user"> | Date | string | null
     employmentStatus?: EnumEmploymentStatusWithAggregatesFilter<"user"> | $Enums.EmploymentStatus
     contractStartDate?: DateTimeNullableWithAggregatesFilter<"user"> | Date | string | null
@@ -73875,6 +76792,7 @@ export namespace Prisma {
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
     mutations?: BankMutationListRelationFilter
     dailyEntries?: DailyBankEntryListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }
 
   export type BankAccountOrderByWithRelationInput = {
@@ -73894,6 +76812,7 @@ export namespace Prisma {
     currency?: CurrencyOrderByWithRelationInput
     mutations?: BankMutationOrderByRelationAggregateInput
     dailyEntries?: DailyBankEntryOrderByRelationAggregateInput
+    valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
 
   export type BankAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -73916,6 +76835,7 @@ export namespace Prisma {
     currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
     mutations?: BankMutationListRelationFilter
     dailyEntries?: DailyBankEntryListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }, "id">
 
   export type BankAccountOrderByWithAggregationInput = {
@@ -74143,6 +77063,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }
 
   export type BranchOrderByWithRelationInput = {
@@ -74164,6 +77085,7 @@ export namespace Prisma {
     users?: userOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
     payrollSlips?: PayrollSlipOrderByRelationAggregateInput
+    valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
 
   export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -74188,6 +77110,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }, "id">
 
   export type BranchOrderByWithAggregationInput = {
@@ -74252,6 +77175,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestListRelationFilter
     heldFunds?: HeldFundListRelationFilter
     payrollRuns?: PayrollRunListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }
 
   export type CompanyOrderByWithRelationInput = {
@@ -74277,6 +77201,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestOrderByRelationAggregateInput
     heldFunds?: HeldFundOrderByRelationAggregateInput
     payrollRuns?: PayrollRunOrderByRelationAggregateInput
+    valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
 
   export type CompanyWhereUniqueInput = Prisma.AtLeast<{
@@ -74305,6 +77230,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestListRelationFilter
     heldFunds?: HeldFundListRelationFilter
     payrollRuns?: PayrollRunListRelationFilter
+    valasTransactions?: ValasTransactionListRelationFilter
   }, "id" | "name" | "code">
 
   export type CompanyOrderByWithAggregationInput = {
@@ -74346,6 +77272,7 @@ export namespace Prisma {
     stocks?: CurrencyStockListRelationFilter
     stockMutations?: StockMutationListRelationFilter
     price?: XOR<CurrencyPriceNullableScalarRelationFilter, CurrencyPriceWhereInput> | null
+    valasTransactions?: ValasTransactionListRelationFilter
   }
 
   export type CurrencyOrderByWithRelationInput = {
@@ -74360,6 +77287,7 @@ export namespace Prisma {
     stocks?: CurrencyStockOrderByRelationAggregateInput
     stockMutations?: StockMutationOrderByRelationAggregateInput
     price?: CurrencyPriceOrderByWithRelationInput
+    valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
 
   export type CurrencyWhereUniqueInput = Prisma.AtLeast<{
@@ -74377,6 +77305,7 @@ export namespace Prisma {
     stocks?: CurrencyStockListRelationFilter
     stockMutations?: StockMutationListRelationFilter
     price?: XOR<CurrencyPriceNullableScalarRelationFilter, CurrencyPriceWhereInput> | null
+    valasTransactions?: ValasTransactionListRelationFilter
   }, "id" | "code">
 
   export type CurrencyOrderByWithAggregationInput = {
@@ -78038,6 +80967,241 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"CorrectionRequest"> | Date | string
   }
 
+  export type ValasTransactionWhereInput = {
+    AND?: ValasTransactionWhereInput | ValasTransactionWhereInput[]
+    OR?: ValasTransactionWhereInput[]
+    NOT?: ValasTransactionWhereInput | ValasTransactionWhereInput[]
+    id?: StringFilter<"ValasTransaction"> | string
+    companyId?: StringFilter<"ValasTransaction"> | string
+    branchId?: StringNullableFilter<"ValasTransaction"> | string | null
+    invoiceNo?: StringFilter<"ValasTransaction"> | string
+    date?: DateTimeFilter<"ValasTransaction"> | Date | string
+    type?: EnumValasTransactionTypeFilter<"ValasTransaction"> | $Enums.ValasTransactionType
+    currencyId?: StringFilter<"ValasTransaction"> | string
+    amount?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    priceRate?: DecimalNullableFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    customerName?: StringFilter<"ValasTransaction"> | string
+    customerPhone?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerIdType?: EnumValasCustomerIdTypeNullableFilter<"ValasTransaction"> | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerAddress?: StringNullableFilter<"ValasTransaction"> | string | null
+    paymentMethod?: EnumValasPaymentMethodFilter<"ValasTransaction"> | $Enums.ValasPaymentMethod
+    bankAccountId?: StringNullableFilter<"ValasTransaction"> | string | null
+    note?: StringNullableFilter<"ValasTransaction"> | string | null
+    status?: EnumValasTransactionStatusFilter<"ValasTransaction"> | $Enums.ValasTransactionStatus
+    voidedAt?: DateTimeNullableFilter<"ValasTransaction"> | Date | string | null
+    voidedBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    voidReason?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+    updatedAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
+    bankAccount?: XOR<BankAccountNullableScalarRelationFilter, BankAccountWhereInput> | null
+  }
+
+  export type ValasTransactionOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
+    invoiceNo?: SortOrder
+    date?: SortOrder
+    type?: SortOrder
+    currencyId?: SortOrder
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrderInput | SortOrder
+    totalIdr?: SortOrder
+    customerName?: SortOrder
+    customerPhone?: SortOrderInput | SortOrder
+    customerIdType?: SortOrderInput | SortOrder
+    customerIdNumber?: SortOrderInput | SortOrder
+    customerAddress?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrder
+    bankAccountId?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    status?: SortOrder
+    voidedAt?: SortOrderInput | SortOrder
+    voidedBy?: SortOrderInput | SortOrder
+    voidReason?: SortOrderInput | SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+    branch?: BranchOrderByWithRelationInput
+    currency?: CurrencyOrderByWithRelationInput
+    bankAccount?: BankAccountOrderByWithRelationInput
+  }
+
+  export type ValasTransactionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    companyId_invoiceNo?: ValasTransactionCompanyIdInvoiceNoCompoundUniqueInput
+    AND?: ValasTransactionWhereInput | ValasTransactionWhereInput[]
+    OR?: ValasTransactionWhereInput[]
+    NOT?: ValasTransactionWhereInput | ValasTransactionWhereInput[]
+    companyId?: StringFilter<"ValasTransaction"> | string
+    branchId?: StringNullableFilter<"ValasTransaction"> | string | null
+    invoiceNo?: StringFilter<"ValasTransaction"> | string
+    date?: DateTimeFilter<"ValasTransaction"> | Date | string
+    type?: EnumValasTransactionTypeFilter<"ValasTransaction"> | $Enums.ValasTransactionType
+    currencyId?: StringFilter<"ValasTransaction"> | string
+    amount?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    priceRate?: DecimalNullableFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    customerName?: StringFilter<"ValasTransaction"> | string
+    customerPhone?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerIdType?: EnumValasCustomerIdTypeNullableFilter<"ValasTransaction"> | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerAddress?: StringNullableFilter<"ValasTransaction"> | string | null
+    paymentMethod?: EnumValasPaymentMethodFilter<"ValasTransaction"> | $Enums.ValasPaymentMethod
+    bankAccountId?: StringNullableFilter<"ValasTransaction"> | string | null
+    note?: StringNullableFilter<"ValasTransaction"> | string | null
+    status?: EnumValasTransactionStatusFilter<"ValasTransaction"> | $Enums.ValasTransactionStatus
+    voidedAt?: DateTimeNullableFilter<"ValasTransaction"> | Date | string | null
+    voidedBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    voidReason?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+    updatedAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    currency?: XOR<CurrencyScalarRelationFilter, CurrencyWhereInput>
+    bankAccount?: XOR<BankAccountNullableScalarRelationFilter, BankAccountWhereInput> | null
+  }, "id" | "companyId_invoiceNo">
+
+  export type ValasTransactionOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrderInput | SortOrder
+    invoiceNo?: SortOrder
+    date?: SortOrder
+    type?: SortOrder
+    currencyId?: SortOrder
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrderInput | SortOrder
+    totalIdr?: SortOrder
+    customerName?: SortOrder
+    customerPhone?: SortOrderInput | SortOrder
+    customerIdType?: SortOrderInput | SortOrder
+    customerIdNumber?: SortOrderInput | SortOrder
+    customerAddress?: SortOrderInput | SortOrder
+    paymentMethod?: SortOrder
+    bankAccountId?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
+    status?: SortOrder
+    voidedAt?: SortOrderInput | SortOrder
+    voidedBy?: SortOrderInput | SortOrder
+    voidReason?: SortOrderInput | SortOrder
+    createdBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ValasTransactionCountOrderByAggregateInput
+    _avg?: ValasTransactionAvgOrderByAggregateInput
+    _max?: ValasTransactionMaxOrderByAggregateInput
+    _min?: ValasTransactionMinOrderByAggregateInput
+    _sum?: ValasTransactionSumOrderByAggregateInput
+  }
+
+  export type ValasTransactionScalarWhereWithAggregatesInput = {
+    AND?: ValasTransactionScalarWhereWithAggregatesInput | ValasTransactionScalarWhereWithAggregatesInput[]
+    OR?: ValasTransactionScalarWhereWithAggregatesInput[]
+    NOT?: ValasTransactionScalarWhereWithAggregatesInput | ValasTransactionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ValasTransaction"> | string
+    companyId?: StringWithAggregatesFilter<"ValasTransaction"> | string
+    branchId?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    invoiceNo?: StringWithAggregatesFilter<"ValasTransaction"> | string
+    date?: DateTimeWithAggregatesFilter<"ValasTransaction"> | Date | string
+    type?: EnumValasTransactionTypeWithAggregatesFilter<"ValasTransaction"> | $Enums.ValasTransactionType
+    currencyId?: StringWithAggregatesFilter<"ValasTransaction"> | string
+    amount?: DecimalWithAggregatesFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    rate?: DecimalWithAggregatesFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    priceRate?: DecimalNullableWithAggregatesFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalWithAggregatesFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    customerName?: StringWithAggregatesFilter<"ValasTransaction"> | string
+    customerPhone?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    customerIdType?: EnumValasCustomerIdTypeNullableWithAggregatesFilter<"ValasTransaction"> | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    customerAddress?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    paymentMethod?: EnumValasPaymentMethodWithAggregatesFilter<"ValasTransaction"> | $Enums.ValasPaymentMethod
+    bankAccountId?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    note?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    status?: EnumValasTransactionStatusWithAggregatesFilter<"ValasTransaction"> | $Enums.ValasTransactionStatus
+    voidedAt?: DateTimeNullableWithAggregatesFilter<"ValasTransaction"> | Date | string | null
+    voidedBy?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    voidReason?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    createdBy?: StringNullableWithAggregatesFilter<"ValasTransaction"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ValasTransaction"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ValasTransaction"> | Date | string
+  }
+
+  export type PublicHolidayCreateInput = {
+    id?: string
+    date: Date | string
+    name: string
+    isJointLeave?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayUncheckedCreateInput = {
+    id?: string
+    date: Date | string
+    name: string
+    isJointLeave?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    isJointLeave?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    isJointLeave?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayCreateManyInput = {
+    id?: string
+    date: Date | string
+    name: string
+    isJointLeave?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    isJointLeave?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    name?: StringFieldUpdateOperationsInput | string
+    isJointLeave?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AttendanceCreateInput = {
     id?: string
     date: Date | string
@@ -78492,10 +81656,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -78533,10 +81693,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -78572,10 +81728,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -78613,10 +81765,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -78653,10 +81801,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -78675,10 +81819,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -78697,10 +81837,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -78870,6 +82006,7 @@ export namespace Prisma {
     currency: CurrencyCreateNestedOneWithoutBankAccountsInput
     mutations?: BankMutationCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateInput = {
@@ -78887,6 +82024,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     mutations?: BankMutationUncheckedCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryUncheckedCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUpdateInput = {
@@ -78904,6 +82042,7 @@ export namespace Prisma {
     currency?: CurrencyUpdateOneRequiredWithoutBankAccountsNestedInput
     mutations?: BankMutationUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateInput = {
@@ -78921,6 +82060,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mutations?: BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUncheckedUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountCreateManyInput = {
@@ -79164,6 +82304,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateInput = {
@@ -79184,6 +82325,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUpdateInput = {
@@ -79204,6 +82346,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateInput = {
@@ -79224,6 +82367,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchCreateManyInput = {
@@ -79290,6 +82434,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateInput = {
@@ -79315,6 +82460,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUpdateInput = {
@@ -79340,6 +82486,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateInput = {
@@ -79365,6 +82512,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateManyInput = {
@@ -79406,6 +82554,7 @@ export namespace Prisma {
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateInput = {
@@ -79420,6 +82569,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUpdateInput = {
@@ -79434,6 +82584,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateInput = {
@@ -79448,6 +82599,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyCreateManyInput = {
@@ -83481,6 +86633,205 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ValasTransactionCreateInput = {
+    id?: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutValasTransactionsInput
+    branch?: BranchCreateNestedOneWithoutValasTransactionsInput
+    currency: CurrencyCreateNestedOneWithoutValasTransactionsInput
+    bankAccount?: BankAccountCreateNestedOneWithoutValasTransactionsInput
+  }
+
+  export type ValasTransactionUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    branch?: BranchUpdateOneWithoutValasTransactionsNestedInput
+    currency?: CurrencyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    bankAccount?: BankAccountUpdateOneWithoutValasTransactionsNestedInput
+  }
+
+  export type ValasTransactionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionCreateManyInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -83496,6 +86847,89 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type PublicHolidayCountOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    isJointLeave?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidayMaxOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    isJointLeave?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidayMinOrderByAggregateInput = {
+    id?: SortOrder
+    date?: SortOrder
+    name?: SortOrder
+    isJointLeave?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -83509,17 +86943,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -83542,11 +86965,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type EnumAttendanceStatusFilter<$PrismaModel = never> = {
@@ -83664,24 +87082,6 @@ export namespace Prisma {
     checkInManualLng?: SortOrder
   }
 
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -83698,20 +87098,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -83742,14 +87128,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumAttendanceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -84067,10 +87445,6 @@ export namespace Prisma {
     phone?: SortOrder
     branchId?: SortOrder
     baseSalary?: SortOrder
-    mealAllowance?: SortOrder
-    transportAllowance?: SortOrder
-    positionAllowance?: SortOrder
-    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     employmentStatus?: SortOrder
     contractStartDate?: SortOrder
@@ -84081,10 +87455,6 @@ export namespace Prisma {
 
   export type userAvgOrderByAggregateInput = {
     baseSalary?: SortOrder
-    mealAllowance?: SortOrder
-    transportAllowance?: SortOrder
-    positionAllowance?: SortOrder
-    bpjsKesehatan?: SortOrder
   }
 
   export type userMaxOrderByAggregateInput = {
@@ -84098,10 +87468,6 @@ export namespace Prisma {
     phone?: SortOrder
     branchId?: SortOrder
     baseSalary?: SortOrder
-    mealAllowance?: SortOrder
-    transportAllowance?: SortOrder
-    positionAllowance?: SortOrder
-    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     employmentStatus?: SortOrder
     contractStartDate?: SortOrder
@@ -84121,10 +87487,6 @@ export namespace Prisma {
     phone?: SortOrder
     branchId?: SortOrder
     baseSalary?: SortOrder
-    mealAllowance?: SortOrder
-    transportAllowance?: SortOrder
-    positionAllowance?: SortOrder
-    bpjsKesehatan?: SortOrder
     joinDate?: SortOrder
     employmentStatus?: SortOrder
     contractStartDate?: SortOrder
@@ -84135,10 +87497,6 @@ export namespace Prisma {
 
   export type userSumOrderByAggregateInput = {
     baseSalary?: SortOrder
-    mealAllowance?: SortOrder
-    transportAllowance?: SortOrder
-    positionAllowance?: SortOrder
-    bpjsKesehatan?: SortOrder
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -84297,11 +87655,21 @@ export namespace Prisma {
     none?: DailyBankEntryWhereInput
   }
 
+  export type ValasTransactionListRelationFilter = {
+    every?: ValasTransactionWhereInput
+    some?: ValasTransactionWhereInput
+    none?: ValasTransactionWhereInput
+  }
+
   export type BankMutationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type DailyBankEntryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ValasTransactionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -87795,6 +91163,197 @@ export namespace Prisma {
     _max?: NestedEnumCorrectionStatusFilter<$PrismaModel>
   }
 
+  export type EnumValasTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionType | EnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionTypeFilter<$PrismaModel> | $Enums.ValasTransactionType
+  }
+
+  export type EnumValasCustomerIdTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasCustomerIdType | EnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel> | $Enums.ValasCustomerIdType | null
+  }
+
+  export type EnumValasPaymentMethodFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasPaymentMethod | EnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasPaymentMethodFilter<$PrismaModel> | $Enums.ValasPaymentMethod
+  }
+
+  export type EnumValasTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionStatus | EnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionStatusFilter<$PrismaModel> | $Enums.ValasTransactionStatus
+  }
+
+  export type BankAccountNullableScalarRelationFilter = {
+    is?: BankAccountWhereInput | null
+    isNot?: BankAccountWhereInput | null
+  }
+
+  export type ValasTransactionCompanyIdInvoiceNoCompoundUniqueInput = {
+    companyId: string
+    invoiceNo: string
+  }
+
+  export type ValasTransactionCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    invoiceNo?: SortOrder
+    date?: SortOrder
+    type?: SortOrder
+    currencyId?: SortOrder
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrder
+    totalIdr?: SortOrder
+    customerName?: SortOrder
+    customerPhone?: SortOrder
+    customerIdType?: SortOrder
+    customerIdNumber?: SortOrder
+    customerAddress?: SortOrder
+    paymentMethod?: SortOrder
+    bankAccountId?: SortOrder
+    note?: SortOrder
+    status?: SortOrder
+    voidedAt?: SortOrder
+    voidedBy?: SortOrder
+    voidReason?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ValasTransactionAvgOrderByAggregateInput = {
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrder
+    totalIdr?: SortOrder
+  }
+
+  export type ValasTransactionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    invoiceNo?: SortOrder
+    date?: SortOrder
+    type?: SortOrder
+    currencyId?: SortOrder
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrder
+    totalIdr?: SortOrder
+    customerName?: SortOrder
+    customerPhone?: SortOrder
+    customerIdType?: SortOrder
+    customerIdNumber?: SortOrder
+    customerAddress?: SortOrder
+    paymentMethod?: SortOrder
+    bankAccountId?: SortOrder
+    note?: SortOrder
+    status?: SortOrder
+    voidedAt?: SortOrder
+    voidedBy?: SortOrder
+    voidReason?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ValasTransactionMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    invoiceNo?: SortOrder
+    date?: SortOrder
+    type?: SortOrder
+    currencyId?: SortOrder
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrder
+    totalIdr?: SortOrder
+    customerName?: SortOrder
+    customerPhone?: SortOrder
+    customerIdType?: SortOrder
+    customerIdNumber?: SortOrder
+    customerAddress?: SortOrder
+    paymentMethod?: SortOrder
+    bankAccountId?: SortOrder
+    note?: SortOrder
+    status?: SortOrder
+    voidedAt?: SortOrder
+    voidedBy?: SortOrder
+    voidReason?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ValasTransactionSumOrderByAggregateInput = {
+    amount?: SortOrder
+    rate?: SortOrder
+    priceRate?: SortOrder
+    totalIdr?: SortOrder
+  }
+
+  export type EnumValasTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionType | EnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ValasTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumValasTransactionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumValasCustomerIdTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasCustomerIdType | EnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumValasCustomerIdTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.ValasCustomerIdType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel>
+  }
+
+  export type EnumValasPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasPaymentMethod | EnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasPaymentMethodWithAggregatesFilter<$PrismaModel> | $Enums.ValasPaymentMethod
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasPaymentMethodFilter<$PrismaModel>
+    _max?: NestedEnumValasPaymentMethodFilter<$PrismaModel>
+  }
+
+  export type EnumValasTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionStatus | EnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.ValasTransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumValasTransactionStatusFilter<$PrismaModel>
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type userCreateNestedOneWithoutAttendancesInput = {
     create?: XOR<userCreateWithoutAttendancesInput, userUncheckedCreateWithoutAttendancesInput>
     connectOrCreate?: userCreateOrConnectWithoutAttendancesInput
@@ -87813,14 +91372,6 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
-  }
-
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -87835,10 +91386,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type EnumAttendanceStatusFieldUpdateOperationsInput = {
@@ -88923,6 +92470,13 @@ export namespace Prisma {
     connect?: DailyBankEntryWhereUniqueInput | DailyBankEntryWhereUniqueInput[]
   }
 
+  export type ValasTransactionCreateNestedManyWithoutBankAccountInput = {
+    create?: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput> | ValasTransactionCreateWithoutBankAccountInput[] | ValasTransactionUncheckedCreateWithoutBankAccountInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBankAccountInput | ValasTransactionCreateOrConnectWithoutBankAccountInput[]
+    createMany?: ValasTransactionCreateManyBankAccountInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+  }
+
   export type BankMutationUncheckedCreateNestedManyWithoutBankAccountInput = {
     create?: XOR<BankMutationCreateWithoutBankAccountInput, BankMutationUncheckedCreateWithoutBankAccountInput> | BankMutationCreateWithoutBankAccountInput[] | BankMutationUncheckedCreateWithoutBankAccountInput[]
     connectOrCreate?: BankMutationCreateOrConnectWithoutBankAccountInput | BankMutationCreateOrConnectWithoutBankAccountInput[]
@@ -88935,6 +92489,13 @@ export namespace Prisma {
     connectOrCreate?: DailyBankEntryCreateOrConnectWithoutBankAccountInput | DailyBankEntryCreateOrConnectWithoutBankAccountInput[]
     createMany?: DailyBankEntryCreateManyBankAccountInputEnvelope
     connect?: DailyBankEntryWhereUniqueInput | DailyBankEntryWhereUniqueInput[]
+  }
+
+  export type ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput = {
+    create?: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput> | ValasTransactionCreateWithoutBankAccountInput[] | ValasTransactionUncheckedCreateWithoutBankAccountInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBankAccountInput | ValasTransactionCreateOrConnectWithoutBankAccountInput[]
+    createMany?: ValasTransactionCreateManyBankAccountInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
   }
 
   export type DecimalFieldUpdateOperationsInput = {
@@ -88997,6 +92558,20 @@ export namespace Prisma {
     deleteMany?: DailyBankEntryScalarWhereInput | DailyBankEntryScalarWhereInput[]
   }
 
+  export type ValasTransactionUpdateManyWithoutBankAccountNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput> | ValasTransactionCreateWithoutBankAccountInput[] | ValasTransactionUncheckedCreateWithoutBankAccountInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBankAccountInput | ValasTransactionCreateOrConnectWithoutBankAccountInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutBankAccountInput | ValasTransactionUpsertWithWhereUniqueWithoutBankAccountInput[]
+    createMany?: ValasTransactionCreateManyBankAccountInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutBankAccountInput | ValasTransactionUpdateWithWhereUniqueWithoutBankAccountInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutBankAccountInput | ValasTransactionUpdateManyWithWhereWithoutBankAccountInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+  }
+
   export type BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput = {
     create?: XOR<BankMutationCreateWithoutBankAccountInput, BankMutationUncheckedCreateWithoutBankAccountInput> | BankMutationCreateWithoutBankAccountInput[] | BankMutationUncheckedCreateWithoutBankAccountInput[]
     connectOrCreate?: BankMutationCreateOrConnectWithoutBankAccountInput | BankMutationCreateOrConnectWithoutBankAccountInput[]
@@ -89023,6 +92598,20 @@ export namespace Prisma {
     update?: DailyBankEntryUpdateWithWhereUniqueWithoutBankAccountInput | DailyBankEntryUpdateWithWhereUniqueWithoutBankAccountInput[]
     updateMany?: DailyBankEntryUpdateManyWithWhereWithoutBankAccountInput | DailyBankEntryUpdateManyWithWhereWithoutBankAccountInput[]
     deleteMany?: DailyBankEntryScalarWhereInput | DailyBankEntryScalarWhereInput[]
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput> | ValasTransactionCreateWithoutBankAccountInput[] | ValasTransactionUncheckedCreateWithoutBankAccountInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBankAccountInput | ValasTransactionCreateOrConnectWithoutBankAccountInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutBankAccountInput | ValasTransactionUpsertWithWhereUniqueWithoutBankAccountInput[]
+    createMany?: ValasTransactionCreateManyBankAccountInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutBankAccountInput | ValasTransactionUpdateWithWhereUniqueWithoutBankAccountInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutBankAccountInput | ValasTransactionUpdateManyWithWhereWithoutBankAccountInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
   }
 
   export type BankAccountCreateNestedOneWithoutMutationsInput = {
@@ -89109,6 +92698,13 @@ export namespace Prisma {
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
   }
 
+  export type ValasTransactionCreateNestedManyWithoutBranchInput = {
+    create?: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput> | ValasTransactionCreateWithoutBranchInput[] | ValasTransactionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBranchInput | ValasTransactionCreateOrConnectWithoutBranchInput[]
+    createMany?: ValasTransactionCreateManyBranchInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+  }
+
   export type CurrencyStockUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<CurrencyStockCreateWithoutBranchInput, CurrencyStockUncheckedCreateWithoutBranchInput> | CurrencyStockCreateWithoutBranchInput[] | CurrencyStockUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: CurrencyStockCreateOrConnectWithoutBranchInput | CurrencyStockCreateOrConnectWithoutBranchInput[]
@@ -89149,6 +92745,13 @@ export namespace Prisma {
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
     createMany?: PayrollSlipCreateManyBranchInputEnvelope
     connect?: PayrollSlipWhereUniqueInput | PayrollSlipWhereUniqueInput[]
+  }
+
+  export type ValasTransactionUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput> | ValasTransactionCreateWithoutBranchInput[] | ValasTransactionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBranchInput | ValasTransactionCreateOrConnectWithoutBranchInput[]
+    createMany?: ValasTransactionCreateManyBranchInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -89253,6 +92856,20 @@ export namespace Prisma {
     deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
   }
 
+  export type ValasTransactionUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput> | ValasTransactionCreateWithoutBranchInput[] | ValasTransactionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBranchInput | ValasTransactionCreateOrConnectWithoutBranchInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutBranchInput | ValasTransactionUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: ValasTransactionCreateManyBranchInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutBranchInput | ValasTransactionUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutBranchInput | ValasTransactionUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+  }
+
   export type CurrencyStockUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<CurrencyStockCreateWithoutBranchInput, CurrencyStockUncheckedCreateWithoutBranchInput> | CurrencyStockCreateWithoutBranchInput[] | CurrencyStockUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: CurrencyStockCreateOrConnectWithoutBranchInput | CurrencyStockCreateOrConnectWithoutBranchInput[]
@@ -89335,6 +92952,20 @@ export namespace Prisma {
     update?: PayrollSlipUpdateWithWhereUniqueWithoutBranchInput | PayrollSlipUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: PayrollSlipUpdateManyWithWhereWithoutBranchInput | PayrollSlipUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: PayrollSlipScalarWhereInput | PayrollSlipScalarWhereInput[]
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput> | ValasTransactionCreateWithoutBranchInput[] | ValasTransactionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutBranchInput | ValasTransactionCreateOrConnectWithoutBranchInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutBranchInput | ValasTransactionUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: ValasTransactionCreateManyBranchInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutBranchInput | ValasTransactionUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutBranchInput | ValasTransactionUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
   }
 
   export type SalaryComponentCreateNestedManyWithoutCompanyInput = {
@@ -89449,6 +93080,13 @@ export namespace Prisma {
     connect?: PayrollRunWhereUniqueInput | PayrollRunWhereUniqueInput[]
   }
 
+  export type ValasTransactionCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput> | ValasTransactionCreateWithoutCompanyInput[] | ValasTransactionUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCompanyInput | ValasTransactionCreateOrConnectWithoutCompanyInput[]
+    createMany?: ValasTransactionCreateManyCompanyInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+  }
+
   export type SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
@@ -89559,6 +93197,13 @@ export namespace Prisma {
     connectOrCreate?: PayrollRunCreateOrConnectWithoutCompanyInput | PayrollRunCreateOrConnectWithoutCompanyInput[]
     createMany?: PayrollRunCreateManyCompanyInputEnvelope
     connect?: PayrollRunWhereUniqueInput | PayrollRunWhereUniqueInput[]
+  }
+
+  export type ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput> | ValasTransactionCreateWithoutCompanyInput[] | ValasTransactionUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCompanyInput | ValasTransactionCreateOrConnectWithoutCompanyInput[]
+    createMany?: ValasTransactionCreateManyCompanyInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
   }
 
   export type SalaryComponentUpdateManyWithoutCompanyNestedInput = {
@@ -89785,6 +93430,20 @@ export namespace Prisma {
     deleteMany?: PayrollRunScalarWhereInput | PayrollRunScalarWhereInput[]
   }
 
+  export type ValasTransactionUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput> | ValasTransactionCreateWithoutCompanyInput[] | ValasTransactionUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCompanyInput | ValasTransactionCreateOrConnectWithoutCompanyInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutCompanyInput | ValasTransactionUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: ValasTransactionCreateManyCompanyInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutCompanyInput | ValasTransactionUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutCompanyInput | ValasTransactionUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+  }
+
   export type SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<SalaryComponentCreateWithoutCompanyInput, SalaryComponentUncheckedCreateWithoutCompanyInput> | SalaryComponentCreateWithoutCompanyInput[] | SalaryComponentUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: SalaryComponentCreateOrConnectWithoutCompanyInput | SalaryComponentCreateOrConnectWithoutCompanyInput[]
@@ -90009,6 +93668,20 @@ export namespace Prisma {
     deleteMany?: PayrollRunScalarWhereInput | PayrollRunScalarWhereInput[]
   }
 
+  export type ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput> | ValasTransactionCreateWithoutCompanyInput[] | ValasTransactionUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCompanyInput | ValasTransactionCreateOrConnectWithoutCompanyInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutCompanyInput | ValasTransactionUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: ValasTransactionCreateManyCompanyInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutCompanyInput | ValasTransactionUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutCompanyInput | ValasTransactionUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+  }
+
   export type BankAccountCreateNestedManyWithoutCurrencyInput = {
     create?: XOR<BankAccountCreateWithoutCurrencyInput, BankAccountUncheckedCreateWithoutCurrencyInput> | BankAccountCreateWithoutCurrencyInput[] | BankAccountUncheckedCreateWithoutCurrencyInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutCurrencyInput | BankAccountCreateOrConnectWithoutCurrencyInput[]
@@ -90036,6 +93709,13 @@ export namespace Prisma {
     connect?: CurrencyPriceWhereUniqueInput
   }
 
+  export type ValasTransactionCreateNestedManyWithoutCurrencyInput = {
+    create?: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput> | ValasTransactionCreateWithoutCurrencyInput[] | ValasTransactionUncheckedCreateWithoutCurrencyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCurrencyInput | ValasTransactionCreateOrConnectWithoutCurrencyInput[]
+    createMany?: ValasTransactionCreateManyCurrencyInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+  }
+
   export type BankAccountUncheckedCreateNestedManyWithoutCurrencyInput = {
     create?: XOR<BankAccountCreateWithoutCurrencyInput, BankAccountUncheckedCreateWithoutCurrencyInput> | BankAccountCreateWithoutCurrencyInput[] | BankAccountUncheckedCreateWithoutCurrencyInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutCurrencyInput | BankAccountCreateOrConnectWithoutCurrencyInput[]
@@ -90061,6 +93741,13 @@ export namespace Prisma {
     create?: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
     connectOrCreate?: CurrencyPriceCreateOrConnectWithoutCurrencyInput
     connect?: CurrencyPriceWhereUniqueInput
+  }
+
+  export type ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput = {
+    create?: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput> | ValasTransactionCreateWithoutCurrencyInput[] | ValasTransactionUncheckedCreateWithoutCurrencyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCurrencyInput | ValasTransactionCreateOrConnectWithoutCurrencyInput[]
+    createMany?: ValasTransactionCreateManyCurrencyInputEnvelope
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
   }
 
   export type BankAccountUpdateManyWithoutCurrencyNestedInput = {
@@ -90115,6 +93802,20 @@ export namespace Prisma {
     update?: XOR<XOR<CurrencyPriceUpdateToOneWithWhereWithoutCurrencyInput, CurrencyPriceUpdateWithoutCurrencyInput>, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
   }
 
+  export type ValasTransactionUpdateManyWithoutCurrencyNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput> | ValasTransactionCreateWithoutCurrencyInput[] | ValasTransactionUncheckedCreateWithoutCurrencyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCurrencyInput | ValasTransactionCreateOrConnectWithoutCurrencyInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutCurrencyInput | ValasTransactionUpsertWithWhereUniqueWithoutCurrencyInput[]
+    createMany?: ValasTransactionCreateManyCurrencyInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutCurrencyInput | ValasTransactionUpdateWithWhereUniqueWithoutCurrencyInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutCurrencyInput | ValasTransactionUpdateManyWithWhereWithoutCurrencyInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+  }
+
   export type BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput = {
     create?: XOR<BankAccountCreateWithoutCurrencyInput, BankAccountUncheckedCreateWithoutCurrencyInput> | BankAccountCreateWithoutCurrencyInput[] | BankAccountUncheckedCreateWithoutCurrencyInput[]
     connectOrCreate?: BankAccountCreateOrConnectWithoutCurrencyInput | BankAccountCreateOrConnectWithoutCurrencyInput[]
@@ -90165,6 +93866,20 @@ export namespace Prisma {
     delete?: CurrencyPriceWhereInput | boolean
     connect?: CurrencyPriceWhereUniqueInput
     update?: XOR<XOR<CurrencyPriceUpdateToOneWithWhereWithoutCurrencyInput, CurrencyPriceUpdateWithoutCurrencyInput>, CurrencyPriceUncheckedUpdateWithoutCurrencyInput>
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput = {
+    create?: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput> | ValasTransactionCreateWithoutCurrencyInput[] | ValasTransactionUncheckedCreateWithoutCurrencyInput[]
+    connectOrCreate?: ValasTransactionCreateOrConnectWithoutCurrencyInput | ValasTransactionCreateOrConnectWithoutCurrencyInput[]
+    upsert?: ValasTransactionUpsertWithWhereUniqueWithoutCurrencyInput | ValasTransactionUpsertWithWhereUniqueWithoutCurrencyInput[]
+    createMany?: ValasTransactionCreateManyCurrencyInputEnvelope
+    set?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    disconnect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    delete?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    connect?: ValasTransactionWhereUniqueInput | ValasTransactionWhereUniqueInput[]
+    update?: ValasTransactionUpdateWithWhereUniqueWithoutCurrencyInput | ValasTransactionUpdateWithWhereUniqueWithoutCurrencyInput[]
+    updateMany?: ValasTransactionUpdateManyWithWhereWithoutCurrencyInput | ValasTransactionUpdateManyWithWhereWithoutCurrencyInput[]
+    deleteMany?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
   }
 
   export type CurrencyCreateNestedOneWithoutPriceInput = {
@@ -91927,6 +95642,82 @@ export namespace Prisma {
     update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutCorrectionRequestsInput, CompanyUpdateWithoutCorrectionRequestsInput>, CompanyUncheckedUpdateWithoutCorrectionRequestsInput>
   }
 
+  export type CompanyCreateNestedOneWithoutValasTransactionsInput = {
+    create?: XOR<CompanyCreateWithoutValasTransactionsInput, CompanyUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutValasTransactionsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type BranchCreateNestedOneWithoutValasTransactionsInput = {
+    create?: XOR<BranchCreateWithoutValasTransactionsInput, BranchUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutValasTransactionsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type CurrencyCreateNestedOneWithoutValasTransactionsInput = {
+    create?: XOR<CurrencyCreateWithoutValasTransactionsInput, CurrencyUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: CurrencyCreateOrConnectWithoutValasTransactionsInput
+    connect?: CurrencyWhereUniqueInput
+  }
+
+  export type BankAccountCreateNestedOneWithoutValasTransactionsInput = {
+    create?: XOR<BankAccountCreateWithoutValasTransactionsInput, BankAccountUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: BankAccountCreateOrConnectWithoutValasTransactionsInput
+    connect?: BankAccountWhereUniqueInput
+  }
+
+  export type EnumValasTransactionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.ValasTransactionType
+  }
+
+  export type NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput = {
+    set?: $Enums.ValasCustomerIdType | null
+  }
+
+  export type EnumValasPaymentMethodFieldUpdateOperationsInput = {
+    set?: $Enums.ValasPaymentMethod
+  }
+
+  export type EnumValasTransactionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ValasTransactionStatus
+  }
+
+  export type CompanyUpdateOneRequiredWithoutValasTransactionsNestedInput = {
+    create?: XOR<CompanyCreateWithoutValasTransactionsInput, CompanyUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutValasTransactionsInput
+    upsert?: CompanyUpsertWithoutValasTransactionsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutValasTransactionsInput, CompanyUpdateWithoutValasTransactionsInput>, CompanyUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type BranchUpdateOneWithoutValasTransactionsNestedInput = {
+    create?: XOR<BranchCreateWithoutValasTransactionsInput, BranchUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutValasTransactionsInput
+    upsert?: BranchUpsertWithoutValasTransactionsInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutValasTransactionsInput, BranchUpdateWithoutValasTransactionsInput>, BranchUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type CurrencyUpdateOneRequiredWithoutValasTransactionsNestedInput = {
+    create?: XOR<CurrencyCreateWithoutValasTransactionsInput, CurrencyUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: CurrencyCreateOrConnectWithoutValasTransactionsInput
+    upsert?: CurrencyUpsertWithoutValasTransactionsInput
+    connect?: CurrencyWhereUniqueInput
+    update?: XOR<XOR<CurrencyUpdateToOneWithWhereWithoutValasTransactionsInput, CurrencyUpdateWithoutValasTransactionsInput>, CurrencyUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type BankAccountUpdateOneWithoutValasTransactionsNestedInput = {
+    create?: XOR<BankAccountCreateWithoutValasTransactionsInput, BankAccountUncheckedCreateWithoutValasTransactionsInput>
+    connectOrCreate?: BankAccountCreateOrConnectWithoutValasTransactionsInput
+    upsert?: BankAccountUpsertWithoutValasTransactionsInput
+    disconnect?: BankAccountWhereInput | boolean
+    delete?: BankAccountWhereInput | boolean
+    connect?: BankAccountWhereUniqueInput
+    update?: XOR<XOR<BankAccountUpdateToOneWithWhereWithoutValasTransactionsInput, BankAccountUpdateWithoutValasTransactionsInput>, BankAccountUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -91941,20 +95732,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -91966,38 +95743,9 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedEnumAttendanceStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumAttendanceStatusFilter<$PrismaModel> | $Enums.AttendanceStatus
   }
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
@@ -92028,6 +95776,71 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumAttendanceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAttendanceStatusFilter<$PrismaModel> | $Enums.AttendanceStatus
+  }
+
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -92054,20 +95867,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -92098,14 +95897,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumAttendanceStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -92834,6 +96625,74 @@ export namespace Prisma {
     _max?: NestedEnumCorrectionStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumValasTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionType | EnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionTypeFilter<$PrismaModel> | $Enums.ValasTransactionType
+  }
+
+  export type NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasCustomerIdType | EnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel> | $Enums.ValasCustomerIdType | null
+  }
+
+  export type NestedEnumValasPaymentMethodFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasPaymentMethod | EnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasPaymentMethodFilter<$PrismaModel> | $Enums.ValasPaymentMethod
+  }
+
+  export type NestedEnumValasTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionStatus | EnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionStatusFilter<$PrismaModel> | $Enums.ValasTransactionStatus
+  }
+
+  export type NestedEnumValasTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionType | EnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionType[] | ListEnumValasTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ValasTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumValasTransactionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumValasCustomerIdTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasCustomerIdType | EnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ValasCustomerIdType[] | ListEnumValasCustomerIdTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumValasCustomerIdTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.ValasCustomerIdType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumValasCustomerIdTypeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumValasPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasPaymentMethod | EnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasPaymentMethod[] | ListEnumValasPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasPaymentMethodWithAggregatesFilter<$PrismaModel> | $Enums.ValasPaymentMethod
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasPaymentMethodFilter<$PrismaModel>
+    _max?: NestedEnumValasPaymentMethodFilter<$PrismaModel>
+  }
+
+  export type NestedEnumValasTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ValasTransactionStatus | EnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ValasTransactionStatus[] | ListEnumValasTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumValasTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.ValasTransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumValasTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumValasTransactionStatusFilter<$PrismaModel>
+  }
+
   export type userCreateWithoutAttendancesInput = {
     id: string
     name: string
@@ -92844,10 +96703,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -92884,10 +96739,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -92927,10 +96778,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -92967,10 +96814,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93017,6 +96860,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutAttendancesInput = {
@@ -93036,6 +96880,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutAttendancesInput = {
@@ -93064,10 +96909,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93104,10 +96945,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93153,10 +96990,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93193,10 +97026,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93249,6 +97078,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutAttendancesInput = {
@@ -93268,6 +97098,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type userCreateWithoutAccountInput = {
@@ -93280,10 +97111,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93320,10 +97147,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93374,10 +97197,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93414,10 +97233,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93452,10 +97267,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93492,10 +97303,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93546,10 +97353,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93586,10 +97389,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -93686,6 +97485,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCustom_rolesInput = {
@@ -93710,6 +97510,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCustom_rolesInput = {
@@ -93727,10 +97528,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93767,10 +97564,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -93969,6 +97762,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCustom_rolesInput = {
@@ -93993,6 +97787,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type userUpsertWithWhereUniqueWithoutCustomRoleInput = {
@@ -94025,10 +97820,6 @@ export namespace Prisma {
     phone?: StringNullableFilter<"user"> | string | null
     branchId?: StringNullableFilter<"user"> | string | null
     baseSalary?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: DecimalNullableFilter<"user"> | Decimal | DecimalJsLike | number | string | null
     joinDate?: DateTimeNullableFilter<"user"> | Date | string | null
     employmentStatus?: EnumEmploymentStatusFilter<"user"> | $Enums.EmploymentStatus
     contractStartDate?: DateTimeNullableFilter<"user"> | Date | string | null
@@ -94903,6 +98694,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutUsersInput = {
@@ -94922,6 +98714,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutUsersInput = {
@@ -95457,6 +99250,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutUsersInput = {
@@ -95476,6 +99270,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type custom_roleUpsertWithoutUsersInput = {
@@ -95617,6 +99412,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBankAccountsInput = {
@@ -95641,6 +99437,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBankAccountsInput = {
@@ -95659,6 +99456,7 @@ export namespace Prisma {
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutBankAccountsInput = {
@@ -95672,6 +99470,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutBankAccountsInput = {
@@ -95747,6 +99546,72 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ValasTransactionCreateWithoutBankAccountInput = {
+    id?: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutValasTransactionsInput
+    branch?: BranchCreateNestedOneWithoutValasTransactionsInput
+    currency: CurrencyCreateNestedOneWithoutValasTransactionsInput
+  }
+
+  export type ValasTransactionUncheckedCreateWithoutBankAccountInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionCreateOrConnectWithoutBankAccountInput = {
+    where: ValasTransactionWhereUniqueInput
+    create: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput>
+  }
+
+  export type ValasTransactionCreateManyBankAccountInputEnvelope = {
+    data: ValasTransactionCreateManyBankAccountInput | ValasTransactionCreateManyBankAccountInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CompanyUpsertWithoutBankAccountsInput = {
     update: XOR<CompanyUpdateWithoutBankAccountsInput, CompanyUncheckedUpdateWithoutBankAccountsInput>
     create: XOR<CompanyCreateWithoutBankAccountsInput, CompanyUncheckedCreateWithoutBankAccountsInput>
@@ -95780,6 +99645,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBankAccountsInput = {
@@ -95804,6 +99670,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyUpsertWithoutBankAccountsInput = {
@@ -95828,6 +99695,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutBankAccountsInput = {
@@ -95841,6 +99709,7 @@ export namespace Prisma {
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput
   }
 
   export type BankMutationUpsertWithWhereUniqueWithoutBankAccountInput = {
@@ -95907,6 +99776,54 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"DailyBankEntry"> | Date | string
   }
 
+  export type ValasTransactionUpsertWithWhereUniqueWithoutBankAccountInput = {
+    where: ValasTransactionWhereUniqueInput
+    update: XOR<ValasTransactionUpdateWithoutBankAccountInput, ValasTransactionUncheckedUpdateWithoutBankAccountInput>
+    create: XOR<ValasTransactionCreateWithoutBankAccountInput, ValasTransactionUncheckedCreateWithoutBankAccountInput>
+  }
+
+  export type ValasTransactionUpdateWithWhereUniqueWithoutBankAccountInput = {
+    where: ValasTransactionWhereUniqueInput
+    data: XOR<ValasTransactionUpdateWithoutBankAccountInput, ValasTransactionUncheckedUpdateWithoutBankAccountInput>
+  }
+
+  export type ValasTransactionUpdateManyWithWhereWithoutBankAccountInput = {
+    where: ValasTransactionScalarWhereInput
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyWithoutBankAccountInput>
+  }
+
+  export type ValasTransactionScalarWhereInput = {
+    AND?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+    OR?: ValasTransactionScalarWhereInput[]
+    NOT?: ValasTransactionScalarWhereInput | ValasTransactionScalarWhereInput[]
+    id?: StringFilter<"ValasTransaction"> | string
+    companyId?: StringFilter<"ValasTransaction"> | string
+    branchId?: StringNullableFilter<"ValasTransaction"> | string | null
+    invoiceNo?: StringFilter<"ValasTransaction"> | string
+    date?: DateTimeFilter<"ValasTransaction"> | Date | string
+    type?: EnumValasTransactionTypeFilter<"ValasTransaction"> | $Enums.ValasTransactionType
+    currencyId?: StringFilter<"ValasTransaction"> | string
+    amount?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    priceRate?: DecimalNullableFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFilter<"ValasTransaction"> | Decimal | DecimalJsLike | number | string
+    customerName?: StringFilter<"ValasTransaction"> | string
+    customerPhone?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerIdType?: EnumValasCustomerIdTypeNullableFilter<"ValasTransaction"> | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: StringNullableFilter<"ValasTransaction"> | string | null
+    customerAddress?: StringNullableFilter<"ValasTransaction"> | string | null
+    paymentMethod?: EnumValasPaymentMethodFilter<"ValasTransaction"> | $Enums.ValasPaymentMethod
+    bankAccountId?: StringNullableFilter<"ValasTransaction"> | string | null
+    note?: StringNullableFilter<"ValasTransaction"> | string | null
+    status?: EnumValasTransactionStatusFilter<"ValasTransaction"> | $Enums.ValasTransactionStatus
+    voidedAt?: DateTimeNullableFilter<"ValasTransaction"> | Date | string | null
+    voidedBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    voidReason?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdBy?: StringNullableFilter<"ValasTransaction"> | string | null
+    createdAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+    updatedAt?: DateTimeFilter<"ValasTransaction"> | Date | string
+  }
+
   export type BankAccountCreateWithoutMutationsInput = {
     id?: string
     bankName: string
@@ -95921,6 +99838,7 @@ export namespace Prisma {
     company: CompanyCreateNestedOneWithoutBankAccountsInput
     currency: CurrencyCreateNestedOneWithoutBankAccountsInput
     dailyEntries?: DailyBankEntryCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutMutationsInput = {
@@ -95937,6 +99855,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     dailyEntries?: DailyBankEntryUncheckedCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountCreateOrConnectWithoutMutationsInput = {
@@ -95969,6 +99888,7 @@ export namespace Prisma {
     company?: CompanyUpdateOneRequiredWithoutBankAccountsNestedInput
     currency?: CurrencyUpdateOneRequiredWithoutBankAccountsNestedInput
     dailyEntries?: DailyBankEntryUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutMutationsInput = {
@@ -95985,6 +99905,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     dailyEntries?: DailyBankEntryUncheckedUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountCreateWithoutDailyEntriesInput = {
@@ -96001,6 +99922,7 @@ export namespace Prisma {
     company: CompanyCreateNestedOneWithoutBankAccountsInput
     currency: CurrencyCreateNestedOneWithoutBankAccountsInput
     mutations?: BankMutationCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutDailyEntriesInput = {
@@ -96017,6 +99939,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     mutations?: BankMutationUncheckedCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountCreateOrConnectWithoutDailyEntriesInput = {
@@ -96049,6 +99972,7 @@ export namespace Prisma {
     company?: CompanyUpdateOneRequiredWithoutBankAccountsNestedInput
     currency?: CurrencyUpdateOneRequiredWithoutBankAccountsNestedInput
     mutations?: BankMutationUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutDailyEntriesInput = {
@@ -96065,6 +99989,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mutations?: BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type CompanyCreateWithoutBranchesInput = {
@@ -96089,6 +100014,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBranchesInput = {
@@ -96113,6 +100039,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBranchesInput = {
@@ -96228,10 +100155,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -96267,10 +100190,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -96420,6 +100339,72 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ValasTransactionCreateWithoutBranchInput = {
+    id?: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutValasTransactionsInput
+    currency: CurrencyCreateNestedOneWithoutValasTransactionsInput
+    bankAccount?: BankAccountCreateNestedOneWithoutValasTransactionsInput
+  }
+
+  export type ValasTransactionUncheckedCreateWithoutBranchInput = {
+    id?: string
+    companyId: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionCreateOrConnectWithoutBranchInput = {
+    where: ValasTransactionWhereUniqueInput
+    create: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput>
+  }
+
+  export type ValasTransactionCreateManyBranchInputEnvelope = {
+    data: ValasTransactionCreateManyBranchInput | ValasTransactionCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CompanyUpsertWithoutBranchesInput = {
     update: XOR<CompanyUpdateWithoutBranchesInput, CompanyUncheckedUpdateWithoutBranchesInput>
     create: XOR<CompanyCreateWithoutBranchesInput, CompanyUncheckedCreateWithoutBranchesInput>
@@ -96453,6 +100438,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBranchesInput = {
@@ -96477,6 +100463,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CurrencyStockUpsertWithWhereUniqueWithoutBranchInput = {
@@ -96620,6 +100607,22 @@ export namespace Prisma {
     data: XOR<PayrollSlipUpdateManyMutationInput, PayrollSlipUncheckedUpdateManyWithoutBranchInput>
   }
 
+  export type ValasTransactionUpsertWithWhereUniqueWithoutBranchInput = {
+    where: ValasTransactionWhereUniqueInput
+    update: XOR<ValasTransactionUpdateWithoutBranchInput, ValasTransactionUncheckedUpdateWithoutBranchInput>
+    create: XOR<ValasTransactionCreateWithoutBranchInput, ValasTransactionUncheckedCreateWithoutBranchInput>
+  }
+
+  export type ValasTransactionUpdateWithWhereUniqueWithoutBranchInput = {
+    where: ValasTransactionWhereUniqueInput
+    data: XOR<ValasTransactionUpdateWithoutBranchInput, ValasTransactionUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type ValasTransactionUpdateManyWithWhereWithoutBranchInput = {
+    where: ValasTransactionScalarWhereInput
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyWithoutBranchInput>
+  }
+
   export type SalaryComponentCreateWithoutCompanyInput = {
     id?: string
     name: string
@@ -96673,6 +100676,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutCompanyInput = {
@@ -96692,6 +100696,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutCompanyInput = {
@@ -96920,6 +100925,7 @@ export namespace Prisma {
     currency: CurrencyCreateNestedOneWithoutBankAccountsInput
     mutations?: BankMutationCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutCompanyInput = {
@@ -96936,6 +100942,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     mutations?: BankMutationUncheckedCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryUncheckedCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountCreateOrConnectWithoutCompanyInput = {
@@ -97243,6 +101250,72 @@ export namespace Prisma {
 
   export type PayrollRunCreateManyCompanyInputEnvelope = {
     data: PayrollRunCreateManyCompanyInput | PayrollRunCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ValasTransactionCreateWithoutCompanyInput = {
+    id?: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch?: BranchCreateNestedOneWithoutValasTransactionsInput
+    currency: CurrencyCreateNestedOneWithoutValasTransactionsInput
+    bankAccount?: BankAccountCreateNestedOneWithoutValasTransactionsInput
+  }
+
+  export type ValasTransactionUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionCreateOrConnectWithoutCompanyInput = {
+    where: ValasTransactionWhereUniqueInput
+    create: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type ValasTransactionCreateManyCompanyInputEnvelope = {
+    data: ValasTransactionCreateManyCompanyInput | ValasTransactionCreateManyCompanyInput[]
     skipDuplicates?: boolean
   }
 
@@ -97728,6 +101801,22 @@ export namespace Prisma {
     data: XOR<PayrollRunUpdateManyMutationInput, PayrollRunUncheckedUpdateManyWithoutCompanyInput>
   }
 
+  export type ValasTransactionUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: ValasTransactionWhereUniqueInput
+    update: XOR<ValasTransactionUpdateWithoutCompanyInput, ValasTransactionUncheckedUpdateWithoutCompanyInput>
+    create: XOR<ValasTransactionCreateWithoutCompanyInput, ValasTransactionUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type ValasTransactionUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: ValasTransactionWhereUniqueInput
+    data: XOR<ValasTransactionUpdateWithoutCompanyInput, ValasTransactionUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type ValasTransactionUpdateManyWithWhereWithoutCompanyInput = {
+    where: ValasTransactionScalarWhereInput
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyWithoutCompanyInput>
+  }
+
   export type BankAccountCreateWithoutCurrencyInput = {
     id?: string
     bankName: string
@@ -97742,6 +101831,7 @@ export namespace Prisma {
     company: CompanyCreateNestedOneWithoutBankAccountsInput
     mutations?: BankMutationCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountUncheckedCreateWithoutCurrencyInput = {
@@ -97758,6 +101848,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     mutations?: BankMutationUncheckedCreateNestedManyWithoutBankAccountInput
     dailyEntries?: DailyBankEntryUncheckedCreateNestedManyWithoutBankAccountInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBankAccountInput
   }
 
   export type BankAccountCreateOrConnectWithoutCurrencyInput = {
@@ -97865,6 +101956,72 @@ export namespace Prisma {
     create: XOR<CurrencyPriceCreateWithoutCurrencyInput, CurrencyPriceUncheckedCreateWithoutCurrencyInput>
   }
 
+  export type ValasTransactionCreateWithoutCurrencyInput = {
+    id?: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutValasTransactionsInput
+    branch?: BranchCreateNestedOneWithoutValasTransactionsInput
+    bankAccount?: BankAccountCreateNestedOneWithoutValasTransactionsInput
+  }
+
+  export type ValasTransactionUncheckedCreateWithoutCurrencyInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionCreateOrConnectWithoutCurrencyInput = {
+    where: ValasTransactionWhereUniqueInput
+    create: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput>
+  }
+
+  export type ValasTransactionCreateManyCurrencyInputEnvelope = {
+    data: ValasTransactionCreateManyCurrencyInput | ValasTransactionCreateManyCurrencyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BankAccountUpsertWithWhereUniqueWithoutCurrencyInput = {
     where: BankAccountWhereUniqueInput
     update: XOR<BankAccountUpdateWithoutCurrencyInput, BankAccountUncheckedUpdateWithoutCurrencyInput>
@@ -97950,6 +102107,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ValasTransactionUpsertWithWhereUniqueWithoutCurrencyInput = {
+    where: ValasTransactionWhereUniqueInput
+    update: XOR<ValasTransactionUpdateWithoutCurrencyInput, ValasTransactionUncheckedUpdateWithoutCurrencyInput>
+    create: XOR<ValasTransactionCreateWithoutCurrencyInput, ValasTransactionUncheckedCreateWithoutCurrencyInput>
+  }
+
+  export type ValasTransactionUpdateWithWhereUniqueWithoutCurrencyInput = {
+    where: ValasTransactionWhereUniqueInput
+    data: XOR<ValasTransactionUpdateWithoutCurrencyInput, ValasTransactionUncheckedUpdateWithoutCurrencyInput>
+  }
+
+  export type ValasTransactionUpdateManyWithWhereWithoutCurrencyInput = {
+    where: ValasTransactionScalarWhereInput
+    data: XOR<ValasTransactionUpdateManyMutationInput, ValasTransactionUncheckedUpdateManyWithoutCurrencyInput>
+  }
+
   export type CurrencyCreateWithoutPriceInput = {
     id?: string
     code: string
@@ -97961,6 +102134,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutPriceInput = {
@@ -97974,6 +102148,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutPriceInput = {
@@ -98003,6 +102178,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutPriceInput = {
@@ -98016,6 +102192,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CompanyCreateWithoutCompanyStockItemsInput = {
@@ -98040,6 +102217,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCompanyStockItemsInput = {
@@ -98064,6 +102242,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCompanyStockItemsInput = {
@@ -98236,6 +102415,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCompanyStockItemsInput = {
@@ -98260,6 +102440,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutCompanyStockItemInput = {
@@ -98459,6 +102640,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutRoleKpisInput = {
@@ -98483,6 +102665,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutRoleKpisInput = {
@@ -98649,6 +102832,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutRoleKpisInput = {
@@ -98673,6 +102857,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type custom_roleUpsertWithoutRoleKpisInput = {
@@ -98789,10 +102974,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -98829,10 +103010,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -98872,10 +103049,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -98912,10 +103085,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -98955,10 +103124,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -98995,10 +103160,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99094,10 +103255,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99134,10 +103291,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99183,10 +103336,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99223,10 +103372,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99272,10 +103417,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99312,10 +103453,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99401,10 +103538,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99441,10 +103574,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99484,10 +103613,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99524,10 +103649,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99578,10 +103699,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99618,10 +103735,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99667,10 +103780,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99707,10 +103816,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99745,10 +103850,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99785,10 +103886,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99839,10 +103936,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99879,10 +103972,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -99917,10 +104006,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -99957,10 +104042,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -100151,10 +104232,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100191,10 +104268,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100497,6 +104570,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutPayrollRunsInput = {
@@ -100521,6 +104595,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutPayrollRunsInput = {
@@ -100538,10 +104613,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -100578,10 +104649,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -100621,10 +104688,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -100661,10 +104724,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -100787,6 +104846,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutPayrollRunsInput = {
@@ -100811,6 +104871,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type userUpsertWithoutPayrollRunsGeneratedInput = {
@@ -100834,10 +104895,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100874,10 +104931,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100923,10 +104976,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100963,10 +105012,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101064,10 +105109,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -101104,10 +105145,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -101154,6 +105191,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPayrollSlipsInput = {
@@ -101173,6 +105211,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPayrollSlipsInput = {
@@ -101225,10 +105264,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -101265,10 +105300,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -101418,10 +105449,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101458,10 +105485,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101514,6 +105537,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPayrollSlipsInput = {
@@ -101533,6 +105557,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type custom_roleUpsertWithoutPayrollSlipsInput = {
@@ -101597,10 +105622,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101637,10 +105658,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101909,6 +105926,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutSalaryComponentsInput = {
@@ -101933,6 +105951,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutSalaryComponentsInput = {
@@ -102045,6 +106064,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutSalaryComponentsInput = {
@@ -102069,6 +106089,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type UserSalaryComponentUpsertWithWhereUniqueWithoutComponentInput = {
@@ -102113,10 +106134,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -102153,10 +106170,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -102238,10 +106251,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -102278,10 +106287,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -102365,6 +106370,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutHeldFundsInput = {
@@ -102389,6 +106395,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutHeldFundsInput = {
@@ -102429,6 +106436,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutHeldFundsInput = {
@@ -102453,6 +106461,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type SampleCreateWithoutRefiningBatchesInput = {
@@ -102545,10 +106554,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -102585,10 +106590,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -102685,10 +106686,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -102725,10 +106722,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -103096,6 +107089,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutCurrencyStocksInput = {
@@ -103115,6 +107109,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutCurrencyStocksInput = {
@@ -103133,6 +107128,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutStocksInput = {
@@ -103146,6 +107142,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutStocksInput = {
@@ -103181,6 +107178,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutCurrencyStocksInput = {
@@ -103200,6 +107198,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type CurrencyUpsertWithoutStocksInput = {
@@ -103224,6 +107223,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutStocksInput = {
@@ -103237,6 +107237,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput
   }
 
   export type BranchCreateWithoutStockMutationsInput = {
@@ -103256,6 +107257,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutStockMutationsInput = {
@@ -103275,6 +107277,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutStockMutationsInput = {
@@ -103293,6 +107296,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyUncheckedCreateWithoutStockMutationsInput = {
@@ -103306,6 +107310,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
     stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
     price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCurrencyInput
   }
 
   export type CurrencyCreateOrConnectWithoutStockMutationsInput = {
@@ -103341,6 +107346,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutStockMutationsInput = {
@@ -103360,6 +107366,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type CurrencyUpsertWithoutStockMutationsInput = {
@@ -103384,6 +107391,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCurrencyNestedInput
   }
 
   export type CurrencyUncheckedUpdateWithoutStockMutationsInput = {
@@ -103397,6 +107405,7 @@ export namespace Prisma {
     bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
     stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
     price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCurrencyNestedInput
   }
 
   export type DailyStockEntryCreateWithoutStockItemInput = {
@@ -103454,6 +107463,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutStockItemsInput = {
@@ -103473,6 +107483,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutStockItemsInput = {
@@ -103542,6 +107553,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutStockItemsInput = {
@@ -103561,6 +107573,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type StockItemCreateWithoutDailyEntriesInput = {
@@ -103649,6 +107662,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistPocketsInput = {
@@ -103673,6 +107687,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistPocketsInput = {
@@ -103809,6 +107824,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistPocketsInput = {
@@ -103833,6 +107849,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type StockistBalanceUpsertWithWhereUniqueWithoutPocketInput = {
@@ -104361,6 +108378,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasPocketsInput = {
@@ -104385,6 +108403,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasPocketsInput = {
@@ -104463,6 +108482,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasPocketsInput = {
@@ -104487,6 +108507,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type KasDailyEntryUpsertWithWhereUniqueWithoutKasPocketInput = {
@@ -104605,6 +108626,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistHeadConfirmationsInput = {
@@ -104629,6 +108651,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistHeadConfirmationsInput = {
@@ -104704,6 +108727,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistHeadConfirmationsInput = {
@@ -104728,6 +108752,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyStockItemUpsertWithoutStockistHeadConfirmationsInput = {
@@ -104793,6 +108818,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutStockistTotalHeadConfirmsInput = {
@@ -104817,6 +108843,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutStockistTotalHeadConfirmsInput = {
@@ -104857,6 +108884,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutStockistTotalHeadConfirmsInput = {
@@ -104881,6 +108909,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutKasHeadConfirmationsInput = {
@@ -104905,6 +108934,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutKasHeadConfirmationsInput = {
@@ -104929,6 +108959,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutKasHeadConfirmationsInput = {
@@ -104969,6 +109000,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutKasHeadConfirmationsInput = {
@@ -104993,6 +109025,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutBankHeadConfirmationsInput = {
@@ -105017,6 +109050,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutBankHeadConfirmationsInput = {
@@ -105041,6 +109075,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutBankHeadConfirmationsInput = {
@@ -105081,6 +109116,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutBankHeadConfirmationsInput = {
@@ -105105,6 +109141,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutHeadConfirmationTotalsInput = {
@@ -105129,6 +109166,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutHeadConfirmationTotalsInput = {
@@ -105153,6 +109191,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutHeadConfirmationTotalsInput = {
@@ -105193,6 +109232,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutHeadConfirmationTotalsInput = {
@@ -105217,6 +109257,7 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateWithoutCorrectionRequestsInput = {
@@ -105241,6 +109282,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutCorrectionRequestsInput = {
@@ -105265,6 +109307,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
     heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
     payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutCorrectionRequestsInput = {
@@ -105305,6 +109348,7 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutCorrectionRequestsInput = {
@@ -105329,6 +109373,375 @@ export namespace Prisma {
     headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
     heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyCreateWithoutValasTransactionsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
+    payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutValasTransactionsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
+    payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutValasTransactionsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutValasTransactionsInput, CompanyUncheckedCreateWithoutValasTransactionsInput>
+  }
+
+  export type BranchCreateWithoutValasTransactionsInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company?: CompanyCreateNestedOneWithoutBranchesInput
+    currencyStocks?: CurrencyStockCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
+    users?: userCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutValasTransactionsInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    currencyStocks?: CurrencyStockUncheckedCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
+    users?: userUncheckedCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutValasTransactionsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutValasTransactionsInput, BranchUncheckedCreateWithoutValasTransactionsInput>
+  }
+
+  export type CurrencyCreateWithoutValasTransactionsInput = {
+    id?: string
+    code: string
+    name: string
+    symbol?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bankAccounts?: BankAccountCreateNestedManyWithoutCurrencyInput
+    stocks?: CurrencyStockCreateNestedManyWithoutCurrencyInput
+    stockMutations?: StockMutationCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceCreateNestedOneWithoutCurrencyInput
+  }
+
+  export type CurrencyUncheckedCreateWithoutValasTransactionsInput = {
+    id?: string
+    code: string
+    name: string
+    symbol?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCurrencyInput
+    stocks?: CurrencyStockUncheckedCreateNestedManyWithoutCurrencyInput
+    stockMutations?: StockMutationUncheckedCreateNestedManyWithoutCurrencyInput
+    price?: CurrencyPriceUncheckedCreateNestedOneWithoutCurrencyInput
+  }
+
+  export type CurrencyCreateOrConnectWithoutValasTransactionsInput = {
+    where: CurrencyWhereUniqueInput
+    create: XOR<CurrencyCreateWithoutValasTransactionsInput, CurrencyUncheckedCreateWithoutValasTransactionsInput>
+  }
+
+  export type BankAccountCreateWithoutValasTransactionsInput = {
+    id?: string
+    bankName: string
+    accountNumber?: string | null
+    accountName: string
+    balance?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    sortOrder?: number
+    note?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutBankAccountsInput
+    currency: CurrencyCreateNestedOneWithoutBankAccountsInput
+    mutations?: BankMutationCreateNestedManyWithoutBankAccountInput
+    dailyEntries?: DailyBankEntryCreateNestedManyWithoutBankAccountInput
+  }
+
+  export type BankAccountUncheckedCreateWithoutValasTransactionsInput = {
+    id?: string
+    companyId: string
+    bankName: string
+    accountNumber?: string | null
+    accountName: string
+    currencyId: string
+    balance?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    sortOrder?: number
+    note?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    mutations?: BankMutationUncheckedCreateNestedManyWithoutBankAccountInput
+    dailyEntries?: DailyBankEntryUncheckedCreateNestedManyWithoutBankAccountInput
+  }
+
+  export type BankAccountCreateOrConnectWithoutValasTransactionsInput = {
+    where: BankAccountWhereUniqueInput
+    create: XOR<BankAccountCreateWithoutValasTransactionsInput, BankAccountUncheckedCreateWithoutValasTransactionsInput>
+  }
+
+  export type CompanyUpsertWithoutValasTransactionsInput = {
+    update: XOR<CompanyUpdateWithoutValasTransactionsInput, CompanyUncheckedUpdateWithoutValasTransactionsInput>
+    create: XOR<CompanyCreateWithoutValasTransactionsInput, CompanyUncheckedCreateWithoutValasTransactionsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutValasTransactionsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutValasTransactionsInput, CompanyUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type CompanyUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
+    payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
+    payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type BranchUpsertWithoutValasTransactionsInput = {
+    update: XOR<BranchUpdateWithoutValasTransactionsInput, BranchUncheckedUpdateWithoutValasTransactionsInput>
+    create: XOR<BranchCreateWithoutValasTransactionsInput, BranchUncheckedCreateWithoutValasTransactionsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutValasTransactionsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutValasTransactionsInput, BranchUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type BranchUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneWithoutBranchesNestedInput
+    currencyStocks?: CurrencyStockUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
+    users?: userUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currencyStocks?: CurrencyStockUncheckedUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
+    users?: userUncheckedUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type CurrencyUpsertWithoutValasTransactionsInput = {
+    update: XOR<CurrencyUpdateWithoutValasTransactionsInput, CurrencyUncheckedUpdateWithoutValasTransactionsInput>
+    create: XOR<CurrencyCreateWithoutValasTransactionsInput, CurrencyUncheckedCreateWithoutValasTransactionsInput>
+    where?: CurrencyWhereInput
+  }
+
+  export type CurrencyUpdateToOneWithWhereWithoutValasTransactionsInput = {
+    where?: CurrencyWhereInput
+    data: XOR<CurrencyUpdateWithoutValasTransactionsInput, CurrencyUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type CurrencyUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bankAccounts?: BankAccountUpdateManyWithoutCurrencyNestedInput
+    stocks?: CurrencyStockUpdateManyWithoutCurrencyNestedInput
+    stockMutations?: StockMutationUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUpdateOneWithoutCurrencyNestedInput
+  }
+
+  export type CurrencyUncheckedUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCurrencyNestedInput
+    stocks?: CurrencyStockUncheckedUpdateManyWithoutCurrencyNestedInput
+    stockMutations?: StockMutationUncheckedUpdateManyWithoutCurrencyNestedInput
+    price?: CurrencyPriceUncheckedUpdateOneWithoutCurrencyNestedInput
+  }
+
+  export type BankAccountUpsertWithoutValasTransactionsInput = {
+    update: XOR<BankAccountUpdateWithoutValasTransactionsInput, BankAccountUncheckedUpdateWithoutValasTransactionsInput>
+    create: XOR<BankAccountCreateWithoutValasTransactionsInput, BankAccountUncheckedCreateWithoutValasTransactionsInput>
+    where?: BankAccountWhereInput
+  }
+
+  export type BankAccountUpdateToOneWithWhereWithoutValasTransactionsInput = {
+    where?: BankAccountWhereInput
+    data: XOR<BankAccountUpdateWithoutValasTransactionsInput, BankAccountUncheckedUpdateWithoutValasTransactionsInput>
+  }
+
+  export type BankAccountUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bankName?: StringFieldUpdateOperationsInput | string
+    accountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    accountName?: StringFieldUpdateOperationsInput | string
+    balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutBankAccountsNestedInput
+    currency?: CurrencyUpdateOneRequiredWithoutBankAccountsNestedInput
+    mutations?: BankMutationUpdateManyWithoutBankAccountNestedInput
+    dailyEntries?: DailyBankEntryUpdateManyWithoutBankAccountNestedInput
+  }
+
+  export type BankAccountUncheckedUpdateWithoutValasTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    bankName?: StringFieldUpdateOperationsInput | string
+    accountNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    accountName?: StringFieldUpdateOperationsInput | string
+    currencyId?: StringFieldUpdateOperationsInput | string
+    balance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mutations?: BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput
+    dailyEntries?: DailyBankEntryUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type RoleKpiCreateManyCustomRoleInput = {
@@ -105361,10 +109774,6 @@ export namespace Prisma {
     phone?: string | null
     branchId?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -105476,10 +109885,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -105516,10 +109921,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -105555,10 +109956,6 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -106891,6 +111288,34 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ValasTransactionCreateManyBankAccountInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type BankMutationUpdateWithoutBankAccountInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumBankMutationTypeFieldUpdateOperationsInput | $Enums.BankMutationType
@@ -106963,6 +111388,90 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ValasTransactionUpdateWithoutBankAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    branch?: BranchUpdateOneWithoutValasTransactionsNestedInput
+    currency?: CurrencyUpdateOneRequiredWithoutValasTransactionsNestedInput
+  }
+
+  export type ValasTransactionUncheckedUpdateWithoutBankAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutBankAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CurrencyStockCreateManyBranchInput = {
     id?: string
     currencyId: string
@@ -107006,10 +111515,6 @@ export namespace Prisma {
     updatedAt: Date | string
     phone?: string | null
     baseSalary?: Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: Decimal | DecimalJsLike | number | string | null
     joinDate?: Date | string | null
     employmentStatus?: $Enums.EmploymentStatus
     contractStartDate?: Date | string | null
@@ -107060,6 +111565,34 @@ export namespace Prisma {
     note?: string | null
     paidAt?: Date | string | null
     paidById?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ValasTransactionCreateManyBranchInput = {
+    id?: string
+    companyId: string
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -107175,10 +111708,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -107214,10 +111743,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -107253,10 +111778,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    mealAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transportAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    positionAllowance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    bpjsKesehatan?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
     contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -107401,6 +111922,90 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paidById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    currency?: CurrencyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    bankAccount?: BankAccountUpdateOneWithoutValasTransactionsNestedInput
+  }
+
+  export type ValasTransactionUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -107614,6 +112219,34 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ValasTransactionCreateManyCompanyInput = {
+    id?: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    currencyId: string
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SalaryComponentUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -107668,6 +112301,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutCompanyInput = {
@@ -107687,6 +112321,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateManyWithoutCompanyInput = {
@@ -107931,6 +112566,7 @@ export namespace Prisma {
     currency?: CurrencyUpdateOneRequiredWithoutBankAccountsNestedInput
     mutations?: BankMutationUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutCompanyInput = {
@@ -107947,6 +112583,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mutations?: BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUncheckedUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateManyWithoutCompanyInput = {
@@ -108289,6 +112926,90 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ValasTransactionUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneWithoutValasTransactionsNestedInput
+    currency?: CurrencyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    bankAccount?: BankAccountUpdateOneWithoutValasTransactionsNestedInput
+  }
+
+  export type ValasTransactionUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    currencyId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BankAccountCreateManyCurrencyInput = {
     id?: string
     companyId: string
@@ -108325,6 +113046,34 @@ export namespace Prisma {
     createdBy?: string | null
   }
 
+  export type ValasTransactionCreateManyCurrencyInput = {
+    id?: string
+    companyId: string
+    branchId?: string | null
+    invoiceNo: string
+    date: Date | string
+    type: $Enums.ValasTransactionType
+    amount: Decimal | DecimalJsLike | number | string
+    rate: Decimal | DecimalJsLike | number | string
+    priceRate?: Decimal | DecimalJsLike | number | string | null
+    totalIdr: Decimal | DecimalJsLike | number | string
+    customerName: string
+    customerPhone?: string | null
+    customerIdType?: $Enums.ValasCustomerIdType | null
+    customerIdNumber?: string | null
+    customerAddress?: string | null
+    paymentMethod?: $Enums.ValasPaymentMethod
+    bankAccountId?: string | null
+    note?: string | null
+    status?: $Enums.ValasTransactionStatus
+    voidedAt?: Date | string | null
+    voidedBy?: string | null
+    voidReason?: string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type BankAccountUpdateWithoutCurrencyInput = {
     id?: StringFieldUpdateOperationsInput | string
     bankName?: StringFieldUpdateOperationsInput | string
@@ -108339,6 +113088,7 @@ export namespace Prisma {
     company?: CompanyUpdateOneRequiredWithoutBankAccountsNestedInput
     mutations?: BankMutationUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateWithoutCurrencyInput = {
@@ -108355,6 +113105,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mutations?: BankMutationUncheckedUpdateManyWithoutBankAccountNestedInput
     dailyEntries?: DailyBankEntryUncheckedUpdateManyWithoutBankAccountNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBankAccountNestedInput
   }
 
   export type BankAccountUncheckedUpdateManyWithoutCurrencyInput = {
@@ -108435,6 +113186,90 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ValasTransactionUpdateWithoutCurrencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutValasTransactionsNestedInput
+    branch?: BranchUpdateOneWithoutValasTransactionsNestedInput
+    bankAccount?: BankAccountUpdateOneWithoutValasTransactionsNestedInput
+  }
+
+  export type ValasTransactionUncheckedUpdateWithoutCurrencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ValasTransactionUncheckedUpdateManyWithoutCurrencyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumValasTransactionTypeFieldUpdateOperationsInput | $Enums.ValasTransactionType
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalIdr?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    customerIdType?: NullableEnumValasCustomerIdTypeFieldUpdateOperationsInput | $Enums.ValasCustomerIdType | null
+    customerIdNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customerAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentMethod?: EnumValasPaymentMethodFieldUpdateOperationsInput | $Enums.ValasPaymentMethod
+    bankAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumValasTransactionStatusFieldUpdateOperationsInput | $Enums.ValasTransactionStatus
+    voidedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    voidedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    voidReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StockistBalanceCreateManyCompanyStockItemInput = {

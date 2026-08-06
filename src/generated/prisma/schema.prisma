@@ -13,6 +13,30 @@ enum AttendanceStatus {
   HOLIDAY
 }
 
+/// Tanggal merah — hari libur nasional & cuti bersama.
+///
+/// Ada karena alpha diturunkan dari KETIADAAN baris presensi: tanpa daftar ini,
+/// setiap tanggal merah yang lewat tanpa presensi akan dihitung alpha dan
+/// dipotong dari gaji. Hari Minggu tidak perlu dicatat di sini — ia sudah
+/// dikecualikan dari hari kerja (lihat src/lib/workday.ts).
+///
+/// Berlaku untuk SEMUA PT: tanggal merah ditetapkan pemerintah, bukan per
+/// perusahaan. Kalau suatu saat satu PT libur sendiri di tanggal yang bukan
+/// tanggal merah, itu bukan baris di sini melainkan presensi berstatus HOLIDAY.
+model PublicHoliday {
+  id           String   @id @default(cuid())
+  date         DateTime @unique @db.Date
+  name         String
+  /// Cuti bersama (bukan hari libur itu sendiri) — dibedakan hanya untuk
+  /// keterangan, keduanya sama-sama bukan hari kerja.
+  isJointLeave Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}
+
 model Attendance {
   id                String           @id @default(cuid())
   userId            String
@@ -109,21 +133,17 @@ model custom_role {
 }
 
 model user {
-  id                 String    @id
-  name               String
-  email              String    @unique
-  emailVerified      Boolean
-  image              String?
-  createdAt          DateTime
-  updatedAt          DateTime
-  phone              String?
-  branchId           String?
-  baseSalary         Decimal?
-  mealAllowance      Decimal?
-  transportAllowance Decimal?
-  positionAllowance  Decimal?
-  bpjsKesehatan      Decimal?
-  joinDate           DateTime?
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  phone         String?
+  branchId      String?
+  baseSalary    Decimal?
+  joinDate      DateTime?
 
   /// Status ikatan kerja. Dipakai rule payroll untuk menegakkan aturan
   /// manajemen "yang masih belum di kontrak belum bisa mendapatkan bonus
@@ -220,22 +240,23 @@ model RoleResourcePermission {
 }
 
 model BankAccount {
-  id            String           @id @default(cuid())
-  companyId     String
-  bankName      String
-  accountNumber String?
-  accountName   String
-  currencyId    String
-  balance       Decimal          @default(0)
-  isActive      Boolean          @default(true)
-  sortOrder     Int              @default(0)
-  note          String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  company       Company          @relation(fields: [companyId], references: [id])
-  currency      Currency         @relation(fields: [currencyId], references: [id])
-  mutations     BankMutation[]
-  dailyEntries  DailyBankEntry[]
+  id                String             @id @default(cuid())
+  companyId         String
+  bankName          String
+  accountNumber     String?
+  accountName       String
+  currencyId        String
+  balance           Decimal            @default(0)
+  isActive          Boolean            @default(true)
+  sortOrder         Int                @default(0)
+  note              String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  company           Company            @relation(fields: [companyId], references: [id])
+  currency          Currency           @relation(fields: [currencyId], references: [id])
+  mutations         BankMutation[]
+  dailyEntries      DailyBankEntry[]
+  valasTransactions ValasTransaction[]
 
   @@index([companyId])
 }
@@ -281,25 +302,26 @@ enum BankMutationType {
 }
 
 model Branch {
-  id                String          @id @default(cuid())
+  id                String             @id @default(cuid())
   name              String
   address           String?
   phone             String?
-  isActive          Boolean         @default(true)
+  isActive          Boolean            @default(true)
   companyId         String?
   // Geofence for attendance check-in validation
   latitude          Float?
   longitude         Float?
-  attendanceRadiusM Int?            @default(20)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  company           Company?        @relation(fields: [companyId], references: [id])
+  attendanceRadiusM Int?               @default(20)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  company           Company?           @relation(fields: [companyId], references: [id])
   currencyStocks    CurrencyStock[]
   stockItems        StockItem[]
   stockMutations    StockMutation[]
   users             user[]
   attendances       Attendance[]
   payrollSlips      PayrollSlip[]
+  valasTransactions ValasTransaction[]
 }
 
 model Company {
@@ -325,20 +347,22 @@ model Company {
   correctionRequests        CorrectionRequest[]
   heldFunds                 HeldFund[]
   payrollRuns               PayrollRun[]
+  valasTransactions         ValasTransaction[]
 }
 
 model Currency {
-  id             String          @id @default(cuid())
-  code           String          @unique
-  name           String
-  symbol         String?
-  isActive       Boolean         @default(true)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  bankAccounts   BankAccount[]
-  stocks         CurrencyStock[]
-  stockMutations StockMutation[]
-  price          CurrencyPrice?
+  id                String             @id @default(cuid())
+  code              String             @unique
+  name              String
+  symbol            String?
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  bankAccounts      BankAccount[]
+  stocks            CurrencyStock[]
+  stockMutations    StockMutation[]
+  price             CurrencyPrice?
+  valasTransactions ValasTransaction[]
 }
 
 // Harga Valas: harga beli & jual yang benar-benar dipakai Pusat Valas Indo hari
@@ -1205,14 +1229,17 @@ enum PayrollEntryStatus {
 // ───────────────────────────────────────────────────────────────────────────
 // KOMPONEN GAJI TAMBAHAN
 //
-// Uang makan, transport, jabatan, dan BPJS sudah jadi kolom tetap di `user`
-// karena dipakai semua karyawan. Komponen di bawah ini untuk sisanya — yang
-// jumlah dan namanya beda-beda per PT (tunjangan pulsa, komunikasi, kacamata,
-// potongan koperasi, dst.) — supaya menambah jenis tunjangan/potongan baru
-// tidak perlu migrasi schema lagi.
+// Uang makan, transport, jabatan, dan BPJS TIDAK LAGI kolom tetap di `user`
+// (migrasi 20260806000000) — sekarang cuma 4 SalaryComponent global biasa,
+// sama seperti tunjangan pulsa, komunikasi, kacamata, potongan koperasi, dst.
+// Dicocokkan oleh `payrollService`/`loadEmployeeContext` lewat NAMA
+// ("Uang Makan", "Uang Transport", "Uang Jabatan", "BPJS Kesehatan"), bukan id
+// tetap — supaya menambah/mengubah jenis tunjangan/potongan tidak perlu
+// migrasi schema lagi, dengan trade-off: rename nama komponen itu lewat
+// halaman Komponen Gaji akan melepas pencocokannya.
 //
-// Semuanya nominal TETAP PER BULAN, sama seperti kolom tetap di atas. Tidak
-// ada perhitungan pro-rata per hari hadir.
+// Semuanya nominal TETAP PER BULAN. Tidak ada perhitungan pro-rata per hari
+// hadir.
 // ───────────────────────────────────────────────────────────────────────────
 
 /// Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.
@@ -1820,4 +1847,122 @@ enum CorrectionStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+// Transaksi Jual & Beli Valas — satu baris per transaksi nasabah di loket.
+//
+// Bentuknya sengaja BEDA dari modul harian (DailyStockEntry, KasDailyEntry,
+// DailyBankEntry): di sana satu baris per pocket per tanggal, di sini satu baris
+// per kejadian. Tidak ada kunci unik per tanggal — nol transaksi sehari adalah
+// keadaan normal, bukan "belum diisi".
+//
+// Sumber harganya adalah Harga Valas (`CurrencyPrice`): BUY memakai `buyPrice`
+// (kita membeli dari nasabah), SELL memakai `sellPrice`. Harga itu global dan
+// BERGERAK, jadi angkanya di-SNAPSHOT ke baris ini saat transaksi dibuat —
+// `rate` adalah kurs yang benar-benar dipakai dan `priceRate` harga yang berlaku
+// saat itu. Tanpa snapshot, laporan kemarin akan ikut berubah setiap kali harga
+// hari ini disimpan.
+//
+// Sengaja TIDAK memutasi `CurrencyStock`/`StockMutation`: stok valas dicatat
+// lewat input harian Stock & Kas (closing qty per tanggal, lalu di-cross-check).
+// Kalau modul ini ikut menulis ke sana, angka stok punya dua sumber kebenaran
+// yang tidak bisa direkonsiliasi. Transaksi di sini adalah catatan penjualan &
+// pembelian; stok tetap milik modul stockist.
+model ValasTransaction {
+  id String @id @default(cuid())
+
+  // PT wajib (sumbu scope izin), cabang opsional — mengikuti pola Branch? di
+  // seluruh repo: cabang boleh dihapus tanpa menghilangkan riwayat transaksinya.
+  companyId String
+  branchId  String?
+
+  // Nomor bukti yang dilihat nasabah, unik per PT. Format:
+  // "{KODE_PT}/{JL|BL}/{YYMMDD}/{urut 4 digit}" — lihat generateInvoiceNo.
+  invoiceNo String
+
+  // Tanggal transaksi (date-only, UTC-midnight seperti modul harian) supaya
+  // laporan per tanggal tidak bergantung zona waktu. Jam sebenarnya ada di
+  // `createdAt`.
+  date DateTime @db.Date
+
+  type ValasTransactionType
+
+  currencyId String
+  // Jumlah valas yang berpindah tangan, dalam satuan mata uangnya.
+  amount     Decimal  @db.Decimal(18, 4)
+  // Kurs yang BENAR-BENAR dipakai (IDR per 1 unit). Boleh berbeda dari
+  // `priceRate` kalau kasir menegosiasikan harga.
+  rate       Decimal  @db.Decimal(18, 4)
+  // Harga dari Harga Valas saat transaksi dibuat — pembanding untuk menilai
+  // seberapa jauh kurs dinego. Null kalau mata uangnya belum punya harga.
+  priceRate  Decimal? @db.Decimal(18, 4)
+  // amount × rate, dihitung server. Disimpan supaya laporan tidak perlu
+  // mengalikan ulang (dan tidak bisa berbeda dari yang tercetak di bukti).
+  totalIdr   Decimal  @db.Decimal(18, 2)
+
+  // ── Nasabah ───────────────────────────────────────────────────────────────
+  // Nama selalu wajib. Identitas (jenis + nomor) wajib di atas ambang
+  // IDENTITY_REQUIRED_THRESHOLD — lihat valas-transaction.service.ts.
+  customerName     String
+  customerPhone    String?
+  customerIdType   ValasCustomerIdType?
+  customerIdNumber String?
+  customerAddress  String?
+
+  paymentMethod ValasPaymentMethod @default(CASH)
+  // Rekening tujuan/asal saat pembayarannya transfer. Nullable karena mayoritas
+  // transaksi loket tunai.
+  bankAccountId String?
+
+  note String?
+
+  // ── Pembatalan ────────────────────────────────────────────────────────────
+  // Transaksi TIDAK pernah dihapus: bukti bernomor yang hilang dari daftar
+  // adalah lubang di jejak audit. Pembatalan menandai, dan barisnya tetap
+  // tampil dengan status VOID (dikeluarkan dari semua total).
+  status     ValasTransactionStatus @default(COMPLETED)
+  voidedAt   DateTime?
+  voidedBy   String?
+  voidReason String?
+
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company      @relation(fields: [companyId], references: [id])
+  branch      Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  currency    Currency     @relation(fields: [currencyId], references: [id])
+  bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, invoiceNo])
+  // Halaman membaca satu PT satu tanggal; laporan membaca rentang tanggal per PT.
+  @@index([companyId, date])
+  @@index([companyId, currencyId, date])
+  @@index([branchId, date])
+}
+
+enum ValasTransactionType {
+  // Perusahaan MEMBELI valas dari nasabah → pakai CurrencyPrice.buyPrice.
+  BUY
+  // Perusahaan MENJUAL valas ke nasabah → pakai CurrencyPrice.sellPrice.
+  SELL
+}
+
+enum ValasPaymentMethod {
+  CASH
+  TRANSFER
+}
+
+enum ValasTransactionStatus {
+  COMPLETED
+  VOID
+}
+
+enum ValasCustomerIdType {
+  KTP
+  SIM
+  PASSPORT
+  KITAS
+  NPWP
+  LAINNYA
 }

@@ -120,6 +120,15 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.PublicHolidayScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  name: 'name',
+  isJointLeave: 'isJointLeave',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.AttendanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -193,10 +202,6 @@ exports.Prisma.UserScalarFieldEnum = {
   phone: 'phone',
   branchId: 'branchId',
   baseSalary: 'baseSalary',
-  mealAllowance: 'mealAllowance',
-  transportAllowance: 'transportAllowance',
-  positionAllowance: 'positionAllowance',
-  bpjsKesehatan: 'bpjsKesehatan',
   joinDate: 'joinDate',
   employmentStatus: 'employmentStatus',
   contractStartDate: 'contractStartDate',
@@ -868,6 +873,35 @@ exports.Prisma.CorrectionRequestScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ValasTransactionScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  branchId: 'branchId',
+  invoiceNo: 'invoiceNo',
+  date: 'date',
+  type: 'type',
+  currencyId: 'currencyId',
+  amount: 'amount',
+  rate: 'rate',
+  priceRate: 'priceRate',
+  totalIdr: 'totalIdr',
+  customerName: 'customerName',
+  customerPhone: 'customerPhone',
+  customerIdType: 'customerIdType',
+  customerIdNumber: 'customerIdNumber',
+  customerAddress: 'customerAddress',
+  paymentMethod: 'paymentMethod',
+  bankAccountId: 'bankAccountId',
+  note: 'note',
+  status: 'status',
+  voidedAt: 'voidedAt',
+  voidedBy: 'voidedBy',
+  voidReason: 'voidReason',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1114,7 +1148,32 @@ exports.CorrectionStatus = exports.$Enums.CorrectionStatus = {
   REJECTED: 'REJECTED'
 };
 
+exports.ValasTransactionType = exports.$Enums.ValasTransactionType = {
+  BUY: 'BUY',
+  SELL: 'SELL'
+};
+
+exports.ValasCustomerIdType = exports.$Enums.ValasCustomerIdType = {
+  KTP: 'KTP',
+  SIM: 'SIM',
+  PASSPORT: 'PASSPORT',
+  KITAS: 'KITAS',
+  NPWP: 'NPWP',
+  LAINNYA: 'LAINNYA'
+};
+
+exports.ValasPaymentMethod = exports.$Enums.ValasPaymentMethod = {
+  CASH: 'CASH',
+  TRANSFER: 'TRANSFER'
+};
+
+exports.ValasTransactionStatus = exports.$Enums.ValasTransactionStatus = {
+  COMPLETED: 'COMPLETED',
+  VOID: 'VOID'
+};
+
 exports.Prisma.ModelName = {
+  PublicHoliday: 'PublicHoliday',
   Attendance: 'Attendance',
   account: 'account',
   session: 'session',
@@ -1167,7 +1226,8 @@ exports.Prisma.ModelName = {
   KasHeadConfirmation: 'KasHeadConfirmation',
   BankHeadConfirmation: 'BankHeadConfirmation',
   CompanyHeadConfirmationTotal: 'CompanyHeadConfirmationTotal',
-  CorrectionRequest: 'CorrectionRequest'
+  CorrectionRequest: 'CorrectionRequest',
+  ValasTransaction: 'ValasTransaction'
 };
 
 /**
