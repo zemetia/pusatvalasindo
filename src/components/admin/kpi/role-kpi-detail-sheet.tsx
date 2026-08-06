@@ -17,12 +17,8 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Combobox,
+} from "@/components/ui/combobox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IconInfoCircle } from "@tabler/icons-react";
 import type { KpiDefinitionRow} from "../kpi-definition-sheet";
@@ -249,25 +245,19 @@ export function RoleKpiDetailSheet({
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-6 px-1">
           <div className="grid gap-1.5">
             <Label>KPI *</Label>
-            <Select
+            <Combobox
               value={form.kpiId}
               onValueChange={(v) => setForm((f) => ({ ...f, kpiId: v }))}
               disabled={isEdit}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih KPI" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableDefinitions.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
-                    {d.name}
-                    <span className="ml-1 text-muted-foreground">
-                      — {SCORING_TYPE_LABELS[d.scoringType] ?? d.scoringType}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={availableDefinitions.map((d) => ({
+                value: d.id,
+                label: d.name,
+                description: SCORING_TYPE_LABELS[d.scoringType] ?? d.scoringType,
+              }))}
+              placeholder="Pilih KPI"
+              searchPlaceholder="Cari KPI..."
+              emptyText="KPI tidak ditemukan."
+            />
             {!isEdit && availableDefinitions.length === 0 && (
               <p className="text-xs text-muted-foreground">
                 Semua KPI aktif sudah dikonfigurasi untuk jabatan ini.
@@ -412,19 +402,15 @@ export function RoleKpiDetailSheet({
                 <FieldLabel tooltip="Batas dihitung per hari, per minggu, atau untuk seluruh bulan.">
                   Cakupan Toleransi
                 </FieldLabel>
-                <Select
+                <Combobox
                   value={form.toleranceScope}
                   onValueChange={(v) => setForm((f) => ({ ...f, toleranceScope: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="DAILY">Per hari</SelectItem>
-                    <SelectItem value="WEEKLY">Per minggu</SelectItem>
-                    <SelectItem value="MONTHLY">Per bulan</SelectItem>
-                  </SelectContent>
-                </Select>
+                  options={[
+                    { value: "DAILY", label: "Per hari" },
+                    { value: "WEEKLY", label: "Per minggu" },
+                    { value: "MONTHLY", label: "Per bulan" },
+                  ]}
+                />
               </div>
             </>
           )}
@@ -439,73 +425,57 @@ export function RoleKpiDetailSheet({
               <FieldLabel tooltip="Kosongkan untuk mengikuti pengaturan pada definisi KPI-nya.">
                 Diisi Oleh
               </FieldLabel>
-              <Select
+              <Combobox
                 value={form.inputSource || "INHERIT"}
                 onValueChange={(v) =>
                   setForm((f) => ({ ...f, inputSource: v === "INHERIT" ? "" : v }))
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INHERIT">
-                    Ikut definisi
-                    {selectedDefinition && (
-                      <span className="ml-1 text-muted-foreground">
-                        (
-                        {INPUT_SOURCE_OPTIONS.find(
+                options={[
+                  {
+                    value: "INHERIT",
+                    label: "Ikut definisi",
+                    description: selectedDefinition
+                      ? (INPUT_SOURCE_OPTIONS.find(
                           (o) => o.value === selectedDefinition.defaultInputSource
-                        )?.label ?? selectedDefinition.defaultInputSource}
-                        )
-                      </span>
-                    )}
-                  </SelectItem>
-                  {INPUT_SOURCE_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                        )?.label ?? selectedDefinition.defaultInputSource)
+                      : undefined,
+                  },
+                  ...INPUT_SOURCE_OPTIONS.map((o) => ({
+                    value: o.value,
+                    label: o.label,
+                  })),
+                ]}
+              />
             </div>
 
             <div className="grid gap-1.5">
               <Label>Perlu Persetujuan</Label>
-              <Select
+              <Combobox
                 value={form.requiresApproval || "INHERIT"}
                 onValueChange={(v) =>
                   setForm((f) => ({ ...f, requiresApproval: v === "INHERIT" ? "" : v }))
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INHERIT">Ikut definisi</SelectItem>
-                  <SelectItem value="YES">Ya, tunggu persetujuan atasan</SelectItem>
-                  <SelectItem value="NO">Tidak, langsung dihitung</SelectItem>
-                </SelectContent>
-              </Select>
+                options={[
+                  { value: "INHERIT", label: "Ikut definisi" },
+                  { value: "YES", label: "Ya, tunggu persetujuan atasan" },
+                  { value: "NO", label: "Tidak, langsung dihitung" },
+                ]}
+              />
             </div>
 
             <div className="grid gap-1.5">
               <Label>Wajib Bukti</Label>
-              <Select
+              <Combobox
                 value={form.requiresEvidence || "INHERIT"}
                 onValueChange={(v) =>
                   setForm((f) => ({ ...f, requiresEvidence: v === "INHERIT" ? "" : v }))
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INHERIT">Ikut definisi</SelectItem>
-                  <SelectItem value="YES">Ya, wajib lampirkan bukti</SelectItem>
-                  <SelectItem value="NO">Tidak wajib</SelectItem>
-                </SelectContent>
-              </Select>
+                options={[
+                  { value: "INHERIT", label: "Ikut definisi" },
+                  { value: "YES", label: "Ya, wajib lampirkan bukti" },
+                  { value: "NO", label: "Tidak wajib" },
+                ]}
+              />
             </div>
 
             <label className="flex items-center gap-2 text-sm">

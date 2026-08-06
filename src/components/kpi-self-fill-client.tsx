@@ -8,13 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Table,
   TableBody,
@@ -260,18 +254,15 @@ export function KpiSelfFillClient({
       <div className="grid grid-cols-2 gap-4 rounded-lg border p-4">
         <div className="grid gap-1.5">
           <Label>Bulan</Label>
-          <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTH_NAMES.slice(1).map((name, i) => (
-                <SelectItem key={i + 1} value={String(i + 1)}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Combobox
+            value={month}
+            onValueChange={setMonth}
+            options={MONTH_NAMES.slice(1).map((name, i) => ({
+              value: String(i + 1),
+              label: name,
+            }))}
+            searchPlaceholder="Cari bulan..."
+          />
         </div>
         <div className="grid gap-1.5">
           <Label>Tahun</Label>
@@ -318,21 +309,19 @@ export function KpiSelfFillClient({
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <Label>KPI *</Label>
-              <Select value={roleKpiId} onValueChange={setRoleKpiId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih KPI..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {fillableKpis.map((k) => (
-                    <SelectItem key={k.roleKpiId} value={k.roleKpiId}>
-                      {k.name}
-                      <span className="text-muted-foreground ml-1">
-                        — {SCORING_TYPE_LABELS[k.scoringType] ?? k.scoringType}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Combobox
+                value={roleKpiId}
+                onValueChange={setRoleKpiId}
+                options={fillableKpis.map((k) => ({
+                  value: k.roleKpiId,
+                  label: k.name,
+                  description:
+                    SCORING_TYPE_LABELS[k.scoringType] ?? k.scoringType,
+                }))}
+                placeholder="Pilih KPI..."
+                searchPlaceholder="Cari KPI..."
+                emptyText="KPI tidak ditemukan."
+              />
             </div>
 
             <div className="grid gap-1.5">

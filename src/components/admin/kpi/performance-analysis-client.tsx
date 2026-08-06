@@ -4,14 +4,9 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Table,
   TableBody,
@@ -32,7 +27,12 @@ import {
 import { SearchInput } from "@/components/admin/search-input";
 import { IconChartHistogram } from "@tabler/icons-react";
 import { MONTH_NAMES, formatPercent } from "@/lib/kpi-utils";
-import type { PerformanceOverview } from "@/backend/services/kpi-analytics.service";
+import {
+  aggregatePerformance,
+  NO_BRANCH,
+  NO_COMPANY,
+  type PerformanceOverview,
+} from "@/lib/kpi-analytics";
 
 /* ── Skala bersama untuk sparkline ──────────────────────────────────────────
  * Domain sama untuk semua baris (bukan min–max tiap baris) supaya garisnya bisa
@@ -49,14 +49,20 @@ function Sparkline({
   values,
   labels,
   max,
+  width = SPARK_W,
+  height = SPARK_H,
+  description = "Tren",
 }: {
   values: (number | null)[];
   labels: string[];
   max: number;
+  width?: number;
+  height?: number;
+  description?: string;
 }) {
   const points = values.map((v, i) => ({
-    x: values.length <= 1 ? SPARK_W / 2 : (i / (values.length - 1)) * SPARK_W,
-    y: v === null ? null : SPARK_H - (Math.max(v, 0) / max) * SPARK_H,
+    x: values.length <= 1 ? width / 2 : (i / (values.length - 1)) * width,
+    y: v === null ? null : height - (Math.max(v, 0) / max) * height,
   }));
 
   // Bulan tanpa hasil memutus garis, bukan digambar sebagai nol — nol berarti
@@ -82,12 +88,12 @@ function Sparkline({
 
   return (
     <svg
-      width={SPARK_W}
-      height={SPARK_H}
-      viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
       className="text-primary overflow-visible"
       role="img"
-      aria-label={`Tren ${labels.join(", ")}: ${values
+      aria-label={`${description} ${labels.join(", ")}: ${values
         .map((v) => (v === null ? "belum dinilai" : formatPercent(v)))
         .join(", ")}`}
     >
@@ -138,18 +144,22 @@ const SORT_LABELS: Record<SortKey, string> = {
   nama: "Nama A–Z",
 };
 
+const ALL = "ALL";
+
 export function PerformanceAnalysisClient({ overview }: { overview: PerformanceOverview }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [company, setCompany] = useState("ALL");
-  const [role, setRole] = useState("ALL");
+  const [company, setCompany] = useState(ALL);
+  const [branch, setBranch] = useState(ALL);
+  const [role, setRole] = useState(ALL);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("skor-desc");
+  const [splitByCompany, setSplitByCompany] = useState(true);
 
-  const { period, historyLabels, totals, byCompany, byRole, rows } = overview;
+  const { period, historyLabels, rows } = overview;
 
   /** Ganti periode = data baru dari server, jadi lewat URL bukan state lokal. */
   const setPeriod = (next: { month?: number; year?: number }) => {
@@ -159,10 +169,112 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
     startTransition(() => router.push(`${pathname}?${params.toString()}`));
   };
 
-  const roleOptions = useMemo(
-    () => [...new Set(rows.map((r) => r.roleName))].sort(),
-    [rows]
+  /* ── Pilihan filter ────────────────────────────────────────────────────────
+   * Diturunkan dari baris yang ada, bukan dari master data: PT atau cabang yang
+   * tidak punya karyawan aktif berjabatan hanya akan menghasilkan halaman
+   * kosong kalau dipilih. Karyawan tanpa cabang (jabatan global) tetap dapat
+   * entri sendiri lewat sentinel — kalau tidak, mereka tidak bisa dipisahkan.
+   */
+  const companyOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const r of rows) map.set(r.companyId ?? NO_COMPANY, r.companyName);
+    return [...map.entries()]
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, "id"));
+  }, [rows]);
+
+  /**
+   * Cabang hanya berarti di dalam satu PT. Selama PT masih "Semua", filternya
+   * tidak ditampilkan sama sekali — daftar cabang lintas PT tidak bisa dibaca
+   * sebagai pilihan yang bermakna, dan nama cabang bisa sama di dua PT.
+   */
+  const branchOptions = useMemo(() => {
+    if (company === ALL) return [];
+    const map = new Map<string, string>();
+    for (const r of rows) {
+      if ((r.companyId ?? NO_COMPANY) !== company) continue;
+      map.set(r.branchId ?? NO_BRANCH, r.branchName);
+    }
+    return [...map.entries()]
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, "id"));
+  }, [rows, company]);
+
+  /**
+   * Jabatan yang dipakai karyawan ber-PT saja. Jabatan yang hanya dimiliki
+   * karyawan tanpa PT tidak ikut muncul — memilihnya tidak pernah berguna untuk
+   * membandingkan tim antar PT, dan hanya membuat daftar jabatan bengkak.
+   */
+  const rolesFor = useMemo(() => {
+    const perCompany = new Map<string, Set<string>>();
+    const all = new Set<string>();
+    for (const r of rows) {
+      if (!r.companyId) continue;
+      all.add(r.roleName);
+      const set = perCompany.get(r.companyId) ?? new Set<string>();
+      set.add(r.roleName);
+      perCompany.set(r.companyId, set);
+    }
+    return (companyId: string) =>
+      [...(companyId === ALL ? all : (perCompany.get(companyId) ?? new Set<string>()))].sort(
+        (a, b) => a.localeCompare(b, "id")
+      );
+  }, [rows]);
+
+  const roleOptions = useMemo(() => rolesFor(company), [rolesFor, company]);
+
+  /**
+   * Mengganti PT bisa membuat cabang & jabatan terpilih jadi mustahil. Cabang
+   * selalu direset (pilihannya terikat PT), jabatan hanya kalau memang tidak
+   * ada di PT baru — kalau namanya sama, mempertahankannya justru yang dimau.
+   */
+  const changeCompany = (value: string) => {
+    setCompany(value);
+    setBranch(ALL);
+    if (role !== ALL && !rolesFor(value).includes(role)) setRole(ALL);
+  };
+
+  const filtersActive = company !== ALL || branch !== ALL || role !== ALL;
+
+  const resetFilters = () => {
+    setCompany(ALL);
+    setBranch(ALL);
+    setRole(ALL);
+  };
+
+  /**
+   * Lingkup halaman. Semua angka di bawah — hero, distribusi grade, per PT, per
+   * jabatan — dihitung dari sini, jadi memilih PT + jabatan langsung memberi
+   * skor tim tersebut, bukan rata-rata seluruh perusahaan.
+   *
+   * Pencarian sengaja tidak ikut: itu alat mencari orang di dalam tabel, bukan
+   * penyempit lingkup — kalau ikut, mengetik satu nama akan membuat "rata-rata"
+   * berubah menjadi skor satu orang.
+   */
+  const scoped = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          (company === ALL || (r.companyId ?? NO_COMPANY) === company) &&
+          (branch === ALL || (r.branchId ?? NO_BRANCH) === branch) &&
+          (role === ALL || r.roleName === role)
+      ),
+    [rows, company, branch, role]
   );
+
+  const { totals, byCompany, byRole, byRoleCompany } = useMemo(
+    () => aggregatePerformance(scoped),
+    [scoped]
+  );
+
+  const scopeLabel = useMemo(() => {
+    const parts = [
+      companyOptions.find((c) => c.value === company)?.label,
+      branchOptions.find((b) => b.value === branch)?.label,
+      role === ALL ? undefined : role,
+    ].filter(Boolean);
+    return parts.length > 0 ? parts.join(" · ") : "Seluruh Karyawan";
+  }, [company, branch, role, companyOptions, branchOptions]);
 
   /**
    * Puncak skala sparkline: 120% kecuali ada yang melampauinya. Dihitung dari
@@ -177,14 +289,12 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const list = rows.filter(
+    const list = scoped.filter(
       (r) =>
-        (company === "ALL" || r.companyId === company) &&
-        (role === "ALL" || r.roleName === role) &&
-        (q === "" ||
-          [r.name, r.roleName, r.branchName, r.companyName].some((v) =>
-            v.toLowerCase().includes(q)
-          ))
+        q === "" ||
+        [r.name, r.roleName, r.branchName, r.companyName].some((v) =>
+          v.toLowerCase().includes(q)
+        )
     );
 
     /**
@@ -220,69 +330,121 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
           return byValue(a.score, b.score, -1, byName);
       }
     });
-  }, [rows, company, role, search, sort]);
+  }, [scoped, search, sort]);
 
   const goodCount = totals.gradeCounts.A + totals.gradeCounts.B;
   const gradeTotal = GRADE_ORDER.reduce((sum, g) => sum + totals.gradeCounts[g], 0);
 
+  /** Memisah per PT hanya masuk akal kalau lingkupnya memang lintas PT. */
+  const canSplit = byCompany.length > 1;
+  const roleRows = canSplit && splitByCompany ? byRoleCompany : byRole;
+
   return (
     <div className={isPending ? "opacity-60 transition-opacity" : undefined}>
-      {/* ── Pemilih periode ── */}
+      {/* ── Filter: menentukan seluruh angka di halaman ── */}
       <div className="flex flex-wrap items-end gap-3 pb-2">
         <div className="grid gap-1.5">
           <Label className="text-muted-foreground text-xs">Bulan</Label>
-          <Select
+          <Combobox
             value={String(period.month)}
             onValueChange={(v) => setPeriod({ month: Number(v) })}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTH_NAMES.slice(1).map((name, i) => (
-                <SelectItem key={i + 1} value={String(i + 1)}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={MONTH_NAMES.slice(1).map((name, i) => ({
+              value: String(i + 1),
+              label: name,
+            }))}
+            searchPlaceholder="Cari bulan..."
+            className="w-36"
+          />
         </div>
         <div className="grid gap-1.5">
           <Label className="text-muted-foreground text-xs">Tahun</Label>
-          <Select
+          <Combobox
             value={String(period.year)}
             onValueChange={(v) => setPeriod({ year: Number(v) })}
-          >
-            <SelectTrigger className="w-28">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map((y) => (
-                <SelectItem key={y} value={String(y)}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map(
+              (y) => ({ value: String(y), label: String(y) })
+            )}
+            className="w-24"
+          />
         </div>
+        <div className="grid gap-1.5">
+          <Label className="text-muted-foreground text-xs">PT</Label>
+          <Combobox
+            value={company}
+            onValueChange={changeCompany}
+            options={[{ value: ALL, label: "Semua PT" }, ...companyOptions]}
+            searchPlaceholder="Cari PT..."
+            className="w-44"
+          />
+        </div>
+        {/* Cabang baru muncul setelah PT dipilih — lihat `branchOptions`. */}
+        {company !== ALL && (
+          <div className="grid gap-1.5">
+            <Label className="text-muted-foreground text-xs">Cabang</Label>
+            <Combobox
+              value={branch}
+              onValueChange={setBranch}
+              options={[{ value: ALL, label: "Semua cabang" }, ...branchOptions]}
+              searchPlaceholder="Cari cabang..."
+              className="w-44"
+            />
+          </div>
+        )}
+        <div className="grid gap-1.5">
+          <Label className="text-muted-foreground text-xs">Jabatan</Label>
+          <Combobox
+            value={role}
+            onValueChange={setRole}
+            options={[
+              { value: ALL, label: "Semua jabatan" },
+              ...roleOptions.map((r) => ({ value: r, label: r })),
+            ]}
+            searchPlaceholder="Cari jabatan..."
+            className="w-44"
+          />
+        </div>
+        {filtersActive && (
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            Reset filter
+          </Button>
+        )}
       </div>
 
-      {/* ── Angka utama halaman ── */}
-      <section className="border-border border-y py-8">
-        <MetricLabel>Rata-rata Skor Seluruh Karyawan</MetricLabel>
-        <MetricValue size="hero" className="mt-2">
-          {totals.avgScore === null ? "—" : formatPercent(totals.avgScore)}
-        </MetricValue>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <DeltaPill value={totals.avgDeltaPct} />
-          <span className="text-muted-foreground text-xs">vs bulan lalu</span>
+      {/* ── Angka utama halaman, mengikuti filter ── */}
+      <section className="border-border flex flex-wrap items-end justify-between gap-6 border-y py-8">
+        <div className="min-w-0">
+          <MetricLabel>Rata-rata Skor · {scopeLabel}</MetricLabel>
+          <MetricValue size="hero" className="mt-2">
+            {totals.avgScore === null ? "—" : formatPercent(totals.avgScore)}
+          </MetricValue>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <DeltaPill value={totals.avgDeltaPct} />
+            <span className="text-muted-foreground text-xs">vs bulan lalu</span>
+          </div>
+          <p className="text-muted-foreground mt-1.5 text-xs">
+            {period.label} ·{" "}
+            {totals.avgScore === null
+              ? "belum ada karyawan yang dinilai pada lingkup ini"
+              : `dihitung dari ${totals.scored} karyawan yang sudah dinilai`}
+          </p>
         </div>
-        <p className="text-muted-foreground mt-1.5 text-xs">
-          {period.label} ·{" "}
-          {totals.avgScore === null
-            ? "belum ada karyawan yang dinilai pada periode ini"
-            : `dihitung dari ${totals.scored} karyawan yang sudah dinilai`}
-        </p>
+
+        {/* Tren rata-rata lingkup ini, bukan per orang. */}
+        <div className="flex flex-col gap-2">
+          <MetricLabel>Tren {historyLabels.length} Bulan</MetricLabel>
+          <Sparkline
+            values={totals.history}
+            labels={historyLabels}
+            max={sparkMax}
+            width={220}
+            height={48}
+            description={`Tren rata-rata ${scopeLabel}:`}
+          />
+          <div className="text-muted-foreground flex justify-between text-[0.7rem]">
+            <span>{historyLabels[0]}</span>
+            <span>{historyLabels[historyLabels.length - 1]}</span>
+          </div>
+        </div>
       </section>
 
       <MetricRow columns={4} className="-mt-px">
@@ -354,17 +516,17 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
         </section>
       )}
 
-      {/* ── Rata-rata per PT ── */}
-      {byCompany.length > 0 && (
+      {/* ── Rata-rata per PT, dalam lingkup filter yang aktif ── */}
+      {byCompany.length > 1 && (
         <MetricRow
-          title="Rata-rata per PT"
+          title={role === ALL ? "Rata-rata per PT" : `Rata-rata per PT · ${role}`}
           columns={byCompany.length >= 3 ? 3 : 2}
           className="-mt-px"
         >
           {byCompany.map((c) => (
             <MetricBlock
-              key={c.companyId}
-              label={c.name}
+              key={c.key}
+              label={c.label}
               size="secondary"
               value={c.avgScore === null ? "—" : formatPercent(c.avgScore)}
               delta={c.deltaPct}
@@ -375,11 +537,96 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
         </MetricRow>
       )}
 
-      {/* ── Peringkat karyawan ── */}
       <div className="mt-10 flex flex-col gap-6">
+        {/* ── Skor tim per jabatan (opsional dipisah per PT) ── */}
+        <SectionCard
+          title="Rata-rata per Jabatan"
+          description={
+            canSplit && splitByCompany
+              ? "Skor tim tiap jabatan di masing-masing PT — diurutkan dari yang terendah."
+              : "Diurutkan dari jabatan dengan rata-rata terendah — beserta KPI yang paling menariknya turun."
+          }
+          padded={false}
+          toolbar={
+            canSplit ? (
+              <Combobox
+                value={splitByCompany ? "split" : "merged"}
+                onValueChange={(v) => setSplitByCompany(v === "split")}
+                options={[
+                  { value: "split", label: "Pisah per PT" },
+                  { value: "merged", label: "Gabung semua PT" },
+                ]}
+                className="ml-auto w-52"
+              />
+            ) : undefined
+          }
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Jabatan</TableHead>
+                {canSplit && splitByCompany && <TableHead>PT</TableHead>}
+                <TableHead className="text-right">Dinilai</TableHead>
+                <TableHead className="text-right">Rata-rata Skor</TableHead>
+                <TableHead>vs Bulan Lalu</TableHead>
+                <TableHead>KPI Terlemah</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {roleRows.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={canSplit && splitByCompany ? 6 : 5} className="p-0">
+                    <EmptyState
+                      title="Belum ada data jabatan"
+                      description="Skor akan muncul setelah ada karyawan yang dinilai pada lingkup ini."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                roleRows.map((r) => (
+                  <TableRow key={r.key}>
+                    <TableCell className="font-medium">{r.label}</TableCell>
+                    {canSplit && splitByCompany && (
+                      <TableCell className="text-muted-foreground text-sm">
+                        {r.subLabel}
+                      </TableCell>
+                    )}
+                    <TableCell className="tabular text-muted-foreground text-right">
+                      {r.scored} / {r.employees}
+                    </TableCell>
+                    <TableCell className="tabular text-right font-medium">
+                      {r.avgScore === null ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : (
+                        formatPercent(r.avgScore)
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <DeltaPill value={r.deltaPct} />
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {r.weakestKpi ? (
+                        <>
+                          {r.weakestKpi.name}{" "}
+                          <span className="text-muted-foreground tabular text-xs">
+                            ({formatPercent(r.weakestKpi.achievement)})
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </SectionCard>
+
+        {/* ── Peringkat karyawan ── */}
         <SectionCard
           title="Peringkat Karyawan"
-          description={`${period.label} · urut menurut ${SORT_LABELS[sort].toLowerCase()}`}
+          description={`${period.label} · ${scopeLabel} · urut menurut ${SORT_LABELS[sort].toLowerCase()}`}
           padded={false}
           toolbar={
             <>
@@ -388,47 +635,23 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
                 onChange={setSearch}
                 placeholder="Cari nama, jabatan, atau cabang..."
               />
-              <Select value={company} onValueChange={setCompany}>
-                <SelectTrigger className="w-44">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Semua PT</SelectItem>
-                  {byCompany.map((c) => (
-                    <SelectItem key={c.companyId} value={c.companyId}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={role} onValueChange={setRole}>
-                <SelectTrigger className="w-44">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Semua jabatan</SelectItem>
-                  {roleOptions.map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-                <SelectTrigger className="ml-auto w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
-                    <SelectItem key={k} value={k}>
-                      {SORT_LABELS[k]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Combobox
+                value={sort}
+                onValueChange={(v) => setSort(v as SortKey)}
+                options={(Object.keys(SORT_LABELS) as SortKey[]).map((k) => ({
+                  value: k,
+                  label: SORT_LABELS[k],
+                }))}
+                searchPlaceholder="Cari urutan..."
+                className="ml-auto w-48"
+              />
             </>
           }
-          footer={`${filtered.length} dari ${rows.length} karyawan ditampilkan`}
+          footer={
+            filtersActive
+              ? `${filtered.length} dari ${scoped.length} karyawan dalam lingkup ini (${rows.length} total)`
+              : `${filtered.length} dari ${rows.length} karyawan ditampilkan`
+          }
         >
           <Table>
             <TableHeader>
@@ -496,71 +719,13 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
                       <Sparkline values={r.history} labels={historyLabels} max={sparkMax} />
                     </TableCell>
                     <TableCell className="text-sm">
-                      {r.weakest ? (
+                      {r.kpis[0] ? (
                         <div className="flex flex-col">
-                          <span>{r.weakest.name}</span>
+                          <span>{r.kpis[0].name}</span>
                           <span className="text-muted-foreground tabular text-xs">
-                            {formatPercent(r.weakest.achievement)}
+                            {formatPercent(r.kpis[0].achievement)}
                           </span>
                         </div>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </SectionCard>
-
-        {/* ── Ringkasan per jabatan ── */}
-        <SectionCard
-          title="Rata-rata per Jabatan"
-          description="Diurutkan dari jabatan dengan rata-rata terendah — beserta KPI yang paling menariknya turun."
-          padded={false}
-        >
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Jabatan</TableHead>
-                <TableHead className="text-right">Dinilai</TableHead>
-                <TableHead className="text-right">Rata-rata Skor</TableHead>
-                <TableHead>KPI Terlemah di Jabatan Ini</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {byRole.length === 0 ? (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={4} className="p-0">
-                    <EmptyState
-                      title="Belum ada data jabatan"
-                      description="Skor akan muncul setelah ada karyawan yang dinilai pada periode ini."
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                byRole.map((r) => (
-                  <TableRow key={r.roleName}>
-                    <TableCell className="font-medium">{r.roleName}</TableCell>
-                    <TableCell className="tabular text-muted-foreground text-right">
-                      {r.scored} / {r.employees}
-                    </TableCell>
-                    <TableCell className="tabular text-right font-medium">
-                      {r.avgScore === null ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        formatPercent(r.avgScore)
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {r.weakestKpi ? (
-                        <>
-                          {r.weakestKpi.name}{" "}
-                          <span className="text-muted-foreground tabular text-xs">
-                            ({formatPercent(r.weakestKpi.achievement)})
-                          </span>
-                        </>
                       ) : (
                         <span className="text-muted-foreground">—</span>
                       )}

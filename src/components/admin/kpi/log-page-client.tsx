@@ -19,13 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import {
   IconTrash,
   IconAlertCircle,
@@ -319,36 +313,30 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
         <div className="grid grid-cols-1 gap-4 rounded-lg border p-4 sm:grid-cols-3">
           <div className="grid gap-1.5">
             <Label>Karyawan</Label>
-            <Select value={userId} onValueChange={setUserId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih karyawan..." />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.name}
-                    <span className="text-muted-foreground ml-1">
-                      — {u.role} · {u.branchName}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={userId}
+              onValueChange={setUserId}
+              options={users.map((u) => ({
+                value: u.id,
+                label: u.name,
+                description: `${u.role} · ${u.branchName}`,
+              }))}
+              placeholder="Pilih karyawan..."
+              searchPlaceholder="Cari nama / jabatan / cabang..."
+              emptyText="Karyawan tidak ditemukan."
+            />
           </div>
           <div className="grid gap-1.5">
             <Label>Bulan</Label>
-            <Select value={month} onValueChange={setMonth}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {MONTH_NAMES.slice(1).map((name, i) => (
-                  <SelectItem key={i + 1} value={String(i + 1)}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={month}
+              onValueChange={setMonth}
+              options={MONTH_NAMES.slice(1).map((name, i) => ({
+                value: String(i + 1),
+                label: name,
+              }))}
+              searchPlaceholder="Cari bulan..."
+            />
           </div>
           <div className="grid gap-1.5">
             <Label>Tahun</Label>
@@ -535,22 +523,20 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="grid gap-1.5">
                   <Label>KPI *</Label>
-                  <Select value={roleKpiId} onValueChange={setRoleKpiId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih KPI..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {recordable.map((rk) => (
-                        <SelectItem key={rk.id} value={rk.id}>
-                          {rk.definition.name}
-                          <span className="text-muted-foreground ml-1">
-                            — {SCORING_TYPE_LABELS[rk.definition.scoringType] ??
-                              rk.definition.scoringType}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    value={roleKpiId}
+                    onValueChange={setRoleKpiId}
+                    options={recordable.map((rk) => ({
+                      value: rk.id,
+                      label: rk.definition.name,
+                      description:
+                        SCORING_TYPE_LABELS[rk.definition.scoringType] ??
+                        rk.definition.scoringType,
+                    }))}
+                    placeholder="Pilih KPI..."
+                    searchPlaceholder="Cari KPI..."
+                    emptyText="KPI tidak ditemukan."
+                  />
                 </div>
                 <div className="grid gap-1.5">
                   <Label>Tanggal Kejadian *</Label>

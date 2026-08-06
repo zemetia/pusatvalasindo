@@ -18,6 +18,7 @@
  */
 
 import type { AttendanceStatus } from "@src/generated/prisma/client";
+import { formatJakartaTime, isLateArrival, jakartaMinutesOfDay } from "./attendance-time";
 
 /** Baris absensi yang dibutuhkan kolektor. */
 export type AttendanceRecord = {
@@ -87,13 +88,17 @@ function formatDate(date: Date) {
   });
 }
 
-function formatTime(date: Date) {
-  return `${String(date.getHours()).padStart(2, "0")}.${String(date.getMinutes()).padStart(2, "0")}`;
-}
-
-function minutesOfDay(date: Date) {
-  return date.getHours() * 60 + date.getMinutes();
-}
+/**
+ * Keduanya WIB, bukan zona waktu proses.
+ *
+ * `getHours()` mengikuti zona waktu SERVER: di instance yang berjalan di UTC,
+ * check-in 07.48 WIB terbaca 00.48 — jadi catatan KPI akan menyebut jam yang
+ * bukan jam masuknya, dan batas closing dinilai tujuh jam meleset. Sejak
+ * keterlambatan diturunkan lewat `isLateArrival` (yang sadar WIB), dua helper
+ * ini harus memakai zona yang sama atau angkanya saling bertentangan.
+ */
+const formatTime = formatJakartaTime;
+const minutesOfDay = jakartaMinutesOfDay;
 
 /**
  * Kedisiplinan kehadiran → entri penalti per hari bermasalah.
@@ -106,7 +111,9 @@ export function collectAttendanceDiscipline(records: AttendanceRecord[]): Collec
   const skipped: SkippedDay[] = [];
 
   for (const record of records) {
-    if (record.status === "LATE") {
+    // Diturunkan dari checkIn, bukan dari kolom status — supaya penalti KPI dan
+    // denda payroll tidak pernah memakai ambang jam masuk yang berbeda.
+    if (isLateArrival(record)) {
       const detail = record.checkIn ? ` (masuk ${formatTime(record.checkIn)})` : "";
       entries.push({
         occurredAt: record.date,
