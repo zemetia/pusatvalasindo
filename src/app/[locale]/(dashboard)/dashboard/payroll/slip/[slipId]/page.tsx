@@ -45,7 +45,7 @@ export default async function PayrollSlipDetailPage({
   const canManage = allowsCompany(subject, "payroll.manage", "write", slip.run.companyId);
 
   return (
-    <PageShell width="narrow">
+    <PageShell>
       <PageHeader
         eyebrow={`${view.companyName} · ${MONTH_NAMES[view.periodMonth]} ${view.periodYear}`}
         title={view.employeeName}

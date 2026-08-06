@@ -1,8 +1,14 @@
 "use client";
 
+// Tampilan gaji untuk karyawan yang HANYA punya `payroll.self` (bukan
+// `payroll.manage`) — melihat & menghitung pratinjau gajinya sendiri.
+//
+// Yang berwenang mengelola gaji orang lain memakai PayrollRunPanel
+// (daftar seluruh karyawan + hitung + simpan + bayar), bukan komponen ini.
+
 import { useState } from "react";
 import { toast } from "sonner";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,13 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
 import { MetricBlock } from "@/components/admin/page-shell";
 import { PayrollSlipDetailClient } from "@/components/admin/payroll/payroll-slip-detail-client";
@@ -45,13 +45,9 @@ export type UserRow = {
   name: string;
   role: string;
   branchName: string;
-  /** PT karyawan, diturunkan dari cabangnya. Dipakai filter PT di bawah. */
+  /** PT karyawan, diturunkan dari cabangnya. Dipakai filter PT di panel HR. */
   companyId: string | null;
   baseSalary: number | null;
-  mealAllowance: number | null;
-  transportAllowance: number | null;
-  positionAllowance: number | null;
-  bpjsKesehatan: number | null;
   isActive: boolean;
 };
 
@@ -61,8 +57,6 @@ function scoringTone(scoringType: string) {
   if (scoringType === "REWARD_POINT") return "success";
   return "info";
 }
-
-type CompanyOption = { id: string; name: string; code: string };
 
 const ENTRY_TYPE_LABEL: Record<string, string> = {
   bonus: "Reward",
@@ -230,95 +224,40 @@ function RewardPunishmentSection({ rules }: { rules: PayrollResult["rules"] }) {
   );
 }
 
-export function PayrollPageClient({
-  users,
-  companies,
-}: {
-  users: UserRow[];
-  /**
-   * PT yang boleh dikelola gajinya. Kosong berarti pemanggil hanya melihat slip
-   * gajinya sendiri, sehingga filter PT tidak ditampilkan.
-   */
-  companies: CompanyOption[];
-}) {
+export function PayrollPageClient({ me }: { me: UserRow }) {
   const now = new Date();
-  // Filter PT dulu, baru pilih orangnya — daftar karyawan lintas PT terlalu
-  // panjang untuk dipilih langsung. "all" = semua PT dalam jangkauan.
-  const [companyId, setCompanyId] = useState("all");
-  const [userId, setUserId] = useState("");
   const [month, setMonth] = useState(String(now.getMonth() + 1));
   const [year, setYear] = useState(String(now.getFullYear()));
   const [result, setResult] = useState<PayrollResult | null>(null);
 
-  const selectedUser = users.find((u) => u.id === userId);
-  const queryClient = useQueryClient();
-
-  // Menambah/menghapus penyesuaian manual, menghitung ulang, dan MENYIMPAN
-  // hasil "Hitung" butuh `payroll.manage` write di PT karyawan itu. `companies`
-  // yang diteruskan ke komponen ini sudah disaring server ke PT yang boleh
-  // dikelola pemanggil, jadi keanggotaan di situ sudah cukup — tidak perlu cek
-  // izin terpisah.
-  const canManageSelected = Boolean(
-    selectedUser && companies.some((c) => c.id === selectedUser.companyId)
-  );
-
-  const savedSlipQueryKey = ["payroll-saved-slip", userId, month, year] as const;
+  const savedSlipQueryKey = ["payroll-saved-slip", me.id, month, year] as const;
 
   /**
-   * Begitu karyawan+periode dipilih, periksa dulu apakah gajinya SUDAH pernah
-   * dihitung & tersimpan (lewat Run PT). Kalau sudah, langsung tampilkan —
-   * tidak perlu menekan "Hitung" untuk sesuatu yang sudah punya jawaban.
-   * Hanya kalau belum ada yang tersimpan, kalkulator di bawah dipakai.
+   * Periksa dulu apakah gaji periode ini SUDAH pernah dihitung & tersimpan
+   * (lewat run yang dibuat HR). Kalau sudah, langsung tampilkan — tidak
+   * perlu menekan "Hitung" untuk sesuatu yang sudah punya jawaban.
    */
   const savedSlipQuery = useQuery<PayrollSlipDetailView | null>({
     queryKey: savedSlipQueryKey,
-    enabled: Boolean(userId && month && year),
+    enabled: Boolean(month && year),
     queryFn: async () => {
       const res = await fetch(
-        `/api/payroll/slip?employeeId=${encodeURIComponent(userId)}&month=${month}&year=${year}`
+        `/api/payroll/slip?employeeId=${encodeURIComponent(me.id)}&month=${month}&year=${year}`
       );
       const json = await res.json();
       if (!res.ok) throw new Error(json?.message ?? "Gagal memeriksa slip tersimpan");
       return json.data.slip as PayrollSlipDetailView | null;
     },
   });
-  const hasSavedSlip = Boolean(userId && savedSlipQuery.data);
+  const hasSavedSlip = Boolean(savedSlipQuery.data);
 
-  /**
-   * Untuk yang berwenang mengelola gaji (HR): "Hitung" MENYIMPAN slipnya
-   * (lewat POST /api/payroll/slip) — bukan sekadar pratinjau — supaya begitu
-   * dihitung, langsung ada slip sungguhan dengan kehadiran & tempat mengisi
-   * penyesuaian manual. Menggantikan `calculateMutation` di bawah untuk kasus
-   * ini; karyawan yang cuma melihat gajinya sendiri tetap memakai pratinjau.
-   */
-  const generateSlipMutation = useMutation({
-    mutationFn: async (params: { employeeId: string; month: number; year: number }) => {
-      const res = await fetch("/api/payroll/slip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message ?? "Gagal menghitung gaji");
-      return json.data.slip as PayrollSlipDetailView;
-    },
-    onSuccess: (slip) => {
-      queryClient.setQueryData(savedSlipQueryKey, slip);
-      toast.success("Gaji bulan ini berhasil dihitung dan disimpan");
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
+  /** Pratinjau saja, tidak tersimpan — `payroll.self` tidak boleh menyimpan. */
   const calculateMutation = useMutation({
-    mutationFn: async (params: {
-      employeeId: string;
-      month: number;
-      year: number;
-    }) => {
+    mutationFn: async (params: { month: number; year: number }) => {
       const res = await fetch("/api/payroll/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
+        body: JSON.stringify({ employeeId: me.id, ...params }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Gagal menghitung");
@@ -332,24 +271,13 @@ export function PayrollPageClient({
   });
 
   const handleCalculate = () => {
-    if (!userId || !month || !year) {
-      toast.error("Pilih karyawan, bulan, dan tahun");
+    if (!month || !year) {
+      toast.error("Pilih bulan dan tahun");
       return;
     }
-    const params = { employeeId: userId, month: Number(month), year: Number(year) };
-    if (canManageSelected) {
-      generateSlipMutation.mutate(params);
-    } else {
-      setResult(null);
-      calculateMutation.mutate(params);
-    }
+    setResult(null);
+    calculateMutation.mutate({ month: Number(month), year: Number(year) });
   };
-
-  // Server sudah menyaring `users` ke PT yang boleh dilihat; filter ini murni
-  // untuk mempersempit tampilan, bukan gerbang keamanan.
-  const visibleUsers = users.filter(
-    (u) => u.isActive && (companyId === "all" || u.companyId === companyId)
-  );
 
   const kpiScore = result ? result.kpi.score : 0;
   const grade = getGrade(kpiScore);
@@ -377,80 +305,21 @@ export function PayrollPageClient({
   return (
     <div className="flex flex-col gap-6">
       {/* Selection form */}
-      <div className="bg-card grid grid-cols-1 gap-4 rounded-xl border p-4 shadow-sm sm:grid-cols-4">
-        {companies.length > 1 && (
-          <div className="grid gap-1.5">
-            <Label>PT</Label>
-            <Select
-              value={companyId}
-              onValueChange={(v) => {
-                setCompanyId(v);
-                // Karyawan yang sedang dipilih bisa jadi bukan milik PT baru.
-                setUserId("");
-                setResult(null);
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Semua PT" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua PT</SelectItem>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} ({c.code})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-        <div className="sm:col-span-2 grid gap-1.5">
-          <Label>Karyawan *</Label>
-          <Select
-            value={userId}
-            onValueChange={(v) => {
-              setUserId(v);
-              setResult(null);
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih karyawan" />
-            </SelectTrigger>
-            <SelectContent>
-              {visibleUsers.length === 0 ? (
-                <div className="text-muted-foreground px-2 py-3 text-center text-xs">
-                  Tidak ada karyawan aktif di PT ini
-                </div>
-              ) : (
-                visibleUsers.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.name} — {u.role} ({u.branchName})
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="bg-card grid grid-cols-1 gap-4 rounded-xl border p-4 shadow-sm sm:grid-cols-2">
         <div className="grid gap-1.5">
           <Label>Bulan *</Label>
-          <Select
+          <Combobox
             value={month}
             onValueChange={(v) => {
               setMonth(v);
               setResult(null);
             }}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTH_NAMES.slice(1).map((name, i) => (
-                <SelectItem key={i + 1} value={String(i + 1)}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={MONTH_NAMES.slice(1).map((name, i) => ({
+              value: String(i + 1),
+              label: name,
+            }))}
+            searchPlaceholder="Cari bulan..."
+          />
         </div>
         <div className="grid gap-1.5">
           <Label>Tahun *</Label>
@@ -465,43 +334,36 @@ export function PayrollPageClient({
             }}
           />
         </div>
+
         {/* Tombol Hitung cuma relevan kalau belum ada slip tersimpan untuk
             periode ini — kalau sudah, dia langsung tampil di bawah tanpa
             perlu ditekan. */}
-        {!hasSavedSlip && !(userId && savedSlipQuery.isLoading) && (
-          <div className="sm:col-span-4">
-            <Button
-              onClick={handleCalculate}
-              disabled={!userId || calculateMutation.isPending || generateSlipMutation.isPending}
-            >
-              {calculateMutation.isPending || generateSlipMutation.isPending
-                ? "Menghitung..."
-                : canManageSelected
-                  ? "Hitung & Simpan Gaji"
-                  : "Hitung Gaji & KPI"}
+        {!hasSavedSlip && !savedSlipQuery.isLoading && (
+          <div className="sm:col-span-2">
+            <Button onClick={handleCalculate} disabled={calculateMutation.isPending}>
+              {calculateMutation.isPending ? "Menghitung..." : "Hitung Gaji & KPI"}
             </Button>
           </div>
         )}
       </div>
 
       {/* Memeriksa apakah periode ini sudah pernah dihitung & tersimpan */}
-      {userId && (savedSlipQuery.isLoading || generateSlipMutation.isPending) && (
+      {savedSlipQuery.isLoading && (
         <div className="flex flex-col gap-3">
           <Skeleton className="h-24 w-full rounded-lg" />
           <Skeleton className="h-48 w-full rounded-lg" />
         </div>
       )}
 
-      {/* Sudah pernah dihitung — tampilkan slip tersimpan apa adanya, termasuk
-          penyesuaian manual. "Hitung ulang" ada di dalamnya sendiri (kalau
-          berwenang), bukan lewat kalkulator ad hoc di atas. */}
-      {hasSavedSlip && savedSlipQuery.data && selectedUser && (
+      {/* Sudah pernah dihitung (oleh HR) — tampilkan slip tersimpan apa
+          adanya, tanpa hak mengedit. */}
+      {hasSavedSlip && savedSlipQuery.data && (
         <div className="space-y-3">
           <p className="text-muted-foreground text-sm text-pretty">
-            Gaji {selectedUser.name} periode {MONTH_NAMES[Number(month)]} {year} sudah pernah
-            dihitung dan tersimpan — ini hasilnya.
+            Gaji Anda periode {MONTH_NAMES[Number(month)]} {year} sudah pernah dihitung dan
+            tersimpan — ini hasilnya.
           </p>
-          <PayrollSlipDetailClient slip={savedSlipQuery.data} canManage={canManageSelected} />
+          <PayrollSlipDetailClient slip={savedSlipQuery.data} canManage={false} />
         </div>
       )}
 
@@ -514,7 +376,7 @@ export function PayrollPageClient({
         </div>
       )}
 
-      {!hasSavedSlip && result && selectedUser && !calculateMutation.isPending && (
+      {!hasSavedSlip && result && !calculateMutation.isPending && (
         <>
           {/* Sorotan hasil perhitungan — blok data editorial, bukan kartu */}
           <section className="border-border border-y py-8">
@@ -526,9 +388,8 @@ export function PayrollPageClient({
                 value={formatAmount(result.final.takeHomePay)}
                 meta={
                   <>
-                    {result.employee.name} · {selectedUser.role} ·{" "}
-                    {selectedUser.branchName} — {MONTH_NAMES[result.period.month]}{" "}
-                    {result.period.year}
+                    {result.employee.name} · {me.role} · {me.branchName} —{" "}
+                    {MONTH_NAMES[result.period.month]} {result.period.year}
                   </>
                 }
               />
@@ -593,8 +454,7 @@ export function PayrollPageClient({
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
-                Rincian Gaji — {MONTH_NAMES[result.period.month]}{" "}
-                {result.period.year}
+                Rincian Gaji — {MONTH_NAMES[result.period.month]} {result.period.year}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

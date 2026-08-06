@@ -56,6 +56,8 @@ export type PayrollSlipDetailView = PayrollSlipView & {
   companyName: string;
   periodMonth: number;
   periodYear: number;
+  /** Tanggal masuk kerja karyawan — batas awal hari yang boleh dinilai alpha. */
+  joinDate: string | null;
   /** Boleh ditambah/dihapus entri manual atau dihitung ulang. */
   canEdit: boolean;
 };
@@ -103,6 +105,7 @@ export function serializeSlipDetail(slip: SlipDetailRecord): PayrollSlipDetailVi
     companyName: slip.run.company.name,
     periodMonth: slip.run.periodMonth,
     periodYear: slip.run.periodYear,
+    joinDate: slip.user.joinDate?.toISOString() ?? null,
     canEdit,
   };
 }

@@ -1,13 +1,18 @@
 "use client";
 
-// Penggajian satu bulan untuk satu PT: lihat kehadiran → Hitung → Bayar.
+// Penggajian satu bulan untuk satu PT: daftar SEMUA karyawan aktif, ditandai
+// mana yang sudah dihitung dan mana yang belum → klik baris yang sudah
+// dihitung untuk membuka halaman detail slipnya, klik yang belum untuk
+// Hitung.
 //
-// Berbeda dari kalkulator per karyawan di bawahnya, panel ini MENYIMPAN
-// hasilnya sebagai PayrollRun beserta seluruh slip dan alasannya. Itulah yang
-// membuat gaji bulan lampau masih bisa dibuka dan dijelaskan angka per angka.
+// Daftarnya digabung dari dua sumber: roster karyawan aktif PT ini (prop
+// `users`, dihitung server-side) dan slip yang sudah tersimpan di run
+// berjalan (`run.slips`). Karyawan yang belum punya slip tetap tampil
+// sebagai baris "Belum Dihitung" — bukan hilang sampai run pertama dibuat.
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import {
@@ -15,11 +20,9 @@ import {
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
-  IconCoin,
   IconRefresh,
 } from "@tabler/icons-react";
 
-import { AttendanceHistory } from "@/components/attendance/attendance-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,18 +33,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Combobox } from "@/components/ui/combobox";
 import { MetricBlock, MetricRow, EmptyState } from "@/components/admin/page-shell";
 import { MONTH_NAMES, formatCurrency } from "@/lib/kpi-utils";
 import type { PayrollRunView, PayrollSlipView } from "@/app/api/payroll/runs/serialize";
-import type { Attendance } from "@src/generated/prisma";
+import type { UserRow } from "@/components/admin/payroll/payroll-page-client";
 
 type CompanyOption = { id: string; name: string; code: string };
 
@@ -77,9 +74,14 @@ function geser(month: number, year: number, arah: -1 | 1) {
 
 export function PayrollRunPanel({
   companies,
+  users,
   locale,
 }: {
   companies: CompanyOption[];
+  /** Roster lengkap yang boleh dilihat pemanggil (lintas PT) — disaring ke PT
+   *  terpilih di bawah, supaya daftar tetap menampilkan karyawan yang belum
+   *  punya slip sama sekali. */
+  users: UserRow[];
   locale: string;
 }) {
   const kini = periodeSekarang();
@@ -106,7 +108,7 @@ export function PayrollRunPanel({
     },
   });
 
-  const hitung = useMutation({
+  const hitungSemua = useMutation({
     mutationFn: async () => {
       const res = await fetch("/api/payroll/runs", {
         method: "POST",
@@ -124,7 +126,7 @@ export function PayrollRunPanel({
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const bayar = useMutation({
+  const bayarSemua = useMutation({
     mutationFn: async (runId: string) => {
       const res = await fetch(`/api/payroll/runs/${runId}/pay`, { method: "POST" });
       const json = await res.json();
@@ -139,7 +141,7 @@ export function PayrollRunPanel({
   });
 
   const run = data?.run ?? null;
-  const sibuk = hitung.isPending || bayar.isPending;
+  const sibuk = hitungSemua.isPending || bayarSemua.isPending;
   const sudahDibayar = run?.status === "PAID";
   // Sebagian sudah dibayar per orang — generate ulang akan mengunci ini di
   // server juga, tapi tombolnya dimatikan di sini supaya errornya tidak
@@ -147,6 +149,8 @@ export function PayrollRunPanel({
   const adaYangSudahDibayar = run?.slips.some((s) => s.paidAt) ?? false;
 
   const label = `${MONTH_NAMES[month]} ${year}`;
+
+  const roster = users.filter((u) => u.isActive && u.companyId === companyId);
 
   return (
     <section className="space-y-6">
@@ -179,38 +183,34 @@ export function PayrollRunPanel({
 
         <div className="flex items-center gap-2">
           {companies.length > 1 && (
-            <Select value={companyId} onValueChange={setCompanyId}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Pilih PT" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              value={companyId}
+              onValueChange={setCompanyId}
+              options={companies.map((c) => ({ value: c.id, label: c.name }))}
+              placeholder="Pilih PT"
+              searchPlaceholder="Cari PT..."
+              className="w-48"
+            />
           )}
 
-          {run && !sudahDibayar && (
+          {!bulanDepan && !sudahDibayar && (
             <Button
-              variant="outline"
-              disabled={sibuk || bulanDepan || adaYangSudahDibayar}
+              variant={run ? "outline" : "default"}
+              disabled={sibuk || !companyId || adaYangSudahDibayar}
               title={
                 adaYangSudahDibayar
                   ? "Sudah ada karyawan yang dibayar pada run ini, tidak bisa dihitung ulang seluruhnya"
                   : undefined
               }
-              onClick={() => hitung.mutate()}
+              onClick={() => hitungSemua.mutate()}
             >
               <IconRefresh className="size-4" />
-              Hitung ulang
+              {run ? "Hitung ulang semua" : "Hitung Semua Karyawan"}
             </Button>
           )}
 
           {run && !sudahDibayar && (
-            <Button disabled={sibuk} onClick={() => bayar.mutate(run.id)}>
+            <Button disabled={sibuk} onClick={() => bayarSemua.mutate(run.id)}>
               Bayar Semua
             </Button>
           )}
@@ -228,41 +228,54 @@ export function PayrollRunPanel({
       {isLoading ? (
         <div className="space-y-3">
           <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-64 w-full" />
+          <div className="divide-border divide-y rounded-md border">
+            {(roster.length > 0 ? roster : Array.from({ length: 4 })).map((u, i) => (
+              <Skeleton key={(u as UserRow)?.id ?? i} className="h-14 w-full rounded-none" />
+            ))}
+          </div>
         </div>
-      ) : !run ? (
+      ) : roster.length === 0 ? (
         <EmptyState
-          title={`Gaji ${label} belum dihitung`}
-          description={
-            bulanDepan
-              ? "Bulan ini belum berjalan. Presensi dan KPI-nya belum lengkap, jadi belum bisa dihitung."
-              : "Tekan Hitung untuk menjalankan seluruh rule reward & denda pada periode ini. Hasilnya tersimpan dan bisa dibuka lagi kapan pun."
-          }
-          action={
-            !bulanDepan && (
-              <Button disabled={sibuk || !companyId} onClick={() => hitung.mutate()}>
-                Hitung gaji {label}
-              </Button>
-            )
-          }
+          title="Tidak ada karyawan aktif"
+          description="PT ini belum punya karyawan aktif untuk dihitung gajinya."
         />
       ) : (
-        <RunDetail run={run} queryKey={queryKey} locale={locale} />
+        <RosterList
+          run={run}
+          roster={roster}
+          month={month}
+          year={year}
+          bulanDepan={bulanDepan}
+          queryKey={queryKey}
+          locale={locale}
+        />
       )}
     </section>
   );
 }
 
-function RunDetail({
+function RosterList({
   run,
+  roster,
+  month,
+  year,
+  bulanDepan,
   queryKey,
   locale,
 }: {
-  run: PayrollRunView;
+  run: PayrollRunView | null;
+  roster: UserRow[];
+  month: number;
+  year: number;
+  bulanDepan: boolean;
   queryKey: QueryKey;
   locale: string;
 }) {
-  const tglBayar = run.paidAt
+  const slipByUserId = new Map((run?.slips ?? []).map((s) => [s.userId, s] as const));
+  const jumlahDihitung = run?.slips.length ?? 0;
+  const sudahDibayarCount = run?.slips.filter((s) => s.paidAt).length ?? 0;
+
+  const tglBayar = run?.paidAt
     ? new Date(run.paidAt).toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
@@ -270,48 +283,48 @@ function RunDetail({
       })
     : null;
 
-  const sudahDibayar = run.slips.filter((s) => s.paidAt).length;
-
   return (
     <div className="space-y-8">
       <MetricRow columns={4}>
         <MetricBlock
-          label="Total dibayarkan"
-          value={formatCurrency(run.totalNetPay)}
-          meta={`${run.slips.length} karyawan`}
+          label="Karyawan dihitung"
+          value={`${jumlahDihitung}/${roster.length}`}
+          meta={run ? `${sudahDibayarCount}/${jumlahDihitung} sudah dibayar` : "Belum ada yang dihitung"}
         />
         <MetricBlock
-          label="Status"
-          value={STATUS_LABEL[run.status] ?? run.status}
+          label="Total dibayarkan"
+          value={formatCurrency(run?.totalNetPay ?? 0)}
           size="secondary"
-          meta={
-            tglBayar
-              ? `Dibayar ${tglBayar}`
-              : sudahDibayar > 0
-                ? `${sudahDibayar}/${run.slips.length} karyawan sudah dibayar`
-                : `Perhitungan ke-${run.attempt}`
-          }
+          meta={run ? STATUS_LABEL[run.status] ?? run.status : "—"}
         />
         <MetricBlock
           label="Perlu diperiksa"
-          value={run.jumlahPerluReview}
+          value={run?.jumlahPerluReview ?? 0}
           size="secondary"
-          tone={run.jumlahPerluReview > 0 ? "warning" : "default"}
+          tone={(run?.jumlahPerluReview ?? 0) > 0 ? "warning" : "default"}
           meta={
-            run.jumlahPerluReview > 0
-              ? "Ada rule yang tidak menghasilkan angka"
-              : "Semua rule berjalan normal"
+            !run
+              ? undefined
+              : run.jumlahPerluReview > 0
+                ? "Ada rule yang tidak menghasilkan angka"
+                : "Semua rule berjalan normal"
           }
         />
         <MetricBlock
           label="Dihitung"
-          value={new Date(run.generatedAt).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}
+          value={
+            run
+              ? new Date(run.generatedAt).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })
+              : bulanDepan
+                ? "Bulan depan"
+                : "Belum dihitung"
+          }
           size="secondary"
-          meta={run.rulesetHash ? `Rule ${run.rulesetHash.slice(0, 8)}` : undefined}
+          meta={tglBayar ? `Dibayar ${tglBayar}` : run?.rulesetHash ? `Rule ${run.rulesetHash.slice(0, 8)}` : undefined}
         />
       </MetricRow>
 
@@ -327,8 +340,17 @@ function RunDetail({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {run.slips.map((slip) => (
-            <SlipRow key={slip.id} run={run} slip={slip} queryKey={queryKey} locale={locale} />
+          {roster.map((user) => (
+            <RosterRow
+              key={user.id}
+              user={user}
+              slip={slipByUserId.get(user.id) ?? null}
+              month={month}
+              year={year}
+              bulanDepan={bulanDepan}
+              queryKey={queryKey}
+              locale={locale}
+            />
           ))}
         </TableBody>
       </Table>
@@ -336,246 +358,133 @@ function RunDetail({
   );
 }
 
-/** Baris komponen tetap, dipakai di dalam detail slip yang dibuka. */
-function ComponentLine({ label, value }: { label: string; value: number }) {
-  if (value <= 0) return null;
-  return (
-    <div className="flex items-center justify-between py-1 text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="tabular">{formatCurrency(value)}</span>
-    </div>
-  );
-}
-
 /**
- * Kehadiran bulanan satu karyawan, dimuat hanya saat baris slipnya dibuka.
+ * Satu baris karyawan — entah sudah punya slip tersimpan atau belum.
  *
- * Memakai `/api/attendance` (bukan endpoint baru) supaya aturan otorisasinya
- * — termasuk yang membedakan lihat presensi sendiri vs. orang lain — tetap
- * satu tempat.
+ * Kalau sudah dihitung, seluruh baris jadi tautan ke halaman detail slip —
+ * rinciannya tidak lagi dibuka inline. Kalau belum, klik baris membuka tombol
+ * Hitung; sengaja tidak otomatis terhitung begitu baris dibuka.
  */
-function SlipAttendance({
-  userId,
+function RosterRow({
+  user,
+  slip,
   month,
   year,
-}: {
-  userId: string;
-  month: number;
-  year: number;
-}) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["attendance", userId, month, year],
-    queryFn: async () => {
-      const res = await fetch(`/api/attendance?userId=${userId}&month=${month}&year=${year}`);
-      if (res.status === 403) return { forbidden: true as const, records: [] as Attendance[] };
-      if (!res.ok) throw new Error("Gagal memuat presensi");
-      const records = (await res.json()) as Attendance[];
-      return { forbidden: false as const, records };
-    },
-  });
-
-  if (isLoading) return <Skeleton className="h-24 w-full" />;
-  if (!data || data.forbidden) {
-    return (
-      <p className="text-muted-foreground text-xs">
-        Tidak punya akses melihat rincian presensi karyawan ini.
-      </p>
-    );
-  }
-  return <AttendanceHistory records={data.records} />;
-}
-
-/**
- * Satu baris slip, bisa dibuka untuk melihat data lengkap yang sudah
- * dihitung: rincian gaji, kehadiran bulanan, dan alasan tiap rule.
- *
- * Rincian entri yang muncul di sini persis isi PayrollSlipEntry — termasuk
- * entri yang TIDAK menghasilkan uang. Slip harus bisa menjawab "kenapa bonus
- * saya tidak keluar bulan ini", bukan hanya menampilkan yang keluar.
- */
-function SlipRow({
-  run,
-  slip,
+  bulanDepan,
   queryKey,
   locale,
 }: {
-  run: PayrollRunView;
-  slip: PayrollSlipView;
+  user: UserRow;
+  slip: PayrollSlipView | null;
+  month: number;
+  year: number;
+  bulanDepan: boolean;
   queryKey: QueryKey;
   locale: string;
 }) {
+  const router = useRouter();
   const [terbuka, setTerbuka] = useState(false);
   const queryClient = useQueryClient();
+  const slipHref = slip ? `/${locale}/dashboard/payroll/slip/${slip.id}` : null;
 
-  const runTerkunci = run.status === "PAID" || run.status === "VOID";
-
-  const hitungUlang = useMutation({
+  const hitung = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/payroll/runs/${run.id}/slips/${slip.id}/recalculate`, {
+      const res = await fetch("/api/payroll/slip", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: user.id, month, year }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.message ?? "Gagal menghitung ulang slip");
+      if (!res.ok) throw new Error(json?.message ?? "Gagal menghitung gaji");
       return json;
     },
     onSuccess: () => {
-      toast.success(`Slip ${slip.employeeName} berhasil dihitung ulang`);
+      toast.success(`Gaji ${user.name} berhasil dihitung`);
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  const bayarSlip = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(`/api/payroll/runs/${run.id}/slips/${slip.id}/pay`, {
-        method: "POST",
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message ?? "Gagal menandai gaji sudah dibayar");
-      return json;
-    },
-    onSuccess: () => {
-      toast.success(`Gaji ${slip.employeeName} ditandai sudah dibayar`);
-      queryClient.invalidateQueries({ queryKey });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const sibuk = hitungUlang.isPending || bayarSlip.isPending;
 
   return (
     <>
-      <TableRow className="cursor-pointer" onClick={() => setTerbuka((v) => !v)}>
+      <TableRow
+        className="cursor-pointer"
+        onClick={() => (slipHref ? router.push(slipHref) : setTerbuka((v) => !v))}
+      >
         <TableCell>
           <div className="flex items-center gap-2">
-            <Link
-              href={`/${locale}/dashboard/payroll/slip/${slip.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="hover:text-primary font-medium hover:underline"
-            >
-              {slip.employeeName}
-            </Link>
-            {slip.needsReview && (
+            {slipHref ? (
+              <Link
+                href={slipHref}
+                onClick={(e) => e.stopPropagation()}
+                className="hover:text-primary font-medium hover:underline"
+              >
+                {user.name}
+              </Link>
+            ) : (
+              <span className="font-medium">{user.name}</span>
+            )}
+            {slip?.needsReview && (
               <IconAlertTriangle
                 className="text-warning size-3.5 shrink-0"
                 aria-label="Perlu diperiksa"
               />
             )}
-            {slip.paidAt && (
+            {slip?.paidAt ? (
               <Badge variant="secondary" className="gap-1 px-1.5 py-0 text-[10px]">
                 <IconCheck className="size-3" />
                 Dibayar
               </Badge>
+            ) : slip ? (
+              <Badge variant="soft" className="px-1.5 py-0 text-[10px]">
+                Sudah Dihitung
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
+                Belum Dihitung
+              </Badge>
             )}
           </div>
           <div className="text-muted-foreground text-xs">
-            {slip.roleName} · {slip.branchName}
+            {user.role} · {user.branchName}
           </div>
         </TableCell>
-        <TableCell className="tabular text-right">{formatCurrency(slip.grossPay)}</TableCell>
         <TableCell className="tabular text-right">
-          {slip.totalBonus > 0 ? formatCurrency(slip.totalBonus) : "—"}
+          {slip ? formatCurrency(slip.grossPay) : "—"}
         </TableCell>
         <TableCell className="tabular text-right">
-          {slip.totalPenalty > 0 ? formatCurrency(slip.totalPenalty) : "—"}
+          {slip && slip.totalBonus > 0 ? formatCurrency(slip.totalBonus) : "—"}
         </TableCell>
         <TableCell className="tabular text-right">
-          {slip.totalDeduction > 0 ? formatCurrency(slip.totalDeduction) : "—"}
+          {slip && slip.totalPenalty > 0 ? formatCurrency(slip.totalPenalty) : "—"}
+        </TableCell>
+        <TableCell className="tabular text-right">
+          {slip && slip.totalDeduction > 0 ? formatCurrency(slip.totalDeduction) : "—"}
         </TableCell>
         <TableCell className="tabular text-right font-semibold">
-          {formatCurrency(slip.netPay)}
+          {slip ? formatCurrency(slip.netPay) : "—"}
         </TableCell>
       </TableRow>
 
-      {terbuka && (
+      {terbuka && !slip && (
         <TableRow>
-          <TableCell colSpan={6} className="bg-muted/30 space-y-6">
-            {/* Rincian gaji — komponen tetap yang membentuk gaji kotor */}
-            <div>
-              <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">
-                Rincian Gaji
+          <TableCell colSpan={6} className="bg-muted/30">
+            <div
+              className="flex flex-col items-start gap-3 py-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-muted-foreground text-sm">
+                Gaji {user.name} untuk periode ini belum dihitung.
+                {bulanDepan &&
+                  " Bulan ini belum berjalan — presensi dan KPI-nya belum lengkap."}
               </p>
-              <div className="divide-border divide-y">
-                <ComponentLine label="Gaji Pokok" value={slip.baseSalary} />
-                <ComponentLine label="Uang Makan" value={slip.mealAllowance} />
-                <ComponentLine label="Uang Transport" value={slip.transportAllowance} />
-                <ComponentLine label="Uang Jabatan" value={slip.positionAllowance} />
-                <ComponentLine label="BPJS Kesehatan" value={slip.bpjsKesehatan} />
-                <ComponentLine label="Tunjangan Tambahan" value={slip.totalAllowance} />
-              </div>
-            </div>
-
-            {/* Reward, denda & potongan — satu baris per entri, termasuk yang di-skip */}
-            {slip.entries.length > 0 && (
-              <div>
-                <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">
-                  Reward &amp; Potongan
-                </p>
-                <ul className="divide-border divide-y">
-                  {slip.entries.map((e) => (
-                    <li key={e.id} className="flex items-baseline justify-between gap-4 py-2">
-                      <div className="min-w-0">
-                        <span className={e.status === "APPLIED" ? "" : "text-muted-foreground"}>
-                          {e.label}
-                        </span>
-                        {e.status !== "APPLIED" && (
-                          <Badge variant="outline" className="ml-2 text-[10px]">
-                            {e.status === "ERROR" ? "gagal" : "dilewati"}
-                            {e.flag ? ` · ${e.flag}` : ""}
-                          </Badge>
-                        )}
-                      </div>
-                      <span className="tabular shrink-0 text-sm">
-                        {e.amount === 0 ? "—" : formatCurrency(e.amount)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Kehadiran bulanan karyawan ini */}
-            <div>
-              <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">
-                Kehadiran Bulan Ini
-              </p>
-              <SlipAttendance userId={slip.userId} month={run.periodMonth} year={run.periodYear} />
-            </div>
-
-            {/* Aksi per orang */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-              {slip.paidAt ? (
-                <p className="text-muted-foreground text-xs">
-                  Dibayar {new Date(slip.paidAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                  {slip.paidByName ? ` oleh ${slip.paidByName}` : ""}
-                </p>
-              ) : (
-                <span className="text-muted-foreground text-xs">Belum dibayar</span>
-              )}
-
-              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                {!slip.paidAt && !runTerkunci && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={sibuk}
-                      onClick={() => hitungUlang.mutate()}
-                    >
-                      <IconRefresh className="size-4" />
-                      Hitung ulang
-                    </Button>
-                    <Button size="sm" disabled={sibuk} onClick={() => bayarSlip.mutate()}>
-                      <IconCoin className="size-4" />
-                      Bayar {slip.employeeName.split(" ")[0]}
-                    </Button>
-                  </>
-                )}
-              </div>
+              <Button
+                size="sm"
+                disabled={hitung.isPending || bulanDepan}
+                onClick={() => hitung.mutate()}
+              >
+                {hitung.isPending ? "Menghitung..." : "Hitung & Simpan Gaji"}
+              </Button>
             </div>
           </TableCell>
         </TableRow>

@@ -643,7 +643,7 @@ export function PayrollRuleSheet({ rule, canEditSql, trigger }: Props) {
                 <Textarea
                   rows={2}
                   className="font-mono text-xs"
-                  placeholder="min(hari_hadir, hari_kerja_standar) * (karyawan.uang_makan / hari_kerja_standar)"
+                  placeholder="min(hari_hadir, hari_kerja_standar) * (karyawan.gaji_pokok / hari_kerja_standar)"
                   value={t.formula}
                   onChange={(e) =>
                     setTiers(tiers.map((x, k) => (k === i ? { ...x, formula: e.target.value } : x)))

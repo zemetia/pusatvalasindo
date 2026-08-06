@@ -83,10 +83,6 @@ export default async function PayrollPage({
     branchName: u.branch?.name ?? "—",
     companyId: u.branch?.companyId ?? null,
     baseSalary: u.baseSalary ? Number(u.baseSalary) : null,
-    mealAllowance: u.mealAllowance ? Number(u.mealAllowance) : null,
-    transportAllowance: u.transportAllowance ? Number(u.transportAllowance) : null,
-    positionAllowance: u.positionAllowance ? Number(u.positionAllowance) : null,
-    bpjsKesehatan: u.bpjsKesehatan ? Number(u.bpjsKesehatan) : null,
     isActive: u.isActive,
   }));
 
@@ -97,14 +93,14 @@ export default async function PayrollPage({
         description="Hitung gaji bulanan karyawan berdasarkan gaji pokok dan hasil KPI."
         icon={<IconCoin className="size-5" />}
       />
-      {/* Penggajian per bulan — hanya untuk yang berwenang mengelola gaji
-          orang lain. Karyawan yang cuma melihat slipnya sendiri langsung ke
-          kalkulator di bawah. */}
-      {manage.allowed && companies.length > 0 && (
-        <PayrollRunPanel companies={companies} locale={locale} />
+      {/* Yang berwenang mengelola gaji orang lain melihat daftar seluruh
+          karyawan (hitung, bayar, dsb). Karyawan yang cuma `payroll.self`
+          hanya melihat kalkulator gajinya sendiri. */}
+      {manage.allowed && companies.length > 0 ? (
+        <PayrollRunPanel companies={companies} users={serializedUsers} locale={locale} />
+      ) : (
+        serializedUsers[0] && <PayrollPageClient me={serializedUsers[0]} />
       )}
-
-      <PayrollPageClient users={serializedUsers} companies={companies} />
     </PageShell>
   );
 }

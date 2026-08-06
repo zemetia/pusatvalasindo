@@ -118,11 +118,24 @@ export function buildSlipEntries(
       source: "SISTEM",
       type: "POTONGAN",
       status: "APPLIED",
-      label: "Potongan ketidakhadiran (sakit / izin / alpha)",
+      label: "Potongan ketidakhadiran (sakit / izin / cuti / alpha)",
       amount: -Math.abs(calc.deductions.absence),
       inputs: {
         gaji_harian: calc.components.dailyRate,
+        uang_makan_transport_harian: calc.attendanceDetail.dailyFieldAllowance,
         hari_presensi_tercatat: calc.attendanceDetail.totalDaysLogged,
+        // Dipecah per kategori supaya slip bisa menjawab "kenapa saya dipotong
+        // sebanyak ini" tanpa siapa pun perlu membuka kode. Tarif tiap kategori
+        // ada di payroll.service.ts.
+        hari_sakit_bersurat: calc.attendanceDetail.absenceDays.sakit,
+        hari_sakit_tanpa_surat: calc.attendanceDetail.absenceDays.sakitTanpaSurat,
+        hari_izin: calc.attendanceDetail.absenceDays.izin,
+        hari_cuti: calc.attendanceDetail.absenceDays.cuti,
+        // Alpha dipecah dua: hari kerja yang lewat tanpa baris presensi ikut
+        // dihitung, dan tanggalnya disebut satu per satu.
+        hari_alpha_tercatat: calc.attendanceDetail.recordedAbsentDays,
+        hari_alpha_tanpa_catatan: calc.attendanceDetail.alphaWithoutRecord,
+        tanggal_alpha_tanpa_catatan: calc.attendanceDetail.alphaDates,
       },
     });
   }
@@ -787,7 +800,10 @@ export const payrollRunService = {
     return prisma.payrollSlip.findUnique({
       where: { id: slipId },
       include: {
-        user: { select: { id: true, name: true } },
+        // joinDate ikut karena kalender kehadiran di slip menilai hari kosong
+        // sebagai alpha — tanpa tanggal masuk, hari sebelum karyawan bergabung
+        // akan ikut dihitung alpha.
+        user: { select: { id: true, name: true, joinDate: true } },
         branch: { select: { name: true } },
         customRole: { select: { name: true } },
         paidBy: { select: { name: true } },
