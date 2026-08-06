@@ -18,6 +18,7 @@ model Branch {
   users             user[]
   attendances       Attendance[]
   payrollSlips      PayrollSlip[]
+  valasTransactions ValasTransaction[]
 }
 
 model Company {
@@ -43,6 +44,7 @@ model Company {
   correctionRequests        CorrectionRequest[]
   heldFunds                 HeldFund[]
   payrollRuns               PayrollRun[]
+  valasTransactions         ValasTransaction[]
 }
 
 model Currency {
@@ -57,6 +59,7 @@ model Currency {
   stocks         CurrencyStock[]
   stockMutations StockMutation[]
   price          CurrencyPrice?
+  valasTransactions ValasTransaction[]
 }
 
 // Harga Valas: harga beli & jual yang benar-benar dipakai Pusat Valas Indo hari

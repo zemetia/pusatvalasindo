@@ -17,7 +17,14 @@ import {
   type RuleTierInput,
 } from "@/backend/services/payroll-rule.service";
 import type { RuleGuard, RuleTarget } from "@/backend/payroll-rules/types";
-import { BankMutationType, type StockistMutationType } from "@src/generated/prisma/client";
+import { valasTransactionService } from "@/backend/services/valas-transaction.service";
+import { valasTransactionRepository } from "@/backend/repositories/valas-transaction.repository";
+import { currencyRepository } from "@/backend/repositories/currency.repository";
+import {
+  BankMutationType,
+  type StockistMutationType,
+  type ValasCustomerIdType,
+} from "@src/generated/prisma/client";
 import type { McpCaller } from "@/backend/mcp/auth";
 
 /**
@@ -115,6 +122,54 @@ const ruleDefaultsSchema = z.object({
   flag: z.string().max(60).optional(),
 });
 
+/**
+ * PT tujuan sebuah tool valas: `company_id` kalau diberikan (tetap diperiksa
+ * terhadap scope key-nya), kalau tidak PT milik key itu sendiri. Key global
+ * tanpa `company_id` tidak punya PT default — transaksi harus mendarat di satu
+ * PT tertentu, jadi menebak salah satunya lebih buruk daripada menolak.
+ */
+function valasCompanyId(args: Record<string, unknown>, caller: McpCaller): string {
+  const requested = str(args, "company_id", false);
+  if (requested) {
+    assertCompanyScope(caller, requested);
+    return requested;
+  }
+  if (!caller.companyId) {
+    throw new ValidationError("company_id wajib diisi untuk key global");
+  }
+  return caller.companyId;
+}
+
+/** Filter baca transaksi valas dari argumen tool, dengan scope PT sudah terkunci. */
+async function valasFilterFrom(args: Record<string, unknown>, caller: McpCaller) {
+  const requested = str(args, "company_id", false);
+  if (requested) assertCompanyScope(caller, requested);
+
+  const code = str(args, "currency_code", false);
+  const currency = code ? await currencyRepository.findByCode(code) : null;
+  if (code && !currency) throw new NotFoundError(`Mata uang ${code} tidak ditemukan`);
+
+  const date = str(args, "date", false);
+  const from = str(args, "from", false);
+  const to = str(args, "to", false);
+  const typeRaw = str(args, "type", false).toUpperCase();
+
+  return {
+    // Key ber-PT hanya pernah membaca PT-nya sendiri, apa pun yang diminta.
+    companyIds: caller.companyId ? [caller.companyId] : null,
+    companyId: requested || caller.companyId || undefined,
+    ...(date
+      ? { date: parseDateOnly(date) }
+      : {
+          from: from ? parseDateOnly(from) : undefined,
+          to: to ? parseDateOnly(to) : undefined,
+        }),
+    type: typeRaw === "BUY" || typeRaw === "SELL" ? (typeRaw as "BUY" | "SELL") : undefined,
+    currencyId: currency?.id,
+    q: str(args, "q", false) || undefined,
+  };
+}
+
 export const OPERATE_TOOLS: OperateTool[] = [
   {
     name: "get_patokan_harga",
@@ -190,6 +245,111 @@ export const OPERATE_TOOLS: OperateTool[] = [
         if (companyId) assertCompanyAccess(caller, companyId);
       }
       return currencyStockService.updateRates(id, buyRate, sellRate);
+    },
+  },
+  {
+    name: "get_valas_transactions",
+    description:
+      "List valas jual/beli transactions (loket sales) for one PT. Filter by date (single day) or from/to range, plus type (SELL = sold to customer, BUY = bought from customer), currency code, and a free-text query over invoice no / customer name / ID number. Cancelled (VOID) rows are included and flagged; they are excluded from get_valas_summary. Use get_valas_summary for totals.",
+    permission: [PERMISSIONS.VALAS_TX_VIEW],
+    inputSchema: {
+      company_id: z.string().optional().describe("PT id (from get_companies). Defaults to the key's own PT."),
+      date: z.string().optional().describe("YYYY-MM-DD — a single day. Overrides from/to."),
+      from: z.string().optional().describe("YYYY-MM-DD range start"),
+      to: z.string().optional().describe("YYYY-MM-DD range end"),
+      type: z.enum(["BUY", "SELL"]).optional(),
+      currency_code: z.string().optional().describe("e.g. USD"),
+      q: z.string().optional().describe("Search invoice no / customer name / ID number"),
+      limit: z.number().int().positive().optional().describe("Max rows (default 200, max 1000)"),
+    },
+    handler: async (args, caller) => {
+      const filter = await valasFilterFrom(args, caller);
+      const limit = Math.min(args.limit === undefined ? 200 : num(args, "limit"), 1000);
+      return valasTransactionService.list({ ...filter, includeVoid: true }, limit);
+    },
+  },
+  {
+    name: "get_valas_summary",
+    description:
+      "Totals of valas jual/beli for one PT over a day or a date range: rupiah and transaction count per side (BUY = bought from customer, SELL = sold to customer), plus a per-currency breakdown of units and rupiah. Cancelled (VOID) transactions are excluded.",
+    permission: [PERMISSIONS.VALAS_TX_VIEW],
+    inputSchema: {
+      company_id: z.string().optional().describe("PT id (from get_companies). Defaults to the key's own PT."),
+      date: z.string().optional().describe("YYYY-MM-DD — a single day. Overrides from/to."),
+      from: z.string().optional().describe("YYYY-MM-DD range start"),
+      to: z.string().optional().describe("YYYY-MM-DD range end"),
+      currency_code: z.string().optional().describe("e.g. USD"),
+    },
+    handler: async (args, caller) => {
+      const filter = await valasFilterFrom(args, caller);
+      const [totals, byCurrency] = await Promise.all([
+        valasTransactionRepository.summarize(filter),
+        valasTransactionRepository.summarizeByCurrency(filter),
+      ]);
+      return { ...totals, net: totals.buy.total - totals.sell.total, by_currency: byCurrency };
+    },
+  },
+  {
+    name: "create_valas_transaction",
+    description:
+      "Record one valas transaction at the loket. type SELL = the company sells foreign currency to the customer (uses Harga Valas harga jual), BUY = the company buys from the customer (harga beli). The rate is taken from Harga Valas unless `rate` is passed explicitly, and the IDR total is always computed server-side (amount × rate). Transactions of Rp 100,000,000 or more REQUIRE customer_id_type and customer_id_number. Does NOT move currency stock — stock stays with the daily Stock & Kas input.",
+    permission: [PERMISSIONS.VALAS_TX_CREATE],
+    inputSchema: {
+      company_id: z.string().optional().describe("PT id (from get_companies). Defaults to the key's own PT."),
+      branch_id: z.string().optional().describe("Branch id (from get_branches)"),
+      date: z.string().describe("YYYY-MM-DD"),
+      type: z.enum(["BUY", "SELL"]),
+      currency_code: z.string().describe("e.g. USD"),
+      amount: z.number().positive().describe("Amount in the foreign currency"),
+      rate: z.number().positive().optional().describe("IDR per 1 unit. Omit to use the current Harga Valas."),
+      customer_name: z.string(),
+      customer_phone: z.string().optional(),
+      customer_id_type: z.enum(["KTP", "SIM", "PASSPORT", "KITAS", "NPWP", "LAINNYA"]).optional(),
+      customer_id_number: z.string().optional(),
+      customer_address: z.string().optional(),
+      payment_method: z.enum(["CASH", "TRANSFER"]).optional().describe("Default CASH"),
+      bank_account_id: z.string().optional().describe("Required when payment_method = TRANSFER"),
+      note: z.string().optional(),
+    },
+    handler: async (args, caller) => {
+      const companyId = valasCompanyId(args, caller);
+      const currency = await currencyRepository.findByCode(str(args, "currency_code"));
+      if (!currency) throw new NotFoundError(`Mata uang ${str(args, "currency_code")} tidak ditemukan`);
+
+      return valasTransactionService.create({
+        companyId,
+        branchId: str(args, "branch_id", false) || null,
+        date: parseDateOnly(str(args, "date")),
+        type: str(args, "type").toUpperCase() as "BUY" | "SELL",
+        currencyId: currency.id,
+        amount: num(args, "amount"),
+        rate: args.rate === undefined ? null : num(args, "rate"),
+        customerName: str(args, "customer_name"),
+        customerPhone: str(args, "customer_phone", false) || null,
+        customerIdType: (str(args, "customer_id_type", false) || null) as ValasCustomerIdType | null,
+        customerIdNumber: str(args, "customer_id_number", false) || null,
+        customerAddress: str(args, "customer_address", false) || null,
+        paymentMethod: (str(args, "payment_method", false) || "CASH") as "CASH" | "TRANSFER",
+        bankAccountId: str(args, "bank_account_id", false) || null,
+        note: str(args, "note", false) || null,
+        createdBy: caller.id,
+      });
+    },
+  },
+  {
+    name: "void_valas_transaction",
+    description:
+      "Cancel a recorded valas transaction. The row is NOT deleted — it is marked VOID with the reason, stays visible in get_valas_transactions, and drops out of every total. Wrong amounts are fixed by voiding and re-creating, never by editing: the invoice number was already handed to the customer.",
+    permission: [PERMISSIONS.VALAS_TX_VOID],
+    inputSchema: {
+      transaction_id: z.string().describe("id from get_valas_transactions"),
+      reason: z.string().describe("Why it is being cancelled — required, kept on the row"),
+    },
+    handler: async (args, caller) => {
+      const id = str(args, "transaction_id");
+      const existing = await valasTransactionService.getById(id);
+      assertCompanyScope(caller, existing.companyId);
+      return valasTransactionService.void(id, str(args, "reason"), caller.id);
     },
   },
   {

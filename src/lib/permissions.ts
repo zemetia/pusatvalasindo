@@ -47,6 +47,16 @@ export const PERMISSIONS = {
   CURRENCY_VIEW: "currency.view",
   CURRENCY_MANAGE: "currency.manage",
 
+  // Transaksi jual/beli valas di loket. Sengaja TERPISAH dari CURRENCY_* :
+  // dua izin di atas mengatur master mata uang dan harganya, sedangkan ini
+  // menyangkut uang yang benar-benar berpindah tangan beserta data identitas
+  // nasabahnya. Di web, gerbangnya adalah resource `valas.transaction` (matriks
+  // izin) — permission di bawah ini yang dipakai jalur MCP, yang pemanggilnya
+  // sebuah key, bukan sesi, sehingga tidak bisa membaca matriks per-PT.
+  VALAS_TX_VIEW: "valas_transaction.view",
+  VALAS_TX_CREATE: "valas_transaction.create",
+  VALAS_TX_VOID: "valas_transaction.void",
+
   USERS_VIEW: "users.view",
   USERS_MANAGE: "users.manage",
   // Halaman detail karyawan (KPI + gaji + kalender kehadiran satu orang).
@@ -101,6 +111,9 @@ const ADMIN_PERMISSIONS: Permission[] = [
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.CURRENCY_MANAGE,
+  PERMISSIONS.VALAS_TX_VIEW,
+  PERMISSIONS.VALAS_TX_CREATE,
+  PERMISSIONS.VALAS_TX_VOID,
   PERMISSIONS.USERS_VIEW,
   PERMISSIONS.USERS_MANAGE,
   PERMISSIONS.ROLES_VIEW,
@@ -134,6 +147,11 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.COMPANY_STOCK_VIEW,
   PERMISSIONS.COMPANY_STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
+  PERMISSIONS.VALAS_TX_VIEW,
+  PERMISSIONS.VALAS_TX_CREATE,
+  // Pembatalan transaksi berhenti di Kepala Cabang, tidak turun ke Kasir —
+  // yang mencatat penjualan tidak boleh menganulir penjualannya sendiri.
+  PERMISSIONS.VALAS_TX_VOID,
   PERMISSIONS.USERS_VIEW,
   // Kepala Cabang memang sudah bisa tambah/ubah/hapus pengguna cabangnya —
   // dulu lewat gerbang peran `isAdminRole` di halaman & API Pengguna, bukan
@@ -175,6 +193,8 @@ const AKUNTAN_PERMISSIONS: Permission[] = [
   PERMISSIONS.COMPANY_STOCK_VIEW,
   PERMISSIONS.CURRENCY_VIEW,
   PERMISSIONS.CURRENCY_MANAGE,
+  // Akuntan membaca transaksi untuk rekonsiliasi, tapi tidak mencatatnya.
+  PERMISSIONS.VALAS_TX_VIEW,
 ];
 
 // Base perms shared by Kasir and Teller Dalam/Luar (currency stock handlers).
@@ -188,6 +208,10 @@ const KASIR_BASE_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.CURRENCY_VIEW,
+  // Loket: mencatat jual/beli valas adalah pekerjaan sehari-harinya.
+  // Membatalkan tidak — itu berhenti di Kepala Cabang.
+  PERMISSIONS.VALAS_TX_VIEW,
+  PERMISSIONS.VALAS_TX_CREATE,
 ];
 
 const KASIR_PERMISSIONS: Permission[] = [

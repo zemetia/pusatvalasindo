@@ -140,6 +140,10 @@ Each gated by the matching web permission; PT-scoped automatically. Common args:
 | `set_patokan_harga` | price-benchmark (upsert aturan penyesuaian jual/beli untuk satu currency) | `currency.manage` |
 | `get_harga_final` | price-benchmark (harga jual/beli akhir = kurs SmartDeal + aturan penyesuaian, optional `code` filter) | `currency.view` |
 | `update_currency_rate` | currency-stock (updates buy/sell rate; branch-scope checked) | `currency.manage` |
+| `get_valas_transactions` | valas-transaction (daftar transaksi loket per PT: tanggal/rentang, jenis, currency, pencarian; baris VOID ikut tampil & ditandai) | `valas_transaction.view` |
+| `get_valas_summary` | valas-transaction (rekap rupiah & jumlah transaksi per sisi + rincian per currency; VOID dikecualikan) | `valas_transaction.view` |
+| `create_valas_transaction` | valas-transaction (catat jual/beli; kurs dari Harga Valas kecuali `rate` diisi, total dihitung server, identitas wajib ≥ Rp 100 jt) | `valas_transaction.create` |
+| `void_valas_transaction` | valas-transaction (batalkan transaksi — status VOID + alasan, baris tidak dihapus) | `valas_transaction.void` |
 | `create_bank_mutation` | bank-mutation (CREDIT/DEBIT + balance update; PT-scoped) | `bank.manage` |
 | `confirm_stockist_head` | stockist head-confirmation (kepala cabang re-count per item) | `stockist.verify` |
 | `confirm_kas_head` | kas head-confirmation (kepala cabang cash re-count) | `stockist.verify` |

@@ -26,6 +26,7 @@ import {
   IconChartCandle,
   IconChartHistogram,
   IconAdjustmentsHorizontal,
+  IconArrowsExchange,
   IconReportMoney,
   IconCurrencyDollar,
   IconCoins,
@@ -103,6 +104,19 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
       title: "Input KPI Saya",
       url: "/dashboard/kpi/self",
       icon: IconPencil,
+    });
+  }
+
+  // ── Operational ────────────────────────────────────────────────────────────
+  const navOperational: NavItem[] = [];
+
+  // Transaksi Valas adalah pencatatan operasional harian: dibuka per tanggal dan
+  // diisi hari itu. Kursnya berasal dari Harga Valas di Finance Management.
+  if (show("valas.transaction")) {
+    navOperational.push({
+      title: "Transaksi Valas",
+      url: "/dashboard/transaksi-valas",
+      icon: IconArrowsExchange,
     });
   }
 
@@ -370,6 +384,9 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
       <SidebarContent>
         <NavMain items={navMain} />
         {navSelf.length > 0 && <NavMain items={navSelf} label="Aktivitas Saya" />}
+        {navOperational.length > 0 && (
+          <NavMain items={navOperational} label="Operational" />
+        )}
         {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
         {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
         {navFinanceManagement.length > 0 && (

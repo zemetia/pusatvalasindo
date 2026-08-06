@@ -1,0 +1,117 @@
+// Transaksi Jual & Beli Valas — satu baris per transaksi nasabah di loket.
+//
+// Bentuknya sengaja BEDA dari modul harian (DailyStockEntry, KasDailyEntry,
+// DailyBankEntry): di sana satu baris per pocket per tanggal, di sini satu baris
+// per kejadian. Tidak ada kunci unik per tanggal — nol transaksi sehari adalah
+// keadaan normal, bukan "belum diisi".
+//
+// Sumber harganya adalah Harga Valas (`CurrencyPrice`): BUY memakai `buyPrice`
+// (kita membeli dari nasabah), SELL memakai `sellPrice`. Harga itu global dan
+// BERGERAK, jadi angkanya di-SNAPSHOT ke baris ini saat transaksi dibuat —
+// `rate` adalah kurs yang benar-benar dipakai dan `priceRate` harga yang berlaku
+// saat itu. Tanpa snapshot, laporan kemarin akan ikut berubah setiap kali harga
+// hari ini disimpan.
+//
+// Sengaja TIDAK memutasi `CurrencyStock`/`StockMutation`: stok valas dicatat
+// lewat input harian Stock & Kas (closing qty per tanggal, lalu di-cross-check).
+// Kalau modul ini ikut menulis ke sana, angka stok punya dua sumber kebenaran
+// yang tidak bisa direkonsiliasi. Transaksi di sini adalah catatan penjualan &
+// pembelian; stok tetap milik modul stockist.
+model ValasTransaction {
+  id String @id @default(cuid())
+
+  // PT wajib (sumbu scope izin), cabang opsional — mengikuti pola Branch? di
+  // seluruh repo: cabang boleh dihapus tanpa menghilangkan riwayat transaksinya.
+  companyId String
+  branchId  String?
+
+  // Nomor bukti yang dilihat nasabah, unik per PT. Format:
+  // "{KODE_PT}/{JL|BL}/{YYMMDD}/{urut 4 digit}" — lihat generateInvoiceNo.
+  invoiceNo String
+
+  // Tanggal transaksi (date-only, UTC-midnight seperti modul harian) supaya
+  // laporan per tanggal tidak bergantung zona waktu. Jam sebenarnya ada di
+  // `createdAt`.
+  date DateTime @db.Date
+
+  type ValasTransactionType
+
+  currencyId String
+  // Jumlah valas yang berpindah tangan, dalam satuan mata uangnya.
+  amount     Decimal @db.Decimal(18, 4)
+  // Kurs yang BENAR-BENAR dipakai (IDR per 1 unit). Boleh berbeda dari
+  // `priceRate` kalau kasir menegosiasikan harga.
+  rate       Decimal @db.Decimal(18, 4)
+  // Harga dari Harga Valas saat transaksi dibuat — pembanding untuk menilai
+  // seberapa jauh kurs dinego. Null kalau mata uangnya belum punya harga.
+  priceRate  Decimal? @db.Decimal(18, 4)
+  // amount × rate, dihitung server. Disimpan supaya laporan tidak perlu
+  // mengalikan ulang (dan tidak bisa berbeda dari yang tercetak di bukti).
+  totalIdr   Decimal @db.Decimal(18, 2)
+
+  // ── Nasabah ───────────────────────────────────────────────────────────────
+  // Nama selalu wajib. Identitas (jenis + nomor) wajib di atas ambang
+  // IDENTITY_REQUIRED_THRESHOLD — lihat valas-transaction.service.ts.
+  customerName     String
+  customerPhone    String?
+  customerIdType   ValasCustomerIdType?
+  customerIdNumber String?
+  customerAddress  String?
+
+  paymentMethod ValasPaymentMethod @default(CASH)
+  // Rekening tujuan/asal saat pembayarannya transfer. Nullable karena mayoritas
+  // transaksi loket tunai.
+  bankAccountId String?
+
+  note String?
+
+  // ── Pembatalan ────────────────────────────────────────────────────────────
+  // Transaksi TIDAK pernah dihapus: bukti bernomor yang hilang dari daftar
+  // adalah lubang di jejak audit. Pembatalan menandai, dan barisnya tetap
+  // tampil dengan status VOID (dikeluarkan dari semua total).
+  status     ValasTransactionStatus @default(COMPLETED)
+  voidedAt   DateTime?
+  voidedBy   String?
+  voidReason String?
+
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company      @relation(fields: [companyId], references: [id])
+  branch      Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  currency    Currency     @relation(fields: [currencyId], references: [id])
+  bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, invoiceNo])
+  // Halaman membaca satu PT satu tanggal; laporan membaca rentang tanggal per PT.
+  @@index([companyId, date])
+  @@index([companyId, currencyId, date])
+  @@index([branchId, date])
+}
+
+enum ValasTransactionType {
+  // Perusahaan MEMBELI valas dari nasabah → pakai CurrencyPrice.buyPrice.
+  BUY
+  // Perusahaan MENJUAL valas ke nasabah → pakai CurrencyPrice.sellPrice.
+  SELL
+}
+
+enum ValasPaymentMethod {
+  CASH
+  TRANSFER
+}
+
+enum ValasTransactionStatus {
+  COMPLETED
+  VOID
+}
+
+enum ValasCustomerIdType {
+  KTP
+  SIM
+  PASSPORT
+  KITAS
+  NPWP
+  LAINNYA
+}

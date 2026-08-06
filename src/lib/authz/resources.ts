@@ -409,6 +409,41 @@ export const RESOURCES: ResourceDef[] = [
     legacy: { view: PERMISSIONS.CURRENCY_VIEW, write: PERMISSIONS.CURRENCY_MANAGE },
   },
   {
+    key: "valas.transaction",
+    label: "Transaksi Jual & Beli Valas",
+    group: "Stok & Valas",
+    description:
+      "Mencatat penjualan dan pembelian valas di loket, memakai harga dari Harga Valas. Tulis = boleh membuat transaksi baru untuk PT tersebut; membuat transaksi bertanggal lampau tetap butuh izin ubah tanggal lampau.",
+    page: "/dashboard/transaksi-valas",
+    apis: ["/api/valas-transactions"],
+    // Per-PT (`scoping` default "company"): transaksinya terjadi di cabang, dan
+    // cabang dimiliki satu PT — jadi wewenang mencatat & melihat transaksi bisa
+    // dibatasi per PT, persis seperti Saldo Bank Harian dan Dana Tertahan.
+    //
+    // Sengaja TANPA peta legacy meski CURRENCY_VIEW/CURRENCY_MANAGE terlihat
+    // mirip. Dua izin itu tentang MASTER mata uang & harganya (global, dipegang
+    // Akuntan dan Kasir), sedangkan ini mencatat uang yang benar-benar berpindah
+    // tangan. Memetakannya akan diam-diam memberi setiap pemegang CURRENCY_VIEW
+    // akses ke seluruh riwayat transaksi nasabah termasuk data identitasnya.
+  },
+  {
+    // Kemampuan, bukan halaman — pola yang sama dengan
+    // `finance.receivable.settle`: yang MENCATAT transaksi belum tentu yang
+    // berhak MEMBATALKANNYA. Kalau keduanya satu sakelar, kasir bisa menghapus
+    // penjualannya sendiri dari laporan setoran.
+    //
+    // Pembatalan tidak menghapus baris (statusnya jadi VOID beserta alasan &
+    // pelakunya), jadi jejaknya tetap utuh — tapi angkanya keluar dari semua
+    // total, dan itu keputusan yang perlu wewenang tersendiri.
+    key: "valas.transaction.void",
+    label: "Membatalkan Transaksi Valas",
+    group: "Stok & Valas",
+    description:
+      "Membatalkan transaksi jual/beli valas yang sudah tercatat (status VOID, wajib beralasan). Tanpa ini, transaksi hanya bisa dibuat, tidak bisa dianulir.",
+    capability: true,
+    apis: ["/api/valas-transactions"],
+  },
+  {
     key: "price.benchmark",
     label: "Patokan Harga",
     group: "Stok & Valas",

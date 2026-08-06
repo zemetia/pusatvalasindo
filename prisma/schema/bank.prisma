@@ -15,6 +15,7 @@ model BankAccount {
   currency      Currency         @relation(fields: [currencyId], references: [id])
   mutations     BankMutation[]
   dailyEntries  DailyBankEntry[]
+  valasTransactions ValasTransaction[]
 
   @@index([companyId])
 }

@@ -203,6 +203,7 @@ Tanpa `--apply` script hanya menampilkan rencana. Aman diulang.
 |---|---|---|
 | Saldo Bank Harian | `bank.daily` | per PT, view/edit terpisah |
 | Dana Tertahan (Hutang) | `finance.receivable` + capability `finance.receivable.settle` | per PT, view/edit terpisah; hak "lunas" izin tersendiri |
+| Transaksi Valas (Jual & Beli) | `valas.transaction` + capability `valas.transaction.void` | per PT, view/edit terpisah; hak "batalkan" izin tersendiri |
 | Stock & Kas Harian | `stockist.daily` | per PT, view/edit terpisah |
 | Cross-Check Stock | `stockist.verify` | per PT |
 | Rekening Bank | `bank.accounts` | per PT |
