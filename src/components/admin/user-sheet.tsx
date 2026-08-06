@@ -38,10 +38,6 @@ export type UserRow = {
   roleName: string | null;
   branchId: string | null;
   baseSalary: unknown;
-  mealAllowance: unknown;
-  transportAllowance: unknown;
-  positionAllowance: unknown;
-  bpjsKesehatan: unknown;
   joinDate: string | null;
   isActive: boolean;
   createdAt: string;
@@ -75,10 +71,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
     companyId: initialCompanyId,
     branchId: "",
     baseSalary: "",
-    mealAllowance: "",
-    transportAllowance: "",
-    positionAllowance: "",
-    bpjsKesehatan: "",
     joinDate: "",
   });
 
@@ -98,10 +90,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
         companyId: initialCompanyId,
         branchId: user.branchId ?? "",
         baseSalary: user.baseSalary ? String(user.baseSalary) : "",
-        mealAllowance: user.mealAllowance ? String(user.mealAllowance) : "",
-        transportAllowance: user.transportAllowance ? String(user.transportAllowance) : "",
-        positionAllowance: user.positionAllowance ? String(user.positionAllowance) : "",
-        bpjsKesehatan: user.bpjsKesehatan ? String(user.bpjsKesehatan) : "",
         joinDate: toDateInput(user.joinDate),
       });
     }
@@ -136,10 +124,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
           customRoleId: form.customRoleId || null,
           branchId: form.branchId || null,
           baseSalary: form.baseSalary ? parseFloat(form.baseSalary) : null,
-          mealAllowance: form.mealAllowance ? parseFloat(form.mealAllowance) : null,
-          transportAllowance: form.transportAllowance ? parseFloat(form.transportAllowance) : null,
-          positionAllowance: form.positionAllowance ? parseFloat(form.positionAllowance) : null,
-          bpjsKesehatan: form.bpjsKesehatan ? parseFloat(form.bpjsKesehatan) : null,
           joinDate: form.joinDate || undefined,
         }),
       });
@@ -262,52 +246,6 @@ export function UserSheet({ user, branches, companies, roles, trigger }: Props) 
           onValueChange={(v) => set("baseSalary")(v.value)}
           icon={<Banknote className="w-4 h-4" />}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Makan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.mealAllowance}
-            onValueChange={(v) => set("mealAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Transport (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.transportAllowance}
-            onValueChange={(v) => set("transportAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Jabatan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.positionAllowance}
-            onValueChange={(v) => set("positionAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="BPJS Kesehatan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.bpjsKesehatan}
-            onValueChange={(v) => set("bpjsKesehatan")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-        </div>
         <PremiumField
           label="Tanggal Bergabung"
           type="date"

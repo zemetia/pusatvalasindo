@@ -2,9 +2,9 @@ import prisma from "@/lib/prisma";
 import type { Prisma, SalaryComponentKind } from "@src/generated/prisma/client";
 
 /**
- * Komponen gaji tambahan — tunjangan/potongan di luar kolom tetap di `user`
- * (gaji pokok, uang makan, transport, jabatan, BPJS). Lihat komentar di
- * prisma/schema/payroll.prisma untuk alasan pemisahannya.
+ * Komponen gaji tambahan — segalanya di luar gaji pokok (kolom tetap satu-
+ * satunya yang masih di `user`), termasuk uang makan/transport/jabatan/BPJS.
+ * Lihat komentar di prisma/schema/payroll.prisma untuk detailnya.
  */
 
 export type CreateSalaryComponentInput = {

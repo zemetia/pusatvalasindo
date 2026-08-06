@@ -17,7 +17,7 @@ import { createHash } from "node:crypto";
 
 import prisma from "@/lib/prisma";
 import { validateRule } from "./validate";
-import { verifyRuleSignature, type SignableRule } from "./signature";
+import { hasSigningKey, verifyRuleSignature, type SignableRule } from "./signature";
 import type { LoadedRule, PayrollRule, RuleSet, RuleTier } from "./types";
 
 /** Baris PayrollRule + tier-nya, seperti dibaca dari Prisma. */
@@ -155,10 +155,19 @@ export async function loadRuleSet(): Promise<RuleSet> {
     // Verifikasi tanda tangan SETELAH validasi struktur, supaya rule yang
     // memang salah bentuk menampilkan kesalahan sebenarnya lebih dulu.
     if (!verifyRuleSignature(signablePart(row), row.signature)) {
+      // Dua sebab yang sangat berbeda dan HARUS dibedakan. Kunci yang tidak
+      // diset membuat SELURUH rule gagal verifikasi sekaligus — itu salah
+      // konfigurasi lingkungan, bukan rule yang dirusak. Menyebutnya "tanda
+      // tangan tidak cocok" mengirim orang memeriksa 15 rule yang sebenarnya
+      // baik-baik saja.
       errors.unshift(
-        "Tanda tangan tidak cocok — isi rule ini berubah di luar aplikasi, atau " +
-          "PAYROLL_RULE_SIGNING_KEY berbeda dari saat rule disimpan. Rule tidak " +
-          "dijalankan sampai disimpan ulang lewat halaman Rule."
+        hasSigningKey()
+          ? "Tanda tangan tidak cocok — isi rule ini berubah di luar aplikasi, atau " +
+              "PAYROLL_RULE_SIGNING_KEY berbeda dari saat rule disimpan. Rule tidak " +
+              "dijalankan sampai disimpan ulang lewat halaman Rule."
+          : "PAYROLL_RULE_SIGNING_KEY belum diset, jadi tanda tangan rule tidak bisa " +
+              "diverifikasi sama sekali. Ini masalah konfigurasi lingkungan, bukan " +
+              "masalah pada rule ini — set kunci tersebut, lalu jalankan ulang payroll."
       );
     }
 

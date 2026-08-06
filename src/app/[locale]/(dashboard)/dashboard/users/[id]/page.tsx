@@ -11,7 +11,9 @@ import {
 
 import prisma from "@/lib/prisma";
 import { canViewPayrollOf } from "@/backend/services/payroll.service";
+import { salaryComponentService, pickCoreAllowances } from "@/backend/services/salary-component.service";
 import { requireResource } from "@/backend/helpers/authz";
+import { allowsCompany } from "@/lib/authz/resolve";
 import {
   evaluateRulesForEmployee,
   loadEmployeeContext,
@@ -53,6 +55,7 @@ import {
   type AttendanceStatusKey,
 } from "@/components/admin/employee/attendance-year-grid";
 import { KpiYearTrend, type KpiTrendPoint } from "@/components/admin/employee/kpi-year-trend";
+import { EmploymentStatusPanel } from "@/components/admin/employee/employment-status-panel";
 
 /**
  * Detail satu karyawan: identitas, KPI, gaji, dan kalender kehadiran setahun.
@@ -225,12 +228,11 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
           phone: true,
           joinDate: true,
           isActive: true,
+          employmentStatus: true,
+          contractStartDate: true,
+          contractEndDate: true,
           createdAt: true,
           baseSalary: true,
-          mealAllowance: true,
-          transportAllowance: true,
-          positionAllowance: true,
-          bpjsKesehatan: true,
           customRole: { select: { id: true, name: true } },
           branch: {
             select: {
@@ -270,13 +272,17 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
             orderBy: [{ year: "asc" }, { month: "asc" }],
           })
         : Promise.resolve([]),
+      // Uang makan/transport/jabatan/BPJS bukan lagi kolom tetap `user` —
+      // sekarang komponen gaji biasa, dicocokkan lewat nama (lihat
+      // pickCoreAllowances). Hanya ditarik kalau memang berhak lihat gaji.
+      maySeeSalary ? salaryComponentService.listForUser(id) : Promise.resolve([]),
     ]);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="users/[id]/page" message={msg} />;
   }
 
-  const [employee, attendance, kpiResults] = data;
+  const [employee, attendance, kpiResults, salaryComponents] = data;
   if (!employee) notFound();
 
   const companyId = employee.branch?.companyId ?? null;
@@ -285,6 +291,13 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
   if (!isSelf && !authz.canView(companyId)) {
     notFound();
   }
+
+  // Mengubah status ikatan kerja adalah mutasi data pengguna, jadi gerbangnya
+  // resource `users` (tulis) pada PT karyawan ini — bukan `users.detail`, yang
+  // read-only dan hanya mengatur boleh-tidaknya membuka halaman. Endpoint
+  // PUT /api/users/[id] memeriksa ulang hal yang sama; ini hanya menentukan
+  // apakah tombolnya pantas ditampilkan.
+  const canEditEmployment = allowsCompany(authz.subject, "users", "write", companyId);
 
   // Bagian gaji ditampilkan hanya kalau pemanggil berhak atas gaji PT karyawan
   // ini (`payroll.manage`) atau ini memang dirinya sendiri (`payroll.self`).
@@ -352,12 +365,13 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
 
   /* ── Gaji ──────────────────────────────────────────────────────────────── */
 
+  const coreAllowances = pickCoreAllowances(salaryComponents);
   const salary = {
     base: employee.baseSalary != null ? Number(employee.baseSalary) : null,
-    meal: employee.mealAllowance != null ? Number(employee.mealAllowance) : null,
-    transport: employee.transportAllowance != null ? Number(employee.transportAllowance) : null,
-    position: employee.positionAllowance != null ? Number(employee.positionAllowance) : null,
-    bpjs: employee.bpjsKesehatan != null ? Number(employee.bpjsKesehatan) : null,
+    meal: coreAllowances.meal || null,
+    transport: coreAllowances.transport || null,
+    position: coreAllowances.position || null,
+    bpjs: coreAllowances.bpjs || null,
   };
   const grossFixed =
     (salary.base ?? 0) +
@@ -581,6 +595,21 @@ function ringkasanRule(
         <Field label="Masa Kerja" value={masaKerja(employee.joinDate, today)} />
         <Field label="Akun Dibuat" value={TIMESTAMP_DATE.format(employee.createdAt)} />
       </section>
+
+      {/* Status kontrak diletakkan tepat di bawah identitas: inilah yang dicari
+          HR setelah membaca slip bertuliskan "belum berkontrak", dan ia
+          menjelaskan angka bonus di bagian gaji jauh di bawah. */}
+      <EmploymentStatusPanel
+        userId={employee.id}
+        employeeName={employee.name}
+        status={employee.employmentStatus}
+        contractStartDate={
+          employee.contractStartDate ? toKey(employee.contractStartDate) : null
+        }
+        contractEndDate={employee.contractEndDate ? toKey(employee.contractEndDate) : null}
+        today={today}
+        canEdit={canEditEmployment}
+      />
 
       {/* Angka utama halaman ini. */}
       <section className="border-border border-y py-8">

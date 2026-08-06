@@ -42,10 +42,6 @@ const emptyForm = {
   branchId: "",
   phone: "",
   baseSalary: "",
-  mealAllowance: "",
-  transportAllowance: "",
-  positionAllowance: "",
-  bpjsKesehatan: "",
   joinDate: "",
 };
 
@@ -97,10 +93,6 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           branchId: form.branchId,
           phone: form.phone || undefined,
           baseSalary: form.baseSalary ? parseFloat(form.baseSalary) : undefined,
-          mealAllowance: form.mealAllowance ? parseFloat(form.mealAllowance) : undefined,
-          transportAllowance: form.transportAllowance ? parseFloat(form.transportAllowance) : undefined,
-          positionAllowance: form.positionAllowance ? parseFloat(form.positionAllowance) : undefined,
-          bpjsKesehatan: form.bpjsKesehatan ? parseFloat(form.bpjsKesehatan) : undefined,
           joinDate: form.joinDate || undefined,
         }),
       });
@@ -229,52 +221,6 @@ export function CreateUserSheet({ branches, companies, roles }: Props) {
           onValueChange={(v) => set("baseSalary")(v.value)}
           icon={<Banknote className="w-4 h-4" />}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Makan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.mealAllowance}
-            onValueChange={(v) => set("mealAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Transport (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.transportAllowance}
-            onValueChange={(v) => set("transportAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="Uang Jabatan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.positionAllowance}
-            onValueChange={(v) => set("positionAllowance")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-          <NumericFormat
-            customInput={PremiumField}
-            label="BPJS Kesehatan (IDR)"
-            thousandSeparator="."
-            decimalSeparator=","
-            allowNegative={false}
-            placeholder="0"
-            value={form.bpjsKesehatan}
-            onValueChange={(v) => set("bpjsKesehatan")(v.value)}
-            icon={<Banknote className="w-4 h-4" />}
-          />
-        </div>
         <PremiumField
           label="Tanggal Bergabung"
           type="date"

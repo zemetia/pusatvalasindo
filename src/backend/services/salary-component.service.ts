@@ -26,6 +26,40 @@ export type UserSalaryComponentDto = {
   isActive: boolean;
 };
 
+/**
+ * Nama 4 komponen yang dulu jadi kolom tetap di `user` (migrasi
+ * 20260806000000). `payrollService`/`loadEmployeeContext` mencocokkannya
+ * balik lewat nama ini, bukan id tetap — trade-off-nya, rename komponen ini
+ * lewat halaman Komponen Gaji akan melepas pencocokannya.
+ */
+export const CORE_ALLOWANCE_NAMES = {
+  meal: "Uang Makan",
+  transport: "Uang Transport",
+  position: "Uang Jabatan",
+  bpjs: "BPJS Kesehatan",
+} as const;
+
+const CORE_ALLOWANCE_NAME_SET: ReadonlySet<string> = new Set(
+  Object.values(CORE_ALLOWANCE_NAMES)
+);
+
+/** Nilai 4 komponen inti milik satu karyawan, 0 kalau belum dipasang/nonaktif. */
+export function pickCoreAllowances(components: UserSalaryComponentDto[]) {
+  const byName = (name: string) =>
+    components.find((c) => c.isActive && c.name === name)?.amount ?? 0;
+  return {
+    meal: byName(CORE_ALLOWANCE_NAMES.meal),
+    transport: byName(CORE_ALLOWANCE_NAMES.transport),
+    position: byName(CORE_ALLOWANCE_NAMES.position),
+    bpjs: byName(CORE_ALLOWANCE_NAMES.bpjs),
+  };
+}
+
+/** Komponen tambahan "sungguhan" — semua kecuali 4 yang inti di atas. */
+export function isCoreAllowance(name: string): boolean {
+  return CORE_ALLOWANCE_NAME_SET.has(name);
+}
+
 type ComponentRecord = Awaited<ReturnType<typeof salaryComponentRepository.findById>>;
 
 function toDto(c: NonNullable<ComponentRecord>): SalaryComponentDto {

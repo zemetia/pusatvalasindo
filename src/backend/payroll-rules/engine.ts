@@ -20,6 +20,7 @@ import {
   roundRupiah,
 } from "./formula";
 import { activeRulesOn, loadRuleSet, toIsoDate } from "./loader";
+import { targetingIsUsable } from "./validate";
 import { entryTypeOf } from "./types";
 import type {
   EmployeeContext,
@@ -154,10 +155,6 @@ function buildScope(
     ...row,
     ...(rule.konstanta ?? {}),
     "karyawan.gaji_pokok": emp.gaji_pokok,
-    "karyawan.uang_makan": emp.uang_makan,
-    "karyawan.uang_transport": emp.uang_transport,
-    "karyawan.tunjangan_jabatan": emp.tunjangan_jabatan,
-    "karyawan.bpjs_kesehatan": emp.bpjs_kesehatan,
     "karyawan.tgl_masuk": emp.tgl_masuk,
     "periode.awal": period.awal,
     "periode.akhir": period.akhir,
@@ -637,6 +634,16 @@ export async function evaluateRulesForEmployee(
     // aplikasi) yang paling sunyi. Entri ERROR di bawah ini yang membuat slip
     // bisa menjawab "kenapa bonus saya tidak keluar bulan ini".
     if (loaded.errors.length > 0) {
+      // Sasaran tetap disaring lebih dulu. Rule rusak yang memang bukan untuk
+      // karyawan ini tidak boleh muncul di slipnya — kalau tidak, seorang teller
+      // menerima belasan baris "rule bermasalah" tentang rule kurir dan kepala
+      // cabang, dan yang benar-benar mengenai dirinya tenggelam di antaranya.
+      //
+      // Kecuali kalau justru bagian sasarannya yang rusak: menyaring dengan
+      // sasaran yang tidak sah akan membuang rule dari SEMUA slip tanpa jejak.
+      // Dalam keadaan itu rule sengaja ditampilkan ke semua orang yang mungkin
+      // terkena — terlalu ramai jauh lebih baik daripada senyap.
+      if (targetingIsUsable(loaded.rule) && !ruleTargetsEmployee(loaded.rule, emp)) continue;
       entries.push(brokenRuleEntry(loaded));
       continue;
     }
@@ -679,10 +686,6 @@ export async function loadEmployeeContext(employeeId: string): Promise<EmployeeC
       id: true,
       name: true,
       baseSalary: true,
-      mealAllowance: true,
-      transportAllowance: true,
-      positionAllowance: true,
-      bpjsKesehatan: true,
       joinDate: true,
       branchId: true,
       customRoleId: true,
@@ -701,10 +704,6 @@ export async function loadEmployeeContext(employeeId: string): Promise<EmployeeC
     branchName: u.branch?.name ?? null,
     roleName: u.customRole?.name ?? null,
     gaji_pokok: num(u.baseSalary),
-    uang_makan: num(u.mealAllowance),
-    uang_transport: num(u.transportAllowance),
-    tunjangan_jabatan: num(u.positionAllowance),
-    bpjs_kesehatan: num(u.bpjsKesehatan),
     tgl_masuk: u.joinDate ?? null,
     companyId: u.branch?.companyId ?? null,
     branchId: u.branchId ?? null,

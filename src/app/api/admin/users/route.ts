@@ -17,10 +17,6 @@ const createUserSchema = z.object({
   branchId: z.string().min(1),
   phone: z.string().max(20).optional(),
   baseSalary: z.number().positive().optional(),
-  mealAllowance: z.number().positive().optional(),
-  transportAllowance: z.number().positive().optional(),
-  positionAllowance: z.number().positive().optional(),
-  bpjsKesehatan: z.number().positive().optional(),
   joinDate: z.string().optional(),
 });
 
@@ -32,7 +28,7 @@ export const POST = withValidation(createUserSchema)(
       const authz = await authorize("users", "write");
       if (authz instanceof NextResponse) return authz;
 
-      let { name, email, password, customRoleId, branchId, phone, baseSalary, mealAllowance, transportAllowance, positionAllowance, bpjsKesehatan, joinDate } = ctx.body;
+      let { name, email, password, customRoleId, branchId, phone, baseSalary, joinDate } = ctx.body;
 
       // Pengguna baru lahir di sebuah cabang, dan cabang itulah yang menentukan
       // PT-nya — jadi PT tujuan harus berada dalam scope tulis si pemanggil.
@@ -82,10 +78,6 @@ export const POST = withValidation(createUserSchema)(
           branchId,
           phone: phone ?? null,
           baseSalary: baseSalary ?? null,
-          mealAllowance: mealAllowance ?? null,
-          transportAllowance: transportAllowance ?? null,
-          positionAllowance: positionAllowance ?? null,
-          bpjsKesehatan: bpjsKesehatan ?? null,
           joinDate: joinDate ? new Date(joinDate) : new Date(),
           emailVerified: true,
           updatedAt: new Date(),

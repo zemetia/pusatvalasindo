@@ -23,14 +23,17 @@
 // ───────────────────────────────────────────────────────────────────────────
 // KOMPONEN GAJI TAMBAHAN
 //
-// Uang makan, transport, jabatan, dan BPJS sudah jadi kolom tetap di `user`
-// karena dipakai semua karyawan. Komponen di bawah ini untuk sisanya — yang
-// jumlah dan namanya beda-beda per PT (tunjangan pulsa, komunikasi, kacamata,
-// potongan koperasi, dst.) — supaya menambah jenis tunjangan/potongan baru
-// tidak perlu migrasi schema lagi.
+// Uang makan, transport, jabatan, dan BPJS TIDAK LAGI kolom tetap di `user`
+// (migrasi 20260806000000) — sekarang cuma 4 SalaryComponent global biasa,
+// sama seperti tunjangan pulsa, komunikasi, kacamata, potongan koperasi, dst.
+// Dicocokkan oleh `payrollService`/`loadEmployeeContext` lewat NAMA
+// ("Uang Makan", "Uang Transport", "Uang Jabatan", "BPJS Kesehatan"), bukan id
+// tetap — supaya menambah/mengubah jenis tunjangan/potongan tidak perlu
+// migrasi schema lagi, dengan trade-off: rename nama komponen itu lewat
+// halaman Komponen Gaji akan melepas pencocokannya.
 //
-// Semuanya nominal TETAP PER BULAN, sama seperti kolom tetap di atas. Tidak
-// ada perhitungan pro-rata per hari hadir.
+// Semuanya nominal TETAP PER BULAN. Tidak ada perhitungan pro-rata per hari
+// hadir.
 // ───────────────────────────────────────────────────────────────────────────
 
 /// Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.

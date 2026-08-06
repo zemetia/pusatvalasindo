@@ -24,7 +24,7 @@ const CATATAN_UMUM =
 export const PVI_RULES: RuleSeed[] = [
   {
     ruleKey: 'kpi_pvi_kepala_cabang',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -49,7 +49,7 @@ export const PVI_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pvi_kepala_marketing',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -79,7 +79,7 @@ export const PVI_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pvi_marketing',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -106,7 +106,7 @@ export const PVI_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pvi_teller_dalam',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -129,7 +129,7 @@ export const PVI_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pvi_teller_luar',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -150,7 +150,7 @@ export const PVI_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pvi_kurir',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,

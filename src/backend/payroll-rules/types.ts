@@ -155,10 +155,6 @@ export interface EmployeeContext {
   branchName: string | null;
   roleName: string | null;
   gaji_pokok: number | null;
-  uang_makan: number | null;
-  uang_transport: number | null;
-  tunjangan_jabatan: number | null;
-  bpjs_kesehatan: number | null;
   tgl_masuk: Date | null;
   /** id mentah untuk parameter query. */
   companyId: string | null;

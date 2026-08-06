@@ -1,3 +1,4 @@
+import type { EmploymentStatus } from "@src/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export type UpdateUserInput = Partial<{
@@ -7,12 +8,15 @@ export type UpdateUserInput = Partial<{
   customRoleId: string | null;
   branchId: string | null;
   baseSalary: number | null;
-  mealAllowance: number | null;
-  transportAllowance: number | null;
-  positionAllowance: number | null;
-  bpjsKesehatan: number | null;
   joinDate: Date;
   isActive: boolean;
+  // Ketiganya selalu ditulis bersama — status menentukan apakah tanggalnya
+  // boleh terisi, jadi memperbarui salah satunya sendirian bisa meninggalkan
+  // kombinasi yang mustahil (mis. BELUM_KONTRAK dengan tanggal mulai).
+  // Penegakannya di route; tipe ini hanya membuka jalannya.
+  employmentStatus: EmploymentStatus;
+  contractStartDate: Date | null;
+  contractEndDate: Date | null;
 }>;
 
 const select = {
@@ -25,12 +29,11 @@ const select = {
   customRoleId: true,
   branchId: true,
   baseSalary: true,
-  mealAllowance: true,
-  transportAllowance: true,
-  positionAllowance: true,
-  bpjsKesehatan: true,
   joinDate: true,
   isActive: true,
+  employmentStatus: true,
+  contractStartDate: true,
+  contractEndDate: true,
   createdAt: true,
   updatedAt: true,
   branch: { select: { id: true, name: true } },

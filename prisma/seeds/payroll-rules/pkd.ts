@@ -19,7 +19,7 @@ const CATATAN_UMUM =
 export const PKD_RULES: RuleSeed[] = [
   {
     ruleKey: 'kpi_pkd_kepala_cabang',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,
@@ -48,7 +48,7 @@ export const PKD_RULES: RuleSeed[] = [
 
   {
     ruleKey: 'kpi_pkd_marketing',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: KPI_BULANAN_SQL,

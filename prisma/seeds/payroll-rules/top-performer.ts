@@ -46,7 +46,7 @@ const SQL_PERINGKAT =
 export const TOP_PERFORMER_RULES: RuleSeed[] = [
   {
     ruleKey: 'bonus_top_kpi_pvi',
-    effectiveFrom: '2026-08-01',
+    effectiveFrom: '2020-01-01',
     effectiveTo: null,
     mode: 'agregat',
     sql: SQL_PERINGKAT,

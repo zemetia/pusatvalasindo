@@ -66,10 +66,6 @@ model user {
   phone              String?
   branchId           String?
   baseSalary         Decimal?
-  mealAllowance      Decimal?
-  transportAllowance Decimal?
-  positionAllowance  Decimal?
-  bpjsKesehatan      Decimal?
   joinDate           DateTime?
 
   /// Status ikatan kerja. Dipakai rule payroll untuk menegakkan aturan

@@ -29,14 +29,7 @@ export const ALLOWED_PARAMS = [
 ] as const;
 
 /** Field `karyawan.*` yang boleh dirujuk formula. */
-export const EMPLOYEE_FIELDS = [
-  "gaji_pokok",
-  "uang_makan",
-  "uang_transport",
-  "tunjangan_jabatan",
-  "bpjs_kesehatan",
-  "tgl_masuk",
-] as const;
+export const EMPLOYEE_FIELDS = ["gaji_pokok", "tgl_masuk"] as const;
 
 /** Field `periode.*` yang boleh dirujuk formula. */
 export const PERIOD_FIELDS = ["awal", "akhir", "jumlah_hari", "bulan", "tahun"] as const;
@@ -395,6 +388,35 @@ function checkExpression(
   } catch (e) {
     err(`${at}: ${e instanceof ExpressionError ? e.message : String(e)}`);
   }
+}
+
+/**
+ * Apakah bagian sasaran (`for`/`except`) rule ini cukup sehat untuk dipakai
+ * MENYARING karyawan?
+ *
+ * Dipakai engine untuk rule yang gagal validasi. Rule bermasalah tetap harus
+ * disaring sasarannya — denda kurir tidak boleh muncul di slip teller hanya
+ * karena rule-nya sedang rusak. Tapi penyaringan itu hanya boleh dipercaya
+ * kalau yang rusak BUKAN bagian sasarannya: `for: []` mencocokkan nol orang,
+ * dan menyaring dengannya akan membuat rule lenyap dari semua slip — persis
+ * kegagalan senyap yang ingin dicegah entri ERROR.
+ *
+ * Pemeriksaannya struktural, bukan menebak dari teks pesan error, supaya tidak
+ * ikut rusak saat kalimat error di atas diperbaiki.
+ */
+export function targetingIsUsable(rule: PayrollRule): boolean {
+  const ok = (t: RuleTarget) => {
+    if (typeof t !== "object" || t === null) return false;
+    return (["company", "branch", "roles"] as const).every((key) => {
+      const v = t[key];
+      if (v === undefined || v === "*") return true;
+      return Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === "string");
+    });
+  };
+
+  if (!Array.isArray(rule.for) || rule.for.length === 0 || !rule.for.every(ok)) return false;
+  if (rule.except === undefined) return true;
+  return Array.isArray(rule.except) && rule.except.every(ok);
 }
 
 function validateTarget(t: RuleTarget, at: string, err: (m: string) => void) {
