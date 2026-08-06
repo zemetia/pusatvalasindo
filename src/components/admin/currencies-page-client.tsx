@@ -50,12 +50,16 @@ export function CurrenciesPageClient({ currencies, canManage, pricePageHref }: P
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return currencies.filter((c) => {
-      if (status === "active" && !c.isActive) return false;
-      if (status === "inactive" && c.isActive) return false;
-      if (!q) return true;
-      return c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);
-    });
+    return currencies
+      .filter((c) => {
+        if (status === "active" && !c.isActive) return false;
+        if (status === "inactive" && c.isActive) return false;
+        if (!q) return true;
+        return c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q);
+      })
+      // Yang aktif dulu; yang nonaktif turun ke bawah supaya tidak menyela
+      // daftar mata uang yang benar-benar dipakai sehari-hari.
+      .sort((a, b) => Number(b.isActive) - Number(a.isActive));
   }, [currencies, search, status]);
 
   const activeCount = currencies.filter((c) => c.isActive).length;

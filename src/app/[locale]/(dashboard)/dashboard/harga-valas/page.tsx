@@ -24,9 +24,13 @@ export default async function HargaValasPage({
     return <ErrorPanel source="harga-valas/page" message={msg} />;
   }
 
+  // Mata uang nonaktif tidak diperdagangkan, jadi harganya tidak perlu ada di
+  // sini sama sekali — termasuk tidak ikut menghitung ringkasan di atas tabel.
+  const activeRows = rows.filter((r) => r.isActive);
+
   return (
     <HargaValasPageClient
-      initialRows={rows}
+      initialRows={activeRows}
       initialSetting={setting}
       canManage={authz.can("currency.price", "write")}
       // Tautan ke halaman lain hanya muncul kalau memang boleh dibuka —
