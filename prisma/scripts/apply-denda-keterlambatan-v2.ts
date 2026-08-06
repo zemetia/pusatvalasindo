@@ -11,6 +11,14 @@
 // supaya tanda tangan, urutan versi, dan penutupan masa berlaku versi lama
 // semuanya benar.
 //
+// SUDAH DIJALANKAN — JANGAN DIJALANKAN LAGI. Script ini disimpan sebagai
+// catatan perubahan yang pernah diterapkan. SQL di dalamnya masih memakai jam
+// masuk lama (17.40) yang ditulis tangan, jadi menjalankannya sekarang akan
+// menyimpan versi baru yang MENGEMBALIKAN jam masuk ke 17.40 dan membatalkan
+// 07.40 yang berlaku. Untuk menyelaraskan jam masuk, pakai
+// prisma/scripts/apply-jam-masuk.ts — SQL-nya diturunkan dari
+// src/lib/attendance-time.ts, jadi tidak bisa menyimpang.
+//
 // Jalankan sekali: npx tsx prisma/scripts/apply-denda-keterlambatan-v2.ts
 import { config } from 'dotenv'
 config({ path: '.env.local' })
