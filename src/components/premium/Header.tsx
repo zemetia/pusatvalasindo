@@ -55,10 +55,14 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-4">
-             <div className="hidden md:flex items-center gap-4 px-6 py-3 bg-neutral-900 text-white rounded-2xl shadow-xl hover:bg-primary transition-all group cursor-pointer">
-                <span className="text-[10px] font-black uppercase tracking-widest">Connect Desk</span>
+             <Link
+               href="/login"
+               className="hidden md:flex items-center gap-4 px-6 py-3 bg-neutral-900 text-white rounded-2xl shadow-xl hover:bg-primary transition-all group cursor-pointer"
+             >
+                <LogIn className="w-4 h-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest">{t("login")}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-             </div>
+             </Link>
 
              <button
                className="p-4 bg-white rounded-3xl text-neutral-900 border border-black/5 shadow-xl hover:scale-110 active:scale-95 transition-all"
