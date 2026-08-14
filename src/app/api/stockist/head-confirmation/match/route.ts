@@ -55,12 +55,17 @@ export async function GET(req: NextRequest) {
     }
 
     // Total IDR stock tidak punya pembanding sistem (kepala cabang mengisi satu angka
-    // final), jadi yang dikirim hanya angkanya + jam pengisiannya.
-    const total = await stockistHeadConfirmationService.getStockTotalConfirmation(companyId, date);
+    // final), jadi yang dikirim hanya angkanya + jam pengisiannya. `items` adalah
+    // kuantitas hitung ulang per mata uang, dipakai kolom "Total CC" di grid Stock.
+    const [total, items] = await Promise.all([
+      stockistHeadConfirmationService.getStockTotalConfirmation(companyId, date),
+      stockistHeadConfirmationService.getStockItemConfirmations(companyId, date),
+    ]);
     return NextResponse.json(
       ok({
         confirmedIdrValue: total ? Number(total.confirmedIdrValue) : null,
         confirmedAt: total?.confirmedAt ?? null,
+        items,
       })
     );
   } catch (e) {

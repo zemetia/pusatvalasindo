@@ -19,8 +19,9 @@ const createSchema = z.object({
   // kewajiban ke sisi yang salah tanpa siapa pun sadar.
   kind: z.enum(["CREDIT", "DEBIT"]),
   name: z.string().min(1).max(120),
-  // Jumlahnya opsional: alur normalnya "tambah nama dulu, angkanya diisi di
-  // grid" (pop-up tambah hanya menanyakan nama), jadi 0 adalah nilai awal yang sah.
+  // Pop-up tambah sekarang mengirim jumlahnya, tapi field ini tetap opsional:
+  // 0 adalah nilai awal yang sah untuk hutang yang nominalnya belum diketahui,
+  // dan pemanggil lama yang hanya mengirim nama tidak boleh ikut gagal.
   amount: z.number().optional(),
   note: z.string().max(500).nullable().optional(),
 });

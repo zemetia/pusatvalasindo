@@ -250,6 +250,21 @@ export const stockistHeadConfirmationService = {
     return buildStockRows(items, checks, confirmations);
   },
 
+  /**
+   * Kuantitas hitung ulang kepala cabang per stock item — dibaca grid harian sebagai
+   * pembanding kolom Total. Total sistemnya sengaja tidak ikut dihitung di sini: grid
+   * sudah menjumlahkannya sendiri dari sel yang sedang tampil, jadi selisihnya ikut
+   * bergerak begitu sel diperbaiki tanpa menunggu request ulang.
+   */
+  getStockItemConfirmations: async (companyId: string, date: Date) => {
+    const rows = await stockistHeadConfirmationRepository.findByCompanyAndDate(companyId, date);
+    return rows.map((r) => ({
+      companyStockItemId: r.companyStockItemId,
+      confirmedQuantity: Number(r.confirmedQuantity),
+      confirmedAt: r.confirmedAt,
+    }));
+  },
+
   getStockTotalConfirmation: (companyId: string, date: Date) =>
     stockistTotalHeadConfirmationRepository.findByCompanyAndDate(companyId, date),
 

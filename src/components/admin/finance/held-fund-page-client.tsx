@@ -422,11 +422,11 @@ export function HeldFundPageClient({
     }
   }
 
-  const addRow = async (kind: Kind, name: string) => {
+  const addRow = async (kind: Kind, name: string, amount: number) => {
     const res = await fetch("/api/dana-tertahan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ companyId, date, kind, name }),
+      body: JSON.stringify({ companyId, date, kind, name, amount }),
     })
     const data = await res.json()
     if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menambah")
@@ -435,7 +435,10 @@ export function HeldFundPageClient({
     setRows((prev) => [...prev, created])
     // Baris baru selalu belum lunas, jadi ia juga anggota daftar belum-lunas.
     setOutstandingRows((prev) => [...prev, created])
-    shiftOutstanding(kind, 0, 1)
+    // Angka yang digeser diambil dari BALASAN server (`created`), bukan dari
+    // input dialog: kalau server sempat membulatkan atau menolak sebagian nilai,
+    // posisi tertahan di layar tetap sama dengan yang tersimpan.
+    shiftOutstanding(kind, parseNum(created.savedAmount), 1)
   }
 
   /** Eksekusi pelunasan — hanya dipanggil dari dialog konfirmasi, tidak dari tombol baris. */
@@ -1052,9 +1055,13 @@ function HeldFundRow({
 /* ── Pop-up tambah ────────────────────────────────────────────────────────── */
 
 /**
- * Menanyakan **arah** dan **nama**. Jumlahnya diisi di grid supaya alur
- * pengisiannya sama dengan halaman harian lain: satu kolom angka, simpan saat
- * kehilangan fokus, tanpa tombol simpan.
+ * Menanyakan **arah**, **nama**, dan **jumlah** sekaligus.
+ *
+ * Jumlahnya ikut ditanyakan di sini karena hutang tanpa angka bukan catatan yang
+ * berguna: sebelum ada nominalnya, posisi tertahan di atas halaman tetap Rp 0 dan
+ * tidak ada yang tahu seberapa besar kewajibannya. Angkanya tetap bisa dikoreksi
+ * belakangan lewat grid Input Tanggal — yang dihilangkan hanya keharusan pindah
+ * tab hanya untuk mengetik nominal yang sudah diketahui sejak awal.
  *
  * Arahnya ditanyakan di sini, bukan diubah belakangan di tabel, karena inilah
  * satu-satunya momen si pencatat benar-benar tahu uangnya akan masuk atau keluar.
@@ -1068,14 +1075,16 @@ function AddHeldFundDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   date: string
-  onSubmit: (kind: Kind, name: string) => Promise<void>
+  onSubmit: (kind: Kind, name: string, amount: number) => Promise<void>
 }) {
   const [kind, setKind] = useState<Kind>("CREDIT")
   const [name, setName] = useState("")
+  const [amount, setAmount] = useState<number | undefined>(undefined)
   const [saving, setSaving] = useState(false)
 
   const reset = () => {
     setName("")
+    setAmount(undefined)
     setKind("CREDIT")
   }
 
@@ -1085,10 +1094,17 @@ function AddHeldFundDialog({
       toast.error("Nama wajib diisi")
       return
     }
+    // Nol dibiarkan lolos, kosong tidak: "belum tahu angkanya" masih kondisi yang
+    // sah untuk hutang yang baru terdengar, tapi harus dinyatakan dengan sengaja
+    // mengetik 0 — bukan tercipta diam-diam karena kolomnya terlewat.
+    if (amount === undefined) {
+      toast.error("Jumlah wajib diisi — ketik 0 kalau nominalnya belum diketahui")
+      return
+    }
     setSaving(true)
     try {
-      await onSubmit(kind, trimmed)
-      toast.success(`${KIND_META[kind].label} ditambahkan — isi jumlahnya di tab Input Tanggal`)
+      await onSubmit(kind, trimmed, amount)
+      toast.success(`${KIND_META[kind].label} ${trimmed} ditambahkan — Rp ${fmt(amount)}`)
       reset()
       onOpenChange(false)
     } catch (err) {
@@ -1110,7 +1126,8 @@ function AddHeldFundDialog({
         <DialogHeader>
           <DialogTitle>Tambah Dana Tertahan</DialogTitle>
           <DialogDescription>
-            Untuk tanggal {fmtDate(date)}. Jumlahnya diisi langsung di tabel.
+            Untuk tanggal {fmtDate(date)}. Nominalnya bisa dikoreksi belakangan di tab Input
+            Tanggal.
           </DialogDescription>
         </DialogHeader>
 
@@ -1164,6 +1181,29 @@ function AddHeldFundDialog({
                 }
               }}
             />
+          </div>
+
+          <div className="grid gap-1.5">
+            <label className="text-muted-foreground text-xs font-medium">
+              {kind === "CREDIT" ? "Jumlah yang akan masuk (IDR)" : "Jumlah yang harus dibayar (IDR)"}
+            </label>
+            <NumberInput
+              value={amount ?? ""}
+              placeholder="0"
+              onValueChange={setAmount}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  submit()
+                }
+              }}
+              className="tabular text-right"
+            />
+            <p className="text-muted-foreground text-xs leading-snug">
+              {kind === "CREDIT"
+                ? "Masuk ke posisi Credit — Akan Masuk begitu tersimpan."
+                : "Masuk ke posisi Debit — Akan Keluar begitu tersimpan."}
+            </p>
           </div>
         </div>
 

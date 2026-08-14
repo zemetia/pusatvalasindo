@@ -111,14 +111,16 @@ export function HeadConfirmationSummary({
   )
 }
 
-/** Total IDR final seluruh stock hasil hitung ulang kepala cabang (halaman Cross-Check). */
-export type StockHeadTotal = {
-  confirmedIdrValue: number | null
-  confirmedAt: string | null
-}
-
-export function useStockHeadTotal(companyId: string, date: string) {
-  const [total, setTotal] = useState<StockHeadTotal | null>(null)
+/**
+ * Kuantitas hitung ulang kepala cabang per mata uang, dipetakan `companyStockItemId ->
+ * kuantitas`. Item yang belum dihitung ulang tidak muncul di map — itu yang membedakan
+ * "belum diisi" dari "dihitung ulang dan hasilnya nol".
+ *
+ * Kegagalan sengaja tidak memunculkan toast: ini kolom pembanding di grid, bukan data
+ * utama halamannya.
+ */
+export function useStockItemConfirmations(companyId: string, date: string) {
+  const [byItem, setByItem] = useState<Record<string, number>>({})
 
   useEffect(() => {
     let alive = true
@@ -129,9 +131,15 @@ export function useStockHeadTotal(companyId: string, date: string) {
           `/api/stockist/head-confirmation/match?kind=stock&companyId=${companyId}&date=${date}`
         )
         const data = await res.json()
-        if (alive) setTotal(res.ok && data.success ? (data.data as StockHeadTotal) : null)
+        if (!alive) return
+        if (!res.ok || !data.success) return setByItem({})
+        const items = (data.data?.items ?? []) as {
+          companyStockItemId: string
+          confirmedQuantity: number
+        }[]
+        setByItem(Object.fromEntries(items.map((i) => [i.companyStockItemId, i.confirmedQuantity])))
       } catch {
-        if (alive) setTotal(null)
+        if (alive) setByItem({})
       }
     })()
     return () => {
@@ -139,35 +147,7 @@ export function useStockHeadTotal(companyId: string, date: string) {
     }
   }, [companyId, date])
 
-  return total
-}
-
-/**
- * Info total kepala cabang di kartu Stock. Angkanya tidak punya pembanding otomatis —
- * kepala cabang mengisi satu total IDR final untuk seluruh stock — jadi yang ditampilkan
- * hanya angkanya dan jam pengisiannya, bukan status klop.
- */
-export function StockHeadTotalSummary({ total }: { total: StockHeadTotal | null }) {
-  const confirmed = total?.confirmedIdrValue ?? null
-  const jam = fmtTime(total?.confirmedAt ?? null)
-
-  return (
-    <div className="flex flex-wrap items-end gap-x-10 gap-y-4 border-t pt-4">
-      <Block
-        label="Total Stock — Kepala Cabang (IDR)"
-        value={confirmed === null ? "—" : `Rp ${fmt(confirmed)}`}
-        muted={confirmed === null}
-      />
-      <div className="grid gap-1">
-        <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-wide">
-          Jam Konfirmasi
-        </span>
-        <span className="text-muted-foreground text-sm">
-          {confirmed === null ? "Belum diisi di halaman Cross-Check" : (jam ?? "—")}
-        </span>
-      </div>
-    </div>
-  )
+  return byItem
 }
 
 function Block({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
