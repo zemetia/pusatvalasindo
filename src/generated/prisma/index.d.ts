@@ -519,6 +519,14 @@ export const SalaryComponentKind: {
 export type SalaryComponentKind = (typeof SalaryComponentKind)[keyof typeof SalaryComponentKind]
 
 
+export const HeldFundKind: {
+  CREDIT: 'CREDIT',
+  DEBIT: 'DEBIT'
+};
+
+export type HeldFundKind = (typeof HeldFundKind)[keyof typeof HeldFundKind]
+
+
 export const RefiningMethod: {
   MILLER: 'MILLER',
   WOHLWILL: 'WOHLWILL',
@@ -758,6 +766,10 @@ export const PayrollEntryStatus: typeof $Enums.PayrollEntryStatus
 export type SalaryComponentKind = $Enums.SalaryComponentKind
 
 export const SalaryComponentKind: typeof $Enums.SalaryComponentKind
+
+export type HeldFundKind = $Enums.HeldFundKind
+
+export const HeldFundKind: typeof $Enums.HeldFundKind
 
 export type RefiningMethod = $Enums.RefiningMethod
 
@@ -6386,6 +6398,8 @@ export namespace Prisma {
     payrollRunsGenerated: number
     payrollRunsFinalized: number
     payrollRulesCreated: number
+    heldFundsCreated: number
+    heldFundsSettled: number
     samples: number
     account: number
     session: number
@@ -6406,6 +6420,8 @@ export namespace Prisma {
     payrollRunsGenerated?: boolean | UserCountOutputTypeCountPayrollRunsGeneratedArgs
     payrollRunsFinalized?: boolean | UserCountOutputTypeCountPayrollRunsFinalizedArgs
     payrollRulesCreated?: boolean | UserCountOutputTypeCountPayrollRulesCreatedArgs
+    heldFundsCreated?: boolean | UserCountOutputTypeCountHeldFundsCreatedArgs
+    heldFundsSettled?: boolean | UserCountOutputTypeCountHeldFundsSettledArgs
     samples?: boolean | UserCountOutputTypeCountSamplesArgs
     account?: boolean | UserCountOutputTypeCountAccountArgs
     session?: boolean | UserCountOutputTypeCountSessionArgs
@@ -6518,6 +6534,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountPayrollRulesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PayrollRuleWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountHeldFundsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HeldFundWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountHeldFundsSettledArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HeldFundWhereInput
   }
 
   /**
@@ -13560,6 +13590,8 @@ export namespace Prisma {
     payrollRunsGenerated?: boolean | user$payrollRunsGeneratedArgs<ExtArgs>
     payrollRunsFinalized?: boolean | user$payrollRunsFinalizedArgs<ExtArgs>
     payrollRulesCreated?: boolean | user$payrollRulesCreatedArgs<ExtArgs>
+    heldFundsCreated?: boolean | user$heldFundsCreatedArgs<ExtArgs>
+    heldFundsSettled?: boolean | user$heldFundsSettledArgs<ExtArgs>
     samples?: boolean | user$samplesArgs<ExtArgs>
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
@@ -13645,6 +13677,8 @@ export namespace Prisma {
     payrollRunsGenerated?: boolean | user$payrollRunsGeneratedArgs<ExtArgs>
     payrollRunsFinalized?: boolean | user$payrollRunsFinalizedArgs<ExtArgs>
     payrollRulesCreated?: boolean | user$payrollRulesCreatedArgs<ExtArgs>
+    heldFundsCreated?: boolean | user$heldFundsCreatedArgs<ExtArgs>
+    heldFundsSettled?: boolean | user$heldFundsSettledArgs<ExtArgs>
     samples?: boolean | user$samplesArgs<ExtArgs>
     account?: boolean | user$accountArgs<ExtArgs>
     session?: boolean | user$sessionArgs<ExtArgs>
@@ -13678,6 +13712,8 @@ export namespace Prisma {
       payrollRunsGenerated: Prisma.$PayrollRunPayload<ExtArgs>[]
       payrollRunsFinalized: Prisma.$PayrollRunPayload<ExtArgs>[]
       payrollRulesCreated: Prisma.$PayrollRulePayload<ExtArgs>[]
+      heldFundsCreated: Prisma.$HeldFundPayload<ExtArgs>[]
+      heldFundsSettled: Prisma.$HeldFundPayload<ExtArgs>[]
       samples: Prisma.$SamplePayload<ExtArgs>[]
       account: Prisma.$accountPayload<ExtArgs>[]
       session: Prisma.$sessionPayload<ExtArgs>[]
@@ -14123,6 +14159,8 @@ export namespace Prisma {
     payrollRunsGenerated<T extends user$payrollRunsGeneratedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRunsGeneratedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRunsFinalized<T extends user$payrollRunsFinalizedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRunsFinalizedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollRulesCreated<T extends user$payrollRulesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, user$payrollRulesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    heldFundsCreated<T extends user$heldFundsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, user$heldFundsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    heldFundsSettled<T extends user$heldFundsSettledArgs<ExtArgs> = {}>(args?: Subset<T, user$heldFundsSettledArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HeldFundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     samples<T extends user$samplesArgs<ExtArgs> = {}>(args?: Subset<T, user$samplesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SamplePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     account<T extends user$accountArgs<ExtArgs> = {}>(args?: Subset<T, user$accountArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$accountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     session<T extends user$sessionArgs<ExtArgs> = {}>(args?: Subset<T, user$sessionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$sessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14907,6 +14945,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PayrollRuleScalarFieldEnum | PayrollRuleScalarFieldEnum[]
+  }
+
+  /**
+   * user.heldFundsCreated
+   */
+  export type user$heldFundsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    where?: HeldFundWhereInput
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    cursor?: HeldFundWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
+  }
+
+  /**
+   * user.heldFundsSettled
+   */
+  export type user$heldFundsSettledArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HeldFund
+     */
+    select?: HeldFundSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HeldFund
+     */
+    omit?: HeldFundOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HeldFundInclude<ExtArgs> | null
+    where?: HeldFundWhereInput
+    orderBy?: HeldFundOrderByWithRelationInput | HeldFundOrderByWithRelationInput[]
+    cursor?: HeldFundWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: HeldFundScalarFieldEnum | HeldFundScalarFieldEnum[]
   }
 
   /**
@@ -47009,6 +47095,7 @@ export namespace Prisma {
     id: string | null
     companyId: string | null
     date: Date | null
+    kind: $Enums.HeldFundKind | null
     name: string | null
     amount: Decimal | null
     note: string | null
@@ -47023,6 +47110,7 @@ export namespace Prisma {
     id: string | null
     companyId: string | null
     date: Date | null
+    kind: $Enums.HeldFundKind | null
     name: string | null
     amount: Decimal | null
     note: string | null
@@ -47037,6 +47125,7 @@ export namespace Prisma {
     id: number
     companyId: number
     date: number
+    kind: number
     name: number
     amount: number
     note: number
@@ -47061,6 +47150,7 @@ export namespace Prisma {
     id?: true
     companyId?: true
     date?: true
+    kind?: true
     name?: true
     amount?: true
     note?: true
@@ -47075,6 +47165,7 @@ export namespace Prisma {
     id?: true
     companyId?: true
     date?: true
+    kind?: true
     name?: true
     amount?: true
     note?: true
@@ -47089,6 +47180,7 @@ export namespace Prisma {
     id?: true
     companyId?: true
     date?: true
+    kind?: true
     name?: true
     amount?: true
     note?: true
@@ -47190,6 +47282,7 @@ export namespace Prisma {
     id: string
     companyId: string
     date: Date
+    kind: $Enums.HeldFundKind
     name: string
     amount: Decimal
     note: string | null
@@ -47223,6 +47316,7 @@ export namespace Prisma {
     id?: boolean
     companyId?: boolean
     date?: boolean
+    kind?: boolean
     name?: boolean
     amount?: boolean
     note?: boolean
@@ -47232,12 +47326,15 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }, ExtArgs["result"]["heldFund"]>
 
   export type HeldFundSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     companyId?: boolean
     date?: boolean
+    kind?: boolean
     name?: boolean
     amount?: boolean
     note?: boolean
@@ -47247,12 +47344,15 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }, ExtArgs["result"]["heldFund"]>
 
   export type HeldFundSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     companyId?: boolean
     date?: boolean
+    kind?: boolean
     name?: boolean
     amount?: boolean
     note?: boolean
@@ -47262,12 +47362,15 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }, ExtArgs["result"]["heldFund"]>
 
   export type HeldFundSelectScalar = {
     id?: boolean
     companyId?: boolean
     date?: boolean
+    kind?: boolean
     name?: boolean
     amount?: boolean
     note?: boolean
@@ -47278,26 +47381,35 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type HeldFundOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "name" | "amount" | "note" | "settledAt" | "settledBy" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["heldFund"]>
+  export type HeldFundOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "kind" | "name" | "amount" | "note" | "settledAt" | "settledBy" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["heldFund"]>
   export type HeldFundInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }
   export type HeldFundIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }
   export type HeldFundIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
+    createdByUser?: boolean | HeldFund$createdByUserArgs<ExtArgs>
+    settledByUser?: boolean | HeldFund$settledByUserArgs<ExtArgs>
   }
 
   export type $HeldFundPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "HeldFund"
     objects: {
       company: Prisma.$CompanyPayload<ExtArgs>
+      createdByUser: Prisma.$userPayload<ExtArgs> | null
+      settledByUser: Prisma.$userPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       companyId: string
       date: Date
+      kind: $Enums.HeldFundKind
       name: string
       amount: Prisma.Decimal
       note: string | null
@@ -47701,6 +47813,8 @@ export namespace Prisma {
   export interface Prisma__HeldFundClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    createdByUser<T extends HeldFund$createdByUserArgs<ExtArgs> = {}>(args?: Subset<T, HeldFund$createdByUserArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    settledByUser<T extends HeldFund$settledByUserArgs<ExtArgs> = {}>(args?: Subset<T, HeldFund$settledByUserArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -47733,6 +47847,7 @@ export namespace Prisma {
     readonly id: FieldRef<"HeldFund", 'String'>
     readonly companyId: FieldRef<"HeldFund", 'String'>
     readonly date: FieldRef<"HeldFund", 'DateTime'>
+    readonly kind: FieldRef<"HeldFund", 'HeldFundKind'>
     readonly name: FieldRef<"HeldFund", 'String'>
     readonly amount: FieldRef<"HeldFund", 'Decimal'>
     readonly note: FieldRef<"HeldFund", 'String'>
@@ -48139,6 +48254,44 @@ export namespace Prisma {
      * Limit how many HeldFunds to delete.
      */
     limit?: number
+  }
+
+  /**
+   * HeldFund.createdByUser
+   */
+  export type HeldFund$createdByUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the user
+     */
+    select?: userSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the user
+     */
+    omit?: userOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: userInclude<ExtArgs> | null
+    where?: userWhereInput
+  }
+
+  /**
+   * HeldFund.settledByUser
+   */
+  export type HeldFund$settledByUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the user
+     */
+    select?: userSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the user
+     */
+    omit?: userOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: userInclude<ExtArgs> | null
+    where?: userWhereInput
   }
 
   /**
@@ -68305,6 +68458,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -68317,6 +68471,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -68329,6 +68484,7 @@ export namespace Prisma {
     note: number
     confirmedBy: number
     confirmedAt: number
+    matchedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -68351,6 +68507,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -68363,6 +68520,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -68375,6 +68533,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -68474,6 +68633,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: KasHeadConfirmationCountAggregateOutputType | null
@@ -68505,6 +68665,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -68518,6 +68679,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -68531,6 +68693,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -68544,11 +68707,12 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type KasHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["kasHeadConfirmation"]>
+  export type KasHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "matchedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["kasHeadConfirmation"]>
   export type KasHeadConfirmationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
   }
@@ -68572,6 +68736,7 @@ export namespace Prisma {
       note: string | null
       confirmedBy: string | null
       confirmedAt: Date | null
+      matchedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["kasHeadConfirmation"]>
@@ -69005,6 +69170,7 @@ export namespace Prisma {
     readonly note: FieldRef<"KasHeadConfirmation", 'String'>
     readonly confirmedBy: FieldRef<"KasHeadConfirmation", 'String'>
     readonly confirmedAt: FieldRef<"KasHeadConfirmation", 'DateTime'>
+    readonly matchedAt: FieldRef<"KasHeadConfirmation", 'DateTime'>
     readonly createdAt: FieldRef<"KasHeadConfirmation", 'DateTime'>
     readonly updatedAt: FieldRef<"KasHeadConfirmation", 'DateTime'>
   }
@@ -69454,6 +69620,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -69466,6 +69633,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -69478,6 +69646,7 @@ export namespace Prisma {
     note: number
     confirmedBy: number
     confirmedAt: number
+    matchedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -69500,6 +69669,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -69512,6 +69682,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -69524,6 +69695,7 @@ export namespace Prisma {
     note?: true
     confirmedBy?: true
     confirmedAt?: true
+    matchedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -69623,6 +69795,7 @@ export namespace Prisma {
     note: string | null
     confirmedBy: string | null
     confirmedAt: Date | null
+    matchedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: BankHeadConfirmationCountAggregateOutputType | null
@@ -69654,6 +69827,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -69667,6 +69841,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -69680,6 +69855,7 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -69693,11 +69869,12 @@ export namespace Prisma {
     note?: boolean
     confirmedBy?: boolean
     confirmedAt?: boolean
+    matchedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BankHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["bankHeadConfirmation"]>
+  export type BankHeadConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "date" | "confirmedIdrValue" | "note" | "confirmedBy" | "confirmedAt" | "matchedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["bankHeadConfirmation"]>
   export type BankHeadConfirmationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
   }
@@ -69721,6 +69898,10 @@ export namespace Prisma {
       note: string | null
       confirmedBy: string | null
       confirmedAt: Date | null
+      /**
+       * Jam KLOP — lihat KasHeadConfirmation.matchedAt.
+       */
+      matchedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["bankHeadConfirmation"]>
@@ -70154,6 +70335,7 @@ export namespace Prisma {
     readonly note: FieldRef<"BankHeadConfirmation", 'String'>
     readonly confirmedBy: FieldRef<"BankHeadConfirmation", 'String'>
     readonly confirmedAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
+    readonly matchedAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
     readonly createdAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
     readonly updatedAt: FieldRef<"BankHeadConfirmation", 'DateTime'>
   }
@@ -74983,6 +75165,7 @@ export namespace Prisma {
     id: 'id',
     companyId: 'companyId',
     date: 'date',
+    kind: 'kind',
     name: 'name',
     amount: 'amount',
     note: 'note',
@@ -75282,6 +75465,7 @@ export namespace Prisma {
     note: 'note',
     confirmedBy: 'confirmedBy',
     confirmedAt: 'confirmedAt',
+    matchedAt: 'matchedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -75297,6 +75481,7 @@ export namespace Prisma {
     note: 'note',
     confirmedBy: 'confirmedBy',
     confirmedAt: 'confirmedAt',
+    matchedAt: 'matchedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -75794,6 +75979,20 @@ export namespace Prisma {
    * Reference to a field of type 'SalaryComponentKind[]'
    */
   export type ListEnumSalaryComponentKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SalaryComponentKind[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'HeldFundKind'
+   */
+  export type EnumHeldFundKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HeldFundKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'HeldFundKind[]'
+   */
+  export type ListEnumHeldFundKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HeldFundKind[]'>
     
 
 
@@ -76507,6 +76706,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunListRelationFilter
     payrollRunsFinalized?: PayrollRunListRelationFilter
     payrollRulesCreated?: PayrollRuleListRelationFilter
+    heldFundsCreated?: HeldFundListRelationFilter
+    heldFundsSettled?: HeldFundListRelationFilter
     samples?: SampleListRelationFilter
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
@@ -76545,6 +76746,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunOrderByRelationAggregateInput
     payrollRunsFinalized?: PayrollRunOrderByRelationAggregateInput
     payrollRulesCreated?: PayrollRuleOrderByRelationAggregateInput
+    heldFundsCreated?: HeldFundOrderByRelationAggregateInput
+    heldFundsSettled?: HeldFundOrderByRelationAggregateInput
     samples?: SampleOrderByRelationAggregateInput
     account?: accountOrderByRelationAggregateInput
     session?: sessionOrderByRelationAggregateInput
@@ -76586,6 +76789,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunListRelationFilter
     payrollRunsFinalized?: PayrollRunListRelationFilter
     payrollRulesCreated?: PayrollRuleListRelationFilter
+    heldFundsCreated?: HeldFundListRelationFilter
+    heldFundsSettled?: HeldFundListRelationFilter
     samples?: SampleListRelationFilter
     account?: AccountListRelationFilter
     session?: SessionListRelationFilter
@@ -79075,6 +79280,7 @@ export namespace Prisma {
     id?: StringFilter<"HeldFund"> | string
     companyId?: StringFilter<"HeldFund"> | string
     date?: DateTimeFilter<"HeldFund"> | Date | string
+    kind?: EnumHeldFundKindFilter<"HeldFund"> | $Enums.HeldFundKind
     name?: StringFilter<"HeldFund"> | string
     amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"HeldFund"> | string | null
@@ -79084,12 +79290,15 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"HeldFund"> | Date | string
     updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    createdByUser?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
+    settledByUser?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
   }
 
   export type HeldFundOrderByWithRelationInput = {
     id?: SortOrder
     companyId?: SortOrder
     date?: SortOrder
+    kind?: SortOrder
     name?: SortOrder
     amount?: SortOrder
     note?: SortOrderInput | SortOrder
@@ -79099,6 +79308,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     company?: CompanyOrderByWithRelationInput
+    createdByUser?: userOrderByWithRelationInput
+    settledByUser?: userOrderByWithRelationInput
   }
 
   export type HeldFundWhereUniqueInput = Prisma.AtLeast<{
@@ -79108,6 +79319,7 @@ export namespace Prisma {
     NOT?: HeldFundWhereInput | HeldFundWhereInput[]
     companyId?: StringFilter<"HeldFund"> | string
     date?: DateTimeFilter<"HeldFund"> | Date | string
+    kind?: EnumHeldFundKindFilter<"HeldFund"> | $Enums.HeldFundKind
     name?: StringFilter<"HeldFund"> | string
     amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableFilter<"HeldFund"> | string | null
@@ -79117,12 +79329,15 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"HeldFund"> | Date | string
     updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    createdByUser?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
+    settledByUser?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
   }, "id">
 
   export type HeldFundOrderByWithAggregationInput = {
     id?: SortOrder
     companyId?: SortOrder
     date?: SortOrder
+    kind?: SortOrder
     name?: SortOrder
     amount?: SortOrder
     note?: SortOrderInput | SortOrder
@@ -79145,6 +79360,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"HeldFund"> | string
     companyId?: StringWithAggregatesFilter<"HeldFund"> | string
     date?: DateTimeWithAggregatesFilter<"HeldFund"> | Date | string
+    kind?: EnumHeldFundKindWithAggregatesFilter<"HeldFund"> | $Enums.HeldFundKind
     name?: StringWithAggregatesFilter<"HeldFund"> | string
     amount?: DecimalWithAggregatesFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
     note?: StringNullableWithAggregatesFilter<"HeldFund"> | string | null
@@ -80632,6 +80848,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -80645,6 +80862,7 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
+    matchedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     company?: CompanyOrderByWithRelationInput
@@ -80662,6 +80880,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -80675,6 +80894,7 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
+    matchedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: KasHeadConfirmationCountOrderByAggregateInput
@@ -80695,6 +80915,7 @@ export namespace Prisma {
     note?: StringNullableWithAggregatesFilter<"KasHeadConfirmation"> | string | null
     confirmedBy?: StringNullableWithAggregatesFilter<"KasHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableWithAggregatesFilter<"KasHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableWithAggregatesFilter<"KasHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"KasHeadConfirmation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"KasHeadConfirmation"> | Date | string
   }
@@ -80710,6 +80931,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -80723,6 +80945,7 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
+    matchedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     company?: CompanyOrderByWithRelationInput
@@ -80740,6 +80963,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
@@ -80753,6 +80977,7 @@ export namespace Prisma {
     note?: SortOrderInput | SortOrder
     confirmedBy?: SortOrderInput | SortOrder
     confirmedAt?: SortOrderInput | SortOrder
+    matchedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: BankHeadConfirmationCountOrderByAggregateInput
@@ -80773,6 +80998,7 @@ export namespace Prisma {
     note?: StringNullableWithAggregatesFilter<"BankHeadConfirmation"> | string | null
     confirmedBy?: StringNullableWithAggregatesFilter<"BankHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableWithAggregatesFilter<"BankHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableWithAggregatesFilter<"BankHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"BankHeadConfirmation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"BankHeadConfirmation"> | Date | string
   }
@@ -81675,6 +81901,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -81713,6 +81941,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -81747,6 +81977,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -81785,6 +82017,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -84559,21 +84793,23 @@ export namespace Prisma {
   export type HeldFundCreateInput = {
     id?: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
     settledAt?: Date | string | null
-    settledBy?: string | null
-    createdBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutHeldFundsInput
+    createdByUser?: userCreateNestedOneWithoutHeldFundsCreatedInput
+    settledByUser?: userCreateNestedOneWithoutHeldFundsSettledInput
   }
 
   export type HeldFundUncheckedCreateInput = {
     id?: string
     companyId: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
@@ -84587,21 +84823,23 @@ export namespace Prisma {
   export type HeldFundUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
-    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutHeldFundsNestedInput
+    createdByUser?: userUpdateOneWithoutHeldFundsCreatedNestedInput
+    settledByUser?: userUpdateOneWithoutHeldFundsSettledNestedInput
   }
 
   export type HeldFundUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     companyId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
@@ -84616,6 +84854,7 @@ export namespace Prisma {
     id?: string
     companyId: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
@@ -84629,12 +84868,11 @@ export namespace Prisma {
   export type HeldFundUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
-    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -84643,6 +84881,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     companyId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
@@ -86259,6 +86498,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutKasHeadConfirmationsInput
@@ -86272,6 +86512,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -86283,6 +86524,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutKasHeadConfirmationsNestedInput
@@ -86296,6 +86538,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86308,6 +86551,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -86319,6 +86563,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86331,6 +86576,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86342,6 +86588,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     company: CompanyCreateNestedOneWithoutBankHeadConfirmationsInput
@@ -86355,6 +86602,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -86366,6 +86614,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutBankHeadConfirmationsNestedInput
@@ -86379,6 +86628,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86391,6 +86641,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -86402,6 +86653,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86414,6 +86666,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87371,6 +87624,12 @@ export namespace Prisma {
     none?: PayrollRuleWhereInput
   }
 
+  export type HeldFundListRelationFilter = {
+    every?: HeldFundWhereInput
+    some?: HeldFundWhereInput
+    none?: HeldFundWhereInput
+  }
+
   export type SampleListRelationFilter = {
     every?: SampleWhereInput
     some?: SampleWhereInput
@@ -87419,6 +87678,10 @@ export namespace Prisma {
   }
 
   export type PayrollRuleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type HeldFundOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -88089,12 +88352,6 @@ export namespace Prisma {
     none?: CorrectionRequestWhereInput
   }
 
-  export type HeldFundListRelationFilter = {
-    every?: HeldFundWhereInput
-    some?: HeldFundWhereInput
-    none?: HeldFundWhereInput
-  }
-
   export type SalaryComponentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -88144,10 +88401,6 @@ export namespace Prisma {
   }
 
   export type CorrectionRequestOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type HeldFundOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -89738,10 +89991,18 @@ export namespace Prisma {
     amount?: SortOrder
   }
 
+  export type EnumHeldFundKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.HeldFundKind | EnumHeldFundKindFieldRefInput<$PrismaModel>
+    in?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumHeldFundKindFilter<$PrismaModel> | $Enums.HeldFundKind
+  }
+
   export type HeldFundCountOrderByAggregateInput = {
     id?: SortOrder
     companyId?: SortOrder
     date?: SortOrder
+    kind?: SortOrder
     name?: SortOrder
     amount?: SortOrder
     note?: SortOrder
@@ -89760,6 +90021,7 @@ export namespace Prisma {
     id?: SortOrder
     companyId?: SortOrder
     date?: SortOrder
+    kind?: SortOrder
     name?: SortOrder
     amount?: SortOrder
     note?: SortOrder
@@ -89774,6 +90036,7 @@ export namespace Prisma {
     id?: SortOrder
     companyId?: SortOrder
     date?: SortOrder
+    kind?: SortOrder
     name?: SortOrder
     amount?: SortOrder
     note?: SortOrder
@@ -89786,6 +90049,16 @@ export namespace Prisma {
 
   export type HeldFundSumOrderByAggregateInput = {
     amount?: SortOrder
+  }
+
+  export type EnumHeldFundKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.HeldFundKind | EnumHeldFundKindFieldRefInput<$PrismaModel>
+    in?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumHeldFundKindWithAggregatesFilter<$PrismaModel> | $Enums.HeldFundKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumHeldFundKindFilter<$PrismaModel>
+    _max?: NestedEnumHeldFundKindFilter<$PrismaModel>
   }
 
   export type EnumRefiningMethodFilter<$PrismaModel = never> = {
@@ -90928,6 +91201,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -90944,6 +91218,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -90956,6 +91231,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -90977,6 +91253,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -90993,6 +91270,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -91005,6 +91283,7 @@ export namespace Prisma {
     note?: SortOrder
     confirmedBy?: SortOrder
     confirmedAt?: SortOrder
+    matchedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -91748,6 +92027,20 @@ export namespace Prisma {
     connect?: PayrollRuleWhereUniqueInput | PayrollRuleWhereUniqueInput[]
   }
 
+  export type HeldFundCreateNestedManyWithoutCreatedByUserInput = {
+    create?: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput> | HeldFundCreateWithoutCreatedByUserInput[] | HeldFundUncheckedCreateWithoutCreatedByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCreatedByUserInput | HeldFundCreateOrConnectWithoutCreatedByUserInput[]
+    createMany?: HeldFundCreateManyCreatedByUserInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+  }
+
+  export type HeldFundCreateNestedManyWithoutSettledByUserInput = {
+    create?: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput> | HeldFundCreateWithoutSettledByUserInput[] | HeldFundUncheckedCreateWithoutSettledByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutSettledByUserInput | HeldFundCreateOrConnectWithoutSettledByUserInput[]
+    createMany?: HeldFundCreateManySettledByUserInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+  }
+
   export type SampleCreateNestedManyWithoutTechnicianInput = {
     create?: XOR<SampleCreateWithoutTechnicianInput, SampleUncheckedCreateWithoutTechnicianInput> | SampleCreateWithoutTechnicianInput[] | SampleUncheckedCreateWithoutTechnicianInput[]
     connectOrCreate?: SampleCreateOrConnectWithoutTechnicianInput | SampleCreateOrConnectWithoutTechnicianInput[]
@@ -91877,6 +92170,20 @@ export namespace Prisma {
     connectOrCreate?: PayrollRuleCreateOrConnectWithoutCreatedByInput | PayrollRuleCreateOrConnectWithoutCreatedByInput[]
     createMany?: PayrollRuleCreateManyCreatedByInputEnvelope
     connect?: PayrollRuleWhereUniqueInput | PayrollRuleWhereUniqueInput[]
+  }
+
+  export type HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput = {
+    create?: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput> | HeldFundCreateWithoutCreatedByUserInput[] | HeldFundUncheckedCreateWithoutCreatedByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCreatedByUserInput | HeldFundCreateOrConnectWithoutCreatedByUserInput[]
+    createMany?: HeldFundCreateManyCreatedByUserInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+  }
+
+  export type HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput = {
+    create?: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput> | HeldFundCreateWithoutSettledByUserInput[] | HeldFundUncheckedCreateWithoutSettledByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutSettledByUserInput | HeldFundCreateOrConnectWithoutSettledByUserInput[]
+    createMany?: HeldFundCreateManySettledByUserInputEnvelope
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
   }
 
   export type SampleUncheckedCreateNestedManyWithoutTechnicianInput = {
@@ -92106,6 +92413,34 @@ export namespace Prisma {
     update?: PayrollRuleUpdateWithWhereUniqueWithoutCreatedByInput | PayrollRuleUpdateWithWhereUniqueWithoutCreatedByInput[]
     updateMany?: PayrollRuleUpdateManyWithWhereWithoutCreatedByInput | PayrollRuleUpdateManyWithWhereWithoutCreatedByInput[]
     deleteMany?: PayrollRuleScalarWhereInput | PayrollRuleScalarWhereInput[]
+  }
+
+  export type HeldFundUpdateManyWithoutCreatedByUserNestedInput = {
+    create?: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput> | HeldFundCreateWithoutCreatedByUserInput[] | HeldFundUncheckedCreateWithoutCreatedByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCreatedByUserInput | HeldFundCreateOrConnectWithoutCreatedByUserInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutCreatedByUserInput | HeldFundUpsertWithWhereUniqueWithoutCreatedByUserInput[]
+    createMany?: HeldFundCreateManyCreatedByUserInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutCreatedByUserInput | HeldFundUpdateWithWhereUniqueWithoutCreatedByUserInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutCreatedByUserInput | HeldFundUpdateManyWithWhereWithoutCreatedByUserInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+  }
+
+  export type HeldFundUpdateManyWithoutSettledByUserNestedInput = {
+    create?: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput> | HeldFundCreateWithoutSettledByUserInput[] | HeldFundUncheckedCreateWithoutSettledByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutSettledByUserInput | HeldFundCreateOrConnectWithoutSettledByUserInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutSettledByUserInput | HeldFundUpsertWithWhereUniqueWithoutSettledByUserInput[]
+    createMany?: HeldFundCreateManySettledByUserInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutSettledByUserInput | HeldFundUpdateWithWhereUniqueWithoutSettledByUserInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutSettledByUserInput | HeldFundUpdateManyWithWhereWithoutSettledByUserInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
   }
 
   export type SampleUpdateManyWithoutTechnicianNestedInput = {
@@ -92364,6 +92699,34 @@ export namespace Prisma {
     update?: PayrollRuleUpdateWithWhereUniqueWithoutCreatedByInput | PayrollRuleUpdateWithWhereUniqueWithoutCreatedByInput[]
     updateMany?: PayrollRuleUpdateManyWithWhereWithoutCreatedByInput | PayrollRuleUpdateManyWithWhereWithoutCreatedByInput[]
     deleteMany?: PayrollRuleScalarWhereInput | PayrollRuleScalarWhereInput[]
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
+    create?: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput> | HeldFundCreateWithoutCreatedByUserInput[] | HeldFundUncheckedCreateWithoutCreatedByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutCreatedByUserInput | HeldFundCreateOrConnectWithoutCreatedByUserInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutCreatedByUserInput | HeldFundUpsertWithWhereUniqueWithoutCreatedByUserInput[]
+    createMany?: HeldFundCreateManyCreatedByUserInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutCreatedByUserInput | HeldFundUpdateWithWhereUniqueWithoutCreatedByUserInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutCreatedByUserInput | HeldFundUpdateManyWithWhereWithoutCreatedByUserInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput = {
+    create?: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput> | HeldFundCreateWithoutSettledByUserInput[] | HeldFundUncheckedCreateWithoutSettledByUserInput[]
+    connectOrCreate?: HeldFundCreateOrConnectWithoutSettledByUserInput | HeldFundCreateOrConnectWithoutSettledByUserInput[]
+    upsert?: HeldFundUpsertWithWhereUniqueWithoutSettledByUserInput | HeldFundUpsertWithWhereUniqueWithoutSettledByUserInput[]
+    createMany?: HeldFundCreateManySettledByUserInputEnvelope
+    set?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    disconnect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    delete?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    connect?: HeldFundWhereUniqueInput | HeldFundWhereUniqueInput[]
+    update?: HeldFundUpdateWithWhereUniqueWithoutSettledByUserInput | HeldFundUpdateWithWhereUniqueWithoutSettledByUserInput[]
+    updateMany?: HeldFundUpdateManyWithWhereWithoutSettledByUserInput | HeldFundUpdateManyWithWhereWithoutSettledByUserInput[]
+    deleteMany?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
   }
 
   export type SampleUncheckedUpdateManyWithoutTechnicianNestedInput = {
@@ -94876,12 +95239,48 @@ export namespace Prisma {
     connect?: CompanyWhereUniqueInput
   }
 
+  export type userCreateNestedOneWithoutHeldFundsCreatedInput = {
+    create?: XOR<userCreateWithoutHeldFundsCreatedInput, userUncheckedCreateWithoutHeldFundsCreatedInput>
+    connectOrCreate?: userCreateOrConnectWithoutHeldFundsCreatedInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type userCreateNestedOneWithoutHeldFundsSettledInput = {
+    create?: XOR<userCreateWithoutHeldFundsSettledInput, userUncheckedCreateWithoutHeldFundsSettledInput>
+    connectOrCreate?: userCreateOrConnectWithoutHeldFundsSettledInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type EnumHeldFundKindFieldUpdateOperationsInput = {
+    set?: $Enums.HeldFundKind
+  }
+
   export type CompanyUpdateOneRequiredWithoutHeldFundsNestedInput = {
     create?: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
     connectOrCreate?: CompanyCreateOrConnectWithoutHeldFundsInput
     upsert?: CompanyUpsertWithoutHeldFundsInput
     connect?: CompanyWhereUniqueInput
     update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutHeldFundsInput, CompanyUpdateWithoutHeldFundsInput>, CompanyUncheckedUpdateWithoutHeldFundsInput>
+  }
+
+  export type userUpdateOneWithoutHeldFundsCreatedNestedInput = {
+    create?: XOR<userCreateWithoutHeldFundsCreatedInput, userUncheckedCreateWithoutHeldFundsCreatedInput>
+    connectOrCreate?: userCreateOrConnectWithoutHeldFundsCreatedInput
+    upsert?: userUpsertWithoutHeldFundsCreatedInput
+    disconnect?: userWhereInput | boolean
+    delete?: userWhereInput | boolean
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutHeldFundsCreatedInput, userUpdateWithoutHeldFundsCreatedInput>, userUncheckedUpdateWithoutHeldFundsCreatedInput>
+  }
+
+  export type userUpdateOneWithoutHeldFundsSettledNestedInput = {
+    create?: XOR<userCreateWithoutHeldFundsSettledInput, userUncheckedCreateWithoutHeldFundsSettledInput>
+    connectOrCreate?: userCreateOrConnectWithoutHeldFundsSettledInput
+    upsert?: userUpsertWithoutHeldFundsSettledInput
+    disconnect?: userWhereInput | boolean
+    delete?: userWhereInput | boolean
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutHeldFundsSettledInput, userUpdateWithoutHeldFundsSettledInput>, userUncheckedUpdateWithoutHeldFundsSettledInput>
   }
 
   export type SampleCreateNestedOneWithoutRefiningBatchesInput = {
@@ -96421,6 +96820,23 @@ export namespace Prisma {
     _max?: NestedEnumSalaryComponentKindFilter<$PrismaModel>
   }
 
+  export type NestedEnumHeldFundKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.HeldFundKind | EnumHeldFundKindFieldRefInput<$PrismaModel>
+    in?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumHeldFundKindFilter<$PrismaModel> | $Enums.HeldFundKind
+  }
+
+  export type NestedEnumHeldFundKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.HeldFundKind | EnumHeldFundKindFieldRefInput<$PrismaModel>
+    in?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.HeldFundKind[] | ListEnumHeldFundKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumHeldFundKindWithAggregatesFilter<$PrismaModel> | $Enums.HeldFundKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumHeldFundKindFilter<$PrismaModel>
+    _max?: NestedEnumHeldFundKindFilter<$PrismaModel>
+  }
+
   export type NestedEnumRefiningMethodFilter<$PrismaModel = never> = {
     equals?: $Enums.RefiningMethod | EnumRefiningMethodFieldRefInput<$PrismaModel>
     in?: $Enums.RefiningMethod[] | ListEnumRefiningMethodFieldRefInput<$PrismaModel>
@@ -96721,6 +97137,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -96758,6 +97176,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -96796,6 +97216,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -96833,6 +97255,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -96927,6 +97351,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -96964,6 +97390,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -97008,6 +97436,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -97045,6 +97475,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -97130,6 +97562,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -97167,6 +97601,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -97216,6 +97652,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -97253,6 +97691,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -97286,6 +97726,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -97323,6 +97765,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
   }
@@ -97372,6 +97816,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -97409,6 +97855,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -97547,6 +97995,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -97583,6 +98033,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -98565,6 +99017,82 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type HeldFundCreateWithoutCreatedByUserInput = {
+    id?: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutHeldFundsInput
+    settledByUser?: userCreateNestedOneWithoutHeldFundsSettledInput
+  }
+
+  export type HeldFundUncheckedCreateWithoutCreatedByUserInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundCreateOrConnectWithoutCreatedByUserInput = {
+    where: HeldFundWhereUniqueInput
+    create: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput>
+  }
+
+  export type HeldFundCreateManyCreatedByUserInputEnvelope = {
+    data: HeldFundCreateManyCreatedByUserInput | HeldFundCreateManyCreatedByUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type HeldFundCreateWithoutSettledByUserInput = {
+    id?: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutHeldFundsInput
+    createdByUser?: userCreateNestedOneWithoutHeldFundsCreatedInput
+  }
+
+  export type HeldFundUncheckedCreateWithoutSettledByUserInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundCreateOrConnectWithoutSettledByUserInput = {
+    where: HeldFundWhereUniqueInput
+    create: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput>
+  }
+
+  export type HeldFundCreateManySettledByUserInputEnvelope = {
+    data: HeldFundCreateManySettledByUserInput | HeldFundCreateManySettledByUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SampleCreateWithoutTechnicianInput = {
     id?: string
     sampleNumber: string
@@ -99120,6 +99648,56 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PayrollRule"> | Date | string
     createdById?: StringNullableFilter<"PayrollRule"> | string | null
     supersedesId?: StringNullableFilter<"PayrollRule"> | string | null
+  }
+
+  export type HeldFundUpsertWithWhereUniqueWithoutCreatedByUserInput = {
+    where: HeldFundWhereUniqueInput
+    update: XOR<HeldFundUpdateWithoutCreatedByUserInput, HeldFundUncheckedUpdateWithoutCreatedByUserInput>
+    create: XOR<HeldFundCreateWithoutCreatedByUserInput, HeldFundUncheckedCreateWithoutCreatedByUserInput>
+  }
+
+  export type HeldFundUpdateWithWhereUniqueWithoutCreatedByUserInput = {
+    where: HeldFundWhereUniqueInput
+    data: XOR<HeldFundUpdateWithoutCreatedByUserInput, HeldFundUncheckedUpdateWithoutCreatedByUserInput>
+  }
+
+  export type HeldFundUpdateManyWithWhereWithoutCreatedByUserInput = {
+    where: HeldFundScalarWhereInput
+    data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyWithoutCreatedByUserInput>
+  }
+
+  export type HeldFundScalarWhereInput = {
+    AND?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+    OR?: HeldFundScalarWhereInput[]
+    NOT?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
+    id?: StringFilter<"HeldFund"> | string
+    companyId?: StringFilter<"HeldFund"> | string
+    date?: DateTimeFilter<"HeldFund"> | Date | string
+    kind?: EnumHeldFundKindFilter<"HeldFund"> | $Enums.HeldFundKind
+    name?: StringFilter<"HeldFund"> | string
+    amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
+    note?: StringNullableFilter<"HeldFund"> | string | null
+    settledAt?: DateTimeNullableFilter<"HeldFund"> | Date | string | null
+    settledBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdBy?: StringNullableFilter<"HeldFund"> | string | null
+    createdAt?: DateTimeFilter<"HeldFund"> | Date | string
+    updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
+  }
+
+  export type HeldFundUpsertWithWhereUniqueWithoutSettledByUserInput = {
+    where: HeldFundWhereUniqueInput
+    update: XOR<HeldFundUpdateWithoutSettledByUserInput, HeldFundUncheckedUpdateWithoutSettledByUserInput>
+    create: XOR<HeldFundCreateWithoutSettledByUserInput, HeldFundUncheckedCreateWithoutSettledByUserInput>
+  }
+
+  export type HeldFundUpdateWithWhereUniqueWithoutSettledByUserInput = {
+    where: HeldFundWhereUniqueInput
+    data: XOR<HeldFundUpdateWithoutSettledByUserInput, HeldFundUncheckedUpdateWithoutSettledByUserInput>
+  }
+
+  export type HeldFundUpdateManyWithWhereWithoutSettledByUserInput = {
+    where: HeldFundScalarWhereInput
+    data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyWithoutSettledByUserInput>
   }
 
   export type SampleUpsertWithWhereUniqueWithoutTechnicianInput = {
@@ -100174,6 +100752,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -100210,6 +100790,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -101030,6 +101612,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -101041,6 +101624,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -101062,6 +101646,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -101073,6 +101658,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -101168,19 +101754,21 @@ export namespace Prisma {
   export type HeldFundCreateWithoutCompanyInput = {
     id?: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
     settledAt?: Date | string | null
-    settledBy?: string | null
-    createdBy?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    createdByUser?: userCreateNestedOneWithoutHeldFundsCreatedInput
+    settledByUser?: userCreateNestedOneWithoutHeldFundsSettledInput
   }
 
   export type HeldFundUncheckedCreateWithoutCompanyInput = {
     id?: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
@@ -101648,6 +102236,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"KasHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"KasHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"KasHeadConfirmation"> | Date | string
   }
@@ -101679,6 +102268,7 @@ export namespace Prisma {
     note?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedBy?: StringNullableFilter<"BankHeadConfirmation"> | string | null
     confirmedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
+    matchedAt?: DateTimeNullableFilter<"BankHeadConfirmation"> | Date | string | null
     createdAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
     updatedAt?: DateTimeFilter<"BankHeadConfirmation"> | Date | string
   }
@@ -101766,23 +102356,6 @@ export namespace Prisma {
   export type HeldFundUpdateManyWithWhereWithoutCompanyInput = {
     where: HeldFundScalarWhereInput
     data: XOR<HeldFundUpdateManyMutationInput, HeldFundUncheckedUpdateManyWithoutCompanyInput>
-  }
-
-  export type HeldFundScalarWhereInput = {
-    AND?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
-    OR?: HeldFundScalarWhereInput[]
-    NOT?: HeldFundScalarWhereInput | HeldFundScalarWhereInput[]
-    id?: StringFilter<"HeldFund"> | string
-    companyId?: StringFilter<"HeldFund"> | string
-    date?: DateTimeFilter<"HeldFund"> | Date | string
-    name?: StringFilter<"HeldFund"> | string
-    amount?: DecimalFilter<"HeldFund"> | Decimal | DecimalJsLike | number | string
-    note?: StringNullableFilter<"HeldFund"> | string | null
-    settledAt?: DateTimeNullableFilter<"HeldFund"> | Date | string | null
-    settledBy?: StringNullableFilter<"HeldFund"> | string | null
-    createdBy?: StringNullableFilter<"HeldFund"> | string | null
-    createdAt?: DateTimeFilter<"HeldFund"> | Date | string
-    updatedAt?: DateTimeFilter<"HeldFund"> | Date | string
   }
 
   export type PayrollRunUpsertWithWhereUniqueWithoutCompanyInput = {
@@ -102992,6 +103565,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103029,6 +103604,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103067,6 +103644,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103104,6 +103683,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103142,6 +103723,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103179,6 +103762,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103273,6 +103858,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103310,6 +103897,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -103354,6 +103943,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103391,6 +103982,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -103435,6 +104028,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103472,6 +104067,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -103556,6 +104153,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103593,6 +104192,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103631,6 +104232,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103668,6 +104271,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103717,6 +104322,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103754,6 +104361,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -103798,6 +104407,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103835,6 +104446,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -103868,6 +104481,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -103905,6 +104520,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -103954,6 +104571,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -103991,6 +104610,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -104024,6 +104645,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -104061,6 +104684,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -104250,6 +104875,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -104287,6 +104914,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -104631,6 +105260,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -104668,6 +105299,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -104706,6 +105339,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -104743,6 +105378,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -104913,6 +105550,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -104950,6 +105589,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -104994,6 +105635,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -105031,6 +105674,8 @@ export namespace Prisma {
     payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -105127,6 +105772,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -105164,6 +105811,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -105282,6 +105931,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -105319,6 +105970,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -105467,6 +106120,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -105504,6 +106159,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -105640,6 +106297,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -105677,6 +106336,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -106152,6 +106813,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     samples?: SampleCreateNestedManyWithoutTechnicianInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
@@ -106189,6 +106852,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
@@ -106269,6 +106934,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -106306,6 +106973,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -106403,6 +107072,164 @@ export namespace Prisma {
     create: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
   }
 
+  export type userCreateWithoutHeldFundsCreatedInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    kpiEntries?: KpiEntryCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
+    attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
+    payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
+    samples?: SampleCreateNestedManyWithoutTechnicianInput
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    branch?: BranchCreateNestedOneWithoutUsersInput
+    customRole?: custom_roleCreateNestedOneWithoutUsersInput
+  }
+
+  export type userUncheckedCreateWithoutHeldFundsCreatedInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    branchId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    customRoleId?: string | null
+    kpiEntries?: KpiEntryUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryUncheckedCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
+    payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
+    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutHeldFundsCreatedInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutHeldFundsCreatedInput, userUncheckedCreateWithoutHeldFundsCreatedInput>
+  }
+
+  export type userCreateWithoutHeldFundsSettledInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    kpiEntries?: KpiEntryCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentCreateNestedManyWithoutUserInput
+    attendances?: AttendanceCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipCreateNestedManyWithoutPaidByInput
+    payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    samples?: SampleCreateNestedManyWithoutTechnicianInput
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    branch?: BranchCreateNestedOneWithoutUsersInput
+    customRole?: custom_roleCreateNestedOneWithoutUsersInput
+  }
+
+  export type userUncheckedCreateWithoutHeldFundsSettledInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+    phone?: string | null
+    branchId?: string | null
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    joinDate?: Date | string | null
+    employmentStatus?: $Enums.EmploymentStatus
+    contractStartDate?: Date | string | null
+    contractEndDate?: Date | string | null
+    isActive?: boolean
+    customRoleId?: string | null
+    kpiEntries?: KpiEntryUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiEntriesCreated?: KpiEntryUncheckedCreateNestedManyWithoutCreatedByInput
+    kpiEntriesReviewed?: KpiEntryUncheckedCreateNestedManyWithoutReviewedByInput
+    kpiPeriods?: KpiPeriodUncheckedCreateNestedManyWithoutEmployeeInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedCreateNestedManyWithoutLockedByInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedCreateNestedManyWithoutEmployeeInput
+    salaryComponents?: UserSalaryComponentUncheckedCreateNestedManyWithoutUserInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutUserInput
+    attendancesEdited?: AttendanceUncheckedCreateNestedManyWithoutEditedByInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutUserInput
+    payrollSlipsPaid?: PayrollSlipUncheckedCreateNestedManyWithoutPaidByInput
+    payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
+    payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
+    payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    samples?: SampleUncheckedCreateNestedManyWithoutTechnicianInput
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutHeldFundsSettledInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutHeldFundsSettledInput, userUncheckedCreateWithoutHeldFundsSettledInput>
+  }
+
   export type CompanyUpsertWithoutHeldFundsInput = {
     update: XOR<CompanyUpdateWithoutHeldFundsInput, CompanyUncheckedUpdateWithoutHeldFundsInput>
     create: XOR<CompanyCreateWithoutHeldFundsInput, CompanyUncheckedCreateWithoutHeldFundsInput>
@@ -106462,6 +107289,176 @@ export namespace Prisma {
     correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
     payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type userUpsertWithoutHeldFundsCreatedInput = {
+    update: XOR<userUpdateWithoutHeldFundsCreatedInput, userUncheckedUpdateWithoutHeldFundsCreatedInput>
+    create: XOR<userCreateWithoutHeldFundsCreatedInput, userUncheckedCreateWithoutHeldFundsCreatedInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutHeldFundsCreatedInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutHeldFundsCreatedInput, userUncheckedUpdateWithoutHeldFundsCreatedInput>
+  }
+
+  export type userUpdateWithoutHeldFundsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    kpiEntries?: KpiEntryUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
+    payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
+    samples?: SampleUpdateManyWithoutTechnicianNestedInput
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    branch?: BranchUpdateOneWithoutUsersNestedInput
+    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutHeldFundsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    kpiEntries?: KpiEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
+    payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
+    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type userUpsertWithoutHeldFundsSettledInput = {
+    update: XOR<userUpdateWithoutHeldFundsSettledInput, userUncheckedUpdateWithoutHeldFundsSettledInput>
+    create: XOR<userCreateWithoutHeldFundsSettledInput, userUncheckedCreateWithoutHeldFundsSettledInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutHeldFundsSettledInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutHeldFundsSettledInput, userUncheckedUpdateWithoutHeldFundsSettledInput>
+  }
+
+  export type userUpdateWithoutHeldFundsSettledInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    kpiEntries?: KpiEntryUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUpdateManyWithoutPaidByNestedInput
+    payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    samples?: SampleUpdateManyWithoutTechnicianNestedInput
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    branch?: BranchUpdateOneWithoutUsersNestedInput
+    customRole?: custom_roleUpdateOneWithoutUsersNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutHeldFundsSettledInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    joinDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    employmentStatus?: EnumEmploymentStatusFieldUpdateOperationsInput | $Enums.EmploymentStatus
+    contractStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    contractEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    customRoleId?: NullableStringFieldUpdateOperationsInput | string | null
+    kpiEntries?: KpiEntryUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiEntriesCreated?: KpiEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+    kpiEntriesReviewed?: KpiEntryUncheckedUpdateManyWithoutReviewedByNestedInput
+    kpiPeriods?: KpiPeriodUncheckedUpdateManyWithoutEmployeeNestedInput
+    kpiPeriodsLocked?: KpiPeriodUncheckedUpdateManyWithoutLockedByNestedInput
+    kpiMonthlyResults?: KpiMonthlyResultUncheckedUpdateManyWithoutEmployeeNestedInput
+    salaryComponents?: UserSalaryComponentUncheckedUpdateManyWithoutUserNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutUserNestedInput
+    attendancesEdited?: AttendanceUncheckedUpdateManyWithoutEditedByNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutUserNestedInput
+    payrollSlipsPaid?: PayrollSlipUncheckedUpdateManyWithoutPaidByNestedInput
+    payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
+    payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
+    payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SampleCreateWithoutRefiningBatchesInput = {
@@ -106573,6 +107570,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundCreateNestedManyWithoutSettledByUserInput
     account?: accountCreateNestedManyWithoutUserInput
     session?: sessionCreateNestedManyWithoutUserInput
     branch?: BranchCreateNestedOneWithoutUsersInput
@@ -106610,6 +107609,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedCreateNestedManyWithoutGeneratedByInput
     payrollRunsFinalized?: PayrollRunUncheckedCreateNestedManyWithoutFinalizedByInput
     payrollRulesCreated?: PayrollRuleUncheckedCreateNestedManyWithoutCreatedByInput
+    heldFundsCreated?: HeldFundUncheckedCreateNestedManyWithoutCreatedByUserInput
+    heldFundsSettled?: HeldFundUncheckedCreateNestedManyWithoutSettledByUserInput
     account?: accountUncheckedCreateNestedManyWithoutUserInput
     session?: sessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -106705,6 +107706,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
     branch?: BranchUpdateOneWithoutUsersNestedInput
@@ -106742,6 +107745,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -109904,6 +110909,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -109940,6 +110947,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -110323,6 +111332,34 @@ export namespace Prisma {
     signature: string
     createdAt?: Date | string
     supersedesId?: string | null
+  }
+
+  export type HeldFundCreateManyCreatedByUserInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    settledBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HeldFundCreateManySettledByUserInput = {
+    id?: string
+    companyId: string
+    date: Date | string
+    kind?: $Enums.HeldFundKind
+    name: string
+    amount?: Decimal | DecimalJsLike | number | string
+    note?: string | null
+    settledAt?: Date | string | null
+    createdBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type SampleCreateManyTechnicianInput = {
@@ -111142,6 +112179,90 @@ export namespace Prisma {
     supersedesId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type HeldFundUpdateWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutHeldFundsNestedInput
+    settledByUser?: userUpdateOneWithoutHeldFundsSettledNestedInput
+  }
+
+  export type HeldFundUncheckedUpdateWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutCreatedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUpdateWithoutSettledByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutHeldFundsNestedInput
+    createdByUser?: userUpdateOneWithoutHeldFundsCreatedNestedInput
+  }
+
+  export type HeldFundUncheckedUpdateWithoutSettledByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HeldFundUncheckedUpdateManyWithoutSettledByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
+    name?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    note?: NullableStringFieldUpdateOperationsInput | string | null
+    settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SampleUpdateWithoutTechnicianInput = {
     id?: StringFieldUpdateOperationsInput | string
     sampleNumber?: StringFieldUpdateOperationsInput | string
@@ -111727,6 +112848,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUpdateManyWithoutTechnicianNestedInput
     account?: accountUpdateManyWithoutUserNestedInput
     session?: sessionUpdateManyWithoutUserNestedInput
@@ -111763,6 +112886,8 @@ export namespace Prisma {
     payrollRunsGenerated?: PayrollRunUncheckedUpdateManyWithoutGeneratedByNestedInput
     payrollRunsFinalized?: PayrollRunUncheckedUpdateManyWithoutFinalizedByNestedInput
     payrollRulesCreated?: PayrollRuleUncheckedUpdateManyWithoutCreatedByNestedInput
+    heldFundsCreated?: HeldFundUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    heldFundsSettled?: HeldFundUncheckedUpdateManyWithoutSettledByUserNestedInput
     samples?: SampleUncheckedUpdateManyWithoutTechnicianNestedInput
     account?: accountUncheckedUpdateManyWithoutUserNestedInput
     session?: sessionUncheckedUpdateManyWithoutUserNestedInput
@@ -112142,6 +113267,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -112153,6 +113279,7 @@ export namespace Prisma {
     note?: string | null
     confirmedBy?: string | null
     confirmedAt?: Date | string | null
+    matchedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -112189,6 +113316,7 @@ export namespace Prisma {
   export type HeldFundCreateManyCompanyInput = {
     id?: string
     date: Date | string
+    kind?: $Enums.HeldFundKind
     name: string
     amount?: Decimal | DecimalJsLike | number | string
     note?: string | null
@@ -112679,6 +113807,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112690,6 +113819,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112701,6 +113831,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112712,6 +113843,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112723,6 +113855,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112734,6 +113867,7 @@ export namespace Prisma {
     note?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedBy?: NullableStringFieldUpdateOperationsInput | string | null
     confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    matchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -112828,19 +113962,21 @@ export namespace Prisma {
   export type HeldFundUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
     settledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    settledBy?: NullableStringFieldUpdateOperationsInput | string | null
-    createdBy?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdByUser?: userUpdateOneWithoutHeldFundsCreatedNestedInput
+    settledByUser?: userUpdateOneWithoutHeldFundsSettledNestedInput
   }
 
   export type HeldFundUncheckedUpdateWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
@@ -112854,6 +113990,7 @@ export namespace Prisma {
   export type HeldFundUncheckedUpdateManyWithoutCompanyInput = {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumHeldFundKindFieldUpdateOperationsInput | $Enums.HeldFundKind
     name?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     note?: NullableStringFieldUpdateOperationsInput | string | null

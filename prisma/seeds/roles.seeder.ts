@@ -1,7 +1,7 @@
 import type { PrismaClient } from '../../src/generated/prisma/client'
 import * as XLSX from 'xlsx'
 import * as path from 'path'
-import { getPermissionsForRole, PERMISSIONS } from '../../src/lib/permissions'
+import { getPermissionsForRoleInCompany, getPermissionsForRole, PERMISSIONS } from '../../src/lib/permissions'
 
 // Setiap perusahaan wajib memiliki seluruh role standar ini,
 // terlepas dari apa yang ada di sheet Excel.
@@ -75,7 +75,10 @@ export async function seedRoles(prisma: PrismaClient, companyIds: Record<string,
     console.log(`  🌱 Roles for ${companyCode} (${roleList.length}): ${roleList.join(', ')}`)
 
     for (const roleName of roleList) {
-      let permissions = getPermissionsForRole(roleName)
+      // Per-PT, bukan per-nama-jabatan saja: PKD tidak memakai modul valas sama
+      // sekali, jadi "Teller Dalam" di PKD tidak boleh mewarisi izin stok & kurs
+      // dari "Teller Dalam" di PVI hanya karena namanya kebetulan sama.
+      let permissions = getPermissionsForRoleInCompany(roleName, companyCode)
       let payrollCompanyIds: string[] = []
 
       // Kepala Cabang PKD is the one exception ko Hoker specified: it can view

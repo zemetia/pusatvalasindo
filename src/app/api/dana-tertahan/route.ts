@@ -7,13 +7,17 @@ import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { assertHeldFundEditableDate } from "@/backend/helpers/held-fund-guard";
 import { heldFundRepository } from "@/backend/repositories/held-fund.repository";
-import { buildHeldFundPayload } from "@/backend/services/held-fund.service";
+import { buildHeldFundPayload, toHeldFundRow } from "@/backend/services/held-fund.service";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const createSchema = z.object({
   companyId: z.string().min(1),
   date: z.string().regex(DATE_RE),
+  // Wajib, tanpa default: arah hutang menentukan apakah uangnya akan masuk atau
+  // keluar, dan menebaknya untuk pemanggil yang lupa mengirim akan mencatat
+  // kewajiban ke sisi yang salah tanpa siapa pun sadar.
+  kind: z.enum(["CREDIT", "DEBIT"]),
   name: z.string().min(1).max(120),
   // Jumlahnya opsional: alur normalnya "tambah nama dulu, angkanya diisi di
   // grid" (pop-up tambah hanya menanyakan nama), jadi 0 adalah nilai awal yang sah.
@@ -62,24 +66,14 @@ export const POST = withValidation(createSchema)(
       const created = await heldFundRepository.create({
         companyId: ctx.body.companyId,
         date,
+        kind: ctx.body.kind,
         name: ctx.body.name.trim(),
         amount: ctx.body.amount,
         note: ctx.body.note,
         createdBy: caller.userId,
       });
 
-      return NextResponse.json(
-        ok(
-          {
-            id: created.id,
-            name: created.name,
-            amount: created.amount.toString(),
-            note: created.note,
-            settledAt: created.settledAt?.toISOString() ?? null,
-          },
-          "Dana tertahan ditambahkan"
-        )
-      );
+      return NextResponse.json(ok(toHeldFundRow(created), "Dana tertahan ditambahkan"));
     } catch (e) {
       return handleError(e);
     }

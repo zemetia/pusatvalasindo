@@ -55,6 +55,7 @@ export function DailyVerifyCell({
   canVerify,
   canDirectCorrect,
   allowNegative = false,
+  unfilled = false,
   onVerify,
 }: {
   status: DailyVerifyStatus
@@ -64,6 +65,12 @@ export function DailyVerifyCell({
   approved?: ApprovedCorrection
   canVerify: boolean
   canDirectCorrect?: boolean
+  /**
+   * Baris ini tidak pernah diisi pada tanggal tersebut. Tombolnya tetap ada — "Sesuai"
+   * berarti saldonya memang nol — hanya kalimatnya yang menyesuaikan supaya jelas bahwa
+   * angka 0 itu asumsi, bukan angka yang pernah diketik orang.
+   */
+  unfilled?: boolean
   /**
    * Angka pengganti boleh minus. Dinyalakan oleh grid Bank: rekening bisa
    * overdraft/kartu kredit, jadi saldo negatif adalah keadaan yang sah — dan
@@ -141,6 +148,11 @@ export function DailyVerifyCell({
 
   return (
     <div className="flex items-center gap-1.5">
+      {unfilled && (
+        <span className="text-[10px] text-muted-foreground" title="Tidak diisi — dianggap Rp 0">
+          kosong
+        </span>
+      )}
       <Button size="sm" variant="outline" className="h-7" disabled={submitting} onClick={() => submit("BENAR")}>
         {submitting ? <IconLoader2 className="size-3.5 animate-spin" /> : <IconCheck className="size-3.5" />}
         Sesuai
@@ -159,7 +171,7 @@ export function DailyVerifyCell({
                 {canDirectCorrect ? "Koreksi saldo" : "Ajukan koreksi"}
               </p>
               <p className="text-xs text-muted-foreground">
-                Tersimpan: Rp {fmt(balance)}.{" "}
+                {unfilled ? "Tidak diisi — dianggap Rp 0" : `Tersimpan: Rp ${fmt(balance)}`}.{" "}
                 {canDirectCorrect
                   ? "Angka pengganti langsung berlaku — tetap tercatat di riwayat koreksi."
                   : "Angka pengganti baru berlaku setelah disetujui Owner / Super Admin."}

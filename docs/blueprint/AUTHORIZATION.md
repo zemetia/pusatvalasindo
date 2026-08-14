@@ -108,6 +108,34 @@ pembetulan angka yang sudah lewat. Yang tetap butuh `daily.backdate` hanyalah
 mengubah *isi* baris bertanggal lampau (lihat
 [`held-fund-guard.ts`](../../src/backend/helpers/held-fund-guard.ts)).
 
+## Pengecualian per PT (PKD tanpa modul valas)
+
+Ada satu aturan yang tidak berjalan lewat nama jabatan: **PKD (Pusat Kirim Duit)
+tidak memakai modul valas sama sekali** — tidak ada kurs, stok, kas cabang,
+maupun transaksi valas. Bank tetap ada; mengirim uang justru butuh rekening.
+
+Aturannya harus ditulis dua kali karena ada dua lapis penyimpanan:
+
+| Lapis | Berkas | Isi |
+|---|---|---|
+| Matriks (gerbang yang berlaku) | [`prisma/scripts/apply-role-access-2026-08.ts`](../../prisma/scripts/apply-role-access-2026-08.ts) | `COMPANY_PLANS.PKD` — resource yang dicabut dari setiap jabatan PKD |
+| Array lama (dibaca fallback & ditulis ulang seeder) | [`src/lib/permissions.ts`](../../src/lib/permissions.ts) | `PKD_REVOKED_PERMISSIONS` + `getPermissionsForRoleInCompany()` |
+
+Kenapa lapis kedua perlu: `ROLE_PERMISSION_MAP` memetakan **nama** jabatan, dan
+satu "Teller Dalam" dipakai seluruh PT. Tanpa `getPermissionsForRoleInCompany`,
+setiap `seedRoles` akan mengembalikan izin stok & kurs ke PKD lewat nama jabatan
+yang kebetulan sama.
+
+Di script, aturan PT **menang** atas aturan jabatan: Kepala Cabang PKD tidak ikut
+mendapat hak ubah Stock & Kas, dan Kepala Marketing PKD tidak ikut mendapat
+Patokan Harga.
+
+Yang **belum** ditutup: Owner & Super Admin bersifat global, jadi PKD masih
+muncul sebagai pilihan PT di halaman Stock & Kas Harian, Cross-Check, Stock
+Management PT, dan Transaksi Valas (lihat `getScopedCompaniesFor` — untuk role
+global `authz.where("id")` kosong). Menutupnya butuh penanda di tabel `Company`
+(mis. `usesValas`) yang disaring di daftar PT, bukan izin per jabatan.
+
 ## Mode scope
 
 | Mode | Arti |

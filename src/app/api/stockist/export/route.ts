@@ -146,7 +146,6 @@ export async function GET(req: NextRequest) {
       { header: "Pocket", key: "pocket", width: 24 },
       { header: "Saldo Kemarin", key: "kemarin", width: 18 },
       { header: "Saldo Hari Ini", key: "hariIni", width: 18 },
-      { header: "Delta", key: "delta", width: 14 },
       { header: "Catatan", key: "catatan", width: 30 },
     ];
     styleHeaderRow(kasSheet.getRow(1));
@@ -160,10 +159,9 @@ export async function GET(req: NextRequest) {
         pocket: p.name,
         kemarin: saldoKemarin,
         hariIni: saldoHariIni,
-        delta: saldoHariIni - saldoKemarin,
         catatan: entry?.note ?? "",
       });
-      styleDataRow(row, ["kemarin", "hariIni", "delta"]);
+      styleDataRow(row, ["kemarin", "hariIni"]);
     }
 
     const buffer = await wb.xlsx.writeBuffer();

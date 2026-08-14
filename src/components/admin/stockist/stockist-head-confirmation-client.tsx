@@ -45,6 +45,8 @@ type IdrState = {
   systemTotal: number
   confirmedIdrValue: number | null
   confirmedAt: string | null
+  /** Jam KLOP yang tersimpan di server; null selama angkanya belum klop. */
+  matchedAt: string | null
   idrDraft: number | undefined
   saveState: SaveState
 }
@@ -56,6 +58,16 @@ function fmt(n: number) {
 function fmtTime(iso: string | null) {
   if (!iso) return "-"
   return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+}
+
+/**
+ * Kolom "Jam" hanya berisi JAM KLOP. Selama masih ada selisih, selnya dibiarkan kosong —
+ * jam pengisian yang tampil di baris yang belum cocok dulu terbaca seolah baris itu sudah
+ * beres. Baris yang belum klop memang belum punya jam apa pun untuk ditampilkan.
+ */
+function JamKlop({ matched, iso }: { matched: boolean; iso: string | null }) {
+  if (!matched) return null
+  return <span className="text-success text-sm font-medium">{fmtTime(iso)}</span>
 }
 
 function toDate(d: Date) {
@@ -140,6 +152,9 @@ export function StockistHeadConfirmationClient({
         systemTotal: 0,
         confirmedIdrValue: totals.confirmedIdrValue,
         confirmedAt: totals.idrConfirmedAt,
+        // Klop-nya baris ini menumpang pada kecocokan kuantitas seluruh item (lihat
+        // stockSumSelisih di bawah), jadi tidak ada jam klop tersendiri untuk disimpan.
+        matchedAt: totals.idrConfirmedAt,
         idrDraft: totals.confirmedIdrValue ?? undefined,
         saveState: "idle",
       })
@@ -221,12 +236,18 @@ export function StockistHeadConfirmationClient({
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
+      // Status & jam klop datang dari server (dia yang menandai dan menyimpannya) —
+      // bukan ditebak dari jam browser.
+      const saved = data.data?.confirmation as
+        | { confirmedAt?: string | null; matchedAt?: string | null }
+        | undefined
       setState((prev) =>
         prev
           ? {
               ...prev,
               confirmedIdrValue: prev.idrDraft ?? null,
-              confirmedAt: new Date().toISOString(),
+              confirmedAt: saved?.confirmedAt ?? new Date().toISOString(),
+              matchedAt: saved?.matchedAt ?? null,
               saveState: "saved",
             }
           : prev
@@ -410,7 +431,9 @@ export function StockistHeadConfirmationClient({
                         <TableCell className={selisihClass(selisih)}>
                           {selisih === null ? "-" : fmt(selisih)}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{fmtTime(r.confirmedAt)}</TableCell>
+                        <TableCell>
+                          <JamKlop matched={selisih === 0} iso={r.confirmedAt} />
+                        </TableCell>
                         <TableCell>
                           <SaveIndicator state={r.saveState} />
                         </TableCell>
@@ -455,8 +478,13 @@ export function StockistHeadConfirmationClient({
                       />
                     </TableCell>
                     <TableCell />
-                    <TableCell className="text-sm text-muted-foreground">
-                      {fmtTime(stockIdr?.confirmedAt ?? null)}
+                    <TableCell>
+                      {/* Baris ini tidak punya total sistem sendiri, jadi klop-nya mengikuti
+                          kecocokan kuantitas seluruh item di atasnya. */}
+                      <JamKlop
+                        matched={stockRows.length > 0 && stockSumSelisih === 0}
+                        iso={stockIdr?.confirmedAt ?? null}
+                      />
                     </TableCell>
                     <TableCell>
                       <SaveIndicator state={stockIdr?.saveState ?? "idle"} />
@@ -494,11 +522,13 @@ function toIdrState(api: {
   systemTotal: number
   confirmedIdrValue: number | null
   confirmedAt: string | null
+  matchedAt: string | null
 }): IdrState {
   return {
     systemTotal: api.systemTotal,
     confirmedIdrValue: api.confirmedIdrValue,
     confirmedAt: api.confirmedAt,
+    matchedAt: api.matchedAt,
     idrDraft: api.confirmedIdrValue ?? undefined,
     saveState: "idle",
   }
@@ -573,7 +603,10 @@ function IdrCrossCheckSection({
               <TableCell className={selisihClass(selisih)}>
                 {selisih === null ? "-" : fmt(selisih)}
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">{fmtTime(state.confirmedAt)}</TableCell>
+              <TableCell>
+                {/* Jam klop tersimpan (matchedAt), bukan jam simpan terakhir. */}
+                <JamKlop matched={selisih === 0} iso={state.matchedAt ?? state.confirmedAt} />
+              </TableCell>
               <TableCell>
                 <SaveIndicator state={state.saveState} />
               </TableCell>

@@ -16,6 +16,16 @@ const MATCH_FONT = "FF1B7A43";
 const MISMATCH_FILL = "FFFAD4D4";
 const MISMATCH_FONT = "FFB42318";
 
+/**
+ * Kolom jam di file ini berisi JAM KLOP saja — sama seperti halamannya. Baris yang masih
+ * selisih dibiarkan kosong: jam pengisian pada baris yang belum cocok terbaca seolah baris
+ * itu sudah beres.
+ */
+function jamKlop(isMatch: boolean, iso: Date | string | null | undefined) {
+  if (!isMatch || !iso) return "";
+  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+}
+
 // GET /api/stockist/head-confirmation/export?companyId=&date=YYYY-MM-DD
 // Export lengkap hasil cross-check kepala cabang: Ringkasan, Stock Harian, Kas, Bank — 1 file, 4 sheet.
 export async function GET(req: NextRequest) {
@@ -107,7 +117,7 @@ export async function GET(req: NextRequest) {
       { header: "Total Sistem", key: "sistem", width: 16 },
       { header: "Total Kepala Cabang", key: "kepcab", width: 20 },
       { header: "Selisih", key: "selisih", width: 16 },
-      { header: "Jam Konfirmasi", key: "jam", width: 16 },
+      { header: "Jam Klop", key: "jam", width: 16 },
     ];
     styleHeaderRow(stockSheet.getRow(1));
     for (const row of stockRows) {
@@ -117,7 +127,7 @@ export async function GET(req: NextRequest) {
         sistem: row.systemTotal,
         kepcab: row.confirmedQuantity ?? "",
         selisih: row.selisih ?? "",
-        jam: row.confirmedAt ? new Date(row.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
+        jam: jamKlop(row.isMatch, row.confirmedAt),
       });
       styleDataRow(dataRow, ["sistem", "kepcab", "selisih"]);
       if (row.confirmedQuantity !== null) {
@@ -154,9 +164,9 @@ export async function GET(req: NextRequest) {
       sistem: "",
       kepcab: stockTotalIdr,
       selisih: "",
-      jam: stockTotal?.confirmedAt
-        ? new Date(stockTotal.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
-        : "-",
+      // Baris ini tidak punya total sistem sendiri — klop-nya ikut kecocokan kuantitas
+      // seluruh item di atasnya (sama seperti di halaman cross-check).
+      jam: jamKlop(totalMatch, stockTotal?.confirmedAt),
     });
     styleDataRow(stockIdrRow, ["kepcab"]);
     stockIdrRow.font = { bold: true };
@@ -167,14 +177,14 @@ export async function GET(req: NextRequest) {
       { header: "Total Sistem", key: "sistem", width: 18 },
       { header: "Total Kepala Cabang", key: "kepcab", width: 20 },
       { header: "Selisih", key: "selisih", width: 16 },
-      { header: "Jam Konfirmasi", key: "jam", width: 16 },
+      { header: "Jam Klop", key: "jam", width: 16 },
     ];
     styleHeaderRow(kasSheet.getRow(1));
     const kasRow = kasSheet.addRow({
       sistem: kas.systemTotal,
       kepcab: kas.confirmedIdrValue ?? "",
       selisih: kas.selisih ?? "",
-      jam: kas.confirmedAt ? new Date(kas.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-",
+      jam: jamKlop(kas.isMatch, kas.matchedAt),
     });
     styleDataRow(kasRow, ["sistem", "kepcab", "selisih"]);
     if (kas.confirmedIdrValue !== null) {
@@ -215,7 +225,7 @@ export async function GET(req: NextRequest) {
       noRek: "Total Sistem",
       namaRek: "Total Kepala Cabang",
       mataUang: "Selisih",
-      saldo: "Jam Konfirmasi",
+      saldo: "Jam Klop",
     });
     styleHeaderRow(bankCheckHeader);
     const bankCheckRow = bankSheet.addRow({
@@ -223,9 +233,7 @@ export async function GET(req: NextRequest) {
       noRek: bankConfirmation.systemTotal,
       namaRek: bankConfirmation.confirmedIdrValue ?? "",
       mataUang: bankConfirmation.selisih ?? "",
-      saldo: bankConfirmation.confirmedAt
-        ? new Date(bankConfirmation.confirmedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
-        : "-",
+      saldo: jamKlop(bankConfirmation.isMatch, bankConfirmation.matchedAt),
     });
     styleDataRow(bankCheckRow, ["noRek", "namaRek", "mataUang"]);
     if (bankConfirmation.confirmedIdrValue !== null) {

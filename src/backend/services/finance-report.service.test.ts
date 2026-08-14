@@ -161,12 +161,13 @@ describe("financeReportService.getReport()", () => {
     expect(kas?.worstDiff).toBe(30);
   });
 
-  it("menjumlahkan dana tertahan lintas PT dan tidak mencampurnya ke total aset", async () => {
+  it("menjumlahkan dana tertahan per arah lintas PT dan tidak mencampurnya ke total aset", async () => {
     setup({
       confirmations: [{ kind: "KAS", companyId: "pvi", date: "2026-07-04", amount: 1000 }],
       heldFunds: [
         {
           companyId: "pvi",
+          kind: "CREDIT",
           outstanding: 400,
           outstandingCount: 3,
           settledInRange: 250,
@@ -174,7 +175,17 @@ describe("financeReportService.getReport()", () => {
           addedInRange: 650,
         },
         {
+          companyId: "pvi",
+          kind: "DEBIT",
+          outstanding: 150,
+          outstandingCount: 1,
+          settledInRange: 0,
+          settledCount: 0,
+          addedInRange: 150,
+        },
+        {
           companyId: "ptu",
+          kind: "CREDIT",
           outstanding: 100,
           outstandingCount: 1,
           settledInRange: 0,
@@ -185,38 +196,114 @@ describe("financeReportService.getReport()", () => {
     });
 
     const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
+    const pvi = report.companies.find((c) => c.id === "pvi");
 
-    expect(report.companies.find((c) => c.id === "pvi")?.heldFunds).toEqual({
+    expect(pvi?.heldFunds.credit).toEqual({
       outstanding: 400,
       outstandingCount: 3,
       settled: 250,
       settledCount: 2,
       added: 650,
     });
-    expect(report.group.heldFunds).toEqual({
-      outstanding: 500,
-      outstandingCount: 4,
-      settled: 250,
-      settledCount: 2,
-      added: 750,
+    expect(pvi?.heldFunds.debit).toEqual({
+      outstanding: 150,
+      outstandingCount: 1,
+      settled: 0,
+      settledCount: 0,
+      added: 150,
     });
-    // Inilah alasan piutang berada di section sendiri: kalau ia ikut dijumlahkan
-    // ke posisi aset, seluruh kolom selisih cross-check jadi tidak bisa dicocokkan
-    // dengan angka konfirmasi kepala cabang mana pun.
+    // Piutang menambah, hutang mengurangi — bukan dijumlahkan jadi 550.
+    expect(pvi?.heldFunds.netAdjustment).toBe(250);
+
+    expect(report.group.heldFunds.credit.outstanding).toBe(500);
+    expect(report.group.heldFunds.credit.outstandingCount).toBe(4);
+    expect(report.group.heldFunds.debit.outstanding).toBe(150);
+    expect(report.group.heldFunds.netAdjustment).toBe(350);
+
+    // Inilah alasan dana tertahan berada di section sendiri: kalau ia ikut
+    // dijumlahkan ke posisi aset, seluruh kolom selisih cross-check jadi tidak
+    // bisa dicocokkan dengan angka konfirmasi kepala cabang mana pun.
     expect(report.group.closing.total).toBe(1000);
   });
 
+  it("menurunkan Posisi Bersih dari Saldo Fisik + piutang − hutang", async () => {
+    setup({
+      confirmations: [{ kind: "KAS", companyId: "pvi", date: "2026-07-04", amount: 1000 }],
+      heldFunds: [
+        {
+          companyId: "pvi",
+          kind: "CREDIT",
+          outstanding: 400,
+          outstandingCount: 3,
+          settledInRange: 0,
+          settledCount: 0,
+          addedInRange: 400,
+        },
+        {
+          companyId: "pvi",
+          kind: "DEBIT",
+          outstanding: 150,
+          outstandingCount: 1,
+          settledInRange: 0,
+          settledCount: 0,
+          addedInRange: 150,
+        },
+      ],
+    });
+
+    const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
+    const pvi = report.companies.find((c) => c.id === "pvi");
+
+    expect(pvi?.settlement.physical).toBe(1000);
+    expect(pvi?.settlement.receivable).toBe(400);
+    expect(pvi?.settlement.payable).toBe(150);
+    expect(pvi?.settlement.net).toBe(1250);
+
+    // Konsolidasi memakai basis yang sama: PTU tidak punya konfirmasi maupun
+    // dana tertahan, jadi tidak menggeser apa pun.
+    expect(report.group.settlement.physical).toBe(1000);
+    expect(report.group.settlement.net).toBe(1250);
+  });
+
+  it("membiarkan Posisi Bersih null selama Saldo Fisik belum dikonfirmasi", async () => {
+    // Tanpa satu pun konfirmasi, yang tersisa hanyalah selisih piutang-hutang.
+    // Menampilkannya sebagai "posisi bersih" akan membuat PT yang belum pernah
+    // dikonfirmasi terlihat seolah posisinya sudah diketahui dan kebetulan kecil.
+    setup({
+      heldFunds: [
+        {
+          companyId: "pvi",
+          kind: "CREDIT",
+          outstanding: 400,
+          outstandingCount: 3,
+          settledInRange: 0,
+          settledCount: 0,
+          addedInRange: 400,
+        },
+      ],
+    });
+
+    const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
+    const pvi = report.companies.find((c) => c.id === "pvi");
+
+    expect(pvi?.settlement.physical).toBeNull();
+    expect(pvi?.settlement.net).toBeNull();
+    // Piutangnya sendiri tetap dilaporkan — yang belum diketahui hanya fisiknya.
+    expect(pvi?.settlement.receivable).toBe(400);
+  });
+
   it("melaporkan dana tertahan nol untuk PT yang belum punya catatan sama sekali", async () => {
-    // Repository memakai LEFT JOIN, tapi PT tanpa baris tetap bisa absen dari hasil
-    // (mis. saat filter PT dipersempit). Nol — bukan em dash — karena "tidak ada
-    // piutang" memang berarti nol rupiah tertahan, beda dari saldo yang belum
-    // dikonfirmasi.
+    // PT tanpa baris HeldFund sama sekali tidak muncul di hasil query. Nol —
+    // bukan em dash — karena "tidak ada dana tertahan" memang berarti nol rupiah
+    // tertahan, beda dari saldo yang belum dikonfirmasi.
     setup({ heldFunds: [] });
 
     const report = await financeReportService.getReport(["pvi", "ptu"], RANGE);
 
-    expect(report.companies.every((c) => c.heldFunds.outstanding === 0)).toBe(true);
-    expect(report.group.heldFunds.outstanding).toBe(0);
-    expect(report.group.heldFunds.outstandingCount).toBe(0);
+    expect(report.companies.every((c) => c.heldFunds.credit.outstanding === 0)).toBe(true);
+    expect(report.companies.every((c) => c.heldFunds.debit.outstanding === 0)).toBe(true);
+    expect(report.group.heldFunds.credit.outstanding).toBe(0);
+    expect(report.group.heldFunds.debit.outstandingCount).toBe(0);
+    expect(report.group.heldFunds.netAdjustment).toBe(0);
   });
 });

@@ -16,6 +16,11 @@ model HeldFund {
   // Tanggal hutangnya tercatat — bukan tanggal jatuh tempo. Inilah tanggal yang
   // dinavigasi di halaman Dana Tertahan.
   date      DateTime @db.Date
+  // Arah hutangnya. Tanpa ini satu angka "dana tertahan" mencampur uang yang
+  // akan MASUK dengan uang yang harus KELUAR — dua posisi yang berlawanan dan
+  // tidak boleh saling menutupi. Default CREDIT karena seluruh baris yang sudah
+  // ada dicatat sebagai piutang (hutang orang ke perusahaan).
+  kind      HeldFundKind @default(CREDIT)
   name      String // nama orang/pihak yang uangnya belum masuk
   amount    Decimal  @default(0)
   note      String?
@@ -33,8 +38,25 @@ model HeldFund {
 
   company Company @relation(fields: [companyId], references: [id])
 
+  // Relasi ke user dipasang di atas kolom yang SUDAH ada (`createdBy` /
+  // `settledBy` menyimpan userId), bukan kolom baru — supaya nama pencatat bisa
+  // dibaca dalam satu query, tanpa menyalin nama ke baris hutang. Nama yang
+  // disalin akan basi begitu user-nya ganti nama. `onDelete: SetNull` menjaga
+  // baris hutangnya tetap hidup kalau akun pencatatnya dihapus: yang hilang
+  // seharusnya jejak siapanya, bukan hutangnya.
+  createdByUser user? @relation("HeldFundCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  settledByUser user? @relation("HeldFundSettledBy", fields: [settledBy], references: [id], onDelete: SetNull)
+
   // Halaman membaca satu PT satu tanggal; laporan membaca yang belum lunas
   // lintas tanggal. Dua index terpisah karena dua pola baca yang berbeda.
   @@index([companyId, date])
   @@index([companyId, settledAt])
+}
+
+/// Arah dana tertahan, dinamai dari sisi perusahaan:
+/// • CREDIT — piutang / Account Receivable: orang berhutang, uangnya akan MASUK.
+/// • DEBIT  — hutang / Account Payable: perusahaan yang harus membayar, uangnya akan KELUAR.
+enum HeldFundKind {
+  CREDIT
+  DEBIT
 }

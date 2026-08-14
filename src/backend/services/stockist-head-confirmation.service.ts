@@ -128,33 +128,71 @@ function buildStockTotals(
   };
 }
 
-function buildKasSummary(
-  pockets: KasPocketRow[],
-  entries: KasEntryRow[],
-  confirmation: KasConfirmationRow
-) {
+function kasSystemTotal(pockets: KasPocketRow[], entries: KasEntryRow[]) {
   const pocketIds = new Set(pockets.map((p) => p.id));
-  const systemTotal = entries
+  return entries
     .filter((e) => pocketIds.has(e.kasPocketId))
     .reduce((sum, e) => sum + Number(e.balance), 0);
+}
 
-  return buildIdrSummary(systemTotal, confirmation);
+/**
+ * Menandai KLOP secara otomatis: begitu angka kepala cabang sama persis dengan total
+ * sistem, jamnya dicatat sekali dan tidak digeser lagi oleh penyimpanan berikutnya.
+ *
+ * Dijalankan setiap ringkasan kas/bank dibaca — bukan hanya saat kepala cabang menyimpan —
+ * karena selisihnya bisa tertutup dari sisi sebaliknya: saldo harian yang dibetulkan
+ * setelah angka kepala cabang masuk. Kalau salah satu sisi berubah lagi dan selisihnya
+ * terbuka, jam klopnya dihapus supaya tidak ada tanda klop yang menggantung.
+ */
+async function reconcileMatch<T extends { id: string; matchedAt: Date | null }>(
+  confirmation: T | null,
+  isMatch: boolean,
+  persist: (id: string, matchedAt: Date | null) => Promise<T>
+): Promise<T | null> {
+  if (!confirmation) return null;
+  if (isMatch && confirmation.matchedAt === null) {
+    return persist(confirmation.id, new Date());
+  }
+  if (!isMatch && confirmation.matchedAt !== null) {
+    return persist(confirmation.id, null);
+  }
+  return confirmation;
 }
 
 // Kas dan bank sama-sama satu angka IDR: total sistem vs total hitung ulang kepala cabang.
-function buildIdrSummary(
+async function buildIdrSummary(
   systemTotal: number,
-  confirmation: KasConfirmationRow | BankConfirmationRow
+  confirmation: KasConfirmationRow | BankConfirmationRow,
+  persistMatchedAt: (id: string, matchedAt: Date | null) => Promise<NonNullable<typeof confirmation>>
 ) {
   const confirmedIdrValue = confirmation ? Number(confirmation.confirmedIdrValue) : null;
+  const isMatch = confirmedIdrValue !== null && confirmedIdrValue - systemTotal === 0;
+  const synced = await reconcileMatch(confirmation, isMatch, persistMatchedAt);
+
   return {
     systemTotal,
     confirmedIdrValue,
     selisih: confirmedIdrValue === null ? null : confirmedIdrValue - systemTotal,
-    isMatch: confirmedIdrValue !== null && confirmedIdrValue - systemTotal === 0,
-    confirmedAt: confirmation?.confirmedAt ?? null,
+    isMatch,
+    confirmedAt: synced?.confirmedAt ?? null,
+    /** Jam klop tersimpan; null selama belum klop. */
+    matchedAt: synced?.matchedAt ?? null,
   };
 }
+
+const buildKasSummary = (
+  pockets: KasPocketRow[],
+  entries: KasEntryRow[],
+  confirmation: KasConfirmationRow
+) =>
+  buildIdrSummary(
+    kasSystemTotal(pockets, entries),
+    confirmation,
+    kasHeadConfirmationRepository.setMatchedAt
+  );
+
+const buildBankSummary = (systemTotal: number, confirmation: BankConfirmationRow) =>
+  buildIdrSummary(systemTotal, confirmation, bankHeadConfirmationRepository.setMatchedAt);
 
 export const stockistHeadConfirmationService = {
   // Satu panggilan untuk seluruh halaman cross-check: stock grid + total stock + kas + bank +
@@ -187,13 +225,19 @@ export const stockistHeadConfirmationService = {
     ]);
 
     const rows = buildStockRows(items, checks, stockConfirmations);
+    // Reconcile klop kas & bank jalan di sini juga: halaman cross-check ikut menandai
+    // klop begitu dibuka, tanpa menunggu angkanya disimpan ulang.
+    const [kas, bank] = await Promise.all([
+      buildKasSummary(kasPockets, kasEntries, kasConfirmation),
+      buildBankSummary(bankSystemTotal, bankConfirmation),
+    ]);
 
     return {
       rows,
       stockTotals: buildStockTotals(rows, stockTotalConfirmation),
       companyTotal: companyTotal ? Number(companyTotal.totalIdr) : 0,
-      kas: buildKasSummary(kasPockets, kasEntries, kasConfirmation),
-      bank: buildIdrSummary(bankSystemTotal, bankConfirmation),
+      kas,
+      bank,
     };
   },
 
@@ -278,7 +322,7 @@ export const stockistHeadConfirmationService = {
   }) => {
     assertEditableDate(input.caller, input.date);
 
-    const result = await kasHeadConfirmationRepository.upsert({
+    await kasHeadConfirmationRepository.upsert({
       companyId: input.companyId,
       date: input.date,
       confirmedIdrValue: input.confirmedIdrValue,
@@ -286,10 +330,14 @@ export const stockistHeadConfirmationService = {
       confirmedBy: input.caller.id,
     });
 
-    // Sama seperti upsertStockTotalConfirmation: sertakan total PT terbaru di respons agar
-    // client tidak perlu refetch penuh.
-    const total = await recomputeCompanyTotal(input.companyId, input.date);
-    return { confirmation: result, companyTotal: Number(total.totalIdr) };
+    // Ringkasannya dibaca ulang supaya status klop + jam klopnya ikut ditandai di sini
+    // (reconcileMatch), lalu dikirim balik bersama total PT terbaru — client tidak perlu
+    // refetch penuh hanya untuk tahu apakah angkanya sudah klop.
+    const [summary, total] = await Promise.all([
+      stockistHeadConfirmationService.getKasConfirmation(input.companyId, input.date),
+      recomputeCompanyTotal(input.companyId, input.date),
+    ]);
+    return { confirmation: summary, companyTotal: Number(total.totalIdr) };
   },
 
   // Total sistem bank = jumlah saldo harian (Bank Harian) seluruh rekening aktif PT pada
@@ -299,7 +347,7 @@ export const stockistHeadConfirmationService = {
       bankHeadConfirmationRepository.findByCompanyAndDate(companyId, date),
       dailyBankEntryRepository.sumActiveByCompanyAndDate(companyId, date),
     ]);
-    return buildIdrSummary(systemTotal, confirmation);
+    return buildBankSummary(systemTotal, confirmation);
   },
 
   upsertBankConfirmation: async (input: {
@@ -311,7 +359,7 @@ export const stockistHeadConfirmationService = {
   }) => {
     assertEditableDate(input.caller, input.date);
 
-    const result = await bankHeadConfirmationRepository.upsert({
+    await bankHeadConfirmationRepository.upsert({
       companyId: input.companyId,
       date: input.date,
       confirmedIdrValue: input.confirmedIdrValue,
@@ -319,8 +367,12 @@ export const stockistHeadConfirmationService = {
       confirmedBy: input.caller.id,
     });
 
-    const total = await recomputeCompanyTotal(input.companyId, input.date);
-    return { confirmation: result, companyTotal: Number(total.totalIdr) };
+    // Lihat upsertKasConfirmation: status + jam klop ikut ditandai lewat pembacaan ulang.
+    const [summary, total] = await Promise.all([
+      stockistHeadConfirmationService.getBankConfirmation(input.companyId, input.date),
+      recomputeCompanyTotal(input.companyId, input.date),
+    ]);
+    return { confirmation: summary, companyTotal: Number(total.totalIdr) };
   },
 
   getCompanyTotal: (companyId: string, date: Date) =>

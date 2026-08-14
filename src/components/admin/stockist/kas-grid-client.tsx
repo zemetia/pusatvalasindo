@@ -22,6 +22,10 @@ import {
   type PendingCorrection,
   type ApprovedCorrection,
 } from "@/components/admin/stockist/daily-verify-cell"
+import {
+  HeadConfirmationSummary,
+  useHeadConfirmationMatch,
+} from "@/components/admin/stockist/head-confirmation-summary"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean }
 
@@ -84,6 +88,12 @@ export function KasGridClient({
     rowCount: rows.length,
     selectOnFocus: NAV_SELECT_ON_FOCUS,
   })
+  // Angka kepala cabang dari halaman Cross-Check, plus status & jam klopnya.
+  const { match: headMatch, refresh: refreshHeadMatch } = useHeadConfirmationMatch(
+    "kas",
+    companyId,
+    date
+  )
 
   const loadData = useCallback(async () => {
     if (!companyId || !date) return
@@ -113,7 +123,10 @@ export function KasGridClient({
       const builtRows: Row[] = pocketList.map((p) => {
         const entry = entries[p.id]
         const prev = previous[p.id]
-        const balance = entry?.balance ?? "0"
+        // Pocket tanpa entri tampil KOSONG, bukan pra-isi "0" — kalau dipra-isi, saldo nol
+        // yang memang benar tidak bisa dibedakan dari "belum diisi", dan angka 0 yang
+        // diketik user tidak menghasilkan perubahan apa pun sehingga tidak pernah tersimpan.
+        const balance = entry?.balance ?? ""
         const note = entry?.note ?? ""
         return {
           kasPocketId: p.id,
@@ -146,13 +159,27 @@ export function KasGridClient({
   }, [loadData])
 
   const updateRow = (id: string, field: "balance" | "note", val: string) => {
-    setRows((prev) => prev.map((r) => (r.kasPocketId === id ? { ...r, [field]: val } : r)))
+    setRows((prev) =>
+      prev.map((r) => (r.kasPocketId === id ? { ...r, [field]: val } : r))
+    )
   }
 
   const saveRow = async (id: string) => {
     const row = rowsRef.current.find((r) => r.kasPocketId === id)
     if (!row || !canManage) return
-    if (row.balance === row.savedBalance && row.note === row.savedNote) return
+    // Sel kosong = "belum diisi", bukan saldo 0: tidak ada entri yang dibuat. Sel yang
+    // dikosongkan padahal sudah punya entri dikembalikan ke angka tersimpan — menghapus
+    // saldo hanya boleh lewat alur koreksi, bukan efek samping mengosongkan input.
+    if (row.balance.trim() === "") {
+      if (row.hasEntry) {
+        setRows((prev) =>
+          prev.map((r) => (r.kasPocketId === id ? { ...r, balance: r.savedBalance } : r))
+        )
+      }
+      return
+    }
+    const isDirty = row.balance !== row.savedBalance || row.note !== row.savedNote
+    if (!isDirty) return
 
     setRows((prev) => prev.map((r) => (r.kasPocketId === id ? { ...r, saveState: "saving" } : r)))
 
@@ -172,10 +199,19 @@ export function KasGridClient({
       setRows((prev) =>
         prev.map((r) =>
           r.kasPocketId === id
-            ? { ...r, savedBalance: r.balance, savedNote: r.note, saveState: "saved", hasEntry: true }
+            ? {
+                ...r,
+                savedBalance: r.balance,
+                savedNote: r.note,
+                saveState: "saved",
+                hasEntry: true,
+              }
             : r
         )
       )
+      // Saldo berubah → selisih cross-check bisa baru saja tertutup (atau terbuka lagi).
+      // Server yang memutuskan & menyimpan jam klopnya.
+      refreshHeadMatch()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
       setRows((prev) => prev.map((r) => (r.kasPocketId === id ? { ...r, saveState: "error" } : r)))
@@ -214,6 +250,7 @@ export function KasGridClient({
               ...r,
               balance: next,
               savedBalance: next,
+              hasEntry: true,
               verifyStatus: "BENAR" as const,
               verifyNote: note ?? null,
               pendingCorrection: undefined,
@@ -225,8 +262,13 @@ export function KasGridClient({
               },
             }
           }
+          // Verifikasi baris kosong ikut membuat entrinya (saldo 0) di server — selnya
+          // ikut menampilkan 0, bukan tetap kosong.
           return {
             ...r,
+            hasEntry: true,
+            balance: r.hasEntry ? r.balance : "0",
+            savedBalance: r.hasEntry ? r.savedBalance : "0",
             verifyStatus: status,
             verifyNote: note ?? null,
             pendingCorrection: data.data?.correctionRequestId
@@ -239,6 +281,9 @@ export function KasGridClient({
           }
         })
       )
+      // Verifikasi bisa ikut mengubah saldo (koreksi langsung) atau membuat entri baru
+      // untuk baris kosong — dua-duanya menggeser total sistem.
+      refreshHeadMatch()
       return true
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
@@ -248,20 +293,15 @@ export function KasGridClient({
 
   const totals = useMemo(() => {
     let totalBalance = 0
-    let totalDelta = 0
     let unfilled = 0
     let belumVerifikasi = 0
     for (const r of rows) {
-      const balance = parseNum(r.balance)
-      const ref = r.previousBalance ?? 0
-      totalBalance += balance
-      totalDelta += balance - ref
+      totalBalance += parseNum(r.balance)
       if (!r.hasEntry) unfilled += 1
-      if (r.hasEntry && r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) {
-        belumVerifikasi += 1
-      }
+      // Baris kosong ikut dihitung: sekarang dia juga bisa dikonfirmasi.
+      if (r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) belumVerifikasi += 1
     }
-    return { totalBalance, totalDelta, unfilled, belumVerifikasi }
+    return { totalBalance, unfilled, belumVerifikasi }
   }, [rows])
 
   const onUnfilledChangeRef = useRef(onUnfilledChange)
@@ -323,7 +363,6 @@ export function KasGridClient({
               <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">
                 {isPast ? "Saldo Tanggal Ini" : "Saldo Hari Ini"}
               </TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
               {isPast && (
                 <TableHead className="sticky top-0 z-20 bg-background w-56">Konfirmasi</TableHead>
@@ -351,21 +390,13 @@ export function KasGridClient({
               <TableCell className="text-right">Total</TableCell>
               <TableCell />
               <TableCell className="text-right font-mono">Rp {fmt(totals.totalBalance)}</TableCell>
-              <TableCell
-                className={cn(
-                  "text-right font-mono",
-                  totals.totalDelta > 0 && "text-success",
-                  totals.totalDelta < 0 && "text-destructive"
-                )}
-              >
-                {totals.totalDelta > 0 ? "+" : ""}
-                {fmt(totals.totalDelta)}
-              </TableCell>
               <TableCell colSpan={isPast ? 3 : 2} />
             </TableRow>
           </TableBody>
         </Table>
       </div>
+
+      <HeadConfirmationSummary label="kas" localTotal={totals.totalBalance} match={headMatch} />
     </div>
   )
 }
@@ -407,7 +438,6 @@ function KasRowEdit({
 }) {
   const balance = parseNum(row.balance)
   const reference = row.previousBalance ?? 0
-  const delta = balance - reference
   const isUnfilled = !row.hasEntry
   // Saldo tanggal lampau dikunci — perubahannya wajib lewat pengajuan koreksi.
   const editable = canManage && !isPast
@@ -439,21 +469,12 @@ function KasRowEdit({
           ref={registerCell(rowIndex, "balance")}
           value={row.balance}
           disabled={!editable}
+          placeholder="Belum diisi"
           onValueChange={(val) => onChange(row.kasPocketId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.kasPocketId)}
           onKeyDown={onCellKeyDown(rowIndex, "balance")}
           className="text-right font-mono w-full"
         />
-      </TableCell>
-      <TableCell
-        className={cn(
-          "text-right font-mono text-sm",
-          delta > 0 && "text-success",
-          delta < 0 && "text-destructive"
-        )}
-      >
-        {delta > 0 ? "+" : ""}
-        {fmt(delta)}
       </TableCell>
       <TableCell>
         <Input
@@ -470,22 +491,21 @@ function KasRowEdit({
       </TableCell>
       {isPast && (
         <TableCell>
-          {row.hasEntry ? (
-            <DailyVerifyCell
-              status={row.verifyStatus}
-              note={row.verifyNote}
-              balance={balance}
-              pending={row.pendingCorrection}
-              approved={row.approvedCorrection}
-              canVerify={canManage}
-              canDirectCorrect={canDirectCorrect}
-              onVerify={(status, note, correctedBalance) =>
-                onVerify(row.kasPocketId, status, note, correctedBalance)
-              }
-            />
-          ) : (
-            <span className="text-xs text-muted-foreground">Tidak diisi</span>
-          )}
+          {/* Baris yang tidak diisi ikut dapat tombol Sesuai / Tidak sesuai — saldonya
+              diperlakukan sebagai 0 dan entrinya dibuat saat dikonfirmasi. */}
+          <DailyVerifyCell
+            status={row.verifyStatus}
+            note={row.verifyNote}
+            balance={balance}
+            pending={row.pendingCorrection}
+            approved={row.approvedCorrection}
+            canVerify={canManage}
+            canDirectCorrect={canDirectCorrect}
+            unfilled={isUnfilled}
+            onVerify={(status, note, correctedBalance) =>
+              onVerify(row.kasPocketId, status, note, correctedBalance)
+            }
+          />
         </TableCell>
       )}
       <TableCell>

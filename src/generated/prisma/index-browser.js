@@ -581,6 +581,7 @@ exports.Prisma.HeldFundScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
   date: 'date',
+  kind: 'kind',
   name: 'name',
   amount: 'amount',
   note: 'note',
@@ -826,6 +827,7 @@ exports.Prisma.KasHeadConfirmationScalarFieldEnum = {
   note: 'note',
   confirmedBy: 'confirmedBy',
   confirmedAt: 'confirmedAt',
+  matchedAt: 'matchedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -838,6 +840,7 @@ exports.Prisma.BankHeadConfirmationScalarFieldEnum = {
   note: 'note',
   confirmedBy: 'confirmedBy',
   confirmedAt: 'confirmedAt',
+  matchedAt: 'matchedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1058,6 +1061,11 @@ exports.PayrollEntryStatus = exports.$Enums.PayrollEntryStatus = {
 exports.SalaryComponentKind = exports.$Enums.SalaryComponentKind = {
   ALLOWANCE: 'ALLOWANCE',
   DEDUCTION: 'DEDUCTION'
+};
+
+exports.HeldFundKind = exports.$Enums.HeldFundKind = {
+  CREDIT: 'CREDIT',
+  DEBIT: 'DEBIT'
 };
 
 exports.RefiningMethod = exports.$Enums.RefiningMethod = {

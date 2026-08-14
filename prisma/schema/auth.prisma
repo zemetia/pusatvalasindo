@@ -96,6 +96,8 @@ model user {
   payrollRunsGenerated PayrollRun[]     @relation("PayrollRunGeneratedBy")
   payrollRunsFinalized PayrollRun[]     @relation("PayrollRunFinalizedBy")
   payrollRulesCreated  PayrollRule[]    @relation("PayrollRuleCreatedBy")
+  heldFundsCreated   HeldFund[]         @relation("HeldFundCreatedBy")
+  heldFundsSettled   HeldFund[]         @relation("HeldFundSettledBy")
   samples            Sample[]
   account            account[]
   session            session[]

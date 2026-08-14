@@ -6,6 +6,7 @@ import { handleError } from "@/backend/helpers/handle-error";
 import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { heldFundRepository } from "@/backend/repositories/held-fund.repository";
+import { toHeldFundRow } from "@/backend/services/held-fund.service";
 import { NotFoundError } from "@/backend/errors/app-error";
 
 const settleSchema = z.object({ settled: z.boolean() });
@@ -40,16 +41,7 @@ export const PATCH = withValidation(settleSchema)(
       const updated = await heldFundRepository.setSettled(id, ctx.body.settled, caller.userId);
 
       return NextResponse.json(
-        ok(
-          {
-            id: updated.id,
-            name: updated.name,
-            amount: updated.amount.toString(),
-            note: updated.note,
-            settledAt: updated.settledAt?.toISOString() ?? null,
-          },
-          ctx.body.settled ? "Ditandai lunas" : "Ditandai belum lunas"
-        )
+        ok(toHeldFundRow(updated), ctx.body.settled ? "Ditandai lunas" : "Ditandai belum lunas")
       );
     } catch (e) {
       return handleError(e);

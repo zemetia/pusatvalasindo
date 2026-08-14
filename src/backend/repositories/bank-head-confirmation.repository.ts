@@ -32,4 +32,8 @@ export const bankHeadConfirmationRepository = {
         confirmedAt: new Date(),
       },
     }),
+
+  /** Jam klop — lihat `reconcileMatch` di stockist-head-confirmation.service. */
+  setMatchedAt: (id: string, matchedAt: Date | null) =>
+    prisma.bankHeadConfirmation.update({ where: { id }, data: { matchedAt } }),
 };

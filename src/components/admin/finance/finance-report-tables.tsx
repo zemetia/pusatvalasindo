@@ -446,14 +446,18 @@ export function QualityTable({ companies }: { companies: CompanyFinanceReport[] 
 /* ── Dana tertahan ────────────────────────────────────────────────────────── */
 
 /**
- * Dana Tertahan per PT: posisi belum lunas di akhir periode, berapa yang cair,
- * dan seberapa besar piutang itu dibanding aset yang sudah dikonfirmasi.
+ * Rekonsiliasi Saldo Fisik → Posisi Bersih, per PT.
  *
- * Kolom terakhir itulah alasan tabel ini ada. "Belum lunas Rp 40 juta" tidak
- * berarti apa-apa sampai dibandingkan dengan posisi asetnya — angka yang sama
- * bisa berarti kebocoran serius di satu PT dan pembulatan di PT lain.
+ * Inilah tabel yang menjawab "sebenarnya punya berapa". Dibaca dari kiri ke
+ * kanan sebagai satu kalimat: yang ada secara fisik, ditambah yang masih harus
+ * ditagih, dikurangi yang masih harus dibayar, sama dengan posisi sebenarnya.
+ *
+ * Kolom terakhir sengaja persentase terhadap Saldo Fisik PT-nya sendiri, bukan
+ * terhadap grup: "tertahan Rp 40 juta" tidak berarti apa-apa sampai dibandingkan
+ * dengan posisi PT yang menanggungnya — angka yang sama bisa berarti kebocoran
+ * serius di satu PT dan pembulatan di PT lain.
  */
-export function HeldFundTable({
+export function SettlementTable({
   companies,
   group,
 }: {
@@ -465,41 +469,29 @@ export function HeldFundTable({
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           <TableHead className={HEAD}>PT</TableHead>
-          <TableHead className={HEAD_NUMERIC}>Belum Lunas</TableHead>
-          <TableHead className={HEAD_NUMERIC}>Catatan</TableHead>
-          <TableHead className={HEAD_NUMERIC}>Cair Periode Ini</TableHead>
-          <TableHead className={HEAD_NUMERIC}>Tercatat Periode Ini</TableHead>
-          <TableHead className={HEAD_NUMERIC}>vs Total Aset</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Saldo Fisik</TableHead>
+          <TableHead className={HEAD_NUMERIC}>+ Piutang (Credit)</TableHead>
+          <TableHead className={HEAD_NUMERIC}>− Hutang (Debit)</TableHead>
+          <TableHead className={HEAD_NUMERIC}>= Posisi Bersih</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Selisih vs Fisik</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {companies.map((company) => {
-          const held = company.heldFunds;
+          const s = company.settlement;
           return (
             <TableRow key={company.id}>
               <TableCell className="font-medium">{company.name}</TableCell>
-              <TableCell
-                className={cn(
-                  NUMERIC,
-                  held.outstanding > 0 ? "text-warning font-medium" : "text-muted-foreground",
-                )}
-              >
-                {formatIdr(held.outstanding)}
+              <TableCell className={NUMERIC}>{formatIdr(s.physical)}</TableCell>
+              <TableCell className={cn(NUMERIC, s.receivable > 0 && "text-warning")}>
+                {formatIdr(s.receivable)}
               </TableCell>
-              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-                {formatCount(held.outstandingCount)}
+              <TableCell className={cn(NUMERIC, s.payable > 0 && "text-destructive")}>
+                {formatIdr(s.payable)}
               </TableCell>
-              <TableCell className={cn(NUMERIC, held.settled > 0 && "text-success")}>
-                {formatIdr(held.settled)}
-              </TableCell>
-              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-                {formatIdr(held.added)}
-              </TableCell>
-              {/* Porsi terhadap posisi aset PT-nya sendiri, bukan terhadap grup:
-                  yang ingin diketahui adalah seberapa berat piutang itu untuk PT
-                  yang menanggungnya. */}
-              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-                {formatPercent(share(held.outstanding, company.closing.total))}
+              <TableCell className={cn(NUMERIC, "font-medium")}>{formatIdr(s.net)}</TableCell>
+              <TableCell className={NUMERIC}>
+                <Diff value={company.heldFunds.netAdjustment} />
               </TableCell>
             </TableRow>
           );
@@ -509,21 +501,122 @@ export function HeldFundTable({
         <TableRow className="hover:bg-transparent">
           <TableCell className="font-semibold">Konsolidasi</TableCell>
           <TableCell className={cn(NUMERIC, "font-semibold")}>
-            {formatIdr(group.heldFunds.outstanding)}
-          </TableCell>
-          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-            {formatCount(group.heldFunds.outstandingCount)}
+            {formatIdr(group.settlement.physical)}
           </TableCell>
           <TableCell className={cn(NUMERIC, "font-semibold")}>
-            {formatIdr(group.heldFunds.settled)}
+            {formatIdr(group.settlement.receivable)}
           </TableCell>
-          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-            {formatIdr(group.heldFunds.added)}
+          <TableCell className={cn(NUMERIC, "font-semibold")}>
+            {formatIdr(group.settlement.payable)}
           </TableCell>
-          <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
-            {formatPercent(share(group.heldFunds.outstanding, group.closing.total))}
+          <TableCell className={cn(NUMERIC, "font-semibold")}>
+            {formatIdr(group.settlement.net)}
+          </TableCell>
+          <TableCell className={NUMERIC}>
+            <Diff value={group.heldFunds.netAdjustment} />
           </TableCell>
         </TableRow>
+      </TableFooter>
+    </Table>
+  );
+}
+
+/**
+ * Rincian Dana Tertahan per PT **per arah** — dua baris tiap PT, Credit lalu
+ * Debit.
+ *
+ * Sengaja tidak digabung jadi satu baris per PT dengan kolom kembar: piutang dan
+ * hutang punya kolom yang persis sama artinya (belum lunas, cair, tercatat), dan
+ * menyandingkannya sebagai baris membuat keduanya terbaca dengan skala yang sama
+ * tanpa tabel melebar jadi sepuluh kolom.
+ */
+export function HeldFundTable({
+  companies,
+  group,
+}: {
+  companies: CompanyFinanceReport[];
+  group: GroupFinanceReport;
+}) {
+  const KINDS = [
+    { key: "credit" as const, label: "Credit (Piutang)", tone: "text-warning" },
+    { key: "debit" as const, label: "Debit (Hutang)", tone: "text-destructive" },
+  ];
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow className="hover:bg-transparent">
+          <TableHead className={HEAD}>PT</TableHead>
+          <TableHead className={HEAD}>Arah</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Belum Lunas</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Catatan</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Lunas Periode Ini</TableHead>
+          <TableHead className={HEAD_NUMERIC}>Tercatat Periode Ini</TableHead>
+          <TableHead className={HEAD_NUMERIC}>vs Saldo Fisik</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {companies.flatMap((company) =>
+          KINDS.map(({ key, label, tone }, i) => {
+            const held = company.heldFunds[key];
+            return (
+              <TableRow key={`${company.id}-${key}`}>
+                {/* Nama PT hanya di baris pertama: mengulangnya di baris kedua
+                    membuat mata membacanya sebagai dua PT berbeda. */}
+                <TableCell className={cn("font-medium", i > 0 && "text-transparent select-none")}>
+                  {company.name}
+                </TableCell>
+                <TableCell className="text-muted-foreground text-xs">{label}</TableCell>
+                <TableCell
+                  className={cn(
+                    NUMERIC,
+                    held.outstanding > 0 ? cn(tone, "font-medium") : "text-muted-foreground",
+                  )}
+                >
+                  {formatIdr(held.outstanding)}
+                </TableCell>
+                <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                  {formatCount(held.outstandingCount)}
+                </TableCell>
+                <TableCell className={cn(NUMERIC, held.settled > 0 && "text-success")}>
+                  {formatIdr(held.settled)}
+                </TableCell>
+                <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                  {formatIdr(held.added)}
+                </TableCell>
+                <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                  {formatPercent(share(held.outstanding, company.settlement.physical))}
+                </TableCell>
+              </TableRow>
+            );
+          }),
+        )}
+      </TableBody>
+      <TableFooter>
+        {KINDS.map(({ key, label }) => {
+          const held = group.heldFunds[key];
+          return (
+            <TableRow key={key} className="hover:bg-transparent">
+              <TableCell className="font-semibold">Konsolidasi</TableCell>
+              <TableCell className="text-muted-foreground text-xs">{label}</TableCell>
+              <TableCell className={cn(NUMERIC, "font-semibold")}>
+                {formatIdr(held.outstanding)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatCount(held.outstandingCount)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "font-semibold")}>
+                {formatIdr(held.settled)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatIdr(held.added)}
+              </TableCell>
+              <TableCell className={cn(NUMERIC, "text-muted-foreground")}>
+                {formatPercent(share(held.outstanding, group.settlement.physical))}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableFooter>
     </Table>
   );

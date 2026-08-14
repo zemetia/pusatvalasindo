@@ -9,12 +9,14 @@ import { PageShell, PageHeader } from "@/components/admin/page-shell";
 import { HeldFundPageClient } from "@/components/admin/finance/held-fund-page-client";
 
 /**
- * Dana Tertahan (Hutang) — uang yang belum masuk, dicatat per tanggal.
+ * Dana Tertahan (Hutang) — uang yang belum berpindah, dicatat per tanggal,
+ * dengan arah eksplisit: Credit (piutang) dan Debit (hutang perusahaan).
  *
  * Berbeda dari halaman input harian lain: tiap tanggal dimulai kosong dan
  * barisnya ditambah sebanyak yang memang terjadi. Statusnya bertahan melintasi
- * tanggal, jadi tanggal lampau dibuka untuk *melunasi*, bukan untuk mengoreksi
- * angka — lihat pembagian izinnya di `held-fund-guard.ts`.
+ * tanggal — karena itu tampilan bawaannya adalah daftar SELURUH yang belum
+ * lunas, bukan isi satu tanggal. Tanggal lampau dibuka untuk *melunasi*, bukan
+ * untuk mengoreksi angka — lihat pembagian izinnya di `held-fund-guard.ts`.
  */
 export default async function HutangPage({
   params,
@@ -61,7 +63,7 @@ export default async function HutangPage({
     <PageShell>
       <PageHeader
         title="Dana Tertahan"
-        description="Hutang orang ke perusahaan — uang yang belum masuk. Tiap hari dimulai kosong; buka tanggal lampau untuk menandai yang sudah dibayar."
+        description="Hutang yang belum selesai di kedua arah — Credit (piutang, uang akan masuk) dan Debit (hutang perusahaan, uang akan keluar). Daftarnya lintas tanggal; tandai Lunas begitu uangnya berpindah."
         icon={<IconClockDollar className="size-5" />}
       />
       <HeldFundPageClient

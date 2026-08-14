@@ -29,6 +29,10 @@ import { IconAlertTriangle, IconCheck, IconChecks, IconLoader2, IconSearch, Icon
 import { cn } from "@/lib/utils"
 import { StockistPocketSheet } from "@/components/admin/stockist/stockist-pocket-sheet"
 import type { PendingCorrection, ApprovedCorrection } from "@/components/admin/stockist/daily-verify-cell"
+import {
+  StockHeadTotalSummary,
+  useStockHeadTotal,
+} from "@/components/admin/stockist/head-confirmation-summary"
 
 type Pocket = { id: string; name: string; code: string | null; isActive: boolean; isDefault: boolean }
 type StockItem = { id: string; code: string | null; name: string; type: "CURRENCY" | "LOGAM_MULIA" }
@@ -333,9 +337,17 @@ export function StockistGridClient({
     )
   }, [currencies, currencyFilter])
 
+  // Kolom "Total" ditaruh persis di sebelah nama mata uang. Itu angka yang paling sering
+  // dibaca di grid ini, dan di ujung kanan dia hilang di balik scroll horizontal begitu
+  // pocket-nya banyak. Sort-nya stabil, jadi urutan pocket lain tidak berubah.
+  const orderedPockets = useMemo(
+    () => [...pockets].sort((a, b) => Number(b.isDefault) - Number(a.isDefault)),
+    [pockets]
+  )
+
   // Navigasi panah antar sel opname: baris = mata uang yang tampil, kolom = pocket sesuai
   // urutan header. Kolom "Total" tidak punya input jadi otomatis dilewati saat lompat.
-  const navColumns = useMemo(() => pockets.map((p) => p.id), [pockets])
+  const navColumns = useMemo(() => orderedPockets.map((p) => p.id), [orderedPockets])
   const { registerCell, handleCellKeyDown } = useGridKeyboardNav({
     columns: navColumns,
     rowCount: filteredCurrencies.length,
@@ -383,6 +395,9 @@ export function StockistGridClient({
     }
     return map
   }, [managePockets, currencies, checks])
+
+  // Total IDR stock hasil hitung ulang kepala cabang (halaman Cross-Check) — info saja.
+  const stockHeadTotal = useStockHeadTotal(companyId, date)
 
   const activePocket = activeCell ? pockets.find((p) => p.id === activeCell.pocketId) : undefined
   const activeCurrency = activeCell
@@ -470,12 +485,12 @@ export function StockistGridClient({
               <TableHead className="sticky left-0 top-0 z-30 bg-background border-r">
                 Mata Uang
               </TableHead>
-              {pockets.map((p) => (
+              {orderedPockets.map((p) => (
                 <TableHead
                   key={p.id}
                   className={cn(
                     "sticky top-0 z-20 bg-background text-center min-w-[104px]",
-                    p.isDefault && "font-semibold"
+                    p.isDefault && "font-semibold border-r"
                   )}
                 >
                   {p.name}
@@ -512,14 +527,14 @@ export function StockistGridClient({
                     </div>
                   )}
                 </TableCell>
-                {pockets.map((p) => {
+                {orderedPockets.map((p) => {
                   if (p.isDefault) {
                     // Pocket "Total" — read-only, saldonya dihitung backend dari pocket lain.
                     return (
                       <TableCell
                         key={p.id}
                         className={cn(
-                          "p-0 min-w-[104px]",
+                          "p-0 min-w-[104px] border-r",
                           isLogam ? "bg-muted" : "bg-muted/40"
                         )}
                       >
@@ -631,6 +646,8 @@ export function StockistGridClient({
           </TableBody>
         </Table>
       </div>
+
+      <StockHeadTotalSummary total={stockHeadTotal} />
 
       {canManage && (
         <Drawer open={isMobile && !!activeCell} onOpenChange={(o) => !o && setActiveCell(null)}>

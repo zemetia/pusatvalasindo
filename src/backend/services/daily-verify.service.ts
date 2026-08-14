@@ -97,11 +97,21 @@ async function verifyEntry(params: {
 export const dailyVerifyService = {
   verifyKas: async (input: VerifyInput & { kasPocketId: string }) => {
     assertVerifiable(input);
-    const entry = await kasDailyEntryRepository.findByPocketAndDate(input.kasPocketId, input.date);
-    if (!entry) throw new NotFoundError("Saldo kas tanggal ini belum diisi — tidak ada yang diverifikasi");
 
-    const pocket = await kasPocketRepository.findById(entry.kasPocketId);
+    const pocket = await kasPocketRepository.findById(input.kasPocketId);
     if (!pocket) throw new NotFoundError("Kas pocket tidak ditemukan");
+
+    // Baris yang tidak pernah diisi tetap harus bisa dikonfirmasi: "Sesuai" pada baris
+    // kosong = pernyataan bahwa saldonya memang nol. Entrinya dibuat di sini (balance 0)
+    // supaya hasil verifikasi punya tempat menempel — sama seperti baris yang sudah berisi.
+    const entry =
+      (await kasDailyEntryRepository.findByPocketAndDate(input.kasPocketId, input.date)) ??
+      (await kasDailyEntryRepository.upsert({
+        kasPocketId: input.kasPocketId,
+        date: input.date,
+        balance: 0,
+        createdBy: input.verifiedBy ?? null,
+      }));
 
     return verifyEntry({
       entry,
@@ -116,13 +126,20 @@ export const dailyVerifyService = {
 
   verifyBank: async (input: VerifyInput & { bankAccountId: string }) => {
     assertVerifiable(input);
-    const entry = await dailyBankEntryRepository.findByAccountAndDate(input.bankAccountId, input.date);
-    if (!entry) {
-      throw new NotFoundError("Saldo bank tanggal ini belum diisi — tidak ada yang diverifikasi");
-    }
 
-    const account = await bankAccountRepository.findById(entry.bankAccountId);
+    const account = await bankAccountRepository.findById(input.bankAccountId);
     if (!account) throw new NotFoundError("Rekening tidak ditemukan");
+
+    // Sama seperti kas: rekening yang belum diisi tetap bisa dikonfirmasi, entrinya
+    // dibuat dengan saldo 0 supaya statusnya tersimpan.
+    const entry =
+      (await dailyBankEntryRepository.findByAccountAndDate(input.bankAccountId, input.date)) ??
+      (await dailyBankEntryRepository.upsertOne({
+        bankAccountId: input.bankAccountId,
+        date: input.date,
+        balance: 0,
+        createdBy: input.verifiedBy ?? null,
+      }));
 
     return verifyEntry({
       entry,

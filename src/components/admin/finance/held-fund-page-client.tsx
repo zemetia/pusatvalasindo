@@ -7,6 +7,15 @@ import { NumberInput } from "@/components/ui/number-input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -15,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Combobox } from "@/components/ui/combobox"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Table,
   TableBody,
@@ -31,6 +41,8 @@ import {
 } from "@/components/admin/page-shell"
 import {
   IconAlertTriangle,
+  IconArrowDownLeft,
+  IconArrowUpRight,
   IconCheck,
   IconClockDollar,
   IconLoader2,
@@ -48,19 +60,38 @@ type Company = { id: string; name: string }
 
 type SaveState = "idle" | "saving" | "saved" | "error"
 
+/**
+ * Arah hutang, dari sisi perusahaan. Dua-duanya kewajiban yang belum selesai,
+ * tapi uangnya bergerak ke arah yang berlawanan — karena itu tidak pernah
+ * dijumlahkan jadi satu angka bersih di mana pun di halaman ini.
+ */
+type Kind = "CREDIT" | "DEBIT"
+
 /** Baris apa adanya dari server. */
 type ServerRow = {
   id: string
+  date: string
+  kind: Kind
   name: string
   amount: string
   note: string | null
   settledAt: string | null
+  createdByName: string | null
+  settledByName: string | null
+}
+
+type Outstanding = {
+  total: number
+  count: number
+  credit: { total: number; count: number }
+  debit: { total: number; count: number }
 }
 
 type Payload = {
   serverDate?: string | null
   rows?: ServerRow[]
-  outstanding?: { total: number; count: number }
+  outstandingRows?: ServerRow[]
+  outstanding?: Outstanding
 }
 
 /** Baris + draft yang sedang diketik. `saved*` yang menentukan perlu-tidaknya simpan. */
@@ -76,12 +107,40 @@ const LAST_SELECTION_KEY = "dana-tertahan:last-company"
 const NAV_COLUMNS = ["name", "amount"] as const
 const NAV_SELECT_ON_FOCUS = ["amount"] as const
 
+const EMPTY_OUTSTANDING: Outstanding = {
+  total: 0,
+  count: 0,
+  credit: { total: 0, count: 0 },
+  debit: { total: 0, count: 0 },
+}
+
+/** Satu tempat penamaan arah, supaya label di badge, dialog, dan toast tidak berbeda kata. */
+const KIND_META: Record<Kind, { label: string; long: string; badge: "info" | "danger" }> = {
+  CREDIT: {
+    label: "Credit",
+    long: "Credit — orang berhutang ke perusahaan (uang akan masuk)",
+    badge: "info",
+  },
+  DEBIT: {
+    label: "Debit",
+    long: "Debit — perusahaan berhutang ke orang (uang akan keluar)",
+    badge: "danger",
+  },
+}
+
+const kindKey = (kind: Kind): "credit" | "debit" => (kind === "DEBIT" ? "debit" : "credit")
+
 function toDateKey(d: Date) {
   return d.toISOString().slice(0, 10)
 }
 
 function fmt(n: number) {
   return n.toLocaleString("id-ID", { maximumFractionDigits: 0 })
+}
+
+function fmtDate(iso: string) {
+  const [y, m, d] = iso.split("-")
+  return `${d}/${m}/${y}`
 }
 
 function parseNum(s: string): number {
@@ -134,7 +193,16 @@ interface Props {
 }
 
 /**
- * Dana Tertahan: hutang orang ke perusahaan, dicatat per tanggal.
+ * Dana Tertahan: uang yang tertahan di kedua arah, dicatat per tanggal.
+ *
+ * Halaman ini punya dua tampilan yang menjawab dua pertanyaan berbeda, dan
+ * keduanya perlu ada:
+ *
+ * • **Belum Lunas** — daftar SELURUH hutang yang masih menggantung, credit &
+ *   debit, lintas tanggal. Inilah tampilan bawaan: yang perlu ditindak adalah
+ *   hutang yang belum selesai, bukan hutang yang kebetulan dicatat hari ini.
+ * • **Input Tanggal** — grid pengisian untuk satu tanggal, termasuk yang sudah
+ *   lunas, dengan alur ketik-lalu-blur seperti halaman harian lain.
  *
  * Tiga izin yang berbeda bertemu di satu tabel, dan UI-nya harus jujur soal
  * ketiganya — server tetap yang memutuskan, tapi input yang pasti ditolak tidak
@@ -193,10 +261,26 @@ export function HeldFundPageClient({
   )
 
   const [rows, setRows] = useState<Row[]>(() => (seed?.rows ?? []).map(toRow))
-  const [outstanding, setOutstanding] = useState(() => seed?.outstanding ?? { total: 0, count: 0 })
+  const [outstandingRows, setOutstandingRows] = useState<Row[]>(() =>
+    (seed?.outstandingRows ?? []).map(toRow)
+  )
+  const [outstanding, setOutstanding] = useState<Outstanding>(
+    () => seed?.outstanding ?? EMPTY_OUTSTANDING
+  )
   const [serverDate, setServerDate] = useState<string | null>(() => seed?.serverDate ?? null)
   const [fetching, setFetching] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [kindFilter, setKindFilter] = useState<Kind | "ALL">("ALL")
+
+  /**
+   * Pelunasan tidak pernah langsung dieksekusi dari klik tombol. Baris yang
+   * ditunjuk disimpan di sini dulu supaya dialog konfirmasi bisa menyebut nama,
+   * arah, dan angkanya — "Lunas" berarti uangnya dianggap sudah berpindah, dan
+   * salah klik pada baris tetangga menghapus tagihan yang masih hidup dari
+   * daftar tanpa jejak yang terlihat di layar.
+   */
+  const [confirm, setConfirm] = useState<{ row: Row; settled: boolean } | null>(null)
+  const [confirming, setConfirming] = useState(false)
 
   const inScope = (list: string[] | null) =>
     !!companyId && (list === null || list.includes(companyId))
@@ -230,15 +314,18 @@ export function HeldFundPageClient({
       if (!res.ok || !data.success) {
         toast.error(data.error || data.message || "Gagal memuat data")
         setRows([])
+        setOutstandingRows([])
         return
       }
       const payload = data.data as Payload
       setServerDate(payload.serverDate ?? null)
       setRows((payload.rows ?? []).map(toRow))
-      setOutstanding(payload.outstanding ?? { total: 0, count: 0 })
+      setOutstandingRows((payload.outstandingRows ?? []).map(toRow))
+      setOutstanding(payload.outstanding ?? EMPTY_OUTSTANDING)
     } catch {
       toast.error("Gagal memuat data")
       setRows([])
+      setOutstandingRows([])
     } finally {
       setFetching(false)
     }
@@ -258,15 +345,36 @@ export function HeldFundPageClient({
 
   // Baris yang sedang dioperasikan selalu DIKIRIM oleh pemanggilnya, tidak dicari
   // lewat ref: setiap handler di bawah dipicu oleh event pada satu baris, dan
-  // baris itu sudah ada di tangan `HeldFundRow`. Menyimpan salinan `rows` di ref
+  // baris itu sudah ada di tangan pemanggilnya. Menyimpan salinan `rows` di ref
   // hanya untuk dicari ulang berarti membaca ref saat render — dilarang lint
   // `react-hooks/purity`, dan memang tidak perlu di sini.
 
-  const patchRow = (id: string, patch: Partial<Row>) =>
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)))
+  /**
+   * Satu baris bisa hadir di DUA daftar sekaligus: grid tanggal yang sedang
+   * dibuka dan daftar belum-lunas lintas tanggal. Setiap perubahan karena itu
+   * selalu dikenakan ke keduanya — kalau tidak, mengubah angka di satu tab akan
+   * menyisakan angka lama di tab sebelah sampai halaman dimuat ulang.
+   */
+  const patchRow = (id: string, patch: Partial<Row>) => {
+    const apply = (prev: Row[]) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r))
+    setRows(apply)
+    setOutstandingRows(apply)
+  }
 
   const updateDraft = (id: string, field: "name" | "amount", val: string) =>
     patchRow(id, { [field]: val } as Partial<Row>)
+
+  /** Menggeser posisi tertahan seketika, per arah — tanpa ini angka besar di atas baru benar setelah reload. */
+  const shiftOutstanding = (kind: Kind, deltaTotal: number, deltaCount: number) =>
+    setOutstanding((o) => {
+      const bucket = { total: o[kindKey(kind)].total + deltaTotal, count: o[kindKey(kind)].count + deltaCount }
+      return {
+        total: o.total + deltaTotal,
+        count: o.count + deltaCount,
+        credit: kind === "CREDIT" ? bucket : o.credit,
+        debit: kind === "DEBIT" ? bucket : o.debit,
+      }
+    })
 
   /**
    * Autosave saat kehilangan fokus — tidak ada tombol simpan di grid ini.
@@ -307,32 +415,32 @@ export function HeldFundPageClient({
         savedAmount: row.amount,
         saveState: "saved",
       })
-      // Baris yang belum lunas ikut mengubah posisi tertahan seketika — tanpa ini
-      // angka besar di atas baru benar setelah reload.
-      if (!row.settledAt && delta !== 0) {
-        setOutstanding((o) => ({ ...o, total: o.total + delta }))
-      }
+      if (!row.settledAt && delta !== 0) shiftOutstanding(row.kind, delta, 0)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
       patchRow(row.id, { saveState: "error" })
     }
   }
 
-  const addRow = async (name: string) => {
+  const addRow = async (kind: Kind, name: string) => {
     const res = await fetch("/api/dana-tertahan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ companyId, date, name }),
+      body: JSON.stringify({ companyId, date, kind, name }),
     })
     const data = await res.json()
     if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menambah")
 
-    const created = data.data as ServerRow
-    setRows((prev) => [...prev, toRow(created)])
-    setOutstanding((o) => ({ ...o, count: o.count + 1 }))
+    const created = toRow(data.data as ServerRow)
+    setRows((prev) => [...prev, created])
+    // Baris baru selalu belum lunas, jadi ia juga anggota daftar belum-lunas.
+    setOutstandingRows((prev) => [...prev, created])
+    shiftOutstanding(kind, 0, 1)
   }
 
-  const setSettled = async (row: Row, settled: boolean) => {
+  /** Eksekusi pelunasan — hanya dipanggil dari dialog konfirmasi, tidak dari tombol baris. */
+  const runSettle = async (row: Row, settled: boolean) => {
+    setConfirming(true)
     patchRow(row.id, { saveState: "saving" })
     try {
       const res = await fetch(`/api/dana-tertahan/${row.id}/lunas`, {
@@ -343,19 +451,33 @@ export function HeldFundPageClient({
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menyimpan")
 
+      const updated = data.data as ServerRow
       // Angka yang dipakai adalah yang SUDAH tersimpan, bukan draft yang sedang
       // diketik — kalau tidak, posisi tertahan bergeser memakai angka yang belum
       // pernah sampai ke server.
       const amount = parseNum(row.savedAmount)
-      patchRow(row.id, { settledAt: (data.data as ServerRow).settledAt, saveState: "idle" })
-      setOutstanding((o) => ({
-        total: settled ? o.total - amount : o.total + amount,
-        count: settled ? o.count - 1 : o.count + 1,
-      }))
+      patchRow(row.id, {
+        settledAt: updated.settledAt,
+        settledByName: updated.settledByName,
+        saveState: "idle",
+      })
+      // Daftar belum-lunas hanya memuat yang belum lunas: baris yang baru saja
+      // dilunasi keluar dari sana, dan yang dibatalkan kembali masuk.
+      setOutstandingRows((prev) =>
+        settled
+          ? prev.filter((r) => r.id !== row.id)
+          : prev.some((r) => r.id === row.id)
+            ? prev
+            : [...prev, { ...row, settledAt: null, settledByName: null, saveState: "idle" }]
+      )
+      shiftOutstanding(row.kind, settled ? -amount : amount, settled ? -1 : 1)
       toast.success(data.message ?? (settled ? "Ditandai lunas" : "Ditandai belum lunas"))
+      setConfirm(null)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
       patchRow(row.id, { saveState: "error" })
+    } finally {
+      setConfirming(false)
     }
   }
 
@@ -372,12 +494,8 @@ export function HeldFundPageClient({
       if (!res.ok || !data.success) throw new Error(data.message || data.error || "Gagal menghapus")
 
       setRows((prev) => prev.filter((r) => r.id !== row.id))
-      if (!row.settledAt) {
-        setOutstanding((o) => ({
-          total: o.total - parseNum(row.savedAmount),
-          count: o.count - 1,
-        }))
-      }
+      setOutstandingRows((prev) => prev.filter((r) => r.id !== row.id))
+      if (!row.settledAt) shiftOutstanding(row.kind, -parseNum(row.savedAmount), -1)
       toast.success("Catatan dihapus")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menghapus")
@@ -385,7 +503,7 @@ export function HeldFundPageClient({
     }
   }
 
-  /* ── Ringkasan tanggal yang dibuka ──────────────────────────────────────── */
+  /* ── Turunan ────────────────────────────────────────────────────────────── */
 
   const totals = useMemo(() => {
     let belumLunas = 0
@@ -401,6 +519,11 @@ export function HeldFundPageClient({
     }
     return { belumLunas, lunas, jumlahBelumLunas, all: belumLunas + lunas }
   }, [rows])
+
+  const visibleOutstanding = useMemo(
+    () => (kindFilter === "ALL" ? outstandingRows : outstandingRows.filter((r) => r.kind === kindFilter)),
+    [outstandingRows, kindFilter]
+  )
 
   const companyName = companies.find((c) => c.id === companyId)?.name ?? "-"
 
@@ -468,11 +591,19 @@ export function HeldFundPageClient({
           <MetricRow columns={3}>
             <MetricBlock
               size="hero"
-              label="Dana Tertahan"
+              label="Credit — Akan Masuk"
               prefix="Rp"
-              tone={outstanding.total > 0 ? "warning" : "muted"}
-              value={fmt(outstanding.total)}
-              meta={`${fmt(outstanding.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
+              tone={outstanding.credit.total > 0 ? "warning" : "muted"}
+              value={fmt(outstanding.credit.total)}
+              meta={`${fmt(outstanding.credit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
+            />
+            <MetricBlock
+              size="hero"
+              label="Debit — Akan Keluar"
+              prefix="Rp"
+              tone={outstanding.debit.total > 0 ? "destructive" : "muted"}
+              value={fmt(outstanding.debit.total)}
+              meta={`${fmt(outstanding.debit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
             />
             <MetricBlock
               size="secondary"
@@ -480,89 +611,199 @@ export function HeldFundPageClient({
               prefix="Rp"
               tone={totals.belumLunas > 0 ? "warning" : "muted"}
               value={fmt(totals.belumLunas)}
-              meta={`${fmt(totals.jumlahBelumLunas)} dari ${fmt(rows.length)} catatan`}
-            />
-            <MetricBlock
-              size="secondary"
-              label="Sudah Lunas Tanggal Ini"
-              prefix="Rp"
-              tone={totals.lunas > 0 ? "success" : "muted"}
-              value={fmt(totals.lunas)}
-              meta="Dicatat tanggal ini dan sudah dibayar"
+              meta={`${fmt(totals.jumlahBelumLunas)} dari ${fmt(rows.length)} catatan tanggal ${fmtDate(date)}`}
             />
           </MetricRow>
 
-          {/* ── Tabel ────────────────────────────────────────────────────── */}
-          {fetching && rows.length === 0 ? (
-            <p className="text-muted-foreground text-sm">Memuat data...</p>
-          ) : rows.length === 0 ? (
-            <SectionCard padded={false}>
-              <EmptyState
-                icon={<IconClockDollar className="size-5" />}
-                title="Tidak ada dana tertahan pada tanggal ini"
-                description={
-                  canEditContent
-                    ? "Kosong memang kondisi normal. Tambahkan hanya kalau ada uang yang belum masuk."
-                    : "Tanggal ini tidak punya catatan hutang."
-                }
-                action={
-                  canEditContent ? (
-                    <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
-                      <IconPlus className="size-4" />
-                      Tambah Dana Tertahan
-                    </Button>
-                  ) : undefined
-                }
-              />
-            </SectionCard>
-          ) : (
-            <div className="max-h-[65vh] overflow-y-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="bg-background sticky top-0 z-20">Nama</TableHead>
-                    <TableHead className="bg-background sticky top-0 z-20 w-52 text-right">
-                      Jumlah (IDR)
-                    </TableHead>
-                    <TableHead className="bg-background sticky top-0 z-20 w-32">Status</TableHead>
-                    <TableHead className="bg-background sticky top-0 z-20 w-48">Aksi</TableHead>
-                    <TableHead className="bg-background sticky top-0 z-20 w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.map((row, i) => (
-                    <HeldFundRow
-                      key={row.id}
-                      row={row}
-                      rowIndex={i}
-                      canEditContent={canEditContent}
-                      canSettle={canSettle}
-                      onDraft={updateDraft}
-                      onBlurSave={saveRow}
-                      onSettle={setSettled}
-                      onDelete={removeRow}
-                      registerCell={registerCell}
-                      onCellKeyDown={handleCellKeyDown}
-                    />
-                  ))}
-                  <TableRow className="bg-muted/50 font-medium">
-                    <TableCell className="text-right">Total tanggal ini</TableCell>
-                    <TableCell className="tabular text-right">Rp {fmt(totals.all)}</TableCell>
-                    <TableCell colSpan={3} className="text-muted-foreground text-xs">
-                      Belum lunas Rp {fmt(totals.belumLunas)}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-          )}
+          <Tabs defaultValue="outstanding" className="gap-4">
+            <TabsList>
+              <TabsTrigger value="outstanding">
+                Belum Lunas ({fmt(outstandingRows.length)})
+              </TabsTrigger>
+              <TabsTrigger value="input">Input Tanggal {fmtDate(date)}</TabsTrigger>
+            </TabsList>
+
+            {/* ── Daftar semua yang belum lunas ─────────────────────────── */}
+            <TabsContent value="outstanding" className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {(["ALL", "CREDIT", "DEBIT"] as const).map((k) => (
+                  <Button
+                    key={k}
+                    size="sm"
+                    variant={kindFilter === k ? "default" : "outline"}
+                    onClick={() => setKindFilter(k)}
+                  >
+                    {k === "ALL" ? "Semua" : KIND_META[k].label}
+                  </Button>
+                ))}
+                <span className="text-muted-foreground ml-2 text-xs">
+                  Menampilkan seluruh tanggal, bukan hanya {fmtDate(date)}.
+                </span>
+              </div>
+
+              {fetching && outstandingRows.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Memuat data...</p>
+              ) : visibleOutstanding.length === 0 ? (
+                <SectionCard padded={false}>
+                  <EmptyState
+                    icon={<IconCheck className="size-5" />}
+                    title="Tidak ada dana tertahan yang menggantung"
+                    description={
+                      kindFilter === "ALL"
+                        ? "Semua hutang credit maupun debit sudah dinyatakan lunas."
+                        : `Tidak ada hutang ${KIND_META[kindFilter].label.toLowerCase()} yang belum lunas.`
+                    }
+                  />
+                </SectionCard>
+              ) : (
+                <div className="max-h-[65vh] overflow-y-auto rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="bg-background sticky top-0 z-20 w-28">Tanggal</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-28">Jenis</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20">Nama</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-44 text-right">
+                          Jumlah (IDR)
+                        </TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-40">
+                          Dicatat oleh
+                        </TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-32">Aksi</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {visibleOutstanding.map((row) => (
+                        <TableRow key={row.id}>
+                          <TableCell className="tabular text-sm">{fmtDate(row.date)}</TableCell>
+                          <TableCell>
+                            <KindBadge kind={row.kind} />
+                          </TableCell>
+                          <TableCell className="text-sm font-medium">{row.savedName}</TableCell>
+                          <TableCell className="tabular text-right text-sm">
+                            Rp {fmt(parseNum(row.savedAmount))}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
+                            {row.createdByName ?? "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              disabled={!canSettle || row.saveState === "saving"}
+                              onClick={() => setConfirm({ row, settled: true })}
+                            >
+                              {row.saveState === "saving" ? (
+                                <IconLoader2 className="size-4 animate-spin" />
+                              ) : (
+                                <IconCheck className="size-4" />
+                              )}
+                              Lunas
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      <TableRow className="bg-muted/50 font-medium">
+                        <TableCell colSpan={3} className="text-right">
+                          Total belum lunas
+                          {kindFilter !== "ALL" && ` — ${KIND_META[kindFilter].label}`}
+                        </TableCell>
+                        <TableCell className="tabular text-right">
+                          Rp{" "}
+                          {fmt(
+                            visibleOutstanding.reduce((sum, r) => sum + parseNum(r.savedAmount), 0)
+                          )}
+                        </TableCell>
+                        <TableCell colSpan={2} className="text-muted-foreground text-xs">
+                          {fmt(visibleOutstanding.length)} catatan
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* ── Grid input satu tanggal ───────────────────────────────── */}
+            <TabsContent value="input" className="flex flex-col gap-3">
+              {fetching && rows.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Memuat data...</p>
+              ) : rows.length === 0 ? (
+                <SectionCard padded={false}>
+                  <EmptyState
+                    icon={<IconClockDollar className="size-5" />}
+                    title="Tidak ada dana tertahan pada tanggal ini"
+                    description={
+                      canEditContent
+                        ? "Kosong memang kondisi normal. Tambahkan hanya kalau ada uang yang belum masuk atau belum keluar."
+                        : "Tanggal ini tidak punya catatan hutang."
+                    }
+                    action={
+                      canEditContent ? (
+                        <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
+                          <IconPlus className="size-4" />
+                          Tambah Dana Tertahan
+                        </Button>
+                      ) : undefined
+                    }
+                  />
+                </SectionCard>
+              ) : (
+                <div className="max-h-[65vh] overflow-y-auto rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="bg-background sticky top-0 z-20 w-28">Jenis</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20">Nama</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-52 text-right">
+                          Jumlah (IDR)
+                        </TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-36">
+                          Dicatat oleh
+                        </TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-32">Status</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-48">Aksi</TableHead>
+                        <TableHead className="bg-background sticky top-0 z-20 w-10" />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rows.map((row, i) => (
+                        <HeldFundRow
+                          key={row.id}
+                          row={row}
+                          rowIndex={i}
+                          canEditContent={canEditContent}
+                          canSettle={canSettle}
+                          onDraft={updateDraft}
+                          onBlurSave={saveRow}
+                          onAskSettle={(r, settled) => setConfirm({ row: r, settled })}
+                          onDelete={removeRow}
+                          registerCell={registerCell}
+                          onCellKeyDown={handleCellKeyDown}
+                        />
+                      ))}
+                      <TableRow className="bg-muted/50 font-medium">
+                        <TableCell colSpan={2} className="text-right">
+                          Total tanggal ini
+                        </TableCell>
+                        <TableCell className="tabular text-right">Rp {fmt(totals.all)}</TableCell>
+                        <TableCell colSpan={4} className="text-muted-foreground text-xs">
+                          Belum lunas Rp {fmt(totals.belumLunas)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
 
           <p className="text-muted-foreground max-w-3xl text-xs leading-relaxed">
+            <strong className="font-medium">Credit</strong> = orang berhutang ke perusahaan (uang
+            akan masuk). <strong className="font-medium">Debit</strong> = perusahaan yang harus
+            membayar (uang akan keluar). Keduanya tidak pernah dijumlahkan jadi satu angka bersih.
             Jumlah tersimpan otomatis saat kolomnya kehilangan fokus — tidak ada tombol simpan.
             Menandai lunas <strong className="font-medium">tidak menghapus</strong> catatannya, jadi
-            riwayat &ldquo;pernah tertahan&rdquo; tetap terbaca di Laporan Finance. Angka
-            &ldquo;Dana Tertahan&rdquo; di atas menjumlahkan seluruh tanggal yang belum lunas, bukan
-            hanya tanggal yang sedang dibuka.
+            riwayat &ldquo;pernah tertahan&rdquo; tetap terbaca di Laporan Finance.
           </p>
         </>
       )}
@@ -573,11 +814,32 @@ export function HeldFundPageClient({
         date={date}
         onSubmit={addRow}
       />
+
+      <SettleConfirmDialog
+        target={confirm}
+        busy={confirming}
+        onCancel={() => setConfirm(null)}
+        onConfirm={runSettle}
+      />
     </div>
   )
 }
 
-/* ── Satu baris ───────────────────────────────────────────────────────────── */
+/* ── Potongan kecil ───────────────────────────────────────────────────────── */
+
+function KindBadge({ kind }: { kind: Kind }) {
+  const meta = KIND_META[kind]
+  return (
+    <Badge variant={meta.badge} title={meta.long}>
+      {kind === "CREDIT" ? (
+        <IconArrowDownLeft className="size-3.5" />
+      ) : (
+        <IconArrowUpRight className="size-3.5" />
+      )}
+      {meta.label}
+    </Badge>
+  )
+}
 
 function SaveIndicator({ state }: { state: SaveState }) {
   if (state === "saving") return <IconLoader2 className="text-muted-foreground size-4 animate-spin" />
@@ -586,6 +848,102 @@ function SaveIndicator({ state }: { state: SaveState }) {
   return <IconMinus className="text-muted-foreground/30 size-4" />
 }
 
+/**
+ * Lapisan konfirmasi pelunasan.
+ *
+ * Sengaja menyebut ulang nama, arah, tanggal, dan angkanya alih-alih bertanya
+ * "yakin?": yang perlu dicek user bukan kemauannya sendiri, melainkan apakah
+ * baris yang tersorot memang baris yang ia maksud. Daftar belum-lunas bisa
+ * berisi puluhan nama mirip dari tanggal berbeda.
+ */
+function SettleConfirmDialog({
+  target,
+  busy,
+  onCancel,
+  onConfirm,
+}: {
+  target: { row: Row; settled: boolean } | null
+  busy: boolean
+  onCancel: () => void
+  onConfirm: (row: Row, settled: boolean) => void
+}) {
+  const settled = target?.settled ?? true
+  const row = target?.row
+  const meta = row ? KIND_META[row.kind] : null
+
+  return (
+    <AlertDialog
+      open={target !== null}
+      onOpenChange={(open) => {
+        // Menutup di tengah request akan menyembunyikan hasilnya; tombolnya
+        // sendiri sudah dinonaktifkan, jadi ini menutup jalur Esc / klik luar.
+        if (!open && !busy) onCancel()
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {settled ? "Tandai lunas?" : "Batalkan status lunas?"}
+          </AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-2">
+              <p>
+                {settled
+                  ? "Catatan ini akan keluar dari daftar dana tertahan. Riwayatnya tetap tersimpan dan terbaca di Laporan Finance."
+                  : "Catatan ini akan kembali dihitung sebagai dana tertahan, dan jejak siapa yang melunasinya dihapus."}
+              </p>
+              {row && meta && (
+                <div className="text-foreground bg-muted/40 grid gap-1 rounded-md border p-3 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground text-xs">Nama</span>
+                    <span className="font-medium">{row.savedName}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground text-xs">Jenis</span>
+                    <span className="font-medium">{meta.long}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground text-xs">Tanggal dicatat</span>
+                    <span className="tabular font-medium">{fmtDate(row.date)}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground text-xs">Dicatat oleh</span>
+                    <span className="font-medium">{row.createdByName ?? "—"}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 border-t pt-1">
+                    <span className="text-muted-foreground text-xs">Jumlah</span>
+                    <span className="tabular text-base font-semibold">
+                      Rp {fmt(parseNum(row.savedAmount))}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={busy}>Batal</AlertDialogCancel>
+          {/* Tombol biasa, bukan AlertDialogAction: aksinya asinkron dan dialog
+              baru boleh tertutup setelah server menjawab, sedangkan
+              AlertDialogAction selalu menutup begitu diklik. */}
+          <Button disabled={busy || !row} onClick={() => row && onConfirm(row, settled)}>
+            {busy ? (
+              <IconLoader2 className="size-4 animate-spin" />
+            ) : settled ? (
+              <IconCheck className="size-4" />
+            ) : (
+              <IconRotate2 className="size-4" />
+            )}
+            {settled ? "Ya, tandai lunas" : "Ya, batalkan"}
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+/* ── Satu baris grid tanggal ──────────────────────────────────────────────── */
+
 function HeldFundRow({
   row,
   rowIndex,
@@ -593,7 +951,7 @@ function HeldFundRow({
   canSettle,
   onDraft,
   onBlurSave,
-  onSettle,
+  onAskSettle,
   onDelete,
   registerCell,
   onCellKeyDown,
@@ -604,7 +962,7 @@ function HeldFundRow({
   canSettle: boolean
   onDraft: (id: string, field: "name" | "amount", val: string) => void
   onBlurSave: (row: Row) => void
-  onSettle: (row: Row, settled: boolean) => void
+  onAskSettle: (row: Row, settled: boolean) => void
   onDelete: (row: Row) => void
   registerCell: ReturnType<typeof useGridKeyboardNav>["registerCell"]
   onCellKeyDown: ReturnType<typeof useGridKeyboardNav>["handleCellKeyDown"]
@@ -614,6 +972,9 @@ function HeldFundRow({
 
   return (
     <TableRow className={cn(settled && "bg-success-muted/40")}>
+      <TableCell>
+        <KindBadge kind={row.kind} />
+      </TableCell>
       <TableCell>
         <Input
           ref={registerCell(rowIndex, "name")}
@@ -637,9 +998,12 @@ function HeldFundRow({
           className="tabular w-full text-right"
         />
       </TableCell>
+      <TableCell className="text-muted-foreground text-sm">{row.createdByName ?? "—"}</TableCell>
       <TableCell>
         {settled ? (
-          <Badge variant="success">Lunas</Badge>
+          <Badge variant="success" title={row.settledByName ? `Dilunasi oleh ${row.settledByName}` : undefined}>
+            Lunas
+          </Badge>
         ) : (
           <Badge variant="warning">Tertahan</Badge>
         )}
@@ -647,12 +1011,13 @@ function HeldFundRow({
       <TableCell>
         <div className="flex items-center gap-1.5">
           {/* Sengaja tersedia untuk hari berjalan juga: uang bisa masuk di hari
-              yang sama, dan menunggu besok untuk mencatatnya tidak masuk akal. */}
+              yang sama, dan menunggu besok untuk mencatatnya tidak masuk akal.
+              Kliknya membuka konfirmasi, bukan langsung mengeksekusi. */}
           <Button
             size="sm"
             variant={settled ? "outline" : "default"}
             disabled={!canSettle || busy}
-            onClick={() => onSettle(row, !settled)}
+            onClick={() => onAskSettle(row, !settled)}
           >
             {busy ? (
               <IconLoader2 className="size-4 animate-spin" />
@@ -687,9 +1052,12 @@ function HeldFundRow({
 /* ── Pop-up tambah ────────────────────────────────────────────────────────── */
 
 /**
- * Sengaja hanya menanyakan **nama**. Jumlahnya diisi di grid supaya alur
+ * Menanyakan **arah** dan **nama**. Jumlahnya diisi di grid supaya alur
  * pengisiannya sama dengan halaman harian lain: satu kolom angka, simpan saat
  * kehilangan fokus, tanpa tombol simpan.
+ *
+ * Arahnya ditanyakan di sini, bukan diubah belakangan di tabel, karena inilah
+ * satu-satunya momen si pencatat benar-benar tahu uangnya akan masuk atau keluar.
  */
 function AddHeldFundDialog({
   open,
@@ -700,10 +1068,16 @@ function AddHeldFundDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   date: string
-  onSubmit: (name: string) => Promise<void>
+  onSubmit: (kind: Kind, name: string) => Promise<void>
 }) {
+  const [kind, setKind] = useState<Kind>("CREDIT")
   const [name, setName] = useState("")
   const [saving, setSaving] = useState(false)
+
+  const reset = () => {
+    setName("")
+    setKind("CREDIT")
+  }
 
   const submit = async () => {
     const trimmed = name.trim()
@@ -713,9 +1087,9 @@ function AddHeldFundDialog({
     }
     setSaving(true)
     try {
-      await onSubmit(trimmed)
-      toast.success("Dana tertahan ditambahkan — isi jumlahnya di tabel")
-      setName("")
+      await onSubmit(kind, trimmed)
+      toast.success(`${KIND_META[kind].label} ditambahkan — isi jumlahnya di tab Input Tanggal`)
+      reset()
       onOpenChange(false)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menambah")
@@ -728,30 +1102,71 @@ function AddHeldFundDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) setName("")
+        if (!next) reset()
         onOpenChange(next)
       }}
     >
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Tambah Dana Tertahan</DialogTitle>
           <DialogDescription>
-            Nama pihak yang uangnya belum masuk, untuk tanggal {date}. Jumlahnya diisi langsung di
-            tabel.
+            Untuk tanggal {fmtDate(date)}. Jumlahnya diisi langsung di tabel.
           </DialogDescription>
         </DialogHeader>
-        <Input
-          autoFocus
-          placeholder="Nama, mis. Pak Budi"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              submit()
-            }
-          }}
-        />
+
+        <div className="grid gap-3">
+          <div className="grid gap-1.5">
+            <label className="text-muted-foreground text-xs font-medium">Jenis</label>
+            <div className="grid grid-cols-2 gap-2">
+              {(["CREDIT", "DEBIT"] as const).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setKind(k)}
+                  className={cn(
+                    "flex flex-col items-start gap-0.5 rounded-md border p-3 text-left text-sm transition-colors",
+                    kind === k
+                      ? "border-primary bg-primary/5 ring-primary/30 ring-2"
+                      : "hover:bg-muted/50"
+                  )}
+                >
+                  <span className="flex items-center gap-1.5 font-medium">
+                    {k === "CREDIT" ? (
+                      <IconArrowDownLeft className="size-4" />
+                    ) : (
+                      <IconArrowUpRight className="size-4" />
+                    )}
+                    {KIND_META[k].label}
+                  </span>
+                  <span className="text-muted-foreground text-xs leading-snug">
+                    {k === "CREDIT"
+                      ? "Orang berhutang — uang akan masuk"
+                      : "Perusahaan berhutang — uang akan keluar"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-1.5">
+            <label className="text-muted-foreground text-xs font-medium">
+              {kind === "CREDIT" ? "Nama pihak yang berhutang" : "Nama pihak yang harus dibayar"}
+            </label>
+            <Input
+              autoFocus
+              placeholder="Nama, mis. Pak Budi"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  submit()
+                }
+              }}
+            />
+          </div>
+        </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             Batal

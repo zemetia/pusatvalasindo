@@ -193,6 +193,11 @@ model KasHeadConfirmation {
   note              String?
   confirmedBy       String?
   confirmedAt       DateTime?
+  // Jam KLOP: saat angka kepala cabang pertama kali sama persis dengan total sistem.
+  // Sengaja terpisah dari `confirmedAt` — `confirmedAt` bergerak tiap kali angkanya
+  // disimpan ulang (termasuk saat masih selisih), sedangkan jam klop harus berhenti
+  // di detik cocoknya. Kembali null kalau salah satu sisi berubah dan selisihnya buka lagi.
+  matchedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -212,6 +217,8 @@ model BankHeadConfirmation {
   note              String?
   confirmedBy       String?
   confirmedAt       DateTime?
+  /// Jam KLOP — lihat KasHeadConfirmation.matchedAt.
+  matchedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

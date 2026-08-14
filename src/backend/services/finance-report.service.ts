@@ -93,17 +93,8 @@ export type StockItemPosition = {
   date: string | null;
 };
 
-/**
- * Dana Tertahan — hutang orang ke perusahaan yang uangnya belum masuk.
- *
- * Sengaja BUKAN bagian dari `FinancePosition`. Stock/kas/bank di atas adalah
- * angka hasil cross-check kepala cabang, dan seluruh logika carry-forward serta
- * cross-check bergantung pada definisi itu. Piutang tidak pernah dikonfirmasi
- * lewat jalur yang sama, jadi menjumlahkannya ke "Total Aset Konsolidasi" akan
- * membuat kolom selisih cross-check ikut bergeser dan angkanya tidak lagi bisa
- * dicocokkan dengan apa pun. Ia dilaporkan sebagai posisi terpisah.
- */
-export type HeldFundSummary = {
+/** Rekap satu arah Dana Tertahan (Credit saja, atau Debit saja). */
+export type HeldFundKindSummary = {
   /** Belum lunas pada akhir periode — posisi, bukan arus. */
   outstanding: number;
   outstandingCount: number;
@@ -112,6 +103,62 @@ export type HeldFundSummary = {
   settledCount: number;
   /** Tercatat sepanjang periode, lunas maupun belum. */
   added: number;
+};
+
+/**
+ * Dana Tertahan — uang yang belum berpindah, di kedua arah.
+ *
+ * Sengaja BUKAN bagian dari `FinancePosition`. Stock/kas/bank di atas adalah
+ * angka hasil cross-check kepala cabang, dan seluruh logika carry-forward serta
+ * cross-check bergantung pada definisi itu. Dana tertahan tidak pernah
+ * dikonfirmasi lewat jalur yang sama, jadi menjumlahkannya ke dalam
+ * `FinancePosition` akan membuat kolom selisih cross-check ikut bergeser dan
+ * angkanya tidak lagi bisa dicocokkan dengan apa pun. Efeknya dilaporkan
+ * terpisah lewat `SettlementPosition`.
+ *
+ * Tidak ada field "outstanding" gabungan di sini, dan itu disengaja: piutang 10
+ * juta plus hutang 10 juta bukan "20 juta tertahan" maupun "nol" — keduanya
+ * salah. Satu-satunya penggabungan yang punya arti adalah `netAdjustment`.
+ */
+export type HeldFundSummary = {
+  /** Credit — piutang / Account Receivable. Uang akan MASUK. */
+  credit: HeldFundKindSummary;
+  /** Debit — hutang / Account Payable. Uang akan KELUAR. */
+  debit: HeldFundKindSummary;
+  /**
+   * Pergeseran dari Saldo Fisik ke Posisi Bersih: `+credit − debit`, keduanya
+   * dari yang belum lunas di akhir periode.
+   */
+  netAdjustment: number;
+};
+
+/**
+ * Dua strata angka yang harus dibaca berdampingan, dan sering tertukar:
+ *
+ * • **Saldo Fisik** (`physical`) — stock + kas + bank hasil cross-check kepala
+ *   cabang. Ini yang *ada* dan bisa dihitung ulang malam ini. Padanan
+ *   akuntansinya: Kas & Setara Kas hasil opname fisik.
+ * • **Posisi Bersih** (`net`) — Saldo Fisik + piutang − hutang. Ini yang
+ *   *menjadi hak* perusahaan setelah semua yang tertahan selesai. Padanan
+ *   akuntansinya: posisi kas bersih setelah memperhitungkan piutang & hutang
+ *   usaha.
+ *
+ * Piutang di sini uangnya SUDAH keluar dari laci (barang/valas berpindah,
+ * uangnya belum), jadi Saldo Fisik memang sudah lebih rendah dan piutang
+ * ditambahkan kembali. Hutang sebaliknya: uangnya masih ada secara fisik tapi
+ * sudah menjadi milik orang lain, jadi dikurangkan.
+ *
+ * `net` ikut `null` kalau `physical` null — tanpa satu pun konfirmasi kepala
+ * cabang, "posisi bersih" hanya akan menampilkan nilai piutang dan hutang
+ * sambil berpura-pura itu posisi lengkap.
+ */
+export type SettlementPosition = {
+  physical: number | null;
+  /** Piutang belum tertagih di akhir periode (Credit). */
+  receivable: number;
+  /** Hutang belum dibayar di akhir periode (Debit). */
+  payable: number;
+  net: number | null;
 };
 
 export type CompanyFinanceReport = {
@@ -132,6 +179,8 @@ export type CompanyFinanceReport = {
   corrections: CorrectionCounts;
   stockItems: StockItemPosition[];
   heldFunds: HeldFundSummary;
+  /** Saldo Fisik → Posisi Bersih untuk PT ini. */
+  settlement: SettlementPosition;
 };
 
 export type GroupFinanceReport = {
@@ -152,6 +201,8 @@ export type GroupFinanceReport = {
   verification: VerificationCounts;
   corrections: CorrectionCounts;
   heldFunds: HeldFundSummary;
+  /** Saldo Fisik → Posisi Bersih konsolidasi. */
+  settlement: SettlementPosition;
 };
 
 export type FinanceReport = {
@@ -469,7 +520,14 @@ export const financeReportService = {
     const systemIndex = indexSystemSums(systemSums);
     const qualityIndex = indexQuality(quality, companyIds);
     const stockQtyIndex = indexStockQuantities(stockQuantities);
-    const heldFundIndex = new Map(heldFunds.map((row) => [row.companyId, row]));
+    // Satu PT bisa punya dua baris (CREDIT & DEBIT), jadi indexnya menampung
+    // daftar — bukan satu baris seperti sebelum arah hutang dipisah.
+    const heldFundIndex = new Map<string, HeldFundReportRow[]>();
+    for (const row of heldFunds) {
+      const bucket = heldFundIndex.get(row.companyId);
+      if (bucket) bucket.push(row);
+      else heldFundIndex.set(row.companyId, [row]);
+    }
 
     const periodOffset = fullDates.indexOf(range.from);
     const prevClosingIndex = periodOffset - 1;
@@ -516,6 +574,7 @@ export const financeReportService = {
 
       const companyQuality = qualityIndex.get(company.id);
       const qtyBucket = stockQtyIndex.get(company.id);
+      const companyHeldFunds = heldFundOf(heldFundIndex.get(company.id));
 
       return {
         id: company.id,
@@ -558,7 +617,11 @@ export const financeReportService = {
               date: entry?.date ?? null,
             };
           }),
-        heldFunds: heldFundOf(heldFundIndex.get(company.id)),
+        heldFunds: companyHeldFunds,
+        // Basisnya posisi PENUTUP, bukan rata-rata atau posisi awal: dana
+        // tertahan yang dihitung juga posisi akhir periode, jadi keduanya harus
+        // berdiri di tanggal yang sama supaya selisihnya berarti.
+        settlement: settlementOf(closing.total, companyHeldFunds),
       };
     });
 
@@ -572,6 +635,15 @@ export const financeReportService = {
         : positionAt(groupFullSeries[0]);
     const groupClosing = positionAt(groupFullSeries[groupFullSeries.length - 1]);
     const groupPrevOpening = sumPositions(companyPrevOpenings);
+
+    const groupHeldFunds = companyReports.reduce<HeldFundSummary>(
+      (acc, company) => ({
+        credit: mergeKindSummary(acc.credit, company.heldFunds.credit),
+        debit: mergeKindSummary(acc.debit, company.heldFunds.debit),
+        netAdjustment: acc.netAdjustment + company.heldFunds.netAdjustment,
+      }),
+      emptyHeldFunds(),
+    );
 
     return {
       range,
@@ -605,22 +677,14 @@ export const financeReportService = {
           }),
           { pending: 0, approved: 0, rejected: 0, total: 0 },
         ),
-        heldFunds: companyReports.reduce<HeldFundSummary>(
-          (acc, company) => ({
-            outstanding: acc.outstanding + company.heldFunds.outstanding,
-            outstandingCount: acc.outstandingCount + company.heldFunds.outstandingCount,
-            settled: acc.settled + company.heldFunds.settled,
-            settledCount: acc.settledCount + company.heldFunds.settledCount,
-            added: acc.added + company.heldFunds.added,
-          }),
-          EMPTY_HELD_FUNDS,
-        ),
+        heldFunds: groupHeldFunds,
+        settlement: settlementOf(groupClosing.total, groupHeldFunds),
       },
     };
   },
 };
 
-const EMPTY_HELD_FUNDS: HeldFundSummary = {
+const EMPTY_KIND_SUMMARY: HeldFundKindSummary = {
   outstanding: 0,
   outstandingCount: 0,
   settled: 0,
@@ -628,19 +692,56 @@ const EMPTY_HELD_FUNDS: HeldFundSummary = {
   added: 0,
 };
 
+const emptyHeldFunds = (): HeldFundSummary => ({
+  credit: { ...EMPTY_KIND_SUMMARY },
+  debit: { ...EMPTY_KIND_SUMMARY },
+  netAdjustment: 0,
+});
+
 /**
  * Nol, bukan `null`, saat sebuah PT tidak punya baris Dana Tertahan sama sekali.
- * Di sini "tidak ada piutang" memang berarti nol rupiah tertahan — beda dari
- * stock/kas/bank, di mana absennya konfirmasi berarti angkanya belum diketahui.
+ * Di sini "tidak ada dana tertahan" memang berarti nol rupiah tertahan — beda
+ * dari stock/kas/bank, di mana absennya konfirmasi berarti angkanya belum
+ * diketahui, dan em dash lebih jujur daripada nol.
  */
-function heldFundOf(row: HeldFundReportRow | undefined): HeldFundSummary {
-  if (!row) return { ...EMPTY_HELD_FUNDS };
+function heldFundOf(rows: HeldFundReportRow[] | undefined): HeldFundSummary {
+  const summary = emptyHeldFunds();
+  for (const row of rows ?? []) {
+    const bucket = row.kind === "DEBIT" ? summary.debit : summary.credit;
+    bucket.outstanding = row.outstanding;
+    bucket.outstandingCount = row.outstandingCount;
+    bucket.settled = row.settledInRange;
+    bucket.settledCount = row.settledCount;
+    bucket.added = row.addedInRange;
+  }
+  summary.netAdjustment = summary.credit.outstanding - summary.debit.outstanding;
+  return summary;
+}
+
+function mergeKindSummary(a: HeldFundKindSummary, b: HeldFundKindSummary): HeldFundKindSummary {
   return {
-    outstanding: row.outstanding,
-    outstandingCount: row.outstandingCount,
-    settled: row.settledInRange,
-    settledCount: row.settledCount,
-    added: row.addedInRange,
+    outstanding: a.outstanding + b.outstanding,
+    outstandingCount: a.outstandingCount + b.outstandingCount,
+    settled: a.settled + b.settled,
+    settledCount: a.settledCount + b.settledCount,
+    added: a.added + b.added,
+  };
+}
+
+/**
+ * Saldo Fisik + piutang − hutang.
+ *
+ * `physical` yang `null` menular ke `net`: tanpa konfirmasi kepala cabang, yang
+ * tersisa hanyalah selisih piutang-hutang, dan menampilkannya sebagai "posisi
+ * bersih" akan membuat PT yang belum sekali pun dikonfirmasi terlihat seolah
+ * posisinya sudah diketahui dan kebetulan kecil.
+ */
+function settlementOf(physical: number | null, heldFunds: HeldFundSummary): SettlementPosition {
+  return {
+    physical,
+    receivable: heldFunds.credit.outstanding,
+    payable: heldFunds.debit.outstanding,
+    net: physical == null ? null : physical + heldFunds.netAdjustment,
   };
 }
 

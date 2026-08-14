@@ -73,6 +73,31 @@ export const dailyBankEntryRepository = {
     })
   },
 
+  // Satu baris saja — dipakai alur verifikasi H+1 untuk membuat entri saldo 0 pada
+  // rekening yang tanggal itu tidak diisi, supaya hasil konfirmasinya punya tempat menempel.
+  upsertOne(entry: {
+    bankAccountId: string
+    date: Date
+    balance: number
+    note?: string | null
+    createdBy?: string | null
+  }) {
+    return prisma.dailyBankEntry.upsert({
+      where: { bankAccountId_date: { bankAccountId: entry.bankAccountId, date: entry.date } },
+      update: {
+        balance: new Prisma.Decimal(entry.balance),
+        note: entry.note,
+      },
+      create: {
+        bankAccountId: entry.bankAccountId,
+        date: entry.date,
+        balance: new Prisma.Decimal(entry.balance),
+        note: entry.note,
+        createdBy: entry.createdBy,
+      },
+    })
+  },
+
   upsertMany(
     entries: {
       bankAccountId: string

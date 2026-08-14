@@ -173,6 +173,8 @@ model user {
   payrollRunsGenerated PayrollRun[]          @relation("PayrollRunGeneratedBy")
   payrollRunsFinalized PayrollRun[]          @relation("PayrollRunFinalizedBy")
   payrollRulesCreated  PayrollRule[]         @relation("PayrollRuleCreatedBy")
+  heldFundsCreated     HeldFund[]            @relation("HeldFundCreatedBy")
+  heldFundsSettled     HeldFund[]            @relation("HeldFundSettledBy")
   samples              Sample[]
   account              account[]
   session              session[]
@@ -1305,13 +1307,18 @@ enum SalaryComponentKind {
 // kemudian. Karena itu total dana tertahan dijumlahkan dari SELURUH tanggal yang
 // belum lunas, bukan dari tanggal yang sedang dibuka di halaman.
 model HeldFund {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   companyId String
   // Tanggal hutangnya tercatat — bukan tanggal jatuh tempo. Inilah tanggal yang
   // dinavigasi di halaman Dana Tertahan.
-  date      DateTime @db.Date
+  date      DateTime     @db.Date
+  // Arah hutangnya. Tanpa ini satu angka "dana tertahan" mencampur uang yang
+  // akan MASUK dengan uang yang harus KELUAR — dua posisi yang berlawanan dan
+  // tidak boleh saling menutupi. Default CREDIT karena seluruh baris yang sudah
+  // ada dicatat sebagai piutang (hutang orang ke perusahaan).
+  kind      HeldFundKind @default(CREDIT)
   name      String // nama orang/pihak yang uangnya belum masuk
-  amount    Decimal  @default(0)
+  amount    Decimal      @default(0)
   note      String?
 
   // Pelunasan menandai, tidak menghapus. Baris yang dihapus akan menghilangkan
@@ -1327,10 +1334,27 @@ model HeldFund {
 
   company Company @relation(fields: [companyId], references: [id])
 
+  // Relasi ke user dipasang di atas kolom yang SUDAH ada (`createdBy` /
+  // `settledBy` menyimpan userId), bukan kolom baru — supaya nama pencatat bisa
+  // dibaca dalam satu query, tanpa menyalin nama ke baris hutang. Nama yang
+  // disalin akan basi begitu user-nya ganti nama. `onDelete: SetNull` menjaga
+  // baris hutangnya tetap hidup kalau akun pencatatnya dihapus: yang hilang
+  // seharusnya jejak siapanya, bukan hutangnya.
+  createdByUser user? @relation("HeldFundCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  settledByUser user? @relation("HeldFundSettledBy", fields: [settledBy], references: [id], onDelete: SetNull)
+
   // Halaman membaca satu PT satu tanggal; laporan membaca yang belum lunas
   // lintas tanggal. Dua index terpisah karena dua pola baca yang berbeda.
   @@index([companyId, date])
   @@index([companyId, settledAt])
+}
+
+/// Arah dana tertahan, dinamai dari sisi perusahaan:
+/// • CREDIT — piutang / Account Receivable: orang berhutang, uangnya akan MASUK.
+/// • DEBIT  — hutang / Account Payable: perusahaan yang harus membayar, uangnya akan KELUAR.
+enum HeldFundKind {
+  CREDIT
+  DEBIT
 }
 
 enum RefiningMethod {
@@ -1758,6 +1782,11 @@ model KasHeadConfirmation {
   note              String?
   confirmedBy       String?
   confirmedAt       DateTime?
+  // Jam KLOP: saat angka kepala cabang pertama kali sama persis dengan total sistem.
+  // Sengaja terpisah dari `confirmedAt` — `confirmedAt` bergerak tiap kali angkanya
+  // disimpan ulang (termasuk saat masih selisih), sedangkan jam klop harus berhenti
+  // di detik cocoknya. Kembali null kalau salah satu sisi berubah dan selisihnya buka lagi.
+  matchedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -1777,6 +1806,8 @@ model BankHeadConfirmation {
   note              String?
   confirmedBy       String?
   confirmedAt       DateTime?
+  /// Jam KLOP — lihat KasHeadConfirmation.matchedAt.
+  matchedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

@@ -31,4 +31,8 @@ export const kasHeadConfirmationRepository = {
         confirmedAt: new Date(),
       },
     }),
+
+  /** Jam klop — lihat `reconcileMatch` di stockist-head-confirmation.service. */
+  setMatchedAt: (id: string, matchedAt: Date | null) =>
+    prisma.kasHeadConfirmation.update({ where: { id }, data: { matchedAt } }),
 };

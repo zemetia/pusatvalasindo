@@ -22,6 +22,10 @@ import {
   type PendingCorrection,
   type ApprovedCorrection,
 } from "@/components/admin/stockist/daily-verify-cell"
+import {
+  HeadConfirmationSummary,
+  useHeadConfirmationMatch,
+} from "@/components/admin/stockist/head-confirmation-summary"
 
 type Account = {
   id: string
@@ -86,7 +90,10 @@ function buildRows(payload: BankPayload): Row[] {
   return (payload.accounts ?? []).map((acc) => {
     const entry = entries[acc.id]
     const prev = previous[acc.id]
-    const balance = entry?.balance ?? "0"
+    // Rekening tanpa entri tampil KOSONG, bukan pra-isi "0" — kalau dipra-isi, saldo nol
+    // yang memang benar tidak bisa dibedakan dari "belum diisi", dan angka 0 yang diketik
+    // user tidak menghasilkan perubahan apa pun sehingga tidak pernah tersimpan.
+    const balance = entry?.balance ?? ""
     const note = entry?.note ?? ""
     return {
       bankAccountId: acc.id,
@@ -155,6 +162,12 @@ export function BankGridClient({
     rowCount: rows.length,
     selectOnFocus: NAV_SELECT_ON_FOCUS,
   })
+  // Angka kepala cabang dari halaman Cross-Check, plus status & jam klopnya.
+  const { match: headMatch, refresh: refreshHeadMatch } = useHeadConfirmationMatch(
+    "bank",
+    companyId,
+    date
+  )
 
   const loadData = useCallback(async () => {
     if (!companyId || !date) return
@@ -190,13 +203,27 @@ export function BankGridClient({
   }, [loadData])
 
   const updateRow = (id: string, field: "balance" | "note", val: string) => {
-    setRows((prev) => prev.map((r) => (r.bankAccountId === id ? { ...r, [field]: val } : r)))
+    setRows((prev) =>
+      prev.map((r) => (r.bankAccountId === id ? { ...r, [field]: val } : r))
+    )
   }
 
   const saveRow = async (id: string) => {
     const row = rowsRef.current.find((r) => r.bankAccountId === id)
     if (!row || !canManage) return
-    if (row.balance === row.savedBalance && row.note === row.savedNote) return
+    // Sel kosong = "belum diisi", bukan saldo 0: tidak ada entri yang dibuat. Sel yang
+    // dikosongkan padahal sudah punya entri dikembalikan ke angka tersimpan — menghapus
+    // saldo hanya boleh lewat alur koreksi, bukan efek samping mengosongkan input.
+    if (row.balance.trim() === "") {
+      if (row.hasEntry) {
+        setRows((prev) =>
+          prev.map((r) => (r.bankAccountId === id ? { ...r, balance: r.savedBalance } : r))
+        )
+      }
+      return
+    }
+    const isDirty = row.balance !== row.savedBalance || row.note !== row.savedNote
+    if (!isDirty) return
 
     setRows((prev) =>
       prev.map((r) => (r.bankAccountId === id ? { ...r, saveState: "saving" } : r))
@@ -225,10 +252,19 @@ export function BankGridClient({
       setRows((prev) =>
         prev.map((r) =>
           r.bankAccountId === id
-            ? { ...r, savedBalance: r.balance, savedNote: r.note, saveState: "saved", hasEntry: true }
+            ? {
+                ...r,
+                savedBalance: r.balance,
+                savedNote: r.note,
+                saveState: "saved",
+                hasEntry: true,
+              }
             : r
         )
       )
+      // Saldo berubah → selisih cross-check bisa baru saja tertutup (atau terbuka lagi).
+      // Server yang memutuskan & menyimpan jam klopnya.
+      refreshHeadMatch()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
       setRows((prev) =>
@@ -269,6 +305,7 @@ export function BankGridClient({
               ...r,
               balance: next,
               savedBalance: next,
+              hasEntry: true,
               verifyStatus: "BENAR",
               verifyNote: note ?? null,
               pendingCorrection: undefined,
@@ -280,8 +317,13 @@ export function BankGridClient({
               },
             }
           }
+          // Verifikasi baris kosong ikut membuat entrinya (saldo 0) di server — selnya
+          // ikut menampilkan 0, bukan tetap kosong.
           return {
             ...r,
+            hasEntry: true,
+            balance: r.hasEntry ? r.balance : "0",
+            savedBalance: r.hasEntry ? r.savedBalance : "0",
             verifyStatus: status,
             verifyNote: note ?? null,
             pendingCorrection: data.data?.correctionRequestId
@@ -294,6 +336,9 @@ export function BankGridClient({
           }
         })
       )
+      // Verifikasi bisa ikut mengubah saldo (koreksi langsung) atau membuat entri baru
+      // untuk baris kosong — dua-duanya menggeser total sistem.
+      refreshHeadMatch()
       return true
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Gagal menyimpan")
@@ -303,20 +348,15 @@ export function BankGridClient({
 
   const totals = useMemo(() => {
     let totalBalance = 0
-    let totalDelta = 0
     let unfilled = 0
     let belumVerifikasi = 0
     for (const r of rows) {
-      const balance = parseNum(r.balance)
-      const ref = r.previousBalance ?? r.fallbackBalance
-      totalBalance += balance
-      totalDelta += balance - ref
+      totalBalance += parseNum(r.balance)
       if (!r.hasEntry) unfilled += 1
-      if (r.hasEntry && r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) {
-        belumVerifikasi += 1
-      }
+      // Baris kosong ikut dihitung: sekarang dia juga bisa dikonfirmasi.
+      if (r.verifyStatus === "BELUM_REVIEW" && !r.pendingCorrection) belumVerifikasi += 1
     }
-    return { totalBalance, totalDelta, unfilled, belumVerifikasi }
+    return { totalBalance, unfilled, belumVerifikasi }
   }, [rows])
 
   const onUnfilledChangeRef = useRef(onUnfilledChange)
@@ -367,7 +407,6 @@ export function BankGridClient({
               <TableHead className="sticky top-0 z-20 bg-background w-52 text-right">
                 {isPast ? "Saldo Tanggal Ini" : "Saldo Hari Ini"}
               </TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-36 text-right">Delta</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background w-44">Catatan</TableHead>
               {isPast && (
                 <TableHead className="sticky top-0 z-20 bg-background w-56">Konfirmasi</TableHead>
@@ -396,21 +435,17 @@ export function BankGridClient({
                 Total
               </TableCell>
               <TableCell className="text-right font-mono">Rp {fmt(totals.totalBalance)}</TableCell>
-              <TableCell
-                className={cn(
-                  "text-right font-mono",
-                  totals.totalDelta > 0 && "text-success",
-                  totals.totalDelta < 0 && "text-destructive"
-                )}
-              >
-                {totals.totalDelta > 0 ? "+" : ""}
-                {fmt(totals.totalDelta)}
-              </TableCell>
               <TableCell colSpan={isPast ? 3 : 2} />
             </TableRow>
           </TableBody>
         </Table>
       </div>
+
+      <HeadConfirmationSummary
+        label="bank harian"
+        localTotal={totals.totalBalance}
+        match={headMatch}
+      />
     </div>
   )
 }
@@ -452,7 +487,6 @@ function BankRowEdit({
 }) {
   const balance = parseNum(row.balance)
   const reference = row.previousBalance ?? row.fallbackBalance
-  const delta = balance - reference
   const isUnfilled = !row.hasEntry
   // Saldo tanggal lampau dikunci — perubahannya wajib lewat pengajuan koreksi.
   const editable = canManage && !isPast
@@ -478,7 +512,9 @@ function BankRowEdit({
       </TableCell>
       <TableCell className="text-right font-mono text-sm text-muted-foreground">
         Rp {fmt(reference)}
-        {!row.previousBalance && (
+        {/* `=== null`, bukan falsy: saldo kemarin yang memang 0 tetap "saldo kemarin",
+            bukan jatuh ke saldo referensi rekening. */}
+        {row.previousBalance === null && (
           <div className="text-[10px] text-muted-foreground/60">(saldo referensi)</div>
         )}
       </TableCell>
@@ -493,21 +529,12 @@ function BankRowEdit({
           value={row.balance}
           allowNegative
           disabled={!editable}
+          placeholder="Belum diisi"
           onValueChange={(val) => onChange(row.bankAccountId, "balance", val === undefined ? "" : String(val))}
           onBlur={() => onBlurSave(row.bankAccountId)}
           onKeyDown={onCellKeyDown(rowIndex, "balance")}
           className="text-right font-mono w-full"
         />
-      </TableCell>
-      <TableCell
-        className={cn(
-          "text-right font-mono text-sm",
-          delta > 0 && "text-success",
-          delta < 0 && "text-destructive"
-        )}
-      >
-        {delta > 0 ? "+" : ""}
-        {fmt(delta)}
       </TableCell>
       <TableCell>
         <Input
@@ -524,25 +551,24 @@ function BankRowEdit({
       </TableCell>
       {isPast && (
         <TableCell>
-          {row.hasEntry ? (
-            <DailyVerifyCell
-              status={row.verifyStatus}
-              note={row.verifyNote}
-              balance={balance}
-              pending={row.pendingCorrection}
-              approved={row.approvedCorrection}
-              canVerify={canManage}
-              canDirectCorrect={canDirectCorrect}
-              // Koreksi saldo bank juga boleh minus — kalau tidak, sel yang salah
-              // dicatat positif mustahil dibetulkan ke keadaan overdraft.
-              allowNegative
-              onVerify={(status, note, correctedBalance) =>
-                onVerify(row.bankAccountId, status, note, correctedBalance)
-              }
-            />
-          ) : (
-            <span className="text-xs text-muted-foreground">Tidak diisi</span>
-          )}
+          {/* Baris yang tidak diisi ikut dapat tombol Sesuai / Tidak sesuai — saldonya
+              diperlakukan sebagai 0 dan entrinya dibuat saat dikonfirmasi. */}
+          <DailyVerifyCell
+            status={row.verifyStatus}
+            note={row.verifyNote}
+            balance={balance}
+            pending={row.pendingCorrection}
+            approved={row.approvedCorrection}
+            canVerify={canManage}
+            canDirectCorrect={canDirectCorrect}
+            unfilled={isUnfilled}
+            // Koreksi saldo bank juga boleh minus — kalau tidak, sel yang salah
+            // dicatat positif mustahil dibetulkan ke keadaan overdraft.
+            allowNegative
+            onVerify={(status, note, correctedBalance) =>
+              onVerify(row.bankAccountId, status, note, correctedBalance)
+            }
+          />
         </TableCell>
       )}
       <TableCell>

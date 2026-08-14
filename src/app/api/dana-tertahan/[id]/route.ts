@@ -7,10 +7,12 @@ import { authorize } from "@/backend/helpers/authz";
 import { withValidation } from "@/backend/middleware/with-validation";
 import { assertHeldFundEditableDate } from "@/backend/helpers/held-fund-guard";
 import { heldFundRepository } from "@/backend/repositories/held-fund.repository";
+import { toHeldFundRow } from "@/backend/services/held-fund.service";
 import { NotFoundError } from "@/backend/errors/app-error";
 
 const updateSchema = z.object({
   name: z.string().min(1).max(120).optional(),
+  kind: z.enum(["CREDIT", "DEBIT"]).optional(),
   amount: z.number().optional(),
   note: z.string().max(500).nullable().optional(),
 });
@@ -36,22 +38,12 @@ export const PATCH = withValidation(updateSchema)(
 
       const updated = await heldFundRepository.update(id, {
         ...(ctx.body.name !== undefined ? { name: ctx.body.name.trim() } : {}),
+        ...(ctx.body.kind !== undefined ? { kind: ctx.body.kind } : {}),
         ...(ctx.body.amount !== undefined ? { amount: ctx.body.amount } : {}),
         ...(ctx.body.note !== undefined ? { note: ctx.body.note } : {}),
       });
 
-      return NextResponse.json(
-        ok(
-          {
-            id: updated.id,
-            name: updated.name,
-            amount: updated.amount.toString(),
-            note: updated.note,
-            settledAt: updated.settledAt?.toISOString() ?? null,
-          },
-          "Tersimpan"
-        )
-      );
+      return NextResponse.json(ok(toHeldFundRow(updated), "Tersimpan"));
     } catch (e) {
       return handleError(e);
     }

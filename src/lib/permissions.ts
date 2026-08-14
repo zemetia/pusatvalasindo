@@ -141,7 +141,13 @@ const KEPALA_CABANG_PERMISSIONS: Permission[] = [
   PERMISSIONS.STOCK_VIEW,
   PERMISSIONS.STOCK_MANAGE,
   PERMISSIONS.BANK_VIEW,
+  // Kepala Cabang memegang angka harian cabangnya, bukan sekadar melihatnya:
+  // STOCKIST_MANAGE = ubah Stock & Kas Harian, BANK_DAILY_INPUT = ubah Saldo
+  // Bank Harian. Rekening Bank (BANK_MANAGE) sengaja TIDAK ikut — itu data
+  // induk, bukan angka hari ini.
+  PERMISSIONS.BANK_DAILY_INPUT,
   PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.STOCKIST_MANAGE,
   PERMISSIONS.STOCKIST_VERIFY,
   PERMISSIONS.CORRECTION_VIEW,
   PERMISSIONS.COMPANY_STOCK_VIEW,
@@ -228,12 +234,27 @@ const TELLER_DALAM_PERMISSIONS: Permission[] = [
   PERMISSIONS.CORRECTION_VIEW,
 ];
 
+// Teller Luar: HANYA Presensi & KPI. Sengaja TIDAK diturunkan dari
+// KASIR_BASE_PERMISSIONS meski namanya sederajat dengan Teller Dalam — petugas
+// luar tidak memegang laci, jadi seluruh sisi stok, kas, mata uang, dan kurs
+// (termasuk Watcher Valas, yang legacy view-nya menumpang STOCKIST_VIEW)
+// ditutup. Yang tersisa persis DEFAULT_PERMISSIONS; ditulis lengkap di sini
+// supaya perubahan pada default tidak diam-diam melebarkan akses jabatan ini.
 const TELLER_LUAR_PERMISSIONS: Permission[] = [
-  ...KASIR_BASE_PERMISSIONS,
-  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.DASHBOARD_VIEW,
+  PERMISSIONS.ATTENDANCE_VIEW_OWN,
+  PERMISSIONS.KPI_FILL_OWN,
+  PERMISSIONS.KPI_VIEW_OWN,
 ];
 
 // Marketing: focused on rekening (bank) only — no stock/currency visibility.
+//
+// STOCKIST_VIEW sengaja TIDAK ada di sini meski namanya terdengar sekadar
+// "lihat": ia adalah izin lihat untuk resource `stockist.daily`, yang labelnya
+// "Stock & Kas Harian" — persis dua hal yang tidak boleh dilihat Marketing.
+// Efek sampingnya lebih jauh lagi: `watcher.valas` juga memetakan legacy
+// view-nya ke STOCKIST_VIEW dan ber-scoping global, jadi satu izin ini dulu
+// membuka pemantauan lintas PT juga.
 const MARKETING_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
   PERMISSIONS.ATTENDANCE_VIEW_OWN,
@@ -242,9 +263,39 @@ const MARKETING_PERMISSIONS: Permission[] = [
   PERMISSIONS.PAYROLL_VIEW_OWN,
   PERMISSIONS.BANK_VIEW,
   PERMISSIONS.BANK_DAILY_INPUT,
-  PERMISSIONS.STOCKIST_VIEW,
   PERMISSIONS.CORRECTION_VIEW,
 ];
+
+// Kepala Marketing: wewenang orang/KPI/payroll setara Kepala Cabang, tapi
+// TANPA seluruh sisi stok & kas. Dulu jabatan ini memakai
+// KEPALA_CABANG_PERMISSIONS apa adanya, sehingga kepala tim yang bawahannya
+// dilarang melihat stok justru melihat semuanya — termasuk Cross-Check Stock,
+// Stock Management PT, dan mata uang beserta kursnya.
+//
+// Presensi Karyawan (ATTENDANCE_VIEW_ALL/MANAGE) juga dicabut: kehadiran
+// dikelola HR & Kepala Cabang, bukan kepala tim marketing. Presensi miliknya
+// sendiri tetap ada lewat ATTENDANCE_VIEW_OWN.
+//
+// Patokan Harga tidak muncul di sini karena resource `price.benchmark` sengaja
+// tanpa peta legacy (lihat authz/resources.ts) — wewenangnya diberikan lewat
+// matriks izin, bukan lewat array ini.
+const KEPALA_MARKETING_PERMISSIONS: Permission[] = KEPALA_CABANG_PERMISSIONS.filter(
+  (p) =>
+    !(
+      [
+        PERMISSIONS.STOCK_VIEW,
+        PERMISSIONS.STOCK_MANAGE,
+        PERMISSIONS.STOCKIST_VIEW,
+        PERMISSIONS.STOCKIST_MANAGE,
+        PERMISSIONS.STOCKIST_VERIFY,
+        PERMISSIONS.COMPANY_STOCK_VIEW,
+        PERMISSIONS.COMPANY_STOCK_MANAGE,
+        PERMISSIONS.CURRENCY_VIEW,
+        PERMISSIONS.ATTENDANCE_VIEW_ALL,
+        PERMISSIONS.ATTENDANCE_MANAGE,
+      ] as Permission[]
+    ).includes(p)
+);
 
 const KURIR_PERMISSIONS: Permission[] = [
   PERMISSIONS.DASHBOARD_VIEW,
@@ -269,7 +320,7 @@ const ROLE_PERMISSION_MAP: Record<string, Permission[]> = {
   Admin: ADMIN_PERMISSIONS,
   "Kepala Cabang": KEPALA_CABANG_PERMISSIONS,
   "Kepala & Kasir": KEPALA_CABANG_PERMISSIONS,
-  "Kepala Marketing": KEPALA_CABANG_PERMISSIONS,
+  "Kepala Marketing": KEPALA_MARKETING_PERMISSIONS,
   HR: HR_PERMISSIONS,
   Akuntan: AKUNTAN_PERMISSIONS,
   Kasir: KASIR_PERMISSIONS,
@@ -282,6 +333,55 @@ const ROLE_PERMISSION_MAP: Record<string, Permission[]> = {
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Pengecualian per PT ─────────────────────────────────────────────────────
+
+/**
+ * Izin yang dicabut dari SETIAP jabatan PKD (Pusat Kirim Duit), apa pun namanya.
+ *
+ * PKD adalah jasa kirim uang, bukan money changer: tidak ada laci valas, tidak
+ * ada kas cabang yang dihitung ulang tiap sore, dan tidak ada kurs beli/jual
+ * yang dipasang. Karena `ROLE_PERMISSION_MAP` memetakan NAMA jabatan (satu
+ * "Teller Dalam" untuk seluruh PT), tanpa daftar ini setiap seed akan
+ * mengembalikan modul valas ke PKD lewat nama jabatan yang kebetulan sama.
+ *
+ * Padanan resource-nya (yang benar-benar jadi gerbang, karena seluruh jabatan
+ * sudah `usesResourcePerms`) ada di `prisma/scripts/apply-role-access-2026-08.ts`.
+ * BANK_* sengaja TIDAK ikut dicabut — mengirim uang justru butuh rekening.
+ */
+const PKD_REVOKED_PERMISSIONS: Permission[] = [
+  PERMISSIONS.STOCK_VIEW,
+  PERMISSIONS.STOCK_MANAGE,
+  PERMISSIONS.STOCKIST_VIEW,
+  PERMISSIONS.STOCKIST_MANAGE,
+  PERMISSIONS.STOCKIST_VERIFY,
+  PERMISSIONS.COMPANY_STOCK_VIEW,
+  PERMISSIONS.COMPANY_STOCK_MANAGE,
+  PERMISSIONS.CURRENCY_VIEW,
+  PERMISSIONS.CURRENCY_MANAGE,
+  PERMISSIONS.VALAS_TX_VIEW,
+  PERMISSIONS.VALAS_TX_CREATE,
+  PERMISSIONS.VALAS_TX_VOID,
+];
+
+/** Kode PT yang tidak memakai modul valas sama sekali. */
+const COMPANY_REVOKED_PERMISSIONS: Record<string, Permission[]> = {
+  PKD: PKD_REVOKED_PERMISSIONS,
+};
+
+/**
+ * Izin sebuah jabatan pada PT tertentu — `getPermissionsForRole` dikurangi
+ * pengecualian PT-nya. Dipakai seeder; role global (companyId null) tidak lewat
+ * sini karena tidak dimiliki PT mana pun.
+ */
+export function getPermissionsForRoleInCompany(
+  roleName: string,
+  companyCode: string
+): Permission[] {
+  const base = getPermissionsForRole(roleName);
+  const revoked = COMPANY_REVOKED_PERMISSIONS[companyCode.toUpperCase()];
+  if (!revoked) return base;
+  return base.filter((p) => !revoked.includes(p));
+}
 
 /**
  * Returns the permission list for a given role name.

@@ -31,6 +31,7 @@ import {
   CrossCheckTable,
   DailyDetailTable,
   HeldFundTable,
+  SettlementTable,
   QualityTable,
   StockPositionTable,
 } from "@/components/admin/finance/finance-report-tables";
@@ -162,7 +163,11 @@ export function FinanceReportView({
         kas + bank), bukan laba rugi. &ldquo;Perubahan bersih&rdquo; adalah selisih posisi akhir dan
         posisi awal periode — indikator hasil usaha yang belum dikurangi biaya operasional dan belum
         memisahkan setoran maupun penarikan modal. Hari tanpa konfirmasi memakai saldo terakhir yang
-        masih berlaku.
+        masih berlaku.{" "}
+        <strong className="font-medium">Total Aset Konsolidasi di atas adalah Saldo Fisik</strong> —
+        yang benar-benar ada dan bisa dihitung ulang. Versi setelah piutang dan hutang
+        diperhitungkan ada di bagian{" "}
+        <strong className="font-medium">Dana Tertahan &amp; Posisi Bersih</strong> di bawah.
       </p>
 
       {/* ── Komposisi ────────────────────────────────────────────────────── */}
@@ -327,41 +332,74 @@ export function FinanceReportView({
         </SectionCard>
       </section>
 
-      {/* ── Dana tertahan ────────────────────────────────────────────────── */}
+      {/* ── Dana tertahan & posisi bersih ────────────────────────────────── */}
       <section>
         <SectionHeading
           icon={<IconClockDollar className="size-4" />}
-          title="Dana Tertahan"
-          description="Hutang orang ke perusahaan — uang yang sudah tercatat tapi belum masuk. Sengaja di luar Total Aset di atas: angka itu hanya memuat yang sudah dikonfirmasi kepala cabang."
+          title="Dana Tertahan & Posisi Bersih"
+          description={`Dua strata angka yang harus dibaca berdampingan: Saldo Fisik — yang benar-benar ada dan bisa dihitung ulang — dan Posisi Bersih, yaitu Saldo Fisik setelah piutang ditambahkan dan hutang dikurangkan. Posisi per ${formatDate(range.to)}.`}
         />
-        <MetricRow columns={3} className="mt-6">
+        <MetricRow columns={4} className="mt-6">
           <MetricBlock
             size="secondary"
-            label="Belum Lunas"
-            prefix={group.heldFunds.outstanding > 0 ? "Rp" : undefined}
-            tone={group.heldFunds.outstanding > 0 ? "warning" : "muted"}
+            label="Saldo Fisik"
+            prefix={rp(group.settlement.physical)}
+            value={formatIdr(group.settlement.physical)}
+            meta="Stock + kas + bank hasil cross-check — yang bisa dihitung ulang malam ini"
+          />
+          <MetricBlock
+            size="secondary"
+            label="Piutang — Credit"
+            prefix={group.settlement.receivable > 0 ? "Rp" : undefined}
+            tone={group.settlement.receivable > 0 ? "warning" : "muted"}
             value={
-              group.heldFunds.outstanding > 0 ? formatIdr(group.heldFunds.outstanding) : "Nihil"
+              group.settlement.receivable > 0 ? formatIdr(group.settlement.receivable) : "Nihil"
             }
-            meta={`${formatCount(group.heldFunds.outstandingCount)} catatan, posisi ${formatDate(range.to)}`}
+            meta={`${formatCount(group.heldFunds.credit.outstandingCount)} catatan · uang akan masuk · menambah`}
           />
           <MetricBlock
             size="secondary"
-            label="Cair di Periode Ini"
-            prefix={rp(group.heldFunds.settled)}
-            tone={group.heldFunds.settled > 0 ? "success" : "muted"}
-            value={formatIdr(group.heldFunds.settled)}
-            meta={`${formatCount(group.heldFunds.settledCount)} catatan dinyatakan lunas`}
+            label="Hutang — Debit"
+            prefix={group.settlement.payable > 0 ? "Rp" : undefined}
+            tone={group.settlement.payable > 0 ? "destructive" : "muted"}
+            value={group.settlement.payable > 0 ? formatIdr(group.settlement.payable) : "Nihil"}
+            meta={`${formatCount(group.heldFunds.debit.outstandingCount)} catatan · uang akan keluar · mengurangi`}
           />
           <MetricBlock
-            size="secondary"
-            label="Tercatat di Periode Ini"
-            prefix={rp(group.heldFunds.added)}
-            value={formatIdr(group.heldFunds.added)}
-            meta="Hutang baru sepanjang periode, lunas maupun belum"
+            size="hero"
+            label="Posisi Bersih"
+            prefix={rp(group.settlement.net)}
+            value={formatIdr(group.settlement.net)}
+            meta={
+              <>
+                Saldo Fisik{" "}
+                <span className="tabular text-foreground">
+                  {formatIdr(group.settlement.physical)}
+                </span>{" "}
+                {group.heldFunds.netAdjustment >= 0 ? "+" : "−"}{" "}
+                <span className="tabular text-foreground">
+                  {formatIdr(Math.abs(group.heldFunds.netAdjustment))}
+                </span>{" "}
+                dana tertahan bersih
+              </>
+            }
           />
         </MetricRow>
-        {group.heldFunds.outstanding > 0 && (
+
+        <SectionCard className="mt-8" padded={false}>
+          <SettlementTable companies={report.companies} group={group} />
+        </SectionCard>
+
+        <p className="text-muted-foreground mt-3 max-w-3xl text-xs leading-relaxed">
+          Piutang <strong className="font-medium">ditambahkan</strong> karena uangnya sudah keluar
+          dari laci — valas/barangnya berpindah, pembayarannya belum masuk — sehingga Saldo Fisik
+          memang sudah lebih rendah. Hutang <strong className="font-medium">dikurangkan</strong>{" "}
+          karena uangnya masih ada secara fisik tapi sudah menjadi milik orang lain. Posisi Bersih
+          tidak pernah dipakai sebagai Total Aset di bagian atas halaman: angka itu harus tetap bisa
+          dicocokkan baris per baris dengan hitung ulang kepala cabang.
+        </p>
+
+        {(group.settlement.receivable > 0 || group.settlement.payable > 0) && (
           <SectionCard className="mt-8" padded={false}>
             <HeldFundTable companies={report.companies} group={group} />
           </SectionCard>
