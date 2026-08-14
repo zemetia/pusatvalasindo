@@ -1,0 +1,442 @@
+[
+  {
+    "id": "cmrptnktg006cq0vk28sl4zsk",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnku9006dq0vko8zjosbm",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_complain_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkuv006eq0vk4gldeifu",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkvg006fq0vk30969okp",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_laporan_&_rekonsiliasi_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkw1006gq0vkz32mc5cu",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_laporan_compliance_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkwn006hq0vku2o2d6gb",
+    "companyId": "1",
+    "customRoleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "kpiId": "def_kepuasan_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkx8006iq0vkweksu5qs",
+    "companyId": "1",
+    "customRoleId": "cmrptn3eu003vq0vktqm8dt08",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkxv006jq0vksx3rcnkc",
+    "companyId": "1",
+    "customRoleId": "cmrptn3eu003vq0vktqm8dt08",
+    "kpiId": "def_ketelitian_perhitungan",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkyf006kq0vkicq4cfxj",
+    "companyId": "1",
+    "customRoleId": "cmrptn3eu003vq0vktqm8dt08",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkz0006lq0vkbnz54d9p",
+    "companyId": "1",
+    "customRoleId": "cmrptn3eu003vq0vktqm8dt08",
+    "kpiId": "def_kepuasan_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnkzm006mq0vkejqne9o2",
+    "companyId": "1",
+    "customRoleId": "cmrptn3eu003vq0vktqm8dt08",
+    "kpiId": "def_kebersihan_&_kerapihan_booth",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl08006nq0vkhnhwzgjk",
+    "companyId": "1",
+    "customRoleId": "cmrptn3e6003uq0vkj1wo653f",
+    "kpiId": "def_closing_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl0t006oq0vk5u613xyn",
+    "companyId": "1",
+    "customRoleId": "cmrptn3e6003uq0vkj1wo653f",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl1d006pq0vki0pefjds",
+    "companyId": "1",
+    "customRoleId": "cmrptn3e6003uq0vkj1wo653f",
+    "kpiId": "def_kesesuaian_jumlah_kas",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl1y006qq0vkj8c1fs5e",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cz003sq0vkanq33mzt",
+    "kpiId": "def_ketepatan_waktu_&_jumlah_pengiriman",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl2l006rq0vk7l9x8kqt",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cz003sq0vkanq33mzt",
+    "kpiId": "def_laporan_serah_terima_barang_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl3e006sq0vkmr2y7kv7",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cz003sq0vkanq33mzt",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl40006tq0vksffh3osn",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cd003rq0vk455vb7gh",
+    "kpiId": "def_net_profit_margin",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl4l006uq0vkj4w2e7yk",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cd003rq0vk455vb7gh",
+    "kpiId": "def_ketersediaan_stok_mata_uang",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl55006vq0vkyglydogd",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cd003rq0vk455vb7gh",
+    "kpiId": "def_complain_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl5q006wq0vklcle42lk",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cd003rq0vk455vb7gh",
+    "kpiId": "def_update_kurs",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl6b006xq0vkwbvp8owt",
+    "companyId": "1",
+    "customRoleId": "cmrptn3cd003rq0vk455vb7gh",
+    "kpiId": "def_team_management",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl6w006yq0vkdg2mxjip",
+    "companyId": "1",
+    "customRoleId": "cmrptn3bo003qq0vk0urqlkid",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl7k006zq0vk9to45hai",
+    "companyId": "1",
+    "customRoleId": "cmrptn3bo003qq0vk0urqlkid",
+    "kpiId": "def_kepatuhan_regulasi_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl850070q0vkbpqfh53h",
+    "companyId": "1",
+    "customRoleId": "cmrptn3bo003qq0vk0urqlkid",
+    "kpiId": "def_resiko_likuiditas",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl8t0071q0vky4sp8mrb",
+    "companyId": "1",
+    "customRoleId": "cmrptn3bo003qq0vk0urqlkid",
+    "kpiId": "def_efisiensi_pelaporan_&_monitoring_kurs",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl9f0072q0vk7luhdor0",
+    "companyId": "1",
+    "customRoleId": "cmrptn3bo003qq0vk0urqlkid",
+    "kpiId": "def_team_management",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnl9z0073q0vkoeampm9w",
+    "companyId": "2",
+    "customRoleId": "cmrptn3i90041q0vkt956zg0g",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlal0074q0vkev49six0",
+    "companyId": "2",
+    "customRoleId": "cmrptn3i90041q0vkt956zg0g",
+    "kpiId": "def_ketelitian_perhitungan",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlb80075q0vkwn5mkavf",
+    "companyId": "2",
+    "customRoleId": "cmrptn3i90041q0vkt956zg0g",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlbt0076q0vk5y8jik4o",
+    "companyId": "2",
+    "customRoleId": "cmrptn3i90041q0vkt956zg0g",
+    "kpiId": "def_kepuasan_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlcv0077q0vkczw1wcoh",
+    "companyId": "2",
+    "customRoleId": "cmrptn3i90041q0vkt956zg0g",
+    "kpiId": "def_kebersihan_&_kerapihan_booth",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnldf0078q0vka7oklq9k",
+    "companyId": "2",
+    "customRoleId": "cmrptn3ho0040q0vkgwifaotd",
+    "kpiId": "def_closing_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnldz0079q0vk1vn1dpjm",
+    "companyId": "2",
+    "customRoleId": "cmrptn3ho0040q0vkgwifaotd",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlen007aq0vkctoz29a8",
+    "companyId": "2",
+    "customRoleId": "cmrptn3ho0040q0vkgwifaotd",
+    "kpiId": "def_kesesuaian_jumlah_kas",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlf8007bq0vkhuiboyvh",
+    "companyId": "2",
+    "customRoleId": "cmrptn3gj003yq0vkbdi9lzb5",
+    "kpiId": "def_ketepatan_waktu_&_jumlah_pengiriman",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlg0007cq0vk59zrppz4",
+    "companyId": "2",
+    "customRoleId": "cmrptn3gj003yq0vkbdi9lzb5",
+    "kpiId": "def_laporan_serah_terima_barang_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlgq007dq0vk07vcog4s",
+    "companyId": "2",
+    "customRoleId": "cmrptn3gj003yq0vkbdi9lzb5",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlhd007eq0vkh4lhvtwg",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fz003xq0vkayvghcvo",
+    "kpiId": "def_net_profit_margin",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlhy007fq0vk7klyxrxg",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fz003xq0vkayvghcvo",
+    "kpiId": "def_ketersediaan_stok_mata_uang",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlij007gq0vk8vl70lzo",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fe003wq0vk4c75x37x",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlj5007hq0vkg2utr0ry",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fe003wq0vk4c75x37x",
+    "kpiId": "def_kepatuhan_regulasi_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnljs007iq0vk1adga69v",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fe003wq0vk4c75x37x",
+    "kpiId": "def_complain_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlkd007jq0vkhrf26g5q",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fe003wq0vk4c75x37x",
+    "kpiId": "def_efisiensi_pelaporan_&_monitoring",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlkz007kq0vk9mw4ibsg",
+    "companyId": "2",
+    "customRoleId": "cmrptn3fe003wq0vk4c75x37x",
+    "kpiId": "def_team_management",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnllj007lq0vkkuzgtatn",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlm5007mq0vkuhe8kibi",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_complain_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlmq007nq0vku5mwygd7",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_kesesuaian_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlnb007oq0vk0rmfbpf3",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_laporan_&_rekonsiliasi_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlnv007pq0vk51vn1opi",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_laporan_compliance_tepat_waktu",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnloh007qq0vkx0fx7dym",
+    "companyId": "3",
+    "customRoleId": "cmrptn3ks0045q0vkn390ftul",
+    "kpiId": "def_kepuasan_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlp2007rq0vkwao38ff5",
+    "companyId": "3",
+    "customRoleId": "cmrptn3iv0042q0vkfp9ywcev",
+    "kpiId": "def_jumlah_omzet",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlpn007sq0vktdr577se",
+    "companyId": "3",
+    "customRoleId": "cmrptn3iv0042q0vkfp9ywcev",
+    "kpiId": "def_kepatuhan_regulasi_sop",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlq8007tq0vkh0zyh5q3",
+    "companyId": "3",
+    "customRoleId": "cmrptn3iv0042q0vkfp9ywcev",
+    "kpiId": "def_complain_nasabah",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  },
+  {
+    "id": "cmrptnlqu007uq0vklcxg8h35",
+    "companyId": "3",
+    "customRoleId": "cmrptn3iv0042q0vkfp9ywcev",
+    "kpiId": "def_efisiensi_pelaporan_&_monitoring",
+    "maxAchievement": "1.200000000000000000000000000000",
+    "minAchievement": "0.000000000000000000000000000000"
+  }
+]

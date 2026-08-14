@@ -1,0 +1,488 @@
+[
+  {
+    "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+    "name": "Kepala Cabang",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "attendance.view_all",
+      "attendance.manage",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "kpi.view_all",
+      "kpi.manage",
+      "payroll.view_own",
+      "payroll.manage",
+      "stock.view",
+      "stock.manage",
+      "bank.view",
+      "stockist.view",
+      "stockist.verify",
+      "correction.view",
+      "company_stock.view",
+      "company_stock.manage",
+      "currency.view",
+      "users.view",
+      "roles.view",
+      "stockist.manage",
+      "bank.daily_input"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znr52000smovklwiwqznv",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "attendance.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000tmovk42kk7s03",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "attendance.all",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000umovkv589zfbj",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "kpi.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000vmovk6sw46r77",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "payroll.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000wmovkoxayxb6a",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "watcher.valas",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000xmovk3bo7ulk7",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "bank.accounts",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520010movkmp3rn4af",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "stockist.verify",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520011movk3ykw9ehr",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "stock.pt",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520012movkemb63lf2",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "currency",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520013movkjrn1evct",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "currency.stock",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520014movkp0d59y6n",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "currency.price",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr520015movkq9rgrp8j",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "users",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-07-30T04:03:27.398Z"
+      },
+      {
+        "id": "cms6znr52000zmovkljr42g7e",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-08-13T17:10:01.420Z"
+      },
+      {
+        "id": "cms6znr52000ymovkqyhk8kjv",
+        "roleId": "cmrptn3iv0042q0vkfp9ywcev",
+        "resource": "bank.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:27.398Z",
+        "updatedAt": "2026-08-13T17:10:01.490Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+    "name": "Kepala Marketing",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "kpi.view_all",
+      "kpi.manage",
+      "payroll.view_own",
+      "payroll.manage",
+      "bank.view",
+      "correction.view",
+      "users.view",
+      "roles.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znsvy001ymovkwjsap64f",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "attendance.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0020movkszygg9o6",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "kpi.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0021movkgjc8iz9q",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "payroll.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0022movkg11g372l",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "watcher.valas",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0023movkm1fk5eys",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "bank.accounts",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0024movk2uk8s1zo",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "bank.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy002bmovkczvlnema",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "users",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cmsrrx8sw0007ncx3zvc60ww0",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "price.benchmark",
+        "viewScope": "ALL",
+        "viewCompanyIds": [],
+        "writeScope": "ALL",
+        "writeCompanyIds": [],
+        "createdAt": "2026-08-13T17:10:02.960Z",
+        "updatedAt": "2026-08-13T17:10:02.960Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3ks0045q0vkn390ftul",
+    "name": "Marketing",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "payroll.view_own",
+      "bank.view",
+      "bank.daily_input",
+      "correction.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6zntcn002wmovkq0fbnt8k",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "attendance.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      },
+      {
+        "id": "cms6zntcn002xmovkd1f7frpo",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "kpi.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      },
+      {
+        "id": "cms6zntcn002ymovkakvtd59i",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "payroll.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      },
+      {
+        "id": "cms6zntcn002zmovkkgjez10u",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "watcher.valas",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      },
+      {
+        "id": "cms6zntcn0030movkrgjhqe1o",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "bank.accounts",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      },
+      {
+        "id": "cms6zntcn0031movk13giqk9c",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "bank.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3le0046q0vkrye52zwk",
+    "name": "Teller Dalam",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "stock.view",
+      "stock.manage",
+      "currency.view",
+      "payroll.view_own",
+      "stockist.view",
+      "stockist.manage",
+      "correction.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6zntjm0033movkyal0fnnk",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "attendance.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0034movkzdrm0ego",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "kpi.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0035movkqo0zpu6q",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "payroll.self",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0036movkmfdaix97",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "watcher.valas",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0037movkn25rrm1y",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0038movket95h4tn",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "currency",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm0039movkejr45089",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "currency.stock",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      },
+      {
+        "id": "cms6zntjm003amovka1eccxhf",
+        "roleId": "cmrptn3le0046q0vkrye52zwk",
+        "resource": "currency.price",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.514Z",
+        "updatedAt": "2026-07-30T04:03:30.514Z"
+      }
+    ]
+  }
+]

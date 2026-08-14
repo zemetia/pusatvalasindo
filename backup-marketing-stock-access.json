@@ -1,0 +1,377 @@
+[
+  {
+    "roleId": "cmrptn3cd003rq0vk455vb7gh",
+    "name": "Kepala Marketing",
+    "companyId": "1",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "attendance.view_all",
+      "attendance.manage",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "kpi.view_all",
+      "kpi.manage",
+      "payroll.view_own",
+      "payroll.manage",
+      "stock.view",
+      "stock.manage",
+      "bank.view",
+      "stockist.view",
+      "stockist.verify",
+      "correction.view",
+      "company_stock.view",
+      "company_stock.manage",
+      "currency.view",
+      "users.view",
+      "roles.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znsqe001dmovkis2kh0ky",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      },
+      {
+        "id": "cms6znsqe001emovky3dw3c8o",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "stockist.verify",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      },
+      {
+        "id": "cms6znsqe001fmovkjxs9qwey",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "stock.pt",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      },
+      {
+        "id": "cms6znsqe001gmovkpuu71q3k",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "currency",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      },
+      {
+        "id": "cms6znsqe001hmovk1htal3is",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "currency.stock",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      },
+      {
+        "id": "cms6znsqe001imovkxttthaie",
+        "roleId": "cmrptn3cd003rq0vk455vb7gh",
+        "resource": "currency.price",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.462Z",
+        "updatedAt": "2026-07-30T04:03:29.462Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3fz003xq0vkayvghcvo",
+    "name": "Kepala Marketing",
+    "companyId": "2",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "attendance.view_all",
+      "attendance.manage",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "kpi.view_all",
+      "kpi.manage",
+      "payroll.view_own",
+      "payroll.manage",
+      "stock.view",
+      "stock.manage",
+      "bank.view",
+      "stockist.view",
+      "stockist.verify",
+      "correction.view",
+      "company_stock.view",
+      "company_stock.manage",
+      "currency.view",
+      "users.view",
+      "roles.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znst7001rmovk9raprmo7",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      },
+      {
+        "id": "cms6znst7001smovk45iyn6u6",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "stockist.verify",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      },
+      {
+        "id": "cms6znst7001tmovkzyonbnxi",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "stock.pt",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      },
+      {
+        "id": "cms6znst7001umovkk964ij9j",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "currency",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      },
+      {
+        "id": "cms6znst7001vmovkk7r8ild3",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "currency.stock",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      },
+      {
+        "id": "cms6znst7001wmovk56x6xadp",
+        "roleId": "cmrptn3fz003xq0vkayvghcvo",
+        "resource": "currency.price",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.563Z",
+        "updatedAt": "2026-07-30T04:03:29.563Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+    "name": "Kepala Marketing",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "attendance.view_all",
+      "attendance.manage",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "kpi.view_all",
+      "kpi.manage",
+      "payroll.view_own",
+      "payroll.manage",
+      "stock.view",
+      "stock.manage",
+      "bank.view",
+      "stockist.view",
+      "stockist.verify",
+      "correction.view",
+      "company_stock.view",
+      "company_stock.manage",
+      "currency.view",
+      "users.view",
+      "roles.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znsvy0025movk3tx7d06x",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0026movkx8ke0izw",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "stockist.verify",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0027movkwyfb3c1w",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "stock.pt",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "OWN",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0028movkpj1wbnha",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "currency",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy0029movklkcpt95j",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "currency.stock",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      },
+      {
+        "id": "cms6znsvy002amovkm1qbe4sa",
+        "roleId": "cmrptn3jl0043q0vkqdwcc43h",
+        "resource": "currency.price",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:29.662Z",
+        "updatedAt": "2026-07-30T04:03:29.662Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3dk003tq0vkiluqzm9c",
+    "name": "Marketing",
+    "companyId": "1",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "payroll.view_own",
+      "bank.view",
+      "bank.daily_input",
+      "stockist.view",
+      "correction.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znta1002vmovkwdfvfhtb",
+        "roleId": "cmrptn3dk003tq0vkiluqzm9c",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.169Z",
+        "updatedAt": "2026-07-30T04:03:30.169Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3ks0045q0vkn390ftul",
+    "name": "Marketing",
+    "companyId": "3",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "payroll.view_own",
+      "bank.view",
+      "bank.daily_input",
+      "stockist.view",
+      "correction.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6zntcn0032movkwn1el3fe",
+        "roleId": "cmrptn3ks0045q0vkn390ftul",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.263Z",
+        "updatedAt": "2026-07-30T04:03:30.263Z"
+      }
+    ]
+  },
+  {
+    "roleId": "cmrptn3h4003zq0vknx3rfrsy",
+    "name": "Marketing",
+    "companyId": "2",
+    "permissions": [
+      "dashboard.view",
+      "attendance.view_own",
+      "kpi.fill_own",
+      "kpi.view_own",
+      "payroll.view_own",
+      "bank.view",
+      "bank.daily_input",
+      "stockist.view",
+      "correction.view"
+    ],
+    "resourcePerms": [
+      {
+        "id": "cms6znt79002omovkvf7lyeyq",
+        "roleId": "cmrptn3h4003zq0vknx3rfrsy",
+        "resource": "stockist.daily",
+        "viewScope": "OWN",
+        "viewCompanyIds": [],
+        "writeScope": "NONE",
+        "writeCompanyIds": [],
+        "createdAt": "2026-07-30T04:03:30.069Z",
+        "updatedAt": "2026-07-30T04:03:30.069Z"
+      }
+    ]
+  }
+]
