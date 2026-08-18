@@ -136,9 +136,11 @@ model SmartdealRate {
   name      String
   buy       Float
   sell      Float
-  // Value this row held immediately before the current write — lets the UI
-  // show which currencies moved since the last cron fetch. Null until the
-  // second cron run for a code (nothing to compare against on the first).
+  // Kurs dari TERBITAN SMARTDEAL SEBELUMNYA — hanya bergeser saat
+  // "Kurs diperbarui" milik SmartDeal berubah (atau angkanya sendiri
+  // berubah), bukan setiap kali kita scrape. Itu yang membuat penanda
+  // naik/turun di Watcher Valas bertahan selama SmartDeal belum menerbitkan
+  // kurs baru. Null sampai terbitan kedua untuk sebuah kode.
   prevBuy   Float?
   prevSell  Float?
   fetchedAt DateTime @default(now())

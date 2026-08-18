@@ -5,8 +5,9 @@ export type UpsertSmartdealRateInput = {
   name: string;
   buy: number;
   sell: number;
-  // Value the row held before this write (looked up by the caller from the
-  // previous findAll() result) — null on a code's first-ever write.
+  // Kurs dari terbitan SmartDeal sebelumnya, sudah diputuskan oleh pemanggil
+  // (smartdeal-rate.service): digeser hanya saat jam perubahan SmartDeal —
+  // bukan jam scrape kita — bergerak. Null pada penulisan pertama sebuah kode.
   prevBuy: number | null;
   prevSell: number | null;
 };

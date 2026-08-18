@@ -188,7 +188,7 @@ export function PatokanHargaPageClient({
     <PageShell>
       <PageHeader
         title="Patokan Harga"
-        description="Aturan penyesuaian harga jual & beli Pusat Valas Indo di atas kurs SmartDeal."
+        description="Aturan penyesuaian harga beli & jual Pusat Valas Indo di atas kurs SmartDeal."
         icon={<IconAdjustmentsHorizontal className="size-5" />}
         action={
           canPushToPrices && (
@@ -260,8 +260,8 @@ export function PatokanHargaPageClient({
             <TableHeader>
               <TableRow>
                 <TableHead>Mata Uang</TableHead>
-                <TableHead>Penyesuaian Jual</TableHead>
                 <TableHead>Penyesuaian Beli</TableHead>
+                <TableHead>Penyesuaian Jual</TableHead>
                 <TableHead className="w-56">Terakhir Diubah</TableHead>
               </TableRow>
             </TableHeader>
@@ -290,10 +290,10 @@ export function PatokanHargaPageClient({
                       </TableCell>
                       <TableCell>
                         <Input
-                          value={state?.sellAdjustment ?? ""}
-                          onChange={(e) => updateField(r.code, "sellAdjustment", e.target.value)}
+                          value={state?.buyAdjustment ?? ""}
+                          onChange={(e) => updateField(r.code, "buyAdjustment", e.target.value)}
                           onBlur={() => saveRow(r.code)}
-                          placeholder="mis. +5"
+                          placeholder="mis. c5"
                           disabled={!canManage}
                           className={cn(
                             "h-8 max-w-32 font-mono",
@@ -303,10 +303,10 @@ export function PatokanHargaPageClient({
                       </TableCell>
                       <TableCell>
                         <Input
-                          value={state?.buyAdjustment ?? ""}
-                          onChange={(e) => updateField(r.code, "buyAdjustment", e.target.value)}
+                          value={state?.sellAdjustment ?? ""}
+                          onChange={(e) => updateField(r.code, "sellAdjustment", e.target.value)}
                           onBlur={() => saveRow(r.code)}
-                          placeholder="mis. c5"
+                          placeholder="mis. +5"
                           disabled={!canManage}
                           className={cn(
                             "h-8 max-w-32 font-mono",

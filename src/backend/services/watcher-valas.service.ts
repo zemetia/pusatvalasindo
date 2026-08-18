@@ -18,8 +18,8 @@ export interface WatcherValasRow {
   name: string;
   smartdealBuy: number | null;
   smartdealSell: number | null;
-  // Value from the previous cron fetch — null if unavailable (first fetch,
-  // or code missing from the cache). Lets the UI flag what moved.
+  // Kurs dari terbitan SmartDeal sebelumnya (patokan penanda naik/turun),
+  // bukan dari scrape kita sebelumnya — null kalau belum ada pembanding.
   smartdealPrevBuy: number | null;
   smartdealPrevSell: number | null;
   yahooRate: number | null;

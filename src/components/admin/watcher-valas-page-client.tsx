@@ -44,8 +44,9 @@ function formatUpdatedAt(iso: string) {
   });
 }
 
-// Shows the value plus a change badge vs. the previous cron fetch — `prev`
-// is null on a currency's first-ever fetch, so nothing to compare against yet.
+// Menampilkan nilai plus badge perubahan terhadap terbitan SmartDeal
+// sebelumnya (jam "Kurs diperbarui" mereka), bukan terhadap refresh kita —
+// `prev` null kalau kode ini belum punya pembanding.
 function RateCell({ value, prev }: { value: number | null; prev: number | null }) {
   if (value == null) return <>—</>;
   if (prev == null || prev === value) {
