@@ -16,7 +16,8 @@ model Branch {
   stockItems        StockItem[]
   stockMutations    StockMutation[]
   users             user[]
-  attendances       Attendance[]
+  attendances       Attendance[]       @relation("AttendanceHomeBranch")
+  checkInAttendances Attendance[]      @relation("AttendanceCheckInBranch")
   payrollSlips      PayrollSlip[]
   valasTransactions ValasTransaction[]
 }
@@ -31,6 +32,7 @@ model Company {
   salaryComponents          SalaryComponent[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
+  roleKpiCaps               RoleKpiCap[]
   custom_roles              custom_role[]
   stockistPockets           StockistPocket[]
   kasPockets                KasPocket[]

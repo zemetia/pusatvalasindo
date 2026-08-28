@@ -79,6 +79,8 @@ export type AttendanceRow = {
   name: string;
   role: string;
   branchName: string;
+  /** Cabang tempat clock-in benar-benar terjadi (rotasi antar cabang); null bila belum absen atau presensi manual. */
+  checkInBranchName: string | null;
   companyId: string | null;
   /** Dihitung per karyawan di server, mengikuti scope tulis per PT. */
   canEdit: boolean;
@@ -653,6 +655,11 @@ export function PresensiPageClient({
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {row.branchName}
+                        {row.checkInBranchName && row.checkInBranchName !== row.branchName && (
+                          <div className="text-warning-foreground text-[11px] font-medium">
+                            Absen di {row.checkInBranchName}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap items-center gap-1.5">

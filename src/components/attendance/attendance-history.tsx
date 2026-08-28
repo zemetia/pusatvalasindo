@@ -15,8 +15,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
 
+type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string } | null };
+
 interface AttendanceHistoryProps {
-  records: Attendance[];
+  records: AttendanceWithCheckInBranch[];
 }
 
 function formatDuration(checkIn: Date, checkOut: Date): string {
@@ -109,6 +111,11 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
                           {format(checkInDate, "HH:mm")}
                         </span>
                       </div>
+                      {record.checkInBranch && (
+                        <span className="text-muted-foreground text-[10px] font-medium leading-none">
+                          {record.checkInBranch.name}
+                        </span>
+                      )}
                       {record.checkInPhotoUrl && (
                         <a href={record.checkInPhotoUrl} target="_blank" rel="noopener noreferrer">
                           <img

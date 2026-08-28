@@ -19,6 +19,7 @@ import { stockistTotalHeadConfirmationRepository } from "@/backend/repositories/
 import { kasHeadConfirmationRepository } from "@/backend/repositories/kas-head-confirmation.repository";
 import { bankHeadConfirmationRepository } from "@/backend/repositories/bank-head-confirmation.repository";
 import { companyHeadConfirmationTotalRepository } from "@/backend/repositories/company-head-confirmation-total.repository";
+import { isKlopMatch } from "@/lib/money-match";
 
 // Dates flow through this module as UTC-midnight (parsed from "YYYY-MM-DD" query params), matching
 // the convention used in stockist.service.ts, so date comparisons stay consistent across modules.
@@ -99,7 +100,7 @@ function buildStockRows(
       systemTotal,
       confirmedQuantity,
       selisih: confirmedQuantity === null ? null : confirmedQuantity - systemTotal,
-      isMatch: confirmedQuantity !== null && confirmedQuantity - systemTotal === 0,
+      isMatch: confirmedQuantity !== null && isKlopMatch(confirmedQuantity, systemTotal),
       confirmedAt: confirmation?.confirmedAt ?? null,
     };
   });
@@ -122,7 +123,7 @@ function buildStockTotals(
     systemTotal,
     confirmedTotal,
     selisih: confirmedTotal - systemTotal,
-    isMatch: confirmedTotal - systemTotal === 0,
+    isMatch: isKlopMatch(confirmedTotal, systemTotal),
     confirmedIdrValue,
     idrConfirmedAt: totalConfirmation?.confirmedAt ?? null,
   };
@@ -166,7 +167,7 @@ async function buildIdrSummary(
   persistMatchedAt: (id: string, matchedAt: Date | null) => Promise<NonNullable<typeof confirmation>>
 ) {
   const confirmedIdrValue = confirmation ? Number(confirmation.confirmedIdrValue) : null;
-  const isMatch = confirmedIdrValue !== null && confirmedIdrValue - systemTotal === 0;
+  const isMatch = confirmedIdrValue !== null && isKlopMatch(confirmedIdrValue, systemTotal);
   const synced = await reconcileMatch(confirmation, isMatch, persistMatchedAt);
 
   return {

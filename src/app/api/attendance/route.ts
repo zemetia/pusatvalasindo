@@ -66,38 +66,64 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Geofence validation: user must be within their branch's attendance radius.
-  // Branch lookup runs regardless of whether GPS was sent, so a request that
-  // omits checkInGpsLat/Lng can't silently skip enforcement for a branch that
-  // requires it.
+  // Geofence validation: karyawan bisa absen di cabang PT mana pun (rotasi
+  // antar cabang), asal berada dalam radius SALAH SATU cabang aktif milik PT
+  // itu — bukan hanya cabang yang tercatat di profilnya. Cabang mana yang
+  // cocok dicatat ke checkInBranchId di bawah. Lookup jalan terlepas dari
+  // GPS dikirim atau tidak, supaya request tanpa checkInGpsLat/Lng tidak
+  // diam-diam lolos dari cabang yang mewajibkan geofence.
   const userWithBranch = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
-      branch: {
-        select: { latitude: true, longitude: true, attendanceRadiusM: true, name: true },
-      },
+      branchId: true,
+      branch: { select: { companyId: true } },
     },
   });
-  const branch = userWithBranch?.branch;
-  if (branch?.latitude != null && branch?.longitude != null) {
-    if (checkInGpsLat == null || checkInGpsLng == null) {
-      return NextResponse.json(
-        { error: `Lokasi GPS wajib diaktifkan untuk absen di cabang ${branch.name}.` },
-        { status: 403 }
-      );
-    }
-    const radiusM = branch.attendanceRadiusM ?? 20;
-    const distKm = haversineKm(checkInGpsLat, checkInGpsLng, branch.latitude, branch.longitude);
-    const distM = distKm * 1000;
-    if (distM > radiusM) {
-      return NextResponse.json(
-        {
-          error: `Anda berada ${Math.round(distM)} m dari cabang ${branch.name}. Absensi hanya diizinkan dalam radius ${radiusM} m.`,
-          distanceM: Math.round(distM),
-          radiusM,
-        },
-        { status: 403 }
-      );
+  const companyId = userWithBranch?.branch?.companyId ?? null;
+
+  let checkInBranchId: string | null = userWithBranch?.branchId ?? null;
+
+  if (companyId) {
+    const geofencedBranches = await prisma.branch.findMany({
+      where: {
+        companyId,
+        isActive: true,
+        latitude: { not: null },
+        longitude: { not: null },
+      },
+      select: { id: true, name: true, latitude: true, longitude: true, attendanceRadiusM: true },
+    });
+
+    if (geofencedBranches.length > 0) {
+      if (checkInGpsLat == null || checkInGpsLng == null) {
+        return NextResponse.json(
+          { error: "Lokasi GPS wajib diaktifkan untuk absen." },
+          { status: 403 }
+        );
+      }
+
+      const withDistance = geofencedBranches
+        .map((b) => ({
+          ...b,
+          distM: haversineKm(checkInGpsLat, checkInGpsLng, b.latitude!, b.longitude!) * 1000,
+        }))
+        .sort((a, b) => a.distM - b.distM);
+
+      const nearest = withDistance[0];
+      const matched = withDistance.find((b) => b.distM <= (b.attendanceRadiusM ?? 20));
+
+      if (!matched) {
+        return NextResponse.json(
+          {
+            error: `Anda berada ${Math.round(nearest.distM)} m dari cabang terdekat (${nearest.name}). Absensi hanya diizinkan dalam radius salah satu cabang.`,
+            distanceM: Math.round(nearest.distM),
+            nearestBranch: nearest.name,
+          },
+          { status: 403 }
+        );
+      }
+
+      checkInBranchId = matched.id;
     }
   }
 
@@ -136,6 +162,7 @@ export async function POST(req: NextRequest) {
       checkInGpsLng,
       checkInManualLat,
       checkInManualLng,
+      checkInBranchId,
       isLocationSuspect,
       status,
       notes,
@@ -147,6 +174,7 @@ export async function POST(req: NextRequest) {
       checkInGpsLng,
       checkInManualLat,
       checkInManualLng,
+      checkInBranchId,
       isLocationSuspect,
       status,
       notes,

@@ -89,6 +89,9 @@ export default async function PresensiKaryawanPage({
           isLocationSuspect: true,
           editedAt: true,
           editedBy: { select: { name: true } },
+          // Cabang tempat clock-in benar-benar terjadi — beda dari cabang
+          // profil (branchName) saat karyawan absen di cabang lain (rotasi).
+          checkInBranch: { select: { name: true } },
         },
       }),
     ]);
@@ -108,6 +111,7 @@ export default async function PresensiKaryawanPage({
       name: u.name,
       role: u.customRole?.name ?? "Karyawan",
       branchName: u.branch?.name ?? "—",
+      checkInBranchName: att?.checkInBranch?.name ?? null,
       companyId: u.branch?.companyId ?? null,
       // `canWrite` dievaluasi per karyawan, bukan sekali untuk halaman:
       // sebuah jabatan bisa boleh melihat PT A+B tapi hanya mengoreksi PT A.

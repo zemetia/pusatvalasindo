@@ -137,6 +137,13 @@ export type KpiDefinition = $Result.DefaultSelection<Prisma.$KpiDefinitionPayloa
  */
 export type RoleKpi = $Result.DefaultSelection<Prisma.$RoleKpiPayload>
 /**
+ * Model RoleKpiCap
+ * Plafon skor total (gabungan seluruh KPI tertimbang) untuk satu jabatan di
+ * satu PT. Baris opsional — tanpa baris berarti totalScore bebas tanpa
+ * plafon, sama seperti perilaku default modul ini sebelum fitur ini ada.
+ */
+export type RoleKpiCap = $Result.DefaultSelection<Prisma.$RoleKpiCapPayload>
+/**
  * Model KpiEntry
  * Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai
  * tabel ini: `quantity` berarti jumlah kejadian (penalti/reward), nilai rupiah
@@ -1177,6 +1184,16 @@ export class PrismaClient<
   get roleKpi(): Prisma.RoleKpiDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.roleKpiCap`: Exposes CRUD operations for the **RoleKpiCap** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RoleKpiCaps
+    * const roleKpiCaps = await prisma.roleKpiCap.findMany()
+    * ```
+    */
+  get roleKpiCap(): Prisma.RoleKpiCapDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.kpiEntry`: Exposes CRUD operations for the **KpiEntry** model.
     * Example usage:
     * ```ts
@@ -1961,6 +1978,7 @@ export namespace Prisma {
     CompanyStockItem: 'CompanyStockItem',
     KpiDefinition: 'KpiDefinition',
     RoleKpi: 'RoleKpi',
+    RoleKpiCap: 'RoleKpiCap',
     KpiEntry: 'KpiEntry',
     KpiPeriod: 'KpiPeriod',
     KpiMonthlyResult: 'KpiMonthlyResult',
@@ -2009,7 +2027,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
+      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "roleKpiCap" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3638,6 +3656,80 @@ export namespace Prisma {
           count: {
             args: Prisma.RoleKpiCountArgs<ExtArgs>
             result: $Utils.Optional<RoleKpiCountAggregateOutputType> | number
+          }
+        }
+      }
+      RoleKpiCap: {
+        payload: Prisma.$RoleKpiCapPayload<ExtArgs>
+        fields: Prisma.RoleKpiCapFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RoleKpiCapFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RoleKpiCapFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          findFirst: {
+            args: Prisma.RoleKpiCapFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RoleKpiCapFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          findMany: {
+            args: Prisma.RoleKpiCapFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>[]
+          }
+          create: {
+            args: Prisma.RoleKpiCapCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          createMany: {
+            args: Prisma.RoleKpiCapCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RoleKpiCapCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>[]
+          }
+          delete: {
+            args: Prisma.RoleKpiCapDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          update: {
+            args: Prisma.RoleKpiCapUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          deleteMany: {
+            args: Prisma.RoleKpiCapDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RoleKpiCapUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RoleKpiCapUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>[]
+          }
+          upsert: {
+            args: Prisma.RoleKpiCapUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleKpiCapPayload>
+          }
+          aggregate: {
+            args: Prisma.RoleKpiCapAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRoleKpiCap>
+          }
+          groupBy: {
+            args: Prisma.RoleKpiCapGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RoleKpiCapGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RoleKpiCapCountArgs<ExtArgs>
+            result: $Utils.Optional<RoleKpiCapCountAggregateOutputType> | number
           }
         }
       }
@@ -6213,6 +6305,7 @@ export namespace Prisma {
     companyStockItem?: CompanyStockItemOmit
     kpiDefinition?: KpiDefinitionOmit
     roleKpi?: RoleKpiOmit
+    roleKpiCap?: RoleKpiCapOmit
     kpiEntry?: KpiEntryOmit
     kpiPeriod?: KpiPeriodOmit
     kpiMonthlyResult?: KpiMonthlyResultOmit
@@ -6327,6 +6420,7 @@ export namespace Prisma {
 
   export type Custom_roleCountOutputType = {
     roleKpis: number
+    roleKpiCaps: number
     users: number
     resourcePerms: number
     payrollSlips: number
@@ -6334,6 +6428,7 @@ export namespace Prisma {
 
   export type Custom_roleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roleKpis?: boolean | Custom_roleCountOutputTypeCountRoleKpisArgs
+    roleKpiCaps?: boolean | Custom_roleCountOutputTypeCountRoleKpiCapsArgs
     users?: boolean | Custom_roleCountOutputTypeCountUsersArgs
     resourcePerms?: boolean | Custom_roleCountOutputTypeCountResourcePermsArgs
     payrollSlips?: boolean | Custom_roleCountOutputTypeCountPayrollSlipsArgs
@@ -6355,6 +6450,13 @@ export namespace Prisma {
    */
   export type Custom_roleCountOutputTypeCountRoleKpisArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleKpiWhereInput
+  }
+
+  /**
+   * Custom_roleCountOutputType without action
+   */
+  export type Custom_roleCountOutputTypeCountRoleKpiCapsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleKpiCapWhereInput
   }
 
   /**
@@ -6631,6 +6733,7 @@ export namespace Prisma {
     stockMutations: number
     users: number
     attendances: number
+    checkInAttendances: number
     payrollSlips: number
     valasTransactions: number
   }
@@ -6641,6 +6744,7 @@ export namespace Prisma {
     stockMutations?: boolean | BranchCountOutputTypeCountStockMutationsArgs
     users?: boolean | BranchCountOutputTypeCountUsersArgs
     attendances?: boolean | BranchCountOutputTypeCountAttendancesArgs
+    checkInAttendances?: boolean | BranchCountOutputTypeCountCheckInAttendancesArgs
     payrollSlips?: boolean | BranchCountOutputTypeCountPayrollSlipsArgs
     valasTransactions?: boolean | BranchCountOutputTypeCountValasTransactionsArgs
   }
@@ -6694,6 +6798,13 @@ export namespace Prisma {
   /**
    * BranchCountOutputType without action
    */
+  export type BranchCountOutputTypeCountCheckInAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
   export type BranchCountOutputTypeCountPayrollSlipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PayrollSlipWhereInput
   }
@@ -6714,6 +6825,7 @@ export namespace Prisma {
     salaryComponents: number
     branches: number
     roleKpis: number
+    roleKpiCaps: number
     custom_roles: number
     stockistPockets: number
     kasPockets: number
@@ -6734,6 +6846,7 @@ export namespace Prisma {
     salaryComponents?: boolean | CompanyCountOutputTypeCountSalaryComponentsArgs
     branches?: boolean | CompanyCountOutputTypeCountBranchesArgs
     roleKpis?: boolean | CompanyCountOutputTypeCountRoleKpisArgs
+    roleKpiCaps?: boolean | CompanyCountOutputTypeCountRoleKpiCapsArgs
     custom_roles?: boolean | CompanyCountOutputTypeCountCustom_rolesArgs
     stockistPockets?: boolean | CompanyCountOutputTypeCountStockistPocketsArgs
     kasPockets?: boolean | CompanyCountOutputTypeCountKasPocketsArgs
@@ -6780,6 +6893,13 @@ export namespace Prisma {
    */
   export type CompanyCountOutputTypeCountRoleKpisArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleKpiWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountRoleKpiCapsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleKpiCapWhereInput
   }
 
   /**
@@ -8457,6 +8577,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
+    checkInBranchId: string | null
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
@@ -8480,6 +8601,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
+    checkInBranchId: string | null
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
@@ -8503,6 +8625,7 @@ export namespace Prisma {
     checkInManualLat: number
     checkInManualLng: number
     isLocationSuspect: number
+    checkInBranchId: number
     isWithDoctorNote: number
     status: number
     notes: number
@@ -8542,6 +8665,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    checkInBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8565,6 +8689,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    checkInBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8588,6 +8713,7 @@ export namespace Prisma {
     checkInManualLat?: true
     checkInManualLng?: true
     isLocationSuspect?: true
+    checkInBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8698,6 +8824,7 @@ export namespace Prisma {
     checkInManualLat: number | null
     checkInManualLng: number | null
     isLocationSuspect: boolean
+    checkInBranchId: string | null
     isWithDoctorNote: boolean
     status: $Enums.AttendanceStatus
     notes: string | null
@@ -8740,6 +8867,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    checkInBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8750,6 +8878,7 @@ export namespace Prisma {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8766,6 +8895,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    checkInBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8776,6 +8906,7 @@ export namespace Prisma {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8792,6 +8923,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    checkInBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8802,6 +8934,7 @@ export namespace Prisma {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectScalar = {
@@ -8818,6 +8951,7 @@ export namespace Prisma {
     checkInManualLat?: boolean
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
+    checkInBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8827,21 +8961,24 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "isWithDoctorNote" | "status" | "notes" | "editedById" | "editedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "checkInBranchId" | "isWithDoctorNote" | "status" | "notes" | "editedById" | "editedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }
   export type AttendanceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }
   export type AttendanceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
+    checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
   }
 
   export type $AttendancePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8850,6 +8987,7 @@ export namespace Prisma {
       user: Prisma.$userPayload<ExtArgs>
       editedBy: Prisma.$userPayload<ExtArgs> | null
       branch: Prisma.$BranchPayload<ExtArgs> | null
+      checkInBranch: Prisma.$BranchPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8865,6 +9003,7 @@ export namespace Prisma {
       checkInManualLat: number | null
       checkInManualLng: number | null
       isLocationSuspect: boolean
+      checkInBranchId: string | null
       isWithDoctorNote: boolean
       status: $Enums.AttendanceStatus
       notes: string | null
@@ -9269,6 +9408,7 @@ export namespace Prisma {
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     editedBy<T extends Attendance$editedByArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$editedByArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     branch<T extends Attendance$branchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    checkInBranch<T extends Attendance$checkInBranchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$checkInBranchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9311,6 +9451,7 @@ export namespace Prisma {
     readonly checkInManualLat: FieldRef<"Attendance", 'Float'>
     readonly checkInManualLng: FieldRef<"Attendance", 'Float'>
     readonly isLocationSuspect: FieldRef<"Attendance", 'Boolean'>
+    readonly checkInBranchId: FieldRef<"Attendance", 'String'>
     readonly isWithDoctorNote: FieldRef<"Attendance", 'Boolean'>
     readonly status: FieldRef<"Attendance", 'AttendanceStatus'>
     readonly notes: FieldRef<"Attendance", 'String'>
@@ -9741,6 +9882,25 @@ export namespace Prisma {
    * Attendance.branch
    */
   export type Attendance$branchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
+  }
+
+  /**
+   * Attendance.checkInBranch
+   */
+  export type Attendance$checkInBranchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Branch
      */
@@ -12233,6 +12393,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     roleKpis?: boolean | custom_role$roleKpisArgs<ExtArgs>
+    roleKpiCaps?: boolean | custom_role$roleKpiCapsArgs<ExtArgs>
     company?: boolean | custom_role$companyArgs<ExtArgs>
     users?: boolean | custom_role$usersArgs<ExtArgs>
     resourcePerms?: boolean | custom_role$resourcePermsArgs<ExtArgs>
@@ -12281,6 +12442,7 @@ export namespace Prisma {
   export type custom_roleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "companyId" | "permissions" | "payrollCompanyIds" | "usesResourcePerms" | "createdAt" | "updatedAt", ExtArgs["result"]["custom_role"]>
   export type custom_roleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roleKpis?: boolean | custom_role$roleKpisArgs<ExtArgs>
+    roleKpiCaps?: boolean | custom_role$roleKpiCapsArgs<ExtArgs>
     company?: boolean | custom_role$companyArgs<ExtArgs>
     users?: boolean | custom_role$usersArgs<ExtArgs>
     resourcePerms?: boolean | custom_role$resourcePermsArgs<ExtArgs>
@@ -12298,6 +12460,7 @@ export namespace Prisma {
     name: "custom_role"
     objects: {
       roleKpis: Prisma.$RoleKpiPayload<ExtArgs>[]
+      roleKpiCaps: Prisma.$RoleKpiCapPayload<ExtArgs>[]
       company: Prisma.$CompanyPayload<ExtArgs> | null
       users: Prisma.$userPayload<ExtArgs>[]
       resourcePerms: Prisma.$RoleResourcePermissionPayload<ExtArgs>[]
@@ -12714,6 +12877,7 @@ export namespace Prisma {
   export interface Prisma__custom_roleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     roleKpis<T extends custom_role$roleKpisArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$roleKpisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    roleKpiCaps<T extends custom_role$roleKpiCapsArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$roleKpiCapsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     company<T extends custom_role$companyArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$companyArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     users<T extends custom_role$usersArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     resourcePerms<T extends custom_role$resourcePermsArgs<ExtArgs> = {}>(args?: Subset<T, custom_role$resourcePermsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleResourcePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13178,6 +13342,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RoleKpiScalarFieldEnum | RoleKpiScalarFieldEnum[]
+  }
+
+  /**
+   * custom_role.roleKpiCaps
+   */
+  export type custom_role$roleKpiCapsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    where?: RoleKpiCapWhereInput
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    cursor?: RoleKpiCapWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RoleKpiCapScalarFieldEnum | RoleKpiCapScalarFieldEnum[]
   }
 
   /**
@@ -21128,6 +21316,7 @@ export namespace Prisma {
     stockMutations?: boolean | Branch$stockMutationsArgs<ExtArgs>
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
+    checkInAttendances?: boolean | Branch$checkInAttendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
     valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
@@ -21185,6 +21374,7 @@ export namespace Prisma {
     stockMutations?: boolean | Branch$stockMutationsArgs<ExtArgs>
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
+    checkInAttendances?: boolean | Branch$checkInAttendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
     valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
@@ -21205,6 +21395,7 @@ export namespace Prisma {
       stockMutations: Prisma.$StockMutationPayload<ExtArgs>[]
       users: Prisma.$userPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
+      checkInAttendances: Prisma.$AttendancePayload<ExtArgs>[]
       payrollSlips: Prisma.$PayrollSlipPayload<ExtArgs>[]
       valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
@@ -21620,6 +21811,7 @@ export namespace Prisma {
     stockMutations<T extends Branch$stockMutationsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$stockMutationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockMutationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     users<T extends Branch$usersArgs<ExtArgs> = {}>(args?: Subset<T, Branch$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendances<T extends Branch$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkInAttendances<T extends Branch$checkInAttendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$checkInAttendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollSlips<T extends Branch$payrollSlipsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$payrollSlipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     valasTransactions<T extends Branch$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -22202,6 +22394,30 @@ export namespace Prisma {
   }
 
   /**
+   * Branch.checkInAttendances
+   */
+  export type Branch$checkInAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Attendance
+     */
+    select?: AttendanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Attendance
+     */
+    omit?: AttendanceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceInclude<ExtArgs> | null
+    where?: AttendanceWhereInput
+    orderBy?: AttendanceOrderByWithRelationInput | AttendanceOrderByWithRelationInput[]
+    cursor?: AttendanceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
+  }
+
+  /**
    * Branch.payrollSlips
    */
   export type Branch$payrollSlipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -22443,6 +22659,7 @@ export namespace Prisma {
     salaryComponents?: boolean | Company$salaryComponentsArgs<ExtArgs>
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
+    roleKpiCaps?: boolean | Company$roleKpiCapsArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
     stockistPockets?: boolean | Company$stockistPocketsArgs<ExtArgs>
     kasPockets?: boolean | Company$kasPocketsArgs<ExtArgs>
@@ -22492,6 +22709,7 @@ export namespace Prisma {
     salaryComponents?: boolean | Company$salaryComponentsArgs<ExtArgs>
     branches?: boolean | Company$branchesArgs<ExtArgs>
     roleKpis?: boolean | Company$roleKpisArgs<ExtArgs>
+    roleKpiCaps?: boolean | Company$roleKpiCapsArgs<ExtArgs>
     custom_roles?: boolean | Company$custom_rolesArgs<ExtArgs>
     stockistPockets?: boolean | Company$stockistPocketsArgs<ExtArgs>
     kasPockets?: boolean | Company$kasPocketsArgs<ExtArgs>
@@ -22517,6 +22735,7 @@ export namespace Prisma {
       salaryComponents: Prisma.$SalaryComponentPayload<ExtArgs>[]
       branches: Prisma.$BranchPayload<ExtArgs>[]
       roleKpis: Prisma.$RoleKpiPayload<ExtArgs>[]
+      roleKpiCaps: Prisma.$RoleKpiCapPayload<ExtArgs>[]
       custom_roles: Prisma.$custom_rolePayload<ExtArgs>[]
       stockistPockets: Prisma.$StockistPocketPayload<ExtArgs>[]
       kasPockets: Prisma.$KasPocketPayload<ExtArgs>[]
@@ -22936,6 +23155,7 @@ export namespace Prisma {
     salaryComponents<T extends Company$salaryComponentsArgs<ExtArgs> = {}>(args?: Subset<T, Company$salaryComponentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SalaryComponentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     branches<T extends Company$branchesArgs<ExtArgs> = {}>(args?: Subset<T, Company$branchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     roleKpis<T extends Company$roleKpisArgs<ExtArgs> = {}>(args?: Subset<T, Company$roleKpisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    roleKpiCaps<T extends Company$roleKpiCapsArgs<ExtArgs> = {}>(args?: Subset<T, Company$roleKpiCapsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     custom_roles<T extends Company$custom_rolesArgs<ExtArgs> = {}>(args?: Subset<T, Company$custom_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     stockistPockets<T extends Company$stockistPocketsArgs<ExtArgs> = {}>(args?: Subset<T, Company$stockistPocketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockistPocketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     kasPockets<T extends Company$kasPocketsArgs<ExtArgs> = {}>(args?: Subset<T, Company$kasPocketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KasPocketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -23447,6 +23667,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RoleKpiScalarFieldEnum | RoleKpiScalarFieldEnum[]
+  }
+
+  /**
+   * Company.roleKpiCaps
+   */
+  export type Company$roleKpiCapsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    where?: RoleKpiCapWhereInput
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    cursor?: RoleKpiCapWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RoleKpiCapScalarFieldEnum | RoleKpiCapScalarFieldEnum[]
   }
 
   /**
@@ -32854,6 +33098,7 @@ export namespace Prisma {
     basePoint: Decimal | null
     pointPerUnit: Decimal | null
     toleranceLimit: Decimal | null
+    maxAchievement: Decimal | null
   }
 
   export type RoleKpiSumAggregateOutputType = {
@@ -32862,6 +33107,7 @@ export namespace Prisma {
     basePoint: Decimal | null
     pointPerUnit: Decimal | null
     toleranceLimit: Decimal | null
+    maxAchievement: Decimal | null
   }
 
   export type RoleKpiMinAggregateOutputType = {
@@ -32875,6 +33121,7 @@ export namespace Prisma {
     pointPerUnit: Decimal | null
     toleranceLimit: Decimal | null
     toleranceScope: $Enums.KpiToleranceScope | null
+    maxAchievement: Decimal | null
     inputSource: $Enums.KpiInputSource | null
     requiresApproval: boolean | null
     requiresEvidence: boolean | null
@@ -32894,6 +33141,7 @@ export namespace Prisma {
     pointPerUnit: Decimal | null
     toleranceLimit: Decimal | null
     toleranceScope: $Enums.KpiToleranceScope | null
+    maxAchievement: Decimal | null
     inputSource: $Enums.KpiInputSource | null
     requiresApproval: boolean | null
     requiresEvidence: boolean | null
@@ -32913,6 +33161,7 @@ export namespace Prisma {
     pointPerUnit: number
     toleranceLimit: number
     toleranceScope: number
+    maxAchievement: number
     inputSource: number
     requiresApproval: number
     requiresEvidence: number
@@ -32930,6 +33179,7 @@ export namespace Prisma {
     basePoint?: true
     pointPerUnit?: true
     toleranceLimit?: true
+    maxAchievement?: true
   }
 
   export type RoleKpiSumAggregateInputType = {
@@ -32938,6 +33188,7 @@ export namespace Prisma {
     basePoint?: true
     pointPerUnit?: true
     toleranceLimit?: true
+    maxAchievement?: true
   }
 
   export type RoleKpiMinAggregateInputType = {
@@ -32951,6 +33202,7 @@ export namespace Prisma {
     pointPerUnit?: true
     toleranceLimit?: true
     toleranceScope?: true
+    maxAchievement?: true
     inputSource?: true
     requiresApproval?: true
     requiresEvidence?: true
@@ -32970,6 +33222,7 @@ export namespace Prisma {
     pointPerUnit?: true
     toleranceLimit?: true
     toleranceScope?: true
+    maxAchievement?: true
     inputSource?: true
     requiresApproval?: true
     requiresEvidence?: true
@@ -32989,6 +33242,7 @@ export namespace Prisma {
     pointPerUnit?: true
     toleranceLimit?: true
     toleranceScope?: true
+    maxAchievement?: true
     inputSource?: true
     requiresApproval?: true
     requiresEvidence?: true
@@ -33096,6 +33350,7 @@ export namespace Prisma {
     pointPerUnit: Decimal | null
     toleranceLimit: Decimal | null
     toleranceScope: $Enums.KpiToleranceScope | null
+    maxAchievement: Decimal | null
     inputSource: $Enums.KpiInputSource | null
     requiresApproval: boolean | null
     requiresEvidence: boolean | null
@@ -33135,6 +33390,7 @@ export namespace Prisma {
     pointPerUnit?: boolean
     toleranceLimit?: boolean
     toleranceScope?: boolean
+    maxAchievement?: boolean
     inputSource?: boolean
     requiresApproval?: boolean
     requiresEvidence?: boolean
@@ -33160,6 +33416,7 @@ export namespace Prisma {
     pointPerUnit?: boolean
     toleranceLimit?: boolean
     toleranceScope?: boolean
+    maxAchievement?: boolean
     inputSource?: boolean
     requiresApproval?: boolean
     requiresEvidence?: boolean
@@ -33183,6 +33440,7 @@ export namespace Prisma {
     pointPerUnit?: boolean
     toleranceLimit?: boolean
     toleranceScope?: boolean
+    maxAchievement?: boolean
     inputSource?: boolean
     requiresApproval?: boolean
     requiresEvidence?: boolean
@@ -33206,6 +33464,7 @@ export namespace Prisma {
     pointPerUnit?: boolean
     toleranceLimit?: boolean
     toleranceScope?: boolean
+    maxAchievement?: boolean
     inputSource?: boolean
     requiresApproval?: boolean
     requiresEvidence?: boolean
@@ -33215,7 +33474,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type RoleKpiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "customRoleId" | "kpiId" | "weight" | "targetValue" | "basePoint" | "pointPerUnit" | "toleranceLimit" | "toleranceScope" | "inputSource" | "requiresApproval" | "requiresEvidence" | "systemConfig" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["roleKpi"]>
+  export type RoleKpiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "customRoleId" | "kpiId" | "weight" | "targetValue" | "basePoint" | "pointPerUnit" | "toleranceLimit" | "toleranceScope" | "maxAchievement" | "inputSource" | "requiresApproval" | "requiresEvidence" | "systemConfig" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["roleKpi"]>
   export type RoleKpiInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | CompanyDefaultArgs<ExtArgs>
     customRole?: boolean | RoleKpi$customRoleArgs<ExtArgs>
@@ -33271,6 +33530,12 @@ export namespace Prisma {
        * Cakupan perhitungan toleransi.
        */
       toleranceScope: $Enums.KpiToleranceScope | null
+      /**
+       * Plafon pencapaian KPI ini, dalam rasio (1.2 = 120%). Null = tanpa plafon,
+       * pencapaian bebas di atas 100% (perilaku default modul ini). Hanya
+       * membatasi batas atas — penalti tetap bisa jatuh negatif tanpa batas.
+       */
+      maxAchievement: Prisma.Decimal | null
       inputSource: $Enums.KpiInputSource | null
       requiresApproval: boolean | null
       requiresEvidence: boolean | null
@@ -33722,6 +33987,7 @@ export namespace Prisma {
     readonly pointPerUnit: FieldRef<"RoleKpi", 'Decimal'>
     readonly toleranceLimit: FieldRef<"RoleKpi", 'Decimal'>
     readonly toleranceScope: FieldRef<"RoleKpi", 'KpiToleranceScope'>
+    readonly maxAchievement: FieldRef<"RoleKpi", 'Decimal'>
     readonly inputSource: FieldRef<"RoleKpi", 'KpiInputSource'>
     readonly requiresApproval: FieldRef<"RoleKpi", 'Boolean'>
     readonly requiresEvidence: FieldRef<"RoleKpi", 'Boolean'>
@@ -34188,6 +34454,1127 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: RoleKpiInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RoleKpiCap
+   */
+
+  export type AggregateRoleKpiCap = {
+    _count: RoleKpiCapCountAggregateOutputType | null
+    _avg: RoleKpiCapAvgAggregateOutputType | null
+    _sum: RoleKpiCapSumAggregateOutputType | null
+    _min: RoleKpiCapMinAggregateOutputType | null
+    _max: RoleKpiCapMaxAggregateOutputType | null
+  }
+
+  export type RoleKpiCapAvgAggregateOutputType = {
+    maxTotalScore: Decimal | null
+  }
+
+  export type RoleKpiCapSumAggregateOutputType = {
+    maxTotalScore: Decimal | null
+  }
+
+  export type RoleKpiCapMinAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    customRoleId: string | null
+    maxTotalScore: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleKpiCapMaxAggregateOutputType = {
+    id: string | null
+    companyId: string | null
+    customRoleId: string | null
+    maxTotalScore: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleKpiCapCountAggregateOutputType = {
+    id: number
+    companyId: number
+    customRoleId: number
+    maxTotalScore: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RoleKpiCapAvgAggregateInputType = {
+    maxTotalScore?: true
+  }
+
+  export type RoleKpiCapSumAggregateInputType = {
+    maxTotalScore?: true
+  }
+
+  export type RoleKpiCapMinAggregateInputType = {
+    id?: true
+    companyId?: true
+    customRoleId?: true
+    maxTotalScore?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleKpiCapMaxAggregateInputType = {
+    id?: true
+    companyId?: true
+    customRoleId?: true
+    maxTotalScore?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleKpiCapCountAggregateInputType = {
+    id?: true
+    companyId?: true
+    customRoleId?: true
+    maxTotalScore?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RoleKpiCapAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleKpiCap to aggregate.
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleKpiCaps to fetch.
+     */
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RoleKpiCapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleKpiCaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleKpiCaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RoleKpiCaps
+    **/
+    _count?: true | RoleKpiCapCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RoleKpiCapAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RoleKpiCapSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RoleKpiCapMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RoleKpiCapMaxAggregateInputType
+  }
+
+  export type GetRoleKpiCapAggregateType<T extends RoleKpiCapAggregateArgs> = {
+        [P in keyof T & keyof AggregateRoleKpiCap]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRoleKpiCap[P]>
+      : GetScalarType<T[P], AggregateRoleKpiCap[P]>
+  }
+
+
+
+
+  export type RoleKpiCapGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleKpiCapWhereInput
+    orderBy?: RoleKpiCapOrderByWithAggregationInput | RoleKpiCapOrderByWithAggregationInput[]
+    by: RoleKpiCapScalarFieldEnum[] | RoleKpiCapScalarFieldEnum
+    having?: RoleKpiCapScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RoleKpiCapCountAggregateInputType | true
+    _avg?: RoleKpiCapAvgAggregateInputType
+    _sum?: RoleKpiCapSumAggregateInputType
+    _min?: RoleKpiCapMinAggregateInputType
+    _max?: RoleKpiCapMaxAggregateInputType
+  }
+
+  export type RoleKpiCapGroupByOutputType = {
+    id: string
+    companyId: string
+    customRoleId: string
+    maxTotalScore: Decimal
+    createdAt: Date
+    updatedAt: Date
+    _count: RoleKpiCapCountAggregateOutputType | null
+    _avg: RoleKpiCapAvgAggregateOutputType | null
+    _sum: RoleKpiCapSumAggregateOutputType | null
+    _min: RoleKpiCapMinAggregateOutputType | null
+    _max: RoleKpiCapMaxAggregateOutputType | null
+  }
+
+  type GetRoleKpiCapGroupByPayload<T extends RoleKpiCapGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RoleKpiCapGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RoleKpiCapGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RoleKpiCapGroupByOutputType[P]>
+            : GetScalarType<T[P], RoleKpiCapGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RoleKpiCapSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    customRoleId?: boolean
+    maxTotalScore?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleKpiCap"]>
+
+  export type RoleKpiCapSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    customRoleId?: boolean
+    maxTotalScore?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleKpiCap"]>
+
+  export type RoleKpiCapSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    companyId?: boolean
+    customRoleId?: boolean
+    maxTotalScore?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleKpiCap"]>
+
+  export type RoleKpiCapSelectScalar = {
+    id?: boolean
+    companyId?: boolean
+    customRoleId?: boolean
+    maxTotalScore?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RoleKpiCapOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "companyId" | "customRoleId" | "maxTotalScore" | "createdAt" | "updatedAt", ExtArgs["result"]["roleKpiCap"]>
+  export type RoleKpiCapInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+  export type RoleKpiCapIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+  export type RoleKpiCapIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
+    customRole?: boolean | custom_roleDefaultArgs<ExtArgs>
+  }
+
+  export type $RoleKpiCapPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RoleKpiCap"
+    objects: {
+      company: Prisma.$CompanyPayload<ExtArgs>
+      customRole: Prisma.$custom_rolePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      companyId: string
+      customRoleId: string
+      /**
+       * Plafon totalScore, dalam rasio (1.2 = 120%).
+       */
+      maxTotalScore: Prisma.Decimal
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["roleKpiCap"]>
+    composites: {}
+  }
+
+  type RoleKpiCapGetPayload<S extends boolean | null | undefined | RoleKpiCapDefaultArgs> = $Result.GetResult<Prisma.$RoleKpiCapPayload, S>
+
+  type RoleKpiCapCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RoleKpiCapFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RoleKpiCapCountAggregateInputType | true
+    }
+
+  export interface RoleKpiCapDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RoleKpiCap'], meta: { name: 'RoleKpiCap' } }
+    /**
+     * Find zero or one RoleKpiCap that matches the filter.
+     * @param {RoleKpiCapFindUniqueArgs} args - Arguments to find a RoleKpiCap
+     * @example
+     * // Get one RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RoleKpiCapFindUniqueArgs>(args: SelectSubset<T, RoleKpiCapFindUniqueArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RoleKpiCap that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RoleKpiCapFindUniqueOrThrowArgs} args - Arguments to find a RoleKpiCap
+     * @example
+     * // Get one RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RoleKpiCapFindUniqueOrThrowArgs>(args: SelectSubset<T, RoleKpiCapFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleKpiCap that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapFindFirstArgs} args - Arguments to find a RoleKpiCap
+     * @example
+     * // Get one RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RoleKpiCapFindFirstArgs>(args?: SelectSubset<T, RoleKpiCapFindFirstArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleKpiCap that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapFindFirstOrThrowArgs} args - Arguments to find a RoleKpiCap
+     * @example
+     * // Get one RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RoleKpiCapFindFirstOrThrowArgs>(args?: SelectSubset<T, RoleKpiCapFindFirstOrThrowArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RoleKpiCaps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RoleKpiCaps
+     * const roleKpiCaps = await prisma.roleKpiCap.findMany()
+     * 
+     * // Get first 10 RoleKpiCaps
+     * const roleKpiCaps = await prisma.roleKpiCap.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const roleKpiCapWithIdOnly = await prisma.roleKpiCap.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RoleKpiCapFindManyArgs>(args?: SelectSubset<T, RoleKpiCapFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RoleKpiCap.
+     * @param {RoleKpiCapCreateArgs} args - Arguments to create a RoleKpiCap.
+     * @example
+     * // Create one RoleKpiCap
+     * const RoleKpiCap = await prisma.roleKpiCap.create({
+     *   data: {
+     *     // ... data to create a RoleKpiCap
+     *   }
+     * })
+     * 
+     */
+    create<T extends RoleKpiCapCreateArgs>(args: SelectSubset<T, RoleKpiCapCreateArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RoleKpiCaps.
+     * @param {RoleKpiCapCreateManyArgs} args - Arguments to create many RoleKpiCaps.
+     * @example
+     * // Create many RoleKpiCaps
+     * const roleKpiCap = await prisma.roleKpiCap.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RoleKpiCapCreateManyArgs>(args?: SelectSubset<T, RoleKpiCapCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RoleKpiCaps and returns the data saved in the database.
+     * @param {RoleKpiCapCreateManyAndReturnArgs} args - Arguments to create many RoleKpiCaps.
+     * @example
+     * // Create many RoleKpiCaps
+     * const roleKpiCap = await prisma.roleKpiCap.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RoleKpiCaps and only return the `id`
+     * const roleKpiCapWithIdOnly = await prisma.roleKpiCap.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RoleKpiCapCreateManyAndReturnArgs>(args?: SelectSubset<T, RoleKpiCapCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RoleKpiCap.
+     * @param {RoleKpiCapDeleteArgs} args - Arguments to delete one RoleKpiCap.
+     * @example
+     * // Delete one RoleKpiCap
+     * const RoleKpiCap = await prisma.roleKpiCap.delete({
+     *   where: {
+     *     // ... filter to delete one RoleKpiCap
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RoleKpiCapDeleteArgs>(args: SelectSubset<T, RoleKpiCapDeleteArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RoleKpiCap.
+     * @param {RoleKpiCapUpdateArgs} args - Arguments to update one RoleKpiCap.
+     * @example
+     * // Update one RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RoleKpiCapUpdateArgs>(args: SelectSubset<T, RoleKpiCapUpdateArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RoleKpiCaps.
+     * @param {RoleKpiCapDeleteManyArgs} args - Arguments to filter RoleKpiCaps to delete.
+     * @example
+     * // Delete a few RoleKpiCaps
+     * const { count } = await prisma.roleKpiCap.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RoleKpiCapDeleteManyArgs>(args?: SelectSubset<T, RoleKpiCapDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleKpiCaps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RoleKpiCaps
+     * const roleKpiCap = await prisma.roleKpiCap.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RoleKpiCapUpdateManyArgs>(args: SelectSubset<T, RoleKpiCapUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleKpiCaps and returns the data updated in the database.
+     * @param {RoleKpiCapUpdateManyAndReturnArgs} args - Arguments to update many RoleKpiCaps.
+     * @example
+     * // Update many RoleKpiCaps
+     * const roleKpiCap = await prisma.roleKpiCap.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RoleKpiCaps and only return the `id`
+     * const roleKpiCapWithIdOnly = await prisma.roleKpiCap.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RoleKpiCapUpdateManyAndReturnArgs>(args: SelectSubset<T, RoleKpiCapUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RoleKpiCap.
+     * @param {RoleKpiCapUpsertArgs} args - Arguments to update or create a RoleKpiCap.
+     * @example
+     * // Update or create a RoleKpiCap
+     * const roleKpiCap = await prisma.roleKpiCap.upsert({
+     *   create: {
+     *     // ... data to create a RoleKpiCap
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RoleKpiCap we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RoleKpiCapUpsertArgs>(args: SelectSubset<T, RoleKpiCapUpsertArgs<ExtArgs>>): Prisma__RoleKpiCapClient<$Result.GetResult<Prisma.$RoleKpiCapPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RoleKpiCaps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapCountArgs} args - Arguments to filter RoleKpiCaps to count.
+     * @example
+     * // Count the number of RoleKpiCaps
+     * const count = await prisma.roleKpiCap.count({
+     *   where: {
+     *     // ... the filter for the RoleKpiCaps we want to count
+     *   }
+     * })
+    **/
+    count<T extends RoleKpiCapCountArgs>(
+      args?: Subset<T, RoleKpiCapCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RoleKpiCapCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RoleKpiCap.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RoleKpiCapAggregateArgs>(args: Subset<T, RoleKpiCapAggregateArgs>): Prisma.PrismaPromise<GetRoleKpiCapAggregateType<T>>
+
+    /**
+     * Group by RoleKpiCap.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleKpiCapGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RoleKpiCapGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RoleKpiCapGroupByArgs['orderBy'] }
+        : { orderBy?: RoleKpiCapGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RoleKpiCapGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleKpiCapGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RoleKpiCap model
+   */
+  readonly fields: RoleKpiCapFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RoleKpiCap.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RoleKpiCapClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    customRole<T extends custom_roleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, custom_roleDefaultArgs<ExtArgs>>): Prisma__custom_roleClient<$Result.GetResult<Prisma.$custom_rolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RoleKpiCap model
+   */
+  interface RoleKpiCapFieldRefs {
+    readonly id: FieldRef<"RoleKpiCap", 'String'>
+    readonly companyId: FieldRef<"RoleKpiCap", 'String'>
+    readonly customRoleId: FieldRef<"RoleKpiCap", 'String'>
+    readonly maxTotalScore: FieldRef<"RoleKpiCap", 'Decimal'>
+    readonly createdAt: FieldRef<"RoleKpiCap", 'DateTime'>
+    readonly updatedAt: FieldRef<"RoleKpiCap", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RoleKpiCap findUnique
+   */
+  export type RoleKpiCapFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleKpiCap to fetch.
+     */
+    where: RoleKpiCapWhereUniqueInput
+  }
+
+  /**
+   * RoleKpiCap findUniqueOrThrow
+   */
+  export type RoleKpiCapFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleKpiCap to fetch.
+     */
+    where: RoleKpiCapWhereUniqueInput
+  }
+
+  /**
+   * RoleKpiCap findFirst
+   */
+  export type RoleKpiCapFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleKpiCap to fetch.
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleKpiCaps to fetch.
+     */
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleKpiCaps.
+     */
+    cursor?: RoleKpiCapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleKpiCaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleKpiCaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleKpiCaps.
+     */
+    distinct?: RoleKpiCapScalarFieldEnum | RoleKpiCapScalarFieldEnum[]
+  }
+
+  /**
+   * RoleKpiCap findFirstOrThrow
+   */
+  export type RoleKpiCapFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleKpiCap to fetch.
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleKpiCaps to fetch.
+     */
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleKpiCaps.
+     */
+    cursor?: RoleKpiCapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleKpiCaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleKpiCaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleKpiCaps.
+     */
+    distinct?: RoleKpiCapScalarFieldEnum | RoleKpiCapScalarFieldEnum[]
+  }
+
+  /**
+   * RoleKpiCap findMany
+   */
+  export type RoleKpiCapFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleKpiCaps to fetch.
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleKpiCaps to fetch.
+     */
+    orderBy?: RoleKpiCapOrderByWithRelationInput | RoleKpiCapOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RoleKpiCaps.
+     */
+    cursor?: RoleKpiCapWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleKpiCaps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleKpiCaps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleKpiCaps.
+     */
+    distinct?: RoleKpiCapScalarFieldEnum | RoleKpiCapScalarFieldEnum[]
+  }
+
+  /**
+   * RoleKpiCap create
+   */
+  export type RoleKpiCapCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RoleKpiCap.
+     */
+    data: XOR<RoleKpiCapCreateInput, RoleKpiCapUncheckedCreateInput>
+  }
+
+  /**
+   * RoleKpiCap createMany
+   */
+  export type RoleKpiCapCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RoleKpiCaps.
+     */
+    data: RoleKpiCapCreateManyInput | RoleKpiCapCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RoleKpiCap createManyAndReturn
+   */
+  export type RoleKpiCapCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * The data used to create many RoleKpiCaps.
+     */
+    data: RoleKpiCapCreateManyInput | RoleKpiCapCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleKpiCap update
+   */
+  export type RoleKpiCapUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RoleKpiCap.
+     */
+    data: XOR<RoleKpiCapUpdateInput, RoleKpiCapUncheckedUpdateInput>
+    /**
+     * Choose, which RoleKpiCap to update.
+     */
+    where: RoleKpiCapWhereUniqueInput
+  }
+
+  /**
+   * RoleKpiCap updateMany
+   */
+  export type RoleKpiCapUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RoleKpiCaps.
+     */
+    data: XOR<RoleKpiCapUpdateManyMutationInput, RoleKpiCapUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleKpiCaps to update
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * Limit how many RoleKpiCaps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleKpiCap updateManyAndReturn
+   */
+  export type RoleKpiCapUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * The data used to update RoleKpiCaps.
+     */
+    data: XOR<RoleKpiCapUpdateManyMutationInput, RoleKpiCapUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleKpiCaps to update
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * Limit how many RoleKpiCaps to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleKpiCap upsert
+   */
+  export type RoleKpiCapUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RoleKpiCap to update in case it exists.
+     */
+    where: RoleKpiCapWhereUniqueInput
+    /**
+     * In case the RoleKpiCap found by the `where` argument doesn't exist, create a new RoleKpiCap with this data.
+     */
+    create: XOR<RoleKpiCapCreateInput, RoleKpiCapUncheckedCreateInput>
+    /**
+     * In case the RoleKpiCap was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RoleKpiCapUpdateInput, RoleKpiCapUncheckedUpdateInput>
+  }
+
+  /**
+   * RoleKpiCap delete
+   */
+  export type RoleKpiCapDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
+    /**
+     * Filter which RoleKpiCap to delete.
+     */
+    where: RoleKpiCapWhereUniqueInput
+  }
+
+  /**
+   * RoleKpiCap deleteMany
+   */
+  export type RoleKpiCapDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleKpiCaps to delete
+     */
+    where?: RoleKpiCapWhereInput
+    /**
+     * Limit how many RoleKpiCaps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleKpiCap without action
+   */
+  export type RoleKpiCapDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleKpiCap
+     */
+    select?: RoleKpiCapSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleKpiCap
+     */
+    omit?: RoleKpiCapOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleKpiCapInclude<ExtArgs> | null
   }
 
 
@@ -74634,6 +76021,7 @@ export namespace Prisma {
     checkInManualLat: 'checkInManualLat',
     checkInManualLng: 'checkInManualLng',
     isLocationSuspect: 'isLocationSuspect',
+    checkInBranchId: 'checkInBranchId',
     isWithDoctorNote: 'isWithDoctorNote',
     status: 'status',
     notes: 'notes',
@@ -74951,6 +76339,7 @@ export namespace Prisma {
     pointPerUnit: 'pointPerUnit',
     toleranceLimit: 'toleranceLimit',
     toleranceScope: 'toleranceScope',
+    maxAchievement: 'maxAchievement',
     inputSource: 'inputSource',
     requiresApproval: 'requiresApproval',
     requiresEvidence: 'requiresEvidence',
@@ -74961,6 +76350,18 @@ export namespace Prisma {
   };
 
   export type RoleKpiScalarFieldEnum = (typeof RoleKpiScalarFieldEnum)[keyof typeof RoleKpiScalarFieldEnum]
+
+
+  export const RoleKpiCapScalarFieldEnum: {
+    id: 'id',
+    companyId: 'companyId',
+    customRoleId: 'customRoleId',
+    maxTotalScore: 'maxTotalScore',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RoleKpiCapScalarFieldEnum = (typeof RoleKpiCapScalarFieldEnum)[keyof typeof RoleKpiCapScalarFieldEnum]
 
 
   export const KpiEntryScalarFieldEnum: {
@@ -76297,6 +77698,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -76307,6 +77709,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    checkInBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }
 
   export type AttendanceOrderByWithRelationInput = {
@@ -76323,6 +77726,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrderInput | SortOrder
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
+    checkInBranchId?: SortOrderInput | SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -76333,6 +77737,7 @@ export namespace Prisma {
     user?: userOrderByWithRelationInput
     editedBy?: userOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
+    checkInBranch?: BranchOrderByWithRelationInput
   }
 
   export type AttendanceWhereUniqueInput = Prisma.AtLeast<{
@@ -76353,6 +77758,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -76363,6 +77769,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, userWhereInput>
     editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    checkInBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }, "id" | "userId_date">
 
   export type AttendanceOrderByWithAggregationInput = {
@@ -76379,6 +77786,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrderInput | SortOrder
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
+    checkInBranchId?: SortOrderInput | SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -76410,6 +77818,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolWithAggregatesFilter<"Attendance"> | boolean
+    checkInBranchId?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolWithAggregatesFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusWithAggregatesFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
@@ -76598,6 +78007,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
     roleKpis?: RoleKpiListRelationFilter
+    roleKpiCaps?: RoleKpiCapListRelationFilter
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     users?: UserListRelationFilter
     resourcePerms?: RoleResourcePermissionListRelationFilter
@@ -76615,6 +78025,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     roleKpis?: RoleKpiOrderByRelationAggregateInput
+    roleKpiCaps?: RoleKpiCapOrderByRelationAggregateInput
     company?: CompanyOrderByWithRelationInput
     users?: userOrderByRelationAggregateInput
     resourcePerms?: RoleResourcePermissionOrderByRelationAggregateInput
@@ -76636,6 +78047,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"custom_role"> | Date | string
     updatedAt?: DateTimeFilter<"custom_role"> | Date | string
     roleKpis?: RoleKpiListRelationFilter
+    roleKpiCaps?: RoleKpiCapListRelationFilter
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     users?: UserListRelationFilter
     resourcePerms?: RoleResourcePermissionListRelationFilter
@@ -77267,6 +78679,7 @@ export namespace Prisma {
     stockMutations?: StockMutationListRelationFilter
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
+    checkInAttendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
     valasTransactions?: ValasTransactionListRelationFilter
   }
@@ -77289,6 +78702,7 @@ export namespace Prisma {
     stockMutations?: StockMutationOrderByRelationAggregateInput
     users?: userOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
+    checkInAttendances?: AttendanceOrderByRelationAggregateInput
     payrollSlips?: PayrollSlipOrderByRelationAggregateInput
     valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
@@ -77314,6 +78728,7 @@ export namespace Prisma {
     stockMutations?: StockMutationListRelationFilter
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
+    checkInAttendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
     valasTransactions?: ValasTransactionListRelationFilter
   }, "id">
@@ -77367,6 +78782,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentListRelationFilter
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
+    roleKpiCaps?: RoleKpiCapListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
     stockistPockets?: StockistPocketListRelationFilter
     kasPockets?: KasPocketListRelationFilter
@@ -77393,6 +78809,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentOrderByRelationAggregateInput
     branches?: BranchOrderByRelationAggregateInput
     roleKpis?: RoleKpiOrderByRelationAggregateInput
+    roleKpiCaps?: RoleKpiCapOrderByRelationAggregateInput
     custom_roles?: custom_roleOrderByRelationAggregateInput
     stockistPockets?: StockistPocketOrderByRelationAggregateInput
     kasPockets?: KasPocketOrderByRelationAggregateInput
@@ -77422,6 +78839,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentListRelationFilter
     branches?: BranchListRelationFilter
     roleKpis?: RoleKpiListRelationFilter
+    roleKpiCaps?: RoleKpiCapListRelationFilter
     custom_roles?: Custom_roleListRelationFilter
     stockistPockets?: StockistPocketListRelationFilter
     kasPockets?: KasPocketListRelationFilter
@@ -78085,6 +79503,7 @@ export namespace Prisma {
     pointPerUnit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: EnumKpiToleranceScopeNullableFilter<"RoleKpi"> | $Enums.KpiToleranceScope | null
+    maxAchievement?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     inputSource?: EnumKpiInputSourceNullableFilter<"RoleKpi"> | $Enums.KpiInputSource | null
     requiresApproval?: BoolNullableFilter<"RoleKpi"> | boolean | null
     requiresEvidence?: BoolNullableFilter<"RoleKpi"> | boolean | null
@@ -78109,6 +79528,7 @@ export namespace Prisma {
     pointPerUnit?: SortOrderInput | SortOrder
     toleranceLimit?: SortOrderInput | SortOrder
     toleranceScope?: SortOrderInput | SortOrder
+    maxAchievement?: SortOrderInput | SortOrder
     inputSource?: SortOrderInput | SortOrder
     requiresApproval?: SortOrderInput | SortOrder
     requiresEvidence?: SortOrderInput | SortOrder
@@ -78137,6 +79557,7 @@ export namespace Prisma {
     pointPerUnit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: EnumKpiToleranceScopeNullableFilter<"RoleKpi"> | $Enums.KpiToleranceScope | null
+    maxAchievement?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     inputSource?: EnumKpiInputSourceNullableFilter<"RoleKpi"> | $Enums.KpiInputSource | null
     requiresApproval?: BoolNullableFilter<"RoleKpi"> | boolean | null
     requiresEvidence?: BoolNullableFilter<"RoleKpi"> | boolean | null
@@ -78161,6 +79582,7 @@ export namespace Prisma {
     pointPerUnit?: SortOrderInput | SortOrder
     toleranceLimit?: SortOrderInput | SortOrder
     toleranceScope?: SortOrderInput | SortOrder
+    maxAchievement?: SortOrderInput | SortOrder
     inputSource?: SortOrderInput | SortOrder
     requiresApproval?: SortOrderInput | SortOrder
     requiresEvidence?: SortOrderInput | SortOrder
@@ -78189,6 +79611,7 @@ export namespace Prisma {
     pointPerUnit?: DecimalNullableWithAggregatesFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: DecimalNullableWithAggregatesFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: EnumKpiToleranceScopeNullableWithAggregatesFilter<"RoleKpi"> | $Enums.KpiToleranceScope | null
+    maxAchievement?: DecimalNullableWithAggregatesFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     inputSource?: EnumKpiInputSourceNullableWithAggregatesFilter<"RoleKpi"> | $Enums.KpiInputSource | null
     requiresApproval?: BoolNullableWithAggregatesFilter<"RoleKpi"> | boolean | null
     requiresEvidence?: BoolNullableWithAggregatesFilter<"RoleKpi"> | boolean | null
@@ -78196,6 +79619,72 @@ export namespace Prisma {
     isActive?: BoolWithAggregatesFilter<"RoleKpi"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"RoleKpi"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RoleKpi"> | Date | string
+  }
+
+  export type RoleKpiCapWhereInput = {
+    AND?: RoleKpiCapWhereInput | RoleKpiCapWhereInput[]
+    OR?: RoleKpiCapWhereInput[]
+    NOT?: RoleKpiCapWhereInput | RoleKpiCapWhereInput[]
+    id?: StringFilter<"RoleKpiCap"> | string
+    companyId?: StringFilter<"RoleKpiCap"> | string
+    customRoleId?: StringFilter<"RoleKpiCap"> | string
+    maxTotalScore?: DecimalFilter<"RoleKpiCap"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    customRole?: XOR<Custom_roleScalarRelationFilter, custom_roleWhereInput>
+  }
+
+  export type RoleKpiCapOrderByWithRelationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    customRoleId?: SortOrder
+    maxTotalScore?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: CompanyOrderByWithRelationInput
+    customRole?: custom_roleOrderByWithRelationInput
+  }
+
+  export type RoleKpiCapWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    companyId_customRoleId?: RoleKpiCapCompanyIdCustomRoleIdCompoundUniqueInput
+    AND?: RoleKpiCapWhereInput | RoleKpiCapWhereInput[]
+    OR?: RoleKpiCapWhereInput[]
+    NOT?: RoleKpiCapWhereInput | RoleKpiCapWhereInput[]
+    companyId?: StringFilter<"RoleKpiCap"> | string
+    customRoleId?: StringFilter<"RoleKpiCap"> | string
+    maxTotalScore?: DecimalFilter<"RoleKpiCap"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
+    customRole?: XOR<Custom_roleScalarRelationFilter, custom_roleWhereInput>
+  }, "id" | "companyId_customRoleId">
+
+  export type RoleKpiCapOrderByWithAggregationInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    customRoleId?: SortOrder
+    maxTotalScore?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RoleKpiCapCountOrderByAggregateInput
+    _avg?: RoleKpiCapAvgOrderByAggregateInput
+    _max?: RoleKpiCapMaxOrderByAggregateInput
+    _min?: RoleKpiCapMinOrderByAggregateInput
+    _sum?: RoleKpiCapSumOrderByAggregateInput
+  }
+
+  export type RoleKpiCapScalarWhereWithAggregatesInput = {
+    AND?: RoleKpiCapScalarWhereWithAggregatesInput | RoleKpiCapScalarWhereWithAggregatesInput[]
+    OR?: RoleKpiCapScalarWhereWithAggregatesInput[]
+    NOT?: RoleKpiCapScalarWhereWithAggregatesInput | RoleKpiCapScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RoleKpiCap"> | string
+    companyId?: StringWithAggregatesFilter<"RoleKpiCap"> | string
+    customRoleId?: StringWithAggregatesFilter<"RoleKpiCap"> | string
+    maxTotalScore?: DecimalWithAggregatesFilter<"RoleKpiCap"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeWithAggregatesFilter<"RoleKpiCap"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RoleKpiCap"> | Date | string
   }
 
   export type KpiEntryWhereInput = {
@@ -81449,6 +82938,7 @@ export namespace Prisma {
     user: userCreateNestedOneWithoutAttendancesInput
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
+    checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
   }
 
   export type AttendanceUncheckedCreateInput = {
@@ -81465,6 +82955,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -81495,6 +82986,7 @@ export namespace Prisma {
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
+    checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateInput = {
@@ -81511,6 +83003,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -81534,6 +83027,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -81577,6 +83071,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -81783,6 +83278,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
@@ -81800,6 +83296,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
@@ -81815,6 +83312,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
@@ -81832,6 +83330,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
@@ -82537,6 +84036,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -82558,6 +84058,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -82579,6 +84080,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -82600,6 +84102,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -82655,6 +84158,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -82681,6 +84185,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -82707,6 +84212,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -82733,6 +84239,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -83480,6 +84987,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -83504,6 +85012,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -83522,6 +85031,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -83546,6 +85056,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -83567,6 +85078,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -83584,6 +85096,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -83604,11 +85117,73 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
     systemConfig?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapCreateInput = {
+    id?: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutRoleKpiCapsInput
+    customRole: custom_roleCreateNestedOneWithoutRoleKpiCapsInput
+  }
+
+  export type RoleKpiCapUncheckedCreateInput = {
+    id?: string
+    companyId: string
+    customRoleId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutRoleKpiCapsNestedInput
+    customRole?: custom_roleUpdateOneRequiredWithoutRoleKpiCapsNestedInput
+  }
+
+  export type RoleKpiCapUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    customRoleId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapCreateManyInput = {
+    id?: string
+    companyId: string
+    customRoleId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    customRoleId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87266,6 +88841,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    checkInBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -87296,6 +88872,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    checkInBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -87319,6 +88896,7 @@ export namespace Prisma {
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
+    checkInBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -87488,6 +89066,12 @@ export namespace Prisma {
     none?: RoleKpiWhereInput
   }
 
+  export type RoleKpiCapListRelationFilter = {
+    every?: RoleKpiCapWhereInput
+    some?: RoleKpiCapWhereInput
+    none?: RoleKpiCapWhereInput
+  }
+
   export type CompanyNullableScalarRelationFilter = {
     is?: CompanyWhereInput | null
     isNot?: CompanyWhereInput | null
@@ -87512,6 +89096,10 @@ export namespace Prisma {
   }
 
   export type RoleKpiOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RoleKpiCapOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -88978,6 +90566,7 @@ export namespace Prisma {
     pointPerUnit?: SortOrder
     toleranceLimit?: SortOrder
     toleranceScope?: SortOrder
+    maxAchievement?: SortOrder
     inputSource?: SortOrder
     requiresApproval?: SortOrder
     requiresEvidence?: SortOrder
@@ -88993,6 +90582,7 @@ export namespace Prisma {
     basePoint?: SortOrder
     pointPerUnit?: SortOrder
     toleranceLimit?: SortOrder
+    maxAchievement?: SortOrder
   }
 
   export type RoleKpiMaxOrderByAggregateInput = {
@@ -89006,6 +90596,7 @@ export namespace Prisma {
     pointPerUnit?: SortOrder
     toleranceLimit?: SortOrder
     toleranceScope?: SortOrder
+    maxAchievement?: SortOrder
     inputSource?: SortOrder
     requiresApproval?: SortOrder
     requiresEvidence?: SortOrder
@@ -89025,6 +90616,7 @@ export namespace Prisma {
     pointPerUnit?: SortOrder
     toleranceLimit?: SortOrder
     toleranceScope?: SortOrder
+    maxAchievement?: SortOrder
     inputSource?: SortOrder
     requiresApproval?: SortOrder
     requiresEvidence?: SortOrder
@@ -89039,6 +90631,7 @@ export namespace Prisma {
     basePoint?: SortOrder
     pointPerUnit?: SortOrder
     toleranceLimit?: SortOrder
+    maxAchievement?: SortOrder
   }
 
   export type EnumKpiToleranceScopeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -89093,6 +90686,46 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type RoleKpiCapCompanyIdCustomRoleIdCompoundUniqueInput = {
+    companyId: string
+    customRoleId: string
+  }
+
+  export type RoleKpiCapCountOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    customRoleId?: SortOrder
+    maxTotalScore?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleKpiCapAvgOrderByAggregateInput = {
+    maxTotalScore?: SortOrder
+  }
+
+  export type RoleKpiCapMaxOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    customRoleId?: SortOrder
+    maxTotalScore?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleKpiCapMinOrderByAggregateInput = {
+    id?: SortOrder
+    companyId?: SortOrder
+    customRoleId?: SortOrder
+    maxTotalScore?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleKpiCapSumOrderByAggregateInput = {
+    maxTotalScore?: SortOrder
   }
 
   export type EnumKpiEntryStatusFilter<$PrismaModel = never> = {
@@ -91651,6 +93284,12 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
+  export type BranchCreateNestedOneWithoutCheckInAttendancesInput = {
+    create?: XOR<BranchCreateWithoutCheckInAttendancesInput, BranchUncheckedCreateWithoutCheckInAttendancesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutCheckInAttendancesInput
+    connect?: BranchWhereUniqueInput
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -91699,6 +93338,16 @@ export namespace Prisma {
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutAttendancesInput, BranchUpdateWithoutAttendancesInput>, BranchUncheckedUpdateWithoutAttendancesInput>
   }
 
+  export type BranchUpdateOneWithoutCheckInAttendancesNestedInput = {
+    create?: XOR<BranchCreateWithoutCheckInAttendancesInput, BranchUncheckedCreateWithoutCheckInAttendancesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutCheckInAttendancesInput
+    upsert?: BranchUpsertWithoutCheckInAttendancesInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutCheckInAttendancesInput, BranchUpdateWithoutCheckInAttendancesInput>, BranchUncheckedUpdateWithoutCheckInAttendancesInput>
+  }
+
   export type userCreateNestedOneWithoutAccountInput = {
     create?: XOR<userCreateWithoutAccountInput, userUncheckedCreateWithoutAccountInput>
     connectOrCreate?: userCreateOrConnectWithoutAccountInput
@@ -91742,6 +93391,13 @@ export namespace Prisma {
     connect?: RoleKpiWhereUniqueInput | RoleKpiWhereUniqueInput[]
   }
 
+  export type RoleKpiCapCreateNestedManyWithoutCustomRoleInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput> | RoleKpiCapCreateWithoutCustomRoleInput[] | RoleKpiCapUncheckedCreateWithoutCustomRoleInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCustomRoleInput | RoleKpiCapCreateOrConnectWithoutCustomRoleInput[]
+    createMany?: RoleKpiCapCreateManyCustomRoleInputEnvelope
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+  }
+
   export type CompanyCreateNestedOneWithoutCustom_rolesInput = {
     create?: XOR<CompanyCreateWithoutCustom_rolesInput, CompanyUncheckedCreateWithoutCustom_rolesInput>
     connectOrCreate?: CompanyCreateOrConnectWithoutCustom_rolesInput
@@ -91774,6 +93430,13 @@ export namespace Prisma {
     connectOrCreate?: RoleKpiCreateOrConnectWithoutCustomRoleInput | RoleKpiCreateOrConnectWithoutCustomRoleInput[]
     createMany?: RoleKpiCreateManyCustomRoleInputEnvelope
     connect?: RoleKpiWhereUniqueInput | RoleKpiWhereUniqueInput[]
+  }
+
+  export type RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput> | RoleKpiCapCreateWithoutCustomRoleInput[] | RoleKpiCapUncheckedCreateWithoutCustomRoleInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCustomRoleInput | RoleKpiCapCreateOrConnectWithoutCustomRoleInput[]
+    createMany?: RoleKpiCapCreateManyCustomRoleInputEnvelope
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
   }
 
   export type userUncheckedCreateNestedManyWithoutCustomRoleInput = {
@@ -91819,6 +93482,20 @@ export namespace Prisma {
     update?: RoleKpiUpdateWithWhereUniqueWithoutCustomRoleInput | RoleKpiUpdateWithWhereUniqueWithoutCustomRoleInput[]
     updateMany?: RoleKpiUpdateManyWithWhereWithoutCustomRoleInput | RoleKpiUpdateManyWithWhereWithoutCustomRoleInput[]
     deleteMany?: RoleKpiScalarWhereInput | RoleKpiScalarWhereInput[]
+  }
+
+  export type RoleKpiCapUpdateManyWithoutCustomRoleNestedInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput> | RoleKpiCapCreateWithoutCustomRoleInput[] | RoleKpiCapUncheckedCreateWithoutCustomRoleInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCustomRoleInput | RoleKpiCapCreateOrConnectWithoutCustomRoleInput[]
+    upsert?: RoleKpiCapUpsertWithWhereUniqueWithoutCustomRoleInput | RoleKpiCapUpsertWithWhereUniqueWithoutCustomRoleInput[]
+    createMany?: RoleKpiCapCreateManyCustomRoleInputEnvelope
+    set?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    disconnect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    delete?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    update?: RoleKpiCapUpdateWithWhereUniqueWithoutCustomRoleInput | RoleKpiCapUpdateWithWhereUniqueWithoutCustomRoleInput[]
+    updateMany?: RoleKpiCapUpdateManyWithWhereWithoutCustomRoleInput | RoleKpiCapUpdateManyWithWhereWithoutCustomRoleInput[]
+    deleteMany?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
   }
 
   export type CompanyUpdateOneWithoutCustom_rolesNestedInput = {
@@ -91885,6 +93562,20 @@ export namespace Prisma {
     update?: RoleKpiUpdateWithWhereUniqueWithoutCustomRoleInput | RoleKpiUpdateWithWhereUniqueWithoutCustomRoleInput[]
     updateMany?: RoleKpiUpdateManyWithWhereWithoutCustomRoleInput | RoleKpiUpdateManyWithWhereWithoutCustomRoleInput[]
     deleteMany?: RoleKpiScalarWhereInput | RoleKpiScalarWhereInput[]
+  }
+
+  export type RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput> | RoleKpiCapCreateWithoutCustomRoleInput[] | RoleKpiCapUncheckedCreateWithoutCustomRoleInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCustomRoleInput | RoleKpiCapCreateOrConnectWithoutCustomRoleInput[]
+    upsert?: RoleKpiCapUpsertWithWhereUniqueWithoutCustomRoleInput | RoleKpiCapUpsertWithWhereUniqueWithoutCustomRoleInput[]
+    createMany?: RoleKpiCapCreateManyCustomRoleInputEnvelope
+    set?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    disconnect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    delete?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    update?: RoleKpiCapUpdateWithWhereUniqueWithoutCustomRoleInput | RoleKpiCapUpdateWithWhereUniqueWithoutCustomRoleInput[]
+    updateMany?: RoleKpiCapUpdateManyWithWhereWithoutCustomRoleInput | RoleKpiCapUpdateManyWithWhereWithoutCustomRoleInput[]
+    deleteMany?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
   }
 
   export type userUncheckedUpdateManyWithoutCustomRoleNestedInput = {
@@ -93054,6 +94745,13 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
+  export type AttendanceCreateNestedManyWithoutCheckInBranchInput = {
+    create?: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput> | AttendanceCreateWithoutCheckInBranchInput[] | AttendanceUncheckedCreateWithoutCheckInBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckInBranchInput | AttendanceCreateOrConnectWithoutCheckInBranchInput[]
+    createMany?: AttendanceCreateManyCheckInBranchInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
   export type PayrollSlipCreateNestedManyWithoutBranchInput = {
     create?: XOR<PayrollSlipCreateWithoutBranchInput, PayrollSlipUncheckedCreateWithoutBranchInput> | PayrollSlipCreateWithoutBranchInput[] | PayrollSlipUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
@@ -93100,6 +94798,13 @@ export namespace Prisma {
     create?: XOR<AttendanceCreateWithoutBranchInput, AttendanceUncheckedCreateWithoutBranchInput> | AttendanceCreateWithoutBranchInput[] | AttendanceUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutBranchInput | AttendanceCreateOrConnectWithoutBranchInput[]
     createMany?: AttendanceCreateManyBranchInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
+  export type AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput = {
+    create?: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput> | AttendanceCreateWithoutCheckInBranchInput[] | AttendanceUncheckedCreateWithoutCheckInBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckInBranchInput | AttendanceCreateOrConnectWithoutCheckInBranchInput[]
+    createMany?: AttendanceCreateManyCheckInBranchInputEnvelope
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
@@ -93205,6 +94910,20 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
+  export type AttendanceUpdateManyWithoutCheckInBranchNestedInput = {
+    create?: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput> | AttendanceCreateWithoutCheckInBranchInput[] | AttendanceUncheckedCreateWithoutCheckInBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckInBranchInput | AttendanceCreateOrConnectWithoutCheckInBranchInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutCheckInBranchInput | AttendanceUpsertWithWhereUniqueWithoutCheckInBranchInput[]
+    createMany?: AttendanceCreateManyCheckInBranchInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput | AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutCheckInBranchInput | AttendanceUpdateManyWithWhereWithoutCheckInBranchInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
   export type PayrollSlipUpdateManyWithoutBranchNestedInput = {
     create?: XOR<PayrollSlipCreateWithoutBranchInput, PayrollSlipUncheckedCreateWithoutBranchInput> | PayrollSlipCreateWithoutBranchInput[] | PayrollSlipUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
@@ -93303,6 +95022,20 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
+  export type AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput = {
+    create?: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput> | AttendanceCreateWithoutCheckInBranchInput[] | AttendanceUncheckedCreateWithoutCheckInBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckInBranchInput | AttendanceCreateOrConnectWithoutCheckInBranchInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutCheckInBranchInput | AttendanceUpsertWithWhereUniqueWithoutCheckInBranchInput[]
+    createMany?: AttendanceCreateManyCheckInBranchInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput | AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutCheckInBranchInput | AttendanceUpdateManyWithWhereWithoutCheckInBranchInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
   export type PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<PayrollSlipCreateWithoutBranchInput, PayrollSlipUncheckedCreateWithoutBranchInput> | PayrollSlipCreateWithoutBranchInput[] | PayrollSlipUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
@@ -93350,6 +95083,13 @@ export namespace Prisma {
     connectOrCreate?: RoleKpiCreateOrConnectWithoutCompanyInput | RoleKpiCreateOrConnectWithoutCompanyInput[]
     createMany?: RoleKpiCreateManyCompanyInputEnvelope
     connect?: RoleKpiWhereUniqueInput | RoleKpiWhereUniqueInput[]
+  }
+
+  export type RoleKpiCapCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput> | RoleKpiCapCreateWithoutCompanyInput[] | RoleKpiCapUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCompanyInput | RoleKpiCapCreateOrConnectWithoutCompanyInput[]
+    createMany?: RoleKpiCapCreateManyCompanyInputEnvelope
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
   }
 
   export type custom_roleCreateNestedManyWithoutCompanyInput = {
@@ -93469,6 +95209,13 @@ export namespace Prisma {
     connectOrCreate?: RoleKpiCreateOrConnectWithoutCompanyInput | RoleKpiCreateOrConnectWithoutCompanyInput[]
     createMany?: RoleKpiCreateManyCompanyInputEnvelope
     connect?: RoleKpiWhereUniqueInput | RoleKpiWhereUniqueInput[]
+  }
+
+  export type RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput> | RoleKpiCapCreateWithoutCompanyInput[] | RoleKpiCapUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCompanyInput | RoleKpiCapCreateOrConnectWithoutCompanyInput[]
+    createMany?: RoleKpiCapCreateManyCompanyInputEnvelope
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
   }
 
   export type custom_roleUncheckedCreateNestedManyWithoutCompanyInput = {
@@ -93609,6 +95356,20 @@ export namespace Prisma {
     update?: RoleKpiUpdateWithWhereUniqueWithoutCompanyInput | RoleKpiUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: RoleKpiUpdateManyWithWhereWithoutCompanyInput | RoleKpiUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: RoleKpiScalarWhereInput | RoleKpiScalarWhereInput[]
+  }
+
+  export type RoleKpiCapUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput> | RoleKpiCapCreateWithoutCompanyInput[] | RoleKpiCapUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCompanyInput | RoleKpiCapCreateOrConnectWithoutCompanyInput[]
+    upsert?: RoleKpiCapUpsertWithWhereUniqueWithoutCompanyInput | RoleKpiCapUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: RoleKpiCapCreateManyCompanyInputEnvelope
+    set?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    disconnect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    delete?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    update?: RoleKpiCapUpdateWithWhereUniqueWithoutCompanyInput | RoleKpiCapUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: RoleKpiCapUpdateManyWithWhereWithoutCompanyInput | RoleKpiCapUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
   }
 
   export type custom_roleUpdateManyWithoutCompanyNestedInput = {
@@ -93847,6 +95608,20 @@ export namespace Prisma {
     update?: RoleKpiUpdateWithWhereUniqueWithoutCompanyInput | RoleKpiUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: RoleKpiUpdateManyWithWhereWithoutCompanyInput | RoleKpiUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: RoleKpiScalarWhereInput | RoleKpiScalarWhereInput[]
+  }
+
+  export type RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput> | RoleKpiCapCreateWithoutCompanyInput[] | RoleKpiCapUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: RoleKpiCapCreateOrConnectWithoutCompanyInput | RoleKpiCapCreateOrConnectWithoutCompanyInput[]
+    upsert?: RoleKpiCapUpsertWithWhereUniqueWithoutCompanyInput | RoleKpiCapUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: RoleKpiCapCreateManyCompanyInputEnvelope
+    set?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    disconnect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    delete?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    connect?: RoleKpiCapWhereUniqueInput | RoleKpiCapWhereUniqueInput[]
+    update?: RoleKpiCapUpdateWithWhereUniqueWithoutCompanyInput | RoleKpiCapUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: RoleKpiCapUpdateManyWithWhereWithoutCompanyInput | RoleKpiCapUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
   }
 
   export type custom_roleUncheckedUpdateManyWithoutCompanyNestedInput = {
@@ -94611,6 +96386,34 @@ export namespace Prisma {
     update?: KpiEntryUpdateWithWhereUniqueWithoutRoleKpiInput | KpiEntryUpdateWithWhereUniqueWithoutRoleKpiInput[]
     updateMany?: KpiEntryUpdateManyWithWhereWithoutRoleKpiInput | KpiEntryUpdateManyWithWhereWithoutRoleKpiInput[]
     deleteMany?: KpiEntryScalarWhereInput | KpiEntryScalarWhereInput[]
+  }
+
+  export type CompanyCreateNestedOneWithoutRoleKpiCapsInput = {
+    create?: XOR<CompanyCreateWithoutRoleKpiCapsInput, CompanyUncheckedCreateWithoutRoleKpiCapsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutRoleKpiCapsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
+  export type custom_roleCreateNestedOneWithoutRoleKpiCapsInput = {
+    create?: XOR<custom_roleCreateWithoutRoleKpiCapsInput, custom_roleUncheckedCreateWithoutRoleKpiCapsInput>
+    connectOrCreate?: custom_roleCreateOrConnectWithoutRoleKpiCapsInput
+    connect?: custom_roleWhereUniqueInput
+  }
+
+  export type CompanyUpdateOneRequiredWithoutRoleKpiCapsNestedInput = {
+    create?: XOR<CompanyCreateWithoutRoleKpiCapsInput, CompanyUncheckedCreateWithoutRoleKpiCapsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutRoleKpiCapsInput
+    upsert?: CompanyUpsertWithoutRoleKpiCapsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutRoleKpiCapsInput, CompanyUpdateWithoutRoleKpiCapsInput>, CompanyUncheckedUpdateWithoutRoleKpiCapsInput>
+  }
+
+  export type custom_roleUpdateOneRequiredWithoutRoleKpiCapsNestedInput = {
+    create?: XOR<custom_roleCreateWithoutRoleKpiCapsInput, custom_roleUncheckedCreateWithoutRoleKpiCapsInput>
+    connectOrCreate?: custom_roleCreateOrConnectWithoutRoleKpiCapsInput
+    upsert?: custom_roleUpsertWithoutRoleKpiCapsInput
+    connect?: custom_roleWhereUniqueInput
+    update?: XOR<XOR<custom_roleUpdateToOneWithWhereWithoutRoleKpiCapsInput, custom_roleUpdateWithoutRoleKpiCapsInput>, custom_roleUncheckedUpdateWithoutRoleKpiCapsInput>
   }
 
   export type userCreateNestedOneWithoutKpiEntriesInput = {
@@ -97283,6 +99086,7 @@ export namespace Prisma {
     stockItems?: StockItemCreateNestedManyWithoutBranchInput
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -97303,6 +99107,7 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -97310,6 +99115,53 @@ export namespace Prisma {
   export type BranchCreateOrConnectWithoutAttendancesInput = {
     where: BranchWhereUniqueInput
     create: XOR<BranchCreateWithoutAttendancesInput, BranchUncheckedCreateWithoutAttendancesInput>
+  }
+
+  export type BranchCreateWithoutCheckInAttendancesInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company?: CompanyCreateNestedOneWithoutBranchesInput
+    currencyStocks?: CurrencyStockCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
+    users?: userCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutCheckInAttendancesInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    currencyStocks?: CurrencyStockUncheckedCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
+    users?: userUncheckedCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutCheckInAttendancesInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutCheckInAttendancesInput, BranchUncheckedCreateWithoutCheckInAttendancesInput>
   }
 
   export type userUpsertWithoutAttendancesInput = {
@@ -97509,6 +99361,7 @@ export namespace Prisma {
     stockItems?: StockItemUpdateManyWithoutBranchNestedInput
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -97529,6 +99382,60 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUpsertWithoutCheckInAttendancesInput = {
+    update: XOR<BranchUpdateWithoutCheckInAttendancesInput, BranchUncheckedUpdateWithoutCheckInAttendancesInput>
+    create: XOR<BranchCreateWithoutCheckInAttendancesInput, BranchUncheckedCreateWithoutCheckInAttendancesInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutCheckInAttendancesInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutCheckInAttendancesInput, BranchUncheckedUpdateWithoutCheckInAttendancesInput>
+  }
+
+  export type BranchUpdateWithoutCheckInAttendancesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneWithoutBranchesNestedInput
+    currencyStocks?: CurrencyStockUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
+    users?: userUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutCheckInAttendancesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currencyStocks?: CurrencyStockUncheckedUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
+    users?: userUncheckedUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -97869,6 +99776,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -97891,6 +99799,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -97911,6 +99820,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RoleKpiCapCreateWithoutCustomRoleInput = {
+    id?: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: CompanyCreateNestedOneWithoutRoleKpiCapsInput
+  }
+
+  export type RoleKpiCapUncheckedCreateWithoutCustomRoleInput = {
+    id?: string
+    companyId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapCreateOrConnectWithoutCustomRoleInput = {
+    where: RoleKpiCapWhereUniqueInput
+    create: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput>
+  }
+
+  export type RoleKpiCapCreateManyCustomRoleInputEnvelope = {
+    data: RoleKpiCapCreateManyCustomRoleInput | RoleKpiCapCreateManyCustomRoleInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CompanyCreateWithoutCustom_rolesInput = {
     id?: string
     name: string
@@ -97921,6 +99856,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -97946,6 +99882,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -98172,6 +100109,7 @@ export namespace Prisma {
     pointPerUnit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: EnumKpiToleranceScopeNullableFilter<"RoleKpi"> | $Enums.KpiToleranceScope | null
+    maxAchievement?: DecimalNullableFilter<"RoleKpi"> | Decimal | DecimalJsLike | number | string | null
     inputSource?: EnumKpiInputSourceNullableFilter<"RoleKpi"> | $Enums.KpiInputSource | null
     requiresApproval?: BoolNullableFilter<"RoleKpi"> | boolean | null
     requiresEvidence?: BoolNullableFilter<"RoleKpi"> | boolean | null
@@ -98179,6 +100117,34 @@ export namespace Prisma {
     isActive?: BoolFilter<"RoleKpi"> | boolean
     createdAt?: DateTimeFilter<"RoleKpi"> | Date | string
     updatedAt?: DateTimeFilter<"RoleKpi"> | Date | string
+  }
+
+  export type RoleKpiCapUpsertWithWhereUniqueWithoutCustomRoleInput = {
+    where: RoleKpiCapWhereUniqueInput
+    update: XOR<RoleKpiCapUpdateWithoutCustomRoleInput, RoleKpiCapUncheckedUpdateWithoutCustomRoleInput>
+    create: XOR<RoleKpiCapCreateWithoutCustomRoleInput, RoleKpiCapUncheckedCreateWithoutCustomRoleInput>
+  }
+
+  export type RoleKpiCapUpdateWithWhereUniqueWithoutCustomRoleInput = {
+    where: RoleKpiCapWhereUniqueInput
+    data: XOR<RoleKpiCapUpdateWithoutCustomRoleInput, RoleKpiCapUncheckedUpdateWithoutCustomRoleInput>
+  }
+
+  export type RoleKpiCapUpdateManyWithWhereWithoutCustomRoleInput = {
+    where: RoleKpiCapScalarWhereInput
+    data: XOR<RoleKpiCapUpdateManyMutationInput, RoleKpiCapUncheckedUpdateManyWithoutCustomRoleInput>
+  }
+
+  export type RoleKpiCapScalarWhereInput = {
+    AND?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
+    OR?: RoleKpiCapScalarWhereInput[]
+    NOT?: RoleKpiCapScalarWhereInput | RoleKpiCapScalarWhereInput[]
+    id?: StringFilter<"RoleKpiCap"> | string
+    companyId?: StringFilter<"RoleKpiCap"> | string
+    customRoleId?: StringFilter<"RoleKpiCap"> | string
+    maxTotalScore?: DecimalFilter<"RoleKpiCap"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleKpiCap"> | Date | string
   }
 
   export type CompanyUpsertWithoutCustom_rolesInput = {
@@ -98202,6 +100168,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -98227,6 +100194,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -98649,6 +100617,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
+    checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutUserInput = {
@@ -98664,6 +100633,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -98703,6 +100673,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: userCreateNestedOneWithoutAttendancesInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
+    checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutEditedByInput = {
@@ -98719,6 +100690,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -99221,6 +101193,7 @@ export namespace Prisma {
     stockItems?: StockItemCreateNestedManyWithoutBranchInput
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -99241,6 +101214,7 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -99260,6 +101234,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutCustomRoleInput
@@ -99276,6 +101251,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
   }
@@ -99496,6 +101472,7 @@ export namespace Prisma {
     checkInManualLat?: FloatNullableFilter<"Attendance"> | number | null
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
+    checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -99827,6 +101804,7 @@ export namespace Prisma {
     stockItems?: StockItemUpdateManyWithoutBranchNestedInput
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -99847,6 +101825,7 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -99872,6 +101851,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutCustomRoleNestedInput
@@ -99888,6 +101868,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
   }
@@ -99902,6 +101883,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutCustomRoleInput
@@ -99918,6 +101900,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
   }
@@ -99948,6 +101931,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutCustomRoleNestedInput
@@ -99964,6 +101948,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
   }
@@ -99978,6 +101963,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -100003,6 +101989,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -100211,6 +102198,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -100236,6 +102224,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -100579,6 +102568,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -100604,6 +102594,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -100827,11 +102818,69 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: userCreateNestedOneWithoutAttendancesInput
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
+    checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutBranchInput = {
     id?: string
     userId: string
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    checkInBranchId?: string | null
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateOrConnectWithoutBranchInput = {
+    where: AttendanceWhereUniqueInput
+    create: XOR<AttendanceCreateWithoutBranchInput, AttendanceUncheckedCreateWithoutBranchInput>
+  }
+
+  export type AttendanceCreateManyBranchInputEnvelope = {
+    data: AttendanceCreateManyBranchInput | AttendanceCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AttendanceCreateWithoutCheckInBranchInput = {
+    id?: string
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: userCreateNestedOneWithoutAttendancesInput
+    editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
+    branch?: BranchCreateNestedOneWithoutAttendancesInput
+  }
+
+  export type AttendanceUncheckedCreateWithoutCheckInBranchInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
     date: Date | string
     checkIn?: Date | string | null
     checkOut?: Date | string | null
@@ -100851,13 +102900,13 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type AttendanceCreateOrConnectWithoutBranchInput = {
+  export type AttendanceCreateOrConnectWithoutCheckInBranchInput = {
     where: AttendanceWhereUniqueInput
-    create: XOR<AttendanceCreateWithoutBranchInput, AttendanceUncheckedCreateWithoutBranchInput>
+    create: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput>
   }
 
-  export type AttendanceCreateManyBranchInputEnvelope = {
-    data: AttendanceCreateManyBranchInput | AttendanceCreateManyBranchInput[]
+  export type AttendanceCreateManyCheckInBranchInputEnvelope = {
+    data: AttendanceCreateManyCheckInBranchInput | AttendanceCreateManyCheckInBranchInput[]
     skipDuplicates?: boolean
   }
 
@@ -101007,6 +103056,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -101032,6 +103082,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -101173,6 +103224,22 @@ export namespace Prisma {
     data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutBranchInput>
   }
 
+  export type AttendanceUpsertWithWhereUniqueWithoutCheckInBranchInput = {
+    where: AttendanceWhereUniqueInput
+    update: XOR<AttendanceUpdateWithoutCheckInBranchInput, AttendanceUncheckedUpdateWithoutCheckInBranchInput>
+    create: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput>
+  }
+
+  export type AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput = {
+    where: AttendanceWhereUniqueInput
+    data: XOR<AttendanceUpdateWithoutCheckInBranchInput, AttendanceUncheckedUpdateWithoutCheckInBranchInput>
+  }
+
+  export type AttendanceUpdateManyWithWhereWithoutCheckInBranchInput = {
+    where: AttendanceScalarWhereInput
+    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutCheckInBranchInput>
+  }
+
   export type PayrollSlipUpsertWithWhereUniqueWithoutBranchInput = {
     where: PayrollSlipWhereUniqueInput
     update: XOR<PayrollSlipUpdateWithoutBranchInput, PayrollSlipUncheckedUpdateWithoutBranchInput>
@@ -101257,6 +103324,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -101277,6 +103345,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -101299,6 +103368,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -101321,6 +103391,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -101341,6 +103412,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RoleKpiCapCreateWithoutCompanyInput = {
+    id?: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customRole: custom_roleCreateNestedOneWithoutRoleKpiCapsInput
+  }
+
+  export type RoleKpiCapUncheckedCreateWithoutCompanyInput = {
+    id?: string
+    customRoleId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapCreateOrConnectWithoutCompanyInput = {
+    where: RoleKpiCapWhereUniqueInput
+    create: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type RoleKpiCapCreateManyCompanyInputEnvelope = {
+    data: RoleKpiCapCreateManyCompanyInput | RoleKpiCapCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type custom_roleCreateWithoutCompanyInput = {
     id?: string
     name: string
@@ -101351,6 +103448,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     users?: userCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutCustomRoleInput
@@ -101366,6 +103464,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
@@ -101985,6 +104084,22 @@ export namespace Prisma {
   export type RoleKpiUpdateManyWithWhereWithoutCompanyInput = {
     where: RoleKpiScalarWhereInput
     data: XOR<RoleKpiUpdateManyMutationInput, RoleKpiUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type RoleKpiCapUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: RoleKpiCapWhereUniqueInput
+    update: XOR<RoleKpiCapUpdateWithoutCompanyInput, RoleKpiCapUncheckedUpdateWithoutCompanyInput>
+    create: XOR<RoleKpiCapCreateWithoutCompanyInput, RoleKpiCapUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type RoleKpiCapUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: RoleKpiCapWhereUniqueInput
+    data: XOR<RoleKpiCapUpdateWithoutCompanyInput, RoleKpiCapUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type RoleKpiCapUpdateManyWithWhereWithoutCompanyInput = {
+    where: RoleKpiCapScalarWhereInput
+    data: XOR<RoleKpiCapUpdateManyMutationInput, RoleKpiCapUncheckedUpdateManyWithoutCompanyInput>
   }
 
   export type custom_roleUpsertWithWhereUniqueWithoutCompanyInput = {
@@ -102778,6 +104893,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -102803,6 +104919,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -102976,6 +105093,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -103001,6 +105119,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -103133,6 +105252,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -103155,6 +105275,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -103200,6 +105321,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -103225,6 +105347,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -103255,6 +105378,7 @@ export namespace Prisma {
     usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
@@ -103271,6 +105395,7 @@ export namespace Prisma {
     usesResourcePerms?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
@@ -103392,6 +105517,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -103417,6 +105543,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -103453,6 +105580,7 @@ export namespace Prisma {
     usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
@@ -103469,6 +105597,7 @@ export namespace Prisma {
     usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
@@ -103535,6 +105664,206 @@ export namespace Prisma {
   export type KpiEntryUpdateManyWithWhereWithoutRoleKpiInput = {
     where: KpiEntryScalarWhereInput
     data: XOR<KpiEntryUpdateManyMutationInput, KpiEntryUncheckedUpdateManyWithoutRoleKpiInput>
+  }
+
+  export type CompanyCreateWithoutRoleKpiCapsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundCreateNestedManyWithoutCompanyInput
+    payrollRuns?: PayrollRunCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutRoleKpiCapsInput = {
+    id?: string
+    name: string
+    code: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
+    stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
+    kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
+    companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
+    bankAccounts?: BankAccountUncheckedCreateNestedManyWithoutCompanyInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedCreateNestedManyWithoutCompanyInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedCreateNestedManyWithoutCompanyInput
+    correctionRequests?: CorrectionRequestUncheckedCreateNestedManyWithoutCompanyInput
+    heldFunds?: HeldFundUncheckedCreateNestedManyWithoutCompanyInput
+    payrollRuns?: PayrollRunUncheckedCreateNestedManyWithoutCompanyInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutRoleKpiCapsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutRoleKpiCapsInput, CompanyUncheckedCreateWithoutRoleKpiCapsInput>
+  }
+
+  export type custom_roleCreateWithoutRoleKpiCapsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    permissions?: custom_roleCreatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    company?: CompanyCreateNestedOneWithoutCustom_rolesInput
+    users?: userCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutCustomRoleInput
+  }
+
+  export type custom_roleUncheckedCreateWithoutRoleKpiCapsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    companyId?: string | null
+    permissions?: custom_roleCreatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleCreatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
+    resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutCustomRoleInput
+  }
+
+  export type custom_roleCreateOrConnectWithoutRoleKpiCapsInput = {
+    where: custom_roleWhereUniqueInput
+    create: XOR<custom_roleCreateWithoutRoleKpiCapsInput, custom_roleUncheckedCreateWithoutRoleKpiCapsInput>
+  }
+
+  export type CompanyUpsertWithoutRoleKpiCapsInput = {
+    update: XOR<CompanyUpdateWithoutRoleKpiCapsInput, CompanyUncheckedUpdateWithoutRoleKpiCapsInput>
+    create: XOR<CompanyCreateWithoutRoleKpiCapsInput, CompanyUncheckedCreateWithoutRoleKpiCapsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutRoleKpiCapsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutRoleKpiCapsInput, CompanyUncheckedUpdateWithoutRoleKpiCapsInput>
+  }
+
+  export type CompanyUpdateWithoutRoleKpiCapsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUpdateManyWithoutCompanyNestedInput
+    payrollRuns?: PayrollRunUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutRoleKpiCapsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
+    companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
+    bankAccounts?: BankAccountUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistHeadConfirmations?: StockistHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    stockistTotalHeadConfirms?: StockistTotalHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    kasHeadConfirmations?: KasHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    bankHeadConfirmations?: BankHeadConfirmationUncheckedUpdateManyWithoutCompanyNestedInput
+    headConfirmationTotals?: CompanyHeadConfirmationTotalUncheckedUpdateManyWithoutCompanyNestedInput
+    correctionRequests?: CorrectionRequestUncheckedUpdateManyWithoutCompanyNestedInput
+    heldFunds?: HeldFundUncheckedUpdateManyWithoutCompanyNestedInput
+    payrollRuns?: PayrollRunUncheckedUpdateManyWithoutCompanyNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type custom_roleUpsertWithoutRoleKpiCapsInput = {
+    update: XOR<custom_roleUpdateWithoutRoleKpiCapsInput, custom_roleUncheckedUpdateWithoutRoleKpiCapsInput>
+    create: XOR<custom_roleCreateWithoutRoleKpiCapsInput, custom_roleUncheckedCreateWithoutRoleKpiCapsInput>
+    where?: custom_roleWhereInput
+  }
+
+  export type custom_roleUpdateToOneWithWhereWithoutRoleKpiCapsInput = {
+    where?: custom_roleWhereInput
+    data: XOR<custom_roleUpdateWithoutRoleKpiCapsInput, custom_roleUncheckedUpdateWithoutRoleKpiCapsInput>
+  }
+
+  export type custom_roleUpdateWithoutRoleKpiCapsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    permissions?: custom_roleUpdatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
+    users?: userUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutCustomRoleNestedInput
+  }
+
+  export type custom_roleUncheckedUpdateWithoutRoleKpiCapsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    permissions?: custom_roleUpdatepermissionsInput | string[]
+    payrollCompanyIds?: custom_roleUpdatepayrollCompanyIdsInput | string[]
+    usesResourcePerms?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
+    resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
   }
 
   export type userCreateWithoutKpiEntriesInput = {
@@ -103782,6 +106111,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -103805,6 +106135,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -104093,6 +106424,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -104116,6 +106448,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -105187,6 +107520,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -105212,6 +107546,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -105471,6 +107806,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -105496,6 +107832,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -105840,6 +108177,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
@@ -105860,6 +108198,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
@@ -105878,6 +108217,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCustomRoleInput
     company?: CompanyCreateNestedOneWithoutCustom_rolesInput
     users?: userCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionCreateNestedManyWithoutRoleInput
@@ -105894,6 +108234,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCustomRoleInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCustomRoleInput
     users?: userUncheckedCreateNestedManyWithoutCustomRoleInput
     resourcePerms?: RoleResourcePermissionUncheckedCreateNestedManyWithoutRoleInput
   }
@@ -106194,6 +108535,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
@@ -106214,6 +108556,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
@@ -106238,6 +108581,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     company?: CompanyUpdateOneWithoutCustom_rolesNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
@@ -106254,6 +108598,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
   }
@@ -106574,6 +108919,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -106599,6 +108945,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -106712,6 +109059,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -106737,6 +109085,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -107027,6 +109376,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -107052,6 +109402,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -107251,6 +109602,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -107276,6 +109628,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -108093,6 +110446,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -108113,6 +110467,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -108182,6 +110537,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -108202,6 +110558,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -108261,6 +110618,7 @@ export namespace Prisma {
     stockItems?: StockItemCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -108281,6 +110639,7 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -108350,6 +110709,7 @@ export namespace Prisma {
     stockItems?: StockItemUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -108370,6 +110730,7 @@ export namespace Prisma {
     stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -108467,6 +110828,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -108487,6 +110849,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -108557,6 +110920,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -108577,6 +110941,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -108655,6 +111020,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -108680,6 +111046,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -108817,6 +111184,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -108842,6 +111210,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -109371,6 +111740,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemCreateNestedManyWithoutCompanyInput
@@ -109396,6 +111766,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     companyStockItems?: CompanyStockItemUncheckedCreateNestedManyWithoutCompanyInput
@@ -109475,6 +111846,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUpdateManyWithoutCompanyNestedInput
@@ -109500,6 +111872,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     companyStockItems?: CompanyStockItemUncheckedUpdateManyWithoutCompanyNestedInput
@@ -109619,6 +111992,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -109644,6 +112018,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -109720,6 +112095,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -109745,6 +112121,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -109811,6 +112188,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -109836,6 +112214,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -109877,6 +112256,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -109902,6 +112282,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -109927,6 +112308,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -109952,6 +112334,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -109993,6 +112376,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -110018,6 +112402,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -110043,6 +112428,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -110068,6 +112454,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -110109,6 +112496,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -110134,6 +112522,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -110159,6 +112548,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -110184,6 +112574,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -110225,6 +112616,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -110250,6 +112642,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -110275,6 +112668,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -110300,6 +112694,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -110341,6 +112736,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -110366,6 +112762,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -110391,6 +112788,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentCreateNestedManyWithoutCompanyInput
     branches?: BranchCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketCreateNestedManyWithoutCompanyInput
@@ -110416,6 +112814,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedCreateNestedManyWithoutCompanyInput
     branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
     roleKpis?: RoleKpiUncheckedCreateNestedManyWithoutCompanyInput
+    roleKpiCaps?: RoleKpiCapUncheckedCreateNestedManyWithoutCompanyInput
     custom_roles?: custom_roleUncheckedCreateNestedManyWithoutCompanyInput
     stockistPockets?: StockistPocketUncheckedCreateNestedManyWithoutCompanyInput
     kasPockets?: KasPocketUncheckedCreateNestedManyWithoutCompanyInput
@@ -110453,6 +112852,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
   }
 
@@ -110473,6 +112873,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
   }
 
@@ -110574,6 +112975,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUpdateManyWithoutCompanyNestedInput
     branches?: BranchUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUpdateManyWithoutCompanyNestedInput
@@ -110599,6 +113001,7 @@ export namespace Prisma {
     salaryComponents?: SalaryComponentUncheckedUpdateManyWithoutCompanyNestedInput
     branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCompanyNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCompanyNestedInput
     custom_roles?: custom_roleUncheckedUpdateManyWithoutCompanyNestedInput
     stockistPockets?: StockistPocketUncheckedUpdateManyWithoutCompanyNestedInput
     kasPockets?: KasPocketUncheckedUpdateManyWithoutCompanyNestedInput
@@ -110642,6 +113045,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
   }
 
@@ -110662,6 +113066,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
   }
 
@@ -110759,11 +113164,20 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
     systemConfig?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapCreateManyCustomRoleInput = {
+    id?: string
+    companyId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -110829,6 +113243,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -110851,6 +113266,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -110871,11 +113287,36 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
     systemConfig?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapUpdateWithoutCustomRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneRequiredWithoutRoleKpiCapsNestedInput
+  }
+
+  export type RoleKpiCapUncheckedUpdateWithoutCustomRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapUncheckedUpdateManyWithoutCustomRoleInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    companyId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -111194,6 +113635,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -111217,6 +113659,7 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -111728,6 +114171,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
+    checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutUserInput = {
@@ -111743,6 +114187,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -111765,6 +114210,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -111794,6 +114240,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
+    checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutEditedByInput = {
@@ -111810,6 +114257,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -111832,6 +114280,7 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -112657,6 +115106,30 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkInBranchId?: string | null
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateManyCheckInBranchInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -112931,11 +115404,82 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
+    checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUpdateWithoutCheckInBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutAttendancesNestedInput
+    editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
+    branch?: BranchUpdateOneWithoutAttendancesNestedInput
+  }
+
+  export type AttendanceUncheckedUpdateWithoutCheckInBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -112955,9 +115499,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type AttendanceUncheckedUpdateManyWithoutBranchInput = {
+  export type AttendanceUncheckedUpdateManyWithoutCheckInBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -113169,11 +115714,20 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
     systemConfig?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleKpiCapCreateManyCompanyInput = {
+    id?: string
+    customRoleId: string
+    maxTotalScore: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -113428,6 +115982,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -113448,6 +116003,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -113473,6 +116029,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -113495,6 +116052,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -113515,11 +116073,36 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
     systemConfig?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customRole?: custom_roleUpdateOneRequiredWithoutRoleKpiCapsNestedInput
+  }
+
+  export type RoleKpiCapUncheckedUpdateWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customRoleId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleKpiCapUncheckedUpdateManyWithoutCompanyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customRoleId?: StringFieldUpdateOperationsInput | string
+    maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -113534,6 +116117,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUpdateManyWithoutCustomRoleNestedInput
     users?: userUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutCustomRoleNestedInput
@@ -113549,6 +116133,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roleKpis?: RoleKpiUncheckedUpdateManyWithoutCustomRoleNestedInput
+    roleKpiCaps?: RoleKpiCapUncheckedUpdateManyWithoutCustomRoleNestedInput
     users?: userUncheckedUpdateManyWithoutCustomRoleNestedInput
     resourcePerms?: RoleResourcePermissionUncheckedUpdateManyWithoutRoleNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutCustomRoleNestedInput
@@ -114603,6 +117188,7 @@ export namespace Prisma {
     pointPerUnit?: Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: Decimal | DecimalJsLike | number | string | null
     toleranceScope?: $Enums.KpiToleranceScope | null
+    maxAchievement?: Decimal | DecimalJsLike | number | string | null
     inputSource?: $Enums.KpiInputSource | null
     requiresApproval?: boolean | null
     requiresEvidence?: boolean | null
@@ -114620,6 +117206,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -114642,6 +117229,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null
@@ -114662,6 +117250,7 @@ export namespace Prisma {
     pointPerUnit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceLimit?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     toleranceScope?: NullableEnumKpiToleranceScopeFieldUpdateOperationsInput | $Enums.KpiToleranceScope | null
+    maxAchievement?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     inputSource?: NullableEnumKpiInputSourceFieldUpdateOperationsInput | $Enums.KpiInputSource | null
     requiresApproval?: NullableBoolFieldUpdateOperationsInput | boolean | null
     requiresEvidence?: NullableBoolFieldUpdateOperationsInput | boolean | null

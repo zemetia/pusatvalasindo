@@ -77,6 +77,11 @@ model RoleKpi {
   /// Cakupan perhitungan toleransi.
   toleranceScope  KpiToleranceScope? @default(DAILY)
 
+  /// Plafon pencapaian KPI ini, dalam rasio (1.2 = 120%). Null = tanpa plafon,
+  /// pencapaian bebas di atas 100% (perilaku default modul ini). Hanya
+  /// membatasi batas atas — penalti tetap bisa jatuh negatif tanpa batas.
+  maxAchievement Decimal?
+
   // ── Override kebijakan pengisian (null = ikut KpiDefinition) ──
   inputSource      KpiInputSource?
   requiresApproval Boolean?
@@ -100,6 +105,26 @@ model RoleKpi {
 
   @@unique([companyId, customRoleId, kpiId])
   @@index([companyId, customRoleId])
+}
+
+/// Plafon skor total (gabungan seluruh KPI tertimbang) untuk satu jabatan di
+/// satu PT. Baris opsional — tanpa baris berarti totalScore bebas tanpa
+/// plafon, sama seperti perilaku default modul ini sebelum fitur ini ada.
+model RoleKpiCap {
+  id           String @id @default(cuid())
+  companyId    String
+  customRoleId String
+
+  /// Plafon totalScore, dalam rasio (1.2 = 120%).
+  maxTotalScore Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole custom_role @relation(fields: [customRoleId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, customRoleId])
 }
 
 /// Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai

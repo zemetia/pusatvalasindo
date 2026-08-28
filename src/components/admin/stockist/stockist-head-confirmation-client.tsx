@@ -26,6 +26,7 @@ import {
   IconMinus,
 } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { isKlopMatch } from "@/lib/money-match"
 
 type Company = { id: string; name: string }
 type StockItem = { id: string; code: string | null; name: string; type: "CURRENCY" | "LOGAM_MULIA" }
@@ -304,6 +305,7 @@ export function StockistHeadConfirmationClient({
     [stockRows]
   )
   const stockSumSelisih = stockKepcabSum - stockSystemSum
+  const stockSumMatched = stockRows.length > 0 && isKlopMatch(stockKepcabSum, stockSystemSum)
 
   return (
     <div className="flex flex-col gap-6">
@@ -408,6 +410,7 @@ export function StockistHeadConfirmationClient({
                 <TableBody>
                   {stockRowsSorted.map((r) => {
                     const selisih = r.qtyDraft === undefined ? null : r.qtyDraft - r.systemTotal
+                    const matched = r.qtyDraft !== undefined && isKlopMatch(r.qtyDraft, r.systemTotal)
                     return (
                       <TableRow key={r.item.id}>
                         <TableCell className="font-medium text-sm">
@@ -428,11 +431,11 @@ export function StockistHeadConfirmationClient({
                             className="text-right font-mono w-full"
                           />
                         </TableCell>
-                        <TableCell className={selisihClass(selisih)}>
+                        <TableCell className={selisihClass(selisih, matched)}>
                           {selisih === null ? "-" : fmt(selisih)}
                         </TableCell>
                         <TableCell>
-                          <JamKlop matched={selisih === 0} iso={r.confirmedAt} />
+                          <JamKlop matched={matched} iso={r.confirmedAt} />
                         </TableCell>
                         <TableCell>
                           <SaveIndicator state={r.saveState} />
@@ -452,7 +455,7 @@ export function StockistHeadConfirmationClient({
                     <TableCell className="text-right font-mono text-sm font-semibold pr-4">
                       {fmt(stockKepcabSum)}
                     </TableCell>
-                    <TableCell className={cn(selisihClass(stockSumSelisih), "font-semibold")}>
+                    <TableCell className={cn(selisihClass(stockSumSelisih, stockSumMatched), "font-semibold")}>
                       {fmt(stockSumSelisih)}
                     </TableCell>
                     <TableCell colSpan={2} />
@@ -482,7 +485,7 @@ export function StockistHeadConfirmationClient({
                       {/* Baris ini tidak punya total sistem sendiri, jadi klop-nya mengikuti
                           kecocokan kuantitas seluruh item di atasnya. */}
                       <JamKlop
-                        matched={stockRows.length > 0 && stockSumSelisih === 0}
+                        matched={stockSumMatched}
                         iso={stockIdr?.confirmedAt ?? null}
                       />
                     </TableCell>
@@ -534,12 +537,12 @@ function toIdrState(api: {
   }
 }
 
-function selisihClass(selisih: number | null) {
+function selisihClass(selisih: number | null, matched: boolean) {
   return cn(
     "text-right font-mono text-sm font-medium",
     selisih === null && "text-muted-foreground",
-    selisih !== null && selisih === 0 && "text-success",
-    selisih !== null && selisih !== 0 && "text-destructive"
+    selisih !== null && matched && "text-success",
+    selisih !== null && !matched && "text-destructive"
   )
 }
 
@@ -569,6 +572,7 @@ function IdrCrossCheckSection({
 }) {
   if (!state) return null
   const selisih = state.idrDraft === undefined ? null : state.idrDraft - state.systemTotal
+  const matched = state.idrDraft !== undefined && isKlopMatch(state.idrDraft, state.systemTotal)
 
   return (
     <div>
@@ -600,12 +604,12 @@ function IdrCrossCheckSection({
                   className="text-right font-mono w-full"
                 />
               </TableCell>
-              <TableCell className={selisihClass(selisih)}>
+              <TableCell className={selisihClass(selisih, matched)}>
                 {selisih === null ? "-" : fmt(selisih)}
               </TableCell>
               <TableCell>
                 {/* Jam klop tersimpan (matchedAt), bukan jam simpan terakhir. */}
-                <JamKlop matched={selisih === 0} iso={state.matchedAt ?? state.confirmedAt} />
+                <JamKlop matched={matched} iso={state.matchedAt ?? state.confirmedAt} />
               </TableCell>
               <TableCell>
                 <SaveIndicator state={state.saveState} />

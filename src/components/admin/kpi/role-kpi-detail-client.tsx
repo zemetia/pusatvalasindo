@@ -19,6 +19,7 @@ import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import type { KpiDefinitionRow } from "../kpi-definition-sheet";
 import type { RoleKpiDetailRow } from "./role-kpi-detail-sheet";
 import { RoleKpiDetailSheet } from "./role-kpi-detail-sheet";
+import { RoleKpiCapDialog } from "./role-kpi-cap-dialog";
 import { MetricBlock } from "@/components/admin/page-shell";
 import { SCORING_TYPE_LABELS, INPUT_SOURCE_LABELS } from "@/lib/kpi-utils";
 
@@ -43,35 +44,37 @@ function scoringSummary(rk: RoleKpiDetailRow) {
   const base = num(rk.basePoint);
   const perUnit = num(rk.pointPerUnit);
   const tolerance = num(rk.toleranceLimit);
+  const maxAchievement = num(rk.maxAchievement);
   const isCurrency = rk.definition.unit === "CURRENCY";
+  const capSuffix = maxAchievement !== null ? ` · plafon ${Math.round(maxAchievement * 100)}%` : "";
 
   switch (rk.definition.scoringType) {
     case "TARGET_VALUE":
       return target === null
-        ? "target belum disetel"
-        : `target ${isCurrency ? "Rp " : ""}${fmt(target)}`;
+        ? `target belum disetel${capSuffix}`
+        : `target ${isCurrency ? "Rp " : ""}${fmt(target)}${capSuffix}`;
     case "PENALTY_POINT":
       return perUnit === null
-        ? "poin per kejadian belum disetel"
-        : `−${fmt(perUnit)} poin/kejadian dari ${fmt(base ?? 100)}`;
+        ? `poin per kejadian belum disetel${capSuffix}`
+        : `−${fmt(perUnit)} poin/kejadian dari ${fmt(base ?? 100)}${capSuffix}`;
     case "REWARD_POINT":
       return perUnit === null || target === null
-        ? "poin/target belum disetel"
-        : `+${fmt(perUnit)} poin/kejadian, target ${fmt(target)}`;
+        ? `poin/target belum disetel${capSuffix}`
+        : `+${fmt(perUnit)} poin/kejadian, target ${fmt(target)}${capSuffix}`;
     case "PENALTY_PERCENT":
-      return perUnit === null ? "persen belum disetel" : `−${fmt(perUnit)}% per kejadian`;
+      return perUnit === null ? `persen belum disetel${capSuffix}` : `−${fmt(perUnit)}% per kejadian${capSuffix}`;
     case "TOLERANCE_LIMIT": {
-      if (tolerance === null || perUnit === null) return "batas belum disetel";
+      if (tolerance === null || perUnit === null) return `batas belum disetel${capSuffix}`;
       const scope =
         rk.toleranceScope === "WEEKLY"
           ? "minggu"
           : rk.toleranceScope === "MONTHLY"
             ? "bulan"
             : "hari";
-      return `maks ${isCurrency ? "Rp " : ""}${fmt(tolerance)}/${scope}, lewat → −${fmt(perUnit)} poin`;
+      return `maks ${isCurrency ? "Rp " : ""}${fmt(tolerance)}/${scope}, lewat → −${fmt(perUnit)} poin${capSuffix}`;
     }
     case "BOOLEAN_DAILY":
-      return "rasio hari patuh";
+      return `rasio hari patuh${capSuffix}`;
     default:
       return "—";
   }
@@ -89,12 +92,14 @@ export function RoleKpiDetailClient({
   displayRoleName,
   roleKpis,
   definitions,
+  initialMaxTotalScore,
 }: {
   company: CompanyRow;
   roleName: string;
   displayRoleName?: string;
   roleKpis: RoleKpiDetailRow[];
   definitions: KpiDefinitionRow[];
+  initialMaxTotalScore: string | null;
 }) {
   const router = useRouter();
 
@@ -171,6 +176,30 @@ export function RoleKpiDetailClient({
                   : totalPct < 100
                     ? `${activeKpis.length} KPI aktif · kurang ${100 - totalPct}%`
                     : `${activeKpis.length} KPI aktif · lebih ${totalPct - 100}%`
+              }
+            />
+            <MetricBlock
+              label="Plafon Skor Total"
+              size="secondary"
+              value={
+                initialMaxTotalScore
+                  ? Math.round(Number(initialMaxTotalScore) * 100)
+                  : "—"
+              }
+              suffix={initialMaxTotalScore ? "%" : undefined}
+              meta={initialMaxTotalScore ? "skor gabungan tidak melebihi ini" : "tanpa plafon"}
+              action={
+                <RoleKpiCapDialog
+                  companyId={company.id}
+                  customRoleId={customRoleId}
+                  currentMaxTotalScore={initialMaxTotalScore}
+                  trigger={
+                    <Button size="sm" variant="outline">
+                      <IconPencil className="size-3.5" />
+                      Atur Plafon
+                    </Button>
+                  }
+                />
               }
             />
           </div>

@@ -15,6 +15,7 @@ export type RoleKpiScoringParams = {
   pointPerUnit?: number | null;
   toleranceLimit?: number | null;
   toleranceScope?: KpiToleranceScope | null;
+  maxAchievement?: number | null;
   inputSource?: KpiInputSource | null;
   requiresApproval?: boolean | null;
   requiresEvidence?: boolean | null;
@@ -40,6 +41,7 @@ const select = {
   pointPerUnit: true,
   toleranceLimit: true,
   toleranceScope: true,
+  maxAchievement: true,
   inputSource: true,
   requiresApproval: true,
   requiresEvidence: true,

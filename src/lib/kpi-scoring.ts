@@ -28,6 +28,8 @@ export type KpiScoringConfig = {
   pointPerUnit: number | null;
   toleranceLimit: number | null;
   toleranceScope: KpiToleranceScope | null;
+  /** Plafon pencapaian (rasio, 1.2 = 120%). Null = tanpa plafon. */
+  maxAchievement: number | null;
 };
 
 /** Satu entri KPI yang sudah disetujui, dipakai sebagai bahan perhitungan. */
@@ -108,10 +110,14 @@ export function scoreKpiItem(
     reference: number,
     explanation: string
   ): KpiItemScore => {
-    // Tidak ada plafon maupun lantai: 150% tetap 150%, penalti berlebih tetap
-    // negatif. Satu-satunya pengaman adalah pembagian nol/NaN, yang tidak bisa
-    // disimpan sebagai Decimal.
-    const value = Number.isFinite(achievement) ? achievement : 0;
+    // Default tanpa plafon maupun lantai: 150% tetap 150%, penalti berlebih
+    // tetap negatif. Satu pengaman baku adalah pembagian nol/NaN, yang tidak
+    // bisa disimpan sebagai Decimal. Admin bisa menyetel plafon per KPI
+    // (maxAchievement) — itu satu-satunya batas atas yang diterapkan di sini;
+    // lantai (nilai negatif dari penalti) tetap bebas seperti semula.
+    const raw = Number.isFinite(achievement) ? achievement : 0;
+    const value =
+      config.maxAchievement != null ? Math.min(raw, config.maxAchievement) : raw;
     return {
       achievement: value,
       weightedScore: value * config.weight,
@@ -288,11 +294,19 @@ export function gradeFor(totalScore: number): "A" | "B" | "C" | "D" {
  * Dibagi total bobot, bukan diasumsikan berjumlah 1: kalau admin menyetel
  * bobot yang totalnya 0.9, karyawan tidak ikut kehilangan 10% skor. `weightSum`
  * tetap dikembalikan supaya konfigurasi yang tidak rapi bisa ditampilkan.
+ *
+ * `maxTotalScore` (opsional) memplafon rasio gabungan sebelum grade dihitung
+ * — dipakai bila admin menyetel batas total per jabatan (RoleKpiCap). Null
+ * berarti tanpa plafon, sama seperti perilaku default modul ini.
  */
-export function computeTotalScore(items: ScoredKpiItem[]): MonthlyScore {
+export function computeTotalScore(
+  items: ScoredKpiItem[],
+  maxTotalScore?: number | null
+): MonthlyScore {
   const weightSum = items.reduce((total, item) => total + item.weight, 0);
   const weighted = items.reduce((total, item) => total + item.weightedScore, 0);
-  const totalScore = weightSum > 0 ? weighted / weightSum : 0;
+  const raw = weightSum > 0 ? weighted / weightSum : 0;
+  const totalScore = maxTotalScore != null ? Math.min(raw, maxTotalScore) : raw;
 
   return {
     totalScore,

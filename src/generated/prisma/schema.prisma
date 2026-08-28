@@ -53,6 +53,12 @@ model Attendance {
   checkInManualLat  Float?
   checkInManualLng  Float?
   isLocationSuspect Boolean          @default(false)
+  // Cabang tempat clock-in benar-benar terjadi (rotasi antar cabang: karyawan
+  // boleh absen di cabang mana pun asal masuk radiusnya, bukan cuma cabang
+  // yang tercatat di profilnya). Diisi server dari cabang mana pun yang cocok
+  // dengan GPS-nya saat clock-in mandiri. Null untuk presensi manual oleh
+  // atasan/HR — tidak ada GPS untuk dicocokkan ke cabang mana pun.
+  checkInBranchId   String?
   isWithDoctorNote  Boolean          @default(false)
   status            AttendanceStatus @default(PRESENT)
   notes             String?
@@ -64,13 +70,15 @@ model Attendance {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user     user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
-  editedBy user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
-  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  user          user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  editedBy      user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
+  branch        Branch? @relation("AttendanceHomeBranch", fields: [branchId], references: [id], onDelete: SetNull)
+  checkInBranch Branch? @relation("AttendanceCheckInBranch", fields: [checkInBranchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])
   @@index([branchId])
+  @@index([checkInBranchId])
   @@index([date])
   @@index([editedById])
 }
@@ -121,6 +129,7 @@ model custom_role {
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
   roleKpis          RoleKpi[]
+  roleKpiCaps       RoleKpiCap[]
   company           Company?                 @relation(fields: [companyId], references: [id])
   users             user[]
   // Izin per-resource dengan scope PT terpisah untuk baca & tulis.
@@ -304,26 +313,27 @@ enum BankMutationType {
 }
 
 model Branch {
-  id                String             @id @default(cuid())
-  name              String
-  address           String?
-  phone             String?
-  isActive          Boolean            @default(true)
-  companyId         String?
+  id                 String             @id @default(cuid())
+  name               String
+  address            String?
+  phone              String?
+  isActive           Boolean            @default(true)
+  companyId          String?
   // Geofence for attendance check-in validation
-  latitude          Float?
-  longitude         Float?
-  attendanceRadiusM Int?               @default(20)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  company           Company?           @relation(fields: [companyId], references: [id])
-  currencyStocks    CurrencyStock[]
-  stockItems        StockItem[]
-  stockMutations    StockMutation[]
-  users             user[]
-  attendances       Attendance[]
-  payrollSlips      PayrollSlip[]
-  valasTransactions ValasTransaction[]
+  latitude           Float?
+  longitude          Float?
+  attendanceRadiusM  Int?               @default(20)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  company            Company?           @relation(fields: [companyId], references: [id])
+  currencyStocks     CurrencyStock[]
+  stockItems         StockItem[]
+  stockMutations     StockMutation[]
+  users              user[]
+  attendances        Attendance[]       @relation("AttendanceHomeBranch")
+  checkInAttendances Attendance[]       @relation("AttendanceCheckInBranch")
+  payrollSlips       PayrollSlip[]
+  valasTransactions  ValasTransaction[]
 }
 
 model Company {
@@ -336,6 +346,7 @@ model Company {
   salaryComponents          SalaryComponent[]
   branches                  Branch[]
   roleKpis                  RoleKpi[]
+  roleKpiCaps               RoleKpiCap[]
   custom_roles              custom_role[]
   stockistPockets           StockistPocket[]
   kasPockets                KasPocket[]
@@ -441,9 +452,11 @@ model SmartdealRate {
   name      String
   buy       Float
   sell      Float
-  // Value this row held immediately before the current write — lets the UI
-  // show which currencies moved since the last cron fetch. Null until the
-  // second cron run for a code (nothing to compare against on the first).
+  // Kurs dari TERBITAN SMARTDEAL SEBELUMNYA — hanya bergeser saat
+  // "Kurs diperbarui" milik SmartDeal berubah (atau angkanya sendiri
+  // berubah), bukan setiap kali kita scrape. Itu yang membuat penanda
+  // naik/turun di Watcher Valas bertahan selama SmartDeal belum menerbitkan
+  // kurs baru. Null sampai terbitan kedua untuk sebuah kode.
   prevBuy   Float?
   prevSell  Float?
   fetchedAt DateTime @default(now())
@@ -600,6 +613,11 @@ model RoleKpi {
   /// Cakupan perhitungan toleransi.
   toleranceScope KpiToleranceScope? @default(DAILY)
 
+  /// Plafon pencapaian KPI ini, dalam rasio (1.2 = 120%). Null = tanpa plafon,
+  /// pencapaian bebas di atas 100% (perilaku default modul ini). Hanya
+  /// membatasi batas atas — penalti tetap bisa jatuh negatif tanpa batas.
+  maxAchievement Decimal?
+
   // ── Override kebijakan pengisian (null = ikut KpiDefinition) ──
   inputSource      KpiInputSource?
   requiresApproval Boolean?
@@ -623,6 +641,26 @@ model RoleKpi {
 
   @@unique([companyId, customRoleId, kpiId])
   @@index([companyId, customRoleId])
+}
+
+/// Plafon skor total (gabungan seluruh KPI tertimbang) untuk satu jabatan di
+/// satu PT. Baris opsional — tanpa baris berarti totalScore bebas tanpa
+/// plafon, sama seperti perilaku default modul ini sebelum fitur ini ada.
+model RoleKpiCap {
+  id           String @id @default(cuid())
+  companyId    String
+  customRoleId String
+
+  /// Plafon totalScore, dalam rasio (1.2 = 120%).
+  maxTotalScore Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customRole custom_role @relation(fields: [customRoleId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, customRoleId])
 }
 
 /// Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai

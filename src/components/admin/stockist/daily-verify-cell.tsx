@@ -21,7 +21,7 @@ export type ApprovedCorrection = {
 }
 
 function fmt(n: number) {
-  return n.toLocaleString("id-ID", { maximumFractionDigits: 0 })
+  return n.toLocaleString("id-ID", { maximumFractionDigits: 2 })
 }
 
 /** Tag lembut yang menandai sel ini pernah salah dan sudah dikoreksi (disetujui). */

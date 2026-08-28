@@ -15,16 +15,23 @@ import { useTranslations } from "next-intl";
 import { MetricBlock } from "@/components/admin/page-shell";
 
 interface BranchGeofence {
+  id: string;
   latitude: number;
   longitude: number;
   radiusM: number;
   name: string;
 }
 
+type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string } | null };
+
 interface AttendanceClientProps {
   userId: string;
-  initialRecords: Attendance[];
-  branchGeofence?: BranchGeofence | null;
+  initialRecords: AttendanceWithCheckInBranch[];
+  // Semua cabang aktif milik PT ini yang punya geofence — karyawan boleh
+  // absen di cabang mana pun asal masuk radius SALAH SATU (rotasi antar
+  // cabang), bukan hanya cabang di profilnya. Array kosong = tidak ada
+  // cabang di PT ini yang punya geofence, jadi absen tidak dibatasi lokasi.
+  branchGeofences?: BranchGeofence[];
 }
 
 function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -56,9 +63,9 @@ function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
   });
 }
 
-export function AttendanceClient({ userId, initialRecords, branchGeofence }: AttendanceClientProps) {
+export function AttendanceClient({ userId, initialRecords, branchGeofences = [] }: AttendanceClientProps) {
   const t = useTranslations("Dashboard.Attendance");
-  const [records, setRecords] = useState<Attendance[]>(initialRecords);
+  const [records, setRecords] = useState<AttendanceWithCheckInBranch[]>(initialRecords);
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -156,15 +163,18 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
       const currentLocation = await getCurrentLocation();
       setLocation(currentLocation);
 
-      if (branchGeofence) {
-        const distM = haversineMeters(
-          currentLocation.lat,
-          currentLocation.lng,
-          branchGeofence.latitude,
-          branchGeofence.longitude
-        );
-        if (distM > branchGeofence.radiusM) {
-          toast.error("Tidak bisa absen karena di luar dari area kantor.");
+      if (branchGeofences.length > 0) {
+        const withinAnyBranch = branchGeofences.some((geofence) => {
+          const distM = haversineMeters(
+            currentLocation.lat,
+            currentLocation.lng,
+            geofence.latitude,
+            geofence.longitude
+          );
+          return distM <= geofence.radiusM;
+        });
+        if (!withinAnyBranch) {
+          toast.error("Tidak bisa absen karena di luar radius semua cabang.");
           return;
         }
       }
@@ -258,7 +268,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofence }: Att
 
                 <LocationStatus
                   onLocationChange={handleLocationChange}
-                  geofence={branchGeofence}
+                  geofences={branchGeofences}
                 />
 
                 <Button

@@ -24,6 +24,7 @@ const baseConfig: KpiScoringConfig = {
   pointPerUnit: 1,
   toleranceLimit: null,
   toleranceScope: "DAILY",
+  maxAchievement: null,
 };
 
 const cfg = (over: Partial<KpiScoringConfig>): KpiScoringConfig => ({ ...baseConfig, ...over });
@@ -70,6 +71,27 @@ describe("TARGET_VALUE", () => {
       entry("2026-07-02", 100),
     ]);
     expect(result.achievement).toBe(0);
+  });
+
+  it("maxAchievement memplafon pencapaian yang melampauinya", () => {
+    const capped = cfg({
+      scoringType: "TARGET_VALUE",
+      targetValue: 700_000_000,
+      maxAchievement: 1.2,
+    });
+    const result = scoreKpiItem(capped, [entry("2026-07-02", 1_050_000_000)]);
+    expect(result.achievement).toBe(1.2);
+    expect(result.weightedScore).toBe(1.2 * capped.weight);
+  });
+
+  it("maxAchievement tidak mengubah pencapaian di bawah plafon", () => {
+    const capped = cfg({
+      scoringType: "TARGET_VALUE",
+      targetValue: 700_000_000,
+      maxAchievement: 1.2,
+    });
+    const result = scoreKpiItem(capped, [entry("2026-07-02", 350_000_000)]);
+    expect(result.achievement).toBeCloseTo(0.5, 6);
   });
 });
 
@@ -247,6 +269,17 @@ describe("computeTotalScore", () => {
     const result = computeTotalScore([]);
     expect(result.totalScore).toBe(0);
     expect(result.grade).toBe("D");
+  });
+
+  it("maxTotalScore memplafon skor gabungan dan grade yang dihasilkan", () => {
+    const result = computeTotalScore([item(0.5, 1.4), item(0.5, 1.4)], 1.2);
+    expect(result.totalScore).toBe(1.2);
+    expect(result.grade).toBe("A");
+  });
+
+  it("maxTotalScore null berarti tanpa plafon", () => {
+    const result = computeTotalScore([item(0.5, 1.4), item(0.5, 1.4)], null);
+    expect(result.totalScore).toBeCloseTo(1.4, 6);
   });
 });
 

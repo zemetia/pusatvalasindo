@@ -53,6 +53,12 @@ model Attendance {
   checkInManualLat  Float?
   checkInManualLng  Float?
   isLocationSuspect Boolean          @default(false)
+  // Cabang tempat clock-in benar-benar terjadi (rotasi antar cabang: karyawan
+  // boleh absen di cabang mana pun asal masuk radiusnya, bukan cuma cabang
+  // yang tercatat di profilnya). Diisi server dari cabang mana pun yang cocok
+  // dengan GPS-nya saat clock-in mandiri. Null untuk presensi manual oleh
+  // atasan/HR — tidak ada GPS untuk dicocokkan ke cabang mana pun.
+  checkInBranchId   String?
   isWithDoctorNote  Boolean          @default(false)
   status            AttendanceStatus @default(PRESENT)
   notes             String?
@@ -64,13 +70,15 @@ model Attendance {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user     user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
-  editedBy user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
-  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  user        user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  editedBy    user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
+  branch      Branch? @relation("AttendanceHomeBranch", fields: [branchId], references: [id], onDelete: SetNull)
+  checkInBranch Branch? @relation("AttendanceCheckInBranch", fields: [checkInBranchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])
   @@index([branchId])
+  @@index([checkInBranchId])
   @@index([date])
   @@index([editedById])
 }

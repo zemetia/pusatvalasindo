@@ -34,6 +34,7 @@ export type RoleKpiDetailRow = {
   pointPerUnit: string | null;
   toleranceLimit: string | null;
   toleranceScope: string | null;
+  maxAchievement: string | null;
   inputSource: string | null;
   requiresApproval: boolean | null;
   requiresEvidence: boolean | null;
@@ -69,6 +70,7 @@ const empty = {
   pointPerUnit: "",
   toleranceLimit: "",
   toleranceScope: "DAILY",
+  maxAchievement: "",
   inputSource: "",
   requiresApproval: "",
   requiresEvidence: "",
@@ -149,6 +151,9 @@ export function RoleKpiDetailSheet({
         pointPerUnit: roleKpi.pointPerUnit ? String(Number(roleKpi.pointPerUnit)) : "",
         toleranceLimit: roleKpi.toleranceLimit ? String(Number(roleKpi.toleranceLimit)) : "",
         toleranceScope: roleKpi.toleranceScope ?? "DAILY",
+        maxAchievement: roleKpi.maxAchievement
+          ? String(Math.round(Number(roleKpi.maxAchievement) * 100))
+          : "",
         inputSource: roleKpi.inputSource ?? "",
         requiresApproval:
           roleKpi.requiresApproval === null ? "" : roleKpi.requiresApproval ? "YES" : "NO",
@@ -213,6 +218,11 @@ export function RoleKpiDetailSheet({
       toast.error("Batas toleransi wajib diisi untuk cara penilaian ini");
       return;
     }
+    const maxAchievementPct = form.maxAchievement.trim() === "" ? null : parseFloat(form.maxAchievement);
+    if (maxAchievementPct !== null && (isNaN(maxAchievementPct) || maxAchievementPct <= 0)) {
+      toast.error("Plafon pencapaian harus lebih dari 0%");
+      return;
+    }
 
     const params = {
       weight: bobotNum / 100,
@@ -221,6 +231,7 @@ export function RoleKpiDetailSheet({
       pointPerUnit: fields.perUnit ? numOrNull(form.pointPerUnit) : null,
       toleranceLimit: fields.tolerance ? numOrNull(form.toleranceLimit) : null,
       toleranceScope: fields.tolerance ? form.toleranceScope : null,
+      maxAchievement: maxAchievementPct === null ? null : maxAchievementPct / 100,
       inputSource: form.inputSource === "" ? null : form.inputSource,
       requiresApproval: boolOrNull(form.requiresApproval),
       requiresEvidence: boolOrNull(form.requiresEvidence),
@@ -414,6 +425,24 @@ export function RoleKpiDetailSheet({
               </div>
             </>
           )}
+
+          <div className="grid gap-1.5">
+            <FieldLabel tooltip="Batas atas pencapaian KPI ini. Contoh: isi 120 supaya pencapaian di atas 120% tetap dihitung 120%. Kosongkan untuk bebas tanpa plafon.">
+              Plafon Pencapaian (%)
+            </FieldLabel>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Kosongkan = tanpa plafon"
+                value={form.maxAchievement}
+                onChange={(e) => setForm((f) => ({ ...f, maxAchievement: e.target.value }))}
+                className="w-48"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
+          </div>
 
           {/* ── Kebijakan pengisian khusus jabatan ini ── */}
           <div className="grid gap-3 rounded-lg border p-3">

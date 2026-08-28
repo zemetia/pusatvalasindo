@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { IconCheck } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { isKlopMatch } from "@/lib/money-match"
 
 /** Ringkasan cross-check satu PT satu tanggal — bentuknya sama untuk kas dan bank. */
 export type HeadConfirmationMatch = {
@@ -16,7 +17,7 @@ export type HeadConfirmationMatch = {
 }
 
 function fmt(n: number) {
-  return n.toLocaleString("id-ID", { maximumFractionDigits: 0 })
+  return n.toLocaleString("id-ID", { maximumFractionDigits: 2 })
 }
 
 function fmtTime(iso: string | null) {
@@ -78,7 +79,7 @@ export function HeadConfirmationSummary({
   match: HeadConfirmationMatch | null
 }) {
   const confirmed = match?.confirmedIdrValue ?? null
-  const isKlop = confirmed !== null && confirmed === localTotal
+  const isKlop = confirmed !== null && isKlopMatch(confirmed, localTotal)
   const jamKlop = isKlop ? fmtTime(match?.matchedAt ?? null) : null
   const selisih = confirmed === null ? null : confirmed - localTotal
 

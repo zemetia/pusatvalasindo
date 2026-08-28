@@ -117,6 +117,7 @@ async function main() {
       pointPerUnit: Number(roleKpi.pointPerUnit),
       toleranceLimit: null,
       toleranceScope: null,
+      maxAchievement: roleKpi.maxAchievement == null ? null : Number(roleKpi.maxAchievement),
     },
     output.entries.map((e) => ({
       occurredAt: e.occurredAt.toISOString().slice(0, 10),

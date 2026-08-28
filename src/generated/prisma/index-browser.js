@@ -143,6 +143,7 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   checkInManualLat: 'checkInManualLat',
   checkInManualLng: 'checkInManualLng',
   isLocationSuspect: 'isLocationSuspect',
+  checkInBranchId: 'checkInBranchId',
   isWithDoctorNote: 'isWithDoctorNote',
   status: 'status',
   notes: 'notes',
@@ -400,11 +401,21 @@ exports.Prisma.RoleKpiScalarFieldEnum = {
   pointPerUnit: 'pointPerUnit',
   toleranceLimit: 'toleranceLimit',
   toleranceScope: 'toleranceScope',
+  maxAchievement: 'maxAchievement',
   inputSource: 'inputSource',
   requiresApproval: 'requiresApproval',
   requiresEvidence: 'requiresEvidence',
   systemConfig: 'systemConfig',
   isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoleKpiCapScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  customRoleId: 'customRoleId',
+  maxTotalScore: 'maxTotalScore',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1203,6 +1214,7 @@ exports.Prisma.ModelName = {
   CompanyStockItem: 'CompanyStockItem',
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
+  RoleKpiCap: 'RoleKpiCap',
   KpiEntry: 'KpiEntry',
   KpiPeriod: 'KpiPeriod',
   KpiMonthlyResult: 'KpiMonthlyResult',

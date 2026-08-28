@@ -38,6 +38,7 @@ export default async function KpiDetailPage({ params }: PageProps) {
           pointPerUnit: true,
           toleranceLimit: true,
           toleranceScope: true,
+          maxAchievement: true,
           inputSource: true,
           requiresApproval: true,
           requiresEvidence: true,
@@ -62,12 +63,16 @@ export default async function KpiDetailPage({ params }: PageProps) {
         include: { _count: { select: { roleKpis: true } } },
       }),
       prisma.custom_role.findUnique({ where: { id: customRoleId } }),
+      prisma.roleKpiCap.findUnique({
+        where: { companyId_customRoleId: { companyId, customRoleId } },
+        select: { maxTotalScore: true },
+      }),
     ]);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="kpi/[companyId]/[roleName]/page" message={msg} />;
   }
-  const [company, roleKpisRaw, definitions, customRole] = kpiDetailData;
+  const [company, roleKpisRaw, definitions, customRole, roleKpiCap] = kpiDetailData;
 
   if (!company || !customRole) notFound();
 
@@ -81,6 +86,7 @@ export default async function KpiDetailPage({ params }: PageProps) {
     pointPerUnit: rk.pointPerUnit?.toString() ?? null,
     toleranceLimit: rk.toleranceLimit?.toString() ?? null,
     toleranceScope: rk.toleranceScope as string | null,
+    maxAchievement: rk.maxAchievement?.toString() ?? null,
     inputSource: rk.inputSource as string | null,
     requiresApproval: rk.requiresApproval,
     requiresEvidence: rk.requiresEvidence,
@@ -122,6 +128,7 @@ export default async function KpiDetailPage({ params }: PageProps) {
         displayRoleName={customRole.name}
         roleKpis={serializedRoleKpis}
         definitions={serializedDefinitions}
+        initialMaxTotalScore={roleKpiCap?.maxTotalScore?.toString() ?? null}
       />
     </PageShell>
   );

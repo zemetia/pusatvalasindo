@@ -10,6 +10,7 @@ import type {
 import {
   roleKpiRepository
 } from "@/backend/repositories/role-kpi.repository";
+import { roleKpiCapRepository } from "@/backend/repositories/role-kpi-cap.repository";
 import { resolveInputPolicy as resolvePolicy } from "@/lib/kpi-policy";
 import { kpiCollectorService } from "@/backend/services/kpi-collector.service";
 import { kpiEntryRepository } from "@/backend/repositories/kpi-entry.repository";
@@ -109,6 +110,13 @@ export const kpiService = {
     await kpiService.getRoleKpiById(id);
     await roleKpiRepository.delete(id);
   },
+
+  // ── Plafon skor total per jabatan ────────────────────────────────────────
+  getRoleKpiCap: (companyId: string, customRoleId: string) =>
+    roleKpiCapRepository.findByCompanyRole(companyId, customRoleId),
+
+  setRoleKpiCap: (companyId: string, customRoleId: string, maxTotalScore: number | null) =>
+    roleKpiCapRepository.upsert(companyId, customRoleId, maxTotalScore),
 
   /**
    * KPI yang berlaku untuk seorang karyawan, lengkap dengan kebijakan
@@ -408,9 +416,10 @@ export const kpiService = {
     // jadi aman dipanggil setiap kali skor dihitung.
     const collection = await kpiCollectorService.collectForEmployee(employeeId, month, year);
 
-    const [roleKpis, entries] = await Promise.all([
+    const [roleKpis, entries, cap] = await Promise.all([
       roleKpiRepository.findActiveByCompanyRole(companyId, employee.customRoleId),
       kpiEntryRepository.findApprovedForScoring(employeeId, year, month),
+      roleKpiCapRepository.findByCompanyRole(companyId, employee.customRoleId),
     ]);
 
     const entriesByRoleKpi = new Map<string, ScoringEntry[]>();
@@ -435,6 +444,7 @@ export const kpiService = {
           pointPerUnit: toNullableNumber(rk.pointPerUnit),
           toleranceLimit: toNullableNumber(rk.toleranceLimit),
           toleranceScope: rk.toleranceScope,
+          maxAchievement: toNullableNumber(rk.maxAchievement),
         },
         entriesByRoleKpi.get(rk.id) ?? []
       );
@@ -452,7 +462,10 @@ export const kpiService = {
       };
     });
 
-    const summary = computeTotalScore(items);
+    const summary = computeTotalScore(
+      items,
+      cap ? toNullableNumber(cap.maxTotalScore) : null
+    );
 
     return kpiMonthlyResultRepository.upsert({
       employeeId,
@@ -463,6 +476,10 @@ export const kpiService = {
       breakdownJson: {
         weightSum: summary.weightSum,
         items: summary.items,
+        // Dicatat supaya riwayat bulan itu menjelaskan kenapa totalScore lebih
+        // rendah dari jumlah tertimbang item-nya, walau plafonnya berubah lagi
+        // di bulan-bulan berikutnya.
+        maxTotalScore: cap ? toNullableNumber(cap.maxTotalScore) : null,
         // Hasil penarikan otomatis ikut disimpan supaya halaman penilaian bisa
         // menampilkan hari mana yang dilewati kolektor dan perlu diperiksa
         // atasan — tanpa ini, hari bermasalah hilang tanpa jejak.

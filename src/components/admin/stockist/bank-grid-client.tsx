@@ -60,7 +60,7 @@ type Row = {
 }
 
 function fmt(n: number) {
-  return n.toLocaleString("id-ID", { maximumFractionDigits: 0 })
+  return n.toLocaleString("id-ID", { maximumFractionDigits: 2 })
 }
 
 function parseNum(s: string): number {

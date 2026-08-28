@@ -12,7 +12,9 @@ interface Geofence {
 
 interface LocationStatusProps {
   onLocationChange: (lat: number, lng: number) => void;
-  geofence?: Geofence | null;
+  // Semua cabang bergeofence milik PT ini — karyawan dianggap dalam area
+  // kerja kalau masuk radius SALAH SATU (rotasi antar cabang).
+  geofences?: Geofence[];
 }
 
 function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -27,10 +29,11 @@ function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-export function LocationStatus({ onLocationChange, geofence }: LocationStatusProps) {
+export function LocationStatus({ onLocationChange, geofences = [] }: LocationStatusProps) {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [distanceM, setDistanceM] = useState<number | null>(null);
+  // Cabang terdekat dari posisi saat ini, dari semua cabang bergeofence.
+  const [nearest, setNearest] = useState<{ name: string; distanceM: number; radiusM: number } | null>(null);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -44,8 +47,15 @@ export function LocationStatus({ onLocationChange, geofence }: LocationStatusPro
         const { latitude, longitude } = position.coords;
         setStatus("success");
         onLocationChange(latitude, longitude);
-        if (geofence) {
-          setDistanceM(Math.round(haversineM(latitude, longitude, geofence.latitude, geofence.longitude)));
+        if (geofences.length > 0) {
+          const closest = geofences
+            .map((g) => ({
+              name: g.name,
+              radiusM: g.radiusM,
+              distanceM: Math.round(haversineM(latitude, longitude, g.latitude, g.longitude)),
+            }))
+            .sort((a, b) => a.distanceM - b.distanceM)[0];
+          setNearest(closest);
         }
       },
       (error) => {
@@ -68,10 +78,10 @@ export function LocationStatus({ onLocationChange, geofence }: LocationStatusPro
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [onLocationChange, geofence]);
+  }, [onLocationChange, geofences]);
 
-  const isInsideRadius = geofence && distanceM != null && distanceM <= geofence.radiusM;
-  const showGeofence = geofence && status === "success" && distanceM != null;
+  const isInsideRadius = nearest != null && nearest.distanceM <= nearest.radiusM;
+  const showGeofence = geofences.length > 0 && status === "success" && nearest != null;
 
   return (
     <div className="flex flex-col space-y-3 p-4 rounded-2xl bg-muted border border-border">
@@ -108,12 +118,12 @@ export function LocationStatus({ onLocationChange, geofence }: LocationStatusPro
           <div className="flex-1">
             <p className="text-xs font-bold leading-tight">
               {isInsideRadius
-                ? `Dalam radius cabang ${geofence.name}`
-                : `Di luar radius cabang ${geofence.name}`}
+                ? `Dalam radius cabang ${nearest.name}`
+                : `Di luar radius semua cabang (terdekat: ${nearest.name})`}
             </p>
             <p className="text-[11px] opacity-75 mt-0.5">
-              Jarak Anda: <span className="font-semibold">{distanceM} m</span>
-              {" · "}Radius absensi: <span className="font-semibold">{geofence.radiusM} m</span>
+              Jarak Anda: <span className="font-semibold">{nearest.distanceM} m</span>
+              {" · "}Radius absensi: <span className="font-semibold">{nearest.radiusM} m</span>
             </p>
           </div>
           <IconRadar size={18} className="opacity-50 shrink-0" />

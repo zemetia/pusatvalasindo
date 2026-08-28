@@ -47,7 +47,10 @@ export default async function AttendancePage({
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
   let initialRecords;
-  let branchGeofence: { latitude: number; longitude: number; radiusM: number; name: string } | null = null;
+  // Rotasi antar cabang: karyawan bisa absen di cabang PT mana pun, bukan
+  // cuma cabang di profilnya — jadi UI perlu tahu geofence SEMUA cabang aktif
+  // milik PT-nya, sama seperti pengecekan otoritatif di POST /api/attendance.
+  let branchGeofences: { id: string; latitude: number; longitude: number; radiusM: number; name: string }[] = [];
 
   try {
     const [records, userWithBranch] = await Promise.all([
@@ -56,28 +59,37 @@ export default async function AttendancePage({
           userId: session.user.id,
           date: { gte: startOfMonth, lte: endOfMonth },
         },
+        include: { checkInBranch: { select: { name: true } } },
         orderBy: { date: "desc" },
       }),
       prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
-          branch: {
-            select: { latitude: true, longitude: true, attendanceRadiusM: true, name: true },
-          },
+          branch: { select: { companyId: true } },
         },
       }),
     ]);
 
     initialRecords = records;
 
-    const branch = userWithBranch?.branch;
-    if (branch?.latitude != null && branch?.longitude != null) {
-      branchGeofence = {
-        latitude: branch.latitude,
-        longitude: branch.longitude,
-        radiusM: branch.attendanceRadiusM ?? 20,
-        name: branch.name,
-      };
+    const companyId = userWithBranch?.branch?.companyId ?? null;
+    if (companyId) {
+      const branches = await prisma.branch.findMany({
+        where: {
+          companyId,
+          isActive: true,
+          latitude: { not: null },
+          longitude: { not: null },
+        },
+        select: { id: true, latitude: true, longitude: true, attendanceRadiusM: true, name: true },
+      });
+      branchGeofences = branches.map((b) => ({
+        id: b.id,
+        latitude: b.latitude!,
+        longitude: b.longitude!,
+        radiusM: b.attendanceRadiusM ?? 20,
+        name: b.name,
+      }));
     }
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
@@ -96,7 +108,7 @@ export default async function AttendancePage({
       <AttendanceClient
         userId={session.user.id}
         initialRecords={JSON.parse(JSON.stringify(initialRecords))}
-        branchGeofence={branchGeofence}
+        branchGeofences={branchGeofences}
       />
     </PageShell>
   );
