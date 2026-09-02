@@ -27,10 +27,10 @@ type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string
 interface AttendanceClientProps {
   userId: string;
   initialRecords: AttendanceWithCheckInBranch[];
-  // Semua cabang aktif milik PT ini yang punya geofence — karyawan boleh
-  // absen di cabang mana pun asal masuk radius SALAH SATU (rotasi antar
-  // cabang), bukan hanya cabang di profilnya. Array kosong = tidak ada
-  // cabang di PT ini yang punya geofence, jadi absen tidak dibatasi lokasi.
+  // Semua cabang aktif yang punya geofence, lintas PT — karyawan boleh absen
+  // di kantor mana pun asal masuk radius SALAH SATU, bukan hanya cabang di
+  // profilnya. Array kosong = belum ada cabang ber-geofence sama sekali, jadi
+  // absen tidak dibatasi lokasi.
   branchGeofences?: BranchGeofence[];
 }
 
@@ -174,7 +174,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
           return distM <= geofence.radiusM;
         });
         if (!withinAnyBranch) {
-          toast.error("Tidak bisa absen karena di luar radius semua cabang.");
+          toast.error("Tidak bisa absen karena berada di luar area kantor.");
           return;
         }
       }

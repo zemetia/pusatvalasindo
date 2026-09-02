@@ -12,8 +12,8 @@ interface Geofence {
 
 interface LocationStatusProps {
   onLocationChange: (lat: number, lng: number) => void;
-  // Semua cabang bergeofence milik PT ini — karyawan dianggap dalam area
-  // kerja kalau masuk radius SALAH SATU (rotasi antar cabang).
+  // Semua cabang bergeofence, lintas PT — karyawan dianggap sedang di kantor
+  // kalau masuk radius SALAH SATU.
   geofences?: Geofence[];
 }
 
@@ -119,7 +119,7 @@ export function LocationStatus({ onLocationChange, geofences = [] }: LocationSta
             <p className="text-xs font-bold leading-tight">
               {isInsideRadius
                 ? `Dalam radius cabang ${nearest.name}`
-                : `Di luar radius semua cabang (terdekat: ${nearest.name})`}
+                : `Di luar area kantor (terdekat: ${nearest.name})`}
             </p>
             <p className="text-[11px] opacity-75 mt-0.5">
               Jarak Anda: <span className="font-semibold">{nearest.distanceM} m</span>

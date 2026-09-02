@@ -47,13 +47,13 @@ export default async function AttendancePage({
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
   let initialRecords;
-  // Rotasi antar cabang: karyawan bisa absen di cabang PT mana pun, bukan
-  // cuma cabang di profilnya — jadi UI perlu tahu geofence SEMUA cabang aktif
-  // milik PT-nya, sama seperti pengecekan otoritatif di POST /api/attendance.
+  // Patokannya cuma "sedang berada di kantor": karyawan boleh absen di cabang
+  // mana pun, termasuk milik PT lain — jadi UI perlu tahu geofence SEMUA
+  // cabang aktif, sama seperti pengecekan otoritatif di POST /api/attendance.
   let branchGeofences: { id: string; latitude: number; longitude: number; radiusM: number; name: string }[] = [];
 
   try {
-    const [records, userWithBranch] = await Promise.all([
+    const [records, branches] = await Promise.all([
       prisma.attendance.findMany({
         where: {
           userId: session.user.id,
@@ -62,35 +62,25 @@ export default async function AttendancePage({
         include: { checkInBranch: { select: { name: true } } },
         orderBy: { date: "desc" },
       }),
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          branch: { select: { companyId: true } },
-        },
-      }),
-    ]);
-
-    initialRecords = records;
-
-    const companyId = userWithBranch?.branch?.companyId ?? null;
-    if (companyId) {
-      const branches = await prisma.branch.findMany({
+      prisma.branch.findMany({
         where: {
-          companyId,
           isActive: true,
           latitude: { not: null },
           longitude: { not: null },
         },
         select: { id: true, latitude: true, longitude: true, attendanceRadiusM: true, name: true },
-      });
-      branchGeofences = branches.map((b) => ({
-        id: b.id,
-        latitude: b.latitude!,
-        longitude: b.longitude!,
-        radiusM: b.attendanceRadiusM ?? 20,
-        name: b.name,
-      }));
-    }
+      }),
+    ]);
+
+    initialRecords = records;
+
+    branchGeofences = branches.map((b) => ({
+      id: b.id,
+      latitude: b.latitude!,
+      longitude: b.longitude!,
+      radiusM: b.attendanceRadiusM ?? 20,
+      name: b.name,
+    }));
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (

@@ -66,27 +66,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Geofence validation: karyawan bisa absen di cabang PT mana pun (rotasi
-  // antar cabang), asal berada dalam radius SALAH SATU cabang aktif milik PT
-  // itu — bukan hanya cabang yang tercatat di profilnya. Cabang mana yang
-  // cocok dicatat ke checkInBranchId di bawah. Lookup jalan terlepas dari
-  // GPS dikirim atau tidak, supaya request tanpa checkInGpsLat/Lng tidak
-  // diam-diam lolos dari cabang yang mewajibkan geofence.
+  // Geofence validation: patokannya cuma "sedang berada di kantor". Karyawan
+  // boleh absen di cabang mana pun — termasuk cabang milik PT lain (pegawai
+  // PTU absen di kantor PVI, dan sebaliknya) — asal masuk radius SALAH SATU
+  // cabang aktif yang punya geofence. Cabang yang cocok dicatat ke
+  // checkInBranchId di bawah, jadi kalau absennya di luar cabang profilnya
+  // tetap kelihatan di halaman Presensi. Lookup jalan terlepas dari GPS
+  // dikirim atau tidak, supaya request tanpa checkInGpsLat/Lng tidak
+  // diam-diam lolos dari pemeriksaan.
   const userWithBranch = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: {
-      branchId: true,
-      branch: { select: { companyId: true } },
-    },
+    select: { branchId: true },
   });
-  const companyId = userWithBranch?.branch?.companyId ?? null;
 
   let checkInBranchId: string | null = userWithBranch?.branchId ?? null;
 
-  if (companyId) {
+  {
     const geofencedBranches = await prisma.branch.findMany({
       where: {
-        companyId,
         isActive: true,
         latitude: { not: null },
         longitude: { not: null },
@@ -115,7 +112,7 @@ export async function POST(req: NextRequest) {
       if (!matched) {
         return NextResponse.json(
           {
-            error: `Anda berada ${Math.round(nearest.distM)} m dari cabang terdekat (${nearest.name}). Absensi hanya diizinkan dalam radius salah satu cabang.`,
+            error: `Anda berada ${Math.round(nearest.distM)} m dari kantor terdekat (${nearest.name}). Absensi hanya diizinkan dari dalam area kantor.`,
             distanceM: Math.round(nearest.distM),
             nearestBranch: nearest.name,
           },
