@@ -24,13 +24,16 @@ import { formatCount, formatIdr, formatPercent, pctChange } from "@/lib/format";
 import {
   MONTH_NAMES,
   SCORING_TYPE_LABELS,
+  INPUT_SOURCE_LABELS,
   getGrade,
   gradeLabel,
   type KpiBreakdown,
 } from "@/lib/kpi-utils";
+import { kpiEntryRepository } from "@/backend/repositories/kpi-entry.repository";
+import { classifyWorkStartRole, isLateArrival } from "@/lib/attendance-time";
 import { cn } from "@/lib/utils";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -96,6 +99,12 @@ const TIMESTAMP_DATE = new Intl.DateTimeFormat("id-ID", {
 
 /** Tahun paling awal yang bisa dipilih: tahun berjalan dikurangi angka ini. */
 const EARLIEST_YEAR_OFFSET = 6;
+
+const ENTRY_STATUS_META: Record<string, { label: string; variant: BadgeVariant }> = {
+  PENDING: { label: "Menunggu", variant: "warning" },
+  APPROVED: { label: "Disetujui", variant: "success" },
+  REJECTED: { label: "Ditolak", variant: "destructive" },
+};
 
 type Params = {
   params: Promise<{ id: string; locale: string }>;
@@ -305,9 +314,21 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
 
   /* ── Absensi ───────────────────────────────────────────────────────────── */
 
+  // Status kehadiran (PRESENT/LATE) DITURUNKAN ulang dari checkIn di sini —
+  // bukan dibaca apa adanya dari kolom `status`, yang cuma potret ambang jam
+  // masuk yang berlaku saat baris itu dicatat. Tanpa ini, kalender & hitungan
+  // "X hari terlambat" di bawah bisa berbeda dari yang dipakai KPI dan denda
+  // payroll (lihat lib/attendance-time.ts). Status non-kehadiran (izin, sakit,
+  // alpa, dst.) tidak pernah disentuh.
+  const workStartRole = classifyWorkStartRole(employee.customRole?.name);
   const attendanceDays: AttendanceDay[] = attendance.map((a) => ({
     date: toKey(a.date),
-    status: a.status,
+    status:
+      a.status === "PRESENT" || a.status === "LATE"
+        ? isLateArrival({ status: a.status, checkIn: a.checkIn }, workStartRole)
+          ? "LATE"
+          : "PRESENT"
+        : a.status,
     checkIn: a.checkIn ? TIME.format(a.checkIn) : null,
     checkOut: a.checkOut ? TIME.format(a.checkOut) : null,
   }));
@@ -390,8 +411,9 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
   // Payroll, supaya kedua halaman tidak pernah menampilkan angka berbeda.
   let incentive: Awaited<ReturnType<typeof evaluateRulesForEmployee>> | null;
   let breakdown: KpiBreakdown | null;
+  let kpiEntries: Awaited<ReturnType<typeof kpiEntryRepository.findByEmployeePeriod>>;
   try {
-    const [resolvedIncentive, latestDetail] = await Promise.all([
+    const [resolvedIncentive, latestDetail, resolvedEntries] = await Promise.all([
       canSeeSalary && latest
         ? loadEmployeeContext(id).then((emp) =>
             emp ? evaluateRulesForEmployee(emp, latest.month, latest.year) : null
@@ -405,9 +427,16 @@ export default async function EmployeeDetailPage({ params, searchParams }: Param
             select: { breakdownJson: true },
           })
         : Promise.resolve(null),
+      // Rincian summary (breakdown) hanya menunjukkan hasil per KPI setelah
+      // digulung — bagian ini menampilkan setiap catatan mentah yang disubmit
+      // pada periode terakhir, termasuk yang masih menunggu/ditolak.
+      canSeeKpi && latest
+        ? kpiEntryRepository.findByEmployeePeriod(id, latest.year, latest.month)
+        : Promise.resolve([]),
     ]);
     incentive = resolvedIncentive;
     breakdown = (latestDetail?.breakdownJson ?? null) as KpiBreakdown | null;
+    kpiEntries = resolvedEntries;
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="users/[id]/page (rincian)" message={msg} />;
@@ -768,6 +797,76 @@ function ringkasanRule(
                       </TableCell>
                     </TableRow>
                   )}
+                </TableBody>
+              </Table>
+            )}
+          </SectionCard>
+
+          <SectionCard
+            title={`Riwayat Submit KPI — ${periodLabel}`}
+            description="Setiap catatan yang disubmit pada periode ini, termasuk yang masih menunggu atau ditolak."
+            icon={<IconChartBar className="size-4" />}
+            padded={false}
+          >
+            {kpiEntries.length === 0 ? (
+              <EmptyState
+                title="Belum ada catatan KPI"
+                description="Catatan muncul di sini setiap kali karyawan atau atasannya mencatat kejadian KPI."
+              />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>KPI</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                    <TableHead>Sumber</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Keterangan</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {kpiEntries.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {DATE_FULL.format(e.occurredAt)}
+                        <span className="ml-1 text-[11px]">· mgg {e.weekOfMonth}</span>
+                      </TableCell>
+                      <TableCell className="font-medium">{e.roleKpi.definition.name}</TableCell>
+                      <TableCell className="tabular text-right">
+                        {Number(e.quantity).toLocaleString("id-ID")}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-xs">
+                        {INPUT_SOURCE_LABELS[e.source] ?? e.source}
+                        {e.createdBy ? (
+                          <div>oleh {e.createdBy.name}</div>
+                        ) : e.source === "SYSTEM" ? (
+                          <div>otomatis</div>
+                        ) : null}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={ENTRY_STATUS_META[e.status]?.variant ?? "soft"}>
+                          {ENTRY_STATUS_META[e.status]?.label ?? e.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {e.note ?? "—"}
+                        {e.evidenceUrl && (
+                          <>
+                            {" "}
+                            <a
+                              href={e.evidenceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary underline"
+                            >
+                              bukti
+                            </a>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             )}

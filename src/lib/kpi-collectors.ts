@@ -18,7 +18,12 @@
  */
 
 import type { AttendanceStatus } from "@src/generated/prisma/client";
-import { formatJakartaTime, isLateArrival, jakartaMinutesOfDay } from "./attendance-time";
+import {
+  classifyWorkStartRole,
+  formatJakartaTime,
+  isLateArrival,
+  jakartaMinutesOfDay,
+} from "./attendance-time";
 
 /** Baris absensi yang dibutuhkan kolektor. */
 export type AttendanceRecord = {
@@ -106,14 +111,18 @@ const minutesOfDay = jakartaMinutesOfDay;
  * Nilai `quantity` adalah bobot dari DISCIPLINE_WEIGHTS, bukan selalu 1, supaya
  * alpa tidak dianggap sama ringannya dengan terlambat.
  */
-export function collectAttendanceDiscipline(records: AttendanceRecord[]): CollectorOutput {
+export function collectAttendanceDiscipline(
+  records: AttendanceRecord[],
+  roleName?: string | null
+): CollectorOutput {
   const entries: DerivedEntry[] = [];
   const skipped: SkippedDay[] = [];
+  const workStartRole = classifyWorkStartRole(roleName);
 
   for (const record of records) {
     // Diturunkan dari checkIn, bukan dari kolom status — supaya penalti KPI dan
     // denda payroll tidak pernah memakai ambang jam masuk yang berbeda.
-    if (isLateArrival(record)) {
+    if (isLateArrival(record, workStartRole)) {
       const detail = record.checkIn ? ` (masuk ${formatTime(record.checkIn)})` : "";
       entries.push({
         occurredAt: record.date,
@@ -272,11 +281,12 @@ export function isKnownCollector(key: string | null | undefined): key is Collect
 export function runCollector(
   key: CollectorKey,
   records: AttendanceRecord[],
-  config?: unknown
+  config?: unknown,
+  roleName?: string | null
 ): CollectorOutput {
   switch (key) {
     case "ATTENDANCE_LATE":
-      return collectAttendanceDiscipline(records);
+      return collectAttendanceDiscipline(records, roleName);
     case "ATTENDANCE_CLOSING":
       return collectClosingPunctuality(records, (config ?? null) as Partial<ClosingConfig> | null);
     default: {

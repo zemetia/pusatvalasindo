@@ -415,7 +415,7 @@ export function KpiSelfFillClient({
                 return (
                   <TableRow key={e.id}>
                     <TableCell className="text-muted-foreground text-sm">
-                      {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                      {new Date(e.occurredAt).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })}
                       <span className="ml-1 text-[11px]">· mgg {e.weekOfMonth}</span>
                     </TableCell>
                     <TableCell className="font-medium">

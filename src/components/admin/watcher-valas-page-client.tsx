@@ -41,6 +41,7 @@ function formatUpdatedAt(iso: string) {
   return new Date(iso).toLocaleString("id-ID", {
     dateStyle: "medium",
     timeStyle: "medium",
+    timeZone: "Asia/Jakarta",
   });
 }
 

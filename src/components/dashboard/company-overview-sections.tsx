@@ -22,6 +22,7 @@ import {
   type BankCurrencyGroup,
   type getCompanyOverview,
 } from "@/backend/services/dashboard-data.service";
+import { formatJakartaTime } from "@/lib/attendance-time";
 
 type Overview = Awaited<ReturnType<typeof getCompanyOverview>>;
 
@@ -83,7 +84,7 @@ export function CompanyOverviewSections({
                     <TableCell className="font-medium text-sm">{att.user.name}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{att.user.branch?.name ?? "-"}</TableCell>
                     <TableCell className="text-sm font-mono">
-                      {att.checkIn ? att.checkIn.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
+                      {att.checkIn ? formatJakartaTime(att.checkIn) : "-"}
                     </TableCell>
                     <TableCell>
                       <Badge variant="danger">GPS Tidak Sesuai</Badge>
@@ -127,7 +128,7 @@ export function CompanyOverviewSections({
                   <TableRow key={c.id}>
                     <TableCell className="font-medium text-sm">{c.targetLabel}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {c.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}
+                      {c.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", timeZone: "Asia/Jakarta" })}
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">{fmtRate(c.currentValue)}</TableCell>
                     <TableCell className="text-right font-mono text-sm">{fmtRate(c.proposedValue)}</TableCell>
@@ -345,7 +346,7 @@ export function CompanyOverviewSections({
                       <TableCell className="font-medium text-sm">{att.user.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{att.user.branch?.name ?? "-"}</TableCell>
                       <TableCell className="text-sm font-mono">
-                        {att.checkIn ? att.checkIn.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "-"}
+                        {att.checkIn ? formatJakartaTime(att.checkIn) : "-"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={att.status === "PRESENT" ? "success" : att.status === "LATE" ? "warning" : "soft"}>
@@ -407,7 +408,7 @@ export function CompanyOverviewSections({
                       </TableCell>
                       <TableCell className="tabular text-right">{fmtCurrency(mut.amount, mut.bankAccount.currency.code)}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {mut.createdAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short" })}
+                        {mut.createdAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", timeZone: "Asia/Jakarta" })}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -468,7 +469,7 @@ export function CompanyOverviewSections({
       {flags.kpiAll && overview.kpiResults.length > 0 && (
         <SectionCard
           title="Hasil KPI Bulan Ini"
-          description={`Top performers — ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })}`}
+          description={`Top performers — ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}`}
           padded={false}
           action={
             <Button variant="ghost" size="sm" asChild>

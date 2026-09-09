@@ -24,6 +24,7 @@ import {
 import { can, isAdminRole, PERMISSIONS } from "@/lib/permissions";
 import { resolve, type AuthzSubject } from "@/lib/authz/resolve";
 import type { AdminCaller } from "@/backend/helpers/get-admin-caller";
+import { formatJakartaTime } from "@/lib/attendance-time";
 
 export async function DashboardPegawai({
   caller,
@@ -102,6 +103,7 @@ export async function DashboardPegawai({
           day: "numeric",
           month: "long",
           year: "numeric",
+          timeZone: "Asia/Jakarta",
         })}`}
         icon={<IconDashboard className="size-5" />}
       />
@@ -116,7 +118,7 @@ export async function DashboardPegawai({
               tone={ownSummary.ownAttendanceToday ? "default" : "muted"}
               value={
                 ownSummary.ownAttendanceToday?.checkIn
-                  ? ownSummary.ownAttendanceToday.checkIn.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+                  ? formatJakartaTime(ownSummary.ownAttendanceToday.checkIn)
                   : "—"
               }
               meta={
@@ -178,7 +180,7 @@ export async function DashboardPegawai({
               value={ownSummary.ownKpiThisMonth ? `Grade ${ownSummary.ownKpiThisMonth.grade}` : "—"}
               meta={
                 ownSummary.ownKpiThisMonth
-                  ? `Bonus/potongan ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric" })} dihitung saat slip gaji dibuat`
+                  ? `Bonus/potongan ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric", timeZone: "Asia/Jakarta" })} dihitung saat slip gaji dibuat`
                   : "KPI bulan ini belum dihitung"
               }
             />

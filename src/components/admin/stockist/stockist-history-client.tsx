@@ -173,7 +173,7 @@ export function StockistHistoryClient({ companies, defaultCompanyId }: Props) {
               {items.map((m) => (
                 <TableRow key={m.id}>
                   <TableCell className="text-sm whitespace-nowrap">
-                    {new Date(m.createdAt).toLocaleString("id-ID")}
+                    {new Date(m.createdAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}
                   </TableCell>
                   <TableCell className="text-sm">{m.pocket.name}</TableCell>
                   <TableCell>

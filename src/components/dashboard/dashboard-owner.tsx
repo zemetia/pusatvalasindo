@@ -81,6 +81,7 @@ export async function DashboardOwner({
           day: "numeric",
           month: "long",
           year: "numeric",
+          timeZone: "Asia/Jakarta",
         })}`}
         icon={<IconDashboard className="size-5" />}
       />

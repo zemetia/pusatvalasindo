@@ -18,6 +18,11 @@ import {
 } from "@/components/ui/sidebar";
 import { usePathname, Link } from "@src/i18n/routing";
 
+/** Angka notifikasi dibatasi 2 digit — lebih dari itu cukup "99+". */
+function formatBadgeCount(count: number) {
+  return count > 99 ? "99+" : String(count);
+}
+
 function NavMenu({
   items,
   pathname,
@@ -27,6 +32,7 @@ function NavMenu({
     url: string;
     icon?: Icon;
     exact?: boolean;
+    badge?: number;
   }[];
   pathname: string;
 }) {
@@ -55,6 +61,11 @@ function NavMenu({
                   <item.icon className="text-muted-foreground group-hover/btn:text-foreground group-data-[active=true]/btn:text-primary size-4 transition-colors" />
                 )}
                 <span className="truncate">{item.title}</span>
+                {!!item.badge && (
+                  <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none tabular text-white">
+                    {formatBadgeCount(item.badge)}
+                  </span>
+                )}
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -73,6 +84,7 @@ export function NavMain({
     url: string;
     icon?: Icon;
     exact?: boolean;
+    badge?: number;
   }[];
   label?: string;
 }) {

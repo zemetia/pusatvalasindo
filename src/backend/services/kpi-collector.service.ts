@@ -75,7 +75,11 @@ export const kpiCollectorService = {
     const [employee, period] = await Promise.all([
       prisma.user.findUnique({
         where: { id: employeeId },
-        select: { customRoleId: true, branch: { select: { companyId: true } } },
+        select: {
+          customRoleId: true,
+          customRole: { select: { name: true } },
+          branch: { select: { companyId: true } },
+        },
       }),
       kpiPeriodRepository.find(employeeId, month, year),
     ]);
@@ -129,7 +133,7 @@ export const kpiCollectorService = {
         continue;
       }
 
-      const output = runCollector(key, records, roleKpi.systemConfig);
+      const output = runCollector(key, records, roleKpi.systemConfig, employee.customRole?.name);
 
       // Ganti-total dalam satu transaksi: kalau penulisan gagal di tengah,
       // jangan sampai entri lama sudah terhapus sementara yang baru belum ada.

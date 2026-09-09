@@ -6,6 +6,7 @@
 // masing komponen dashboard supaya tidak balik jadi satu file dengan flag isRoleX.
 
 import prisma from "@/lib/prisma";
+import { jakartaDateIso } from "@/lib/attendance-time";
 
 export type Numeric = { toString(): string } | string | number | null | undefined;
 
@@ -64,12 +65,24 @@ export function getDashboardBucket(roleName: string): DashboardBucket {
   return "pegawai";
 }
 
-/** Titik waktu & rentang bulan berjalan/sebelumnya, dipakai oleh semua query dashboard. */
+/**
+ * Titik waktu & rentang bulan berjalan/sebelumnya, dipakai oleh semua query dashboard.
+ *
+ * `todayDate`/`currentMonth`/`currentYear` DITURUNKAN dari kalender WIB (lewat
+ * `jakartaDateIso`), bukan `now.getFullYear()/getMonth()/getDate()` yang mengikuti
+ * zona waktu SERVER. Server yang berjalan di UTC (Vercel) akan menganggap jam
+ * 00.00-06.59 WIB masih "kemarin" — presensi hari ini pun ikut hilang dari
+ * ringkasan sampai jam 07.00 WIB. `Attendance.date` sendiri disimpan sebagai
+ * tengah malam UTC dari tanggal WIB (lihat `src/app/api/attendance/route.ts`),
+ * jadi `todayDate` di sini harus dibentuk dengan cara yang sama supaya keduanya
+ * tetap klop.
+ */
 export function getDashboardPeriod() {
   const now = new Date();
-  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
+  const [year, month, day] = jakartaDateIso(now).split("-").map(Number);
+  const todayDate = new Date(Date.UTC(year, month - 1, day));
+  const currentMonth = month;
+  const currentYear = year;
   const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
   const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
   return { now, todayDate, currentMonth, currentYear, prevMonth, prevYear };

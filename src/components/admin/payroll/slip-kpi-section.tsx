@@ -203,7 +203,7 @@ export function SlipKpiSection({
             {result
               ? `Skornya terakhir dihitung ${new Date(result.calculatedAt).toLocaleDateString(
                   "id-ID",
-                  { day: "numeric", month: "short", year: "numeric" }
+                  { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" }
                 )}`
               : "Skor belum pernah dihitung"}
           </p>

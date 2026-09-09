@@ -691,7 +691,12 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
                     <TableCell className="text-muted-foreground tabular">{i + 1}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-medium">{r.name}</span>
+                        <Link
+                          href={`/dashboard/users/${r.employeeId}`}
+                          className="font-medium hover:text-primary underline-offset-4 hover:underline"
+                        >
+                          {r.name}
+                        </Link>
                         <span className="text-muted-foreground text-xs">{r.roleName}</span>
                       </div>
                     </TableCell>

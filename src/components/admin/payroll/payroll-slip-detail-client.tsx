@@ -351,6 +351,7 @@ export function PayrollSlipDetailClient({
         day: "numeric",
         month: "long",
         year: "numeric",
+        timeZone: "Asia/Jakarta",
       })
     : null;
 
@@ -520,6 +521,7 @@ export function PayrollSlipDetailClient({
               month={slip.periodMonth}
               year={slip.periodYear}
               joinDate={slip.joinDate}
+              roleName={slip.roleName}
             />
           </section>
 

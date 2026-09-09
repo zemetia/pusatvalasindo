@@ -412,7 +412,7 @@ export function PayrollPageClient({ me }: { me: UserRow }) {
                 size="secondary"
                 value={result.attendanceDetail.totalDaysLogged}
                 suffix="hari"
-                meta={`Dihitung ${new Date(result.kpi.calculatedAt).toLocaleString("id-ID")}`}
+                meta={`Dihitung ${new Date(result.kpi.calculatedAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`}
               />
             </div>
           </section>

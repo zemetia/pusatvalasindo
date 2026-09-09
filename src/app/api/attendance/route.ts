@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   // diam-diam lolos dari pemeriksaan.
   const userWithBranch = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { branchId: true },
+    select: { branchId: true, customRole: { select: { name: true } } },
   });
 
   let checkInBranchId: string | null = userWithBranch?.branchId ?? null;
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
   }
 
   const checkInTime = new Date(checkIn);
-  const status = resolveArrivalStatus(checkInTime);
+  const status = resolveArrivalStatus(checkInTime, userWithBranch?.customRole?.name ?? null);
 
   let isLocationSuspect = false;
   if (

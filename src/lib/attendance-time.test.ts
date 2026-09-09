@@ -1,29 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  WORK_START_HOUR,
-  WORK_START_LABEL,
-  WORK_START_MINUTE,
-  WORK_START_MINUTES,
+  classifyWorkStartRole,
   formatJakartaTime,
   jakartaMinutesOfDay,
   lateMinutesOf,
-  workStartSqlExpr,
+  workStartLabelFor,
+  workStartMinutesFor,
+  workStartSqlExprFor,
 } from "./attendance-time";
 
 /** Waktu WIB (UTC+7) sebagai Date — 07.40 WIB = 00.40 UTC. */
 const wib = (hour: number, minute: number) =>
   new Date(Date.UTC(2026, 7, 3, hour - 7, minute));
-
-/**
- * Batas diambil dari konstanta, bukan ditulis ulang sebagai angka.
- *
- * Tes yang mengetik "7" dan "40" sendiri akan tetap hijau setelah jam kerja
- * diubah — ia hanya menguji dirinya sendiri. Yang perlu dijamin adalah PERILAKU
- * relatif terhadap ambang: tepat di batas bukan telat, satu menit sesudahnya
- * telat satu menit.
- */
-const batas = { jam: WORK_START_HOUR, menit: WORK_START_MINUTE };
 
 describe("jam masuk WIB", () => {
   it("membaca jam menurut Asia/Jakarta, bukan zona waktu proses", () => {
@@ -31,34 +20,55 @@ describe("jam masuk WIB", () => {
     expect(formatJakartaTime(wib(18, 5))).toBe("18.05");
   });
 
-  it("jam masuk saat ini 07.40", () => {
-    expect(WORK_START_LABEL).toBe("07.40");
-    expect(WORK_START_HOUR).toBe(7);
-    expect(WORK_START_MINUTE).toBe(40);
+  it("Kepala Cabang masuk 07.30, Karyawan masuk 07.55", () => {
+    expect(workStartLabelFor("KEPALA_CABANG")).toBe("07.30");
+    expect(workStartLabelFor("KARYAWAN")).toBe("07.55");
+    expect(workStartMinutesFor("KEPALA_CABANG")).toBe(7 * 60 + 30);
+    expect(workStartMinutesFor("KARYAWAN")).toBe(7 * 60 + 55);
+  });
+});
+
+describe("classifyWorkStartRole", () => {
+  it("mengenali Kepala Cabang dan aliasnya, bebas besar/kecil huruf dan spasi", () => {
+    expect(classifyWorkStartRole("Kepala Cabang")).toBe("KEPALA_CABANG");
+    expect(classifyWorkStartRole("KEPALA CABANG")).toBe("KEPALA_CABANG");
+    expect(classifyWorkStartRole(" kepala cabang ")).toBe("KEPALA_CABANG");
+    expect(classifyWorkStartRole("Kepala & Kasir")).toBe("KEPALA_CABANG");
   });
 
-  it("label selalu dua digit dan sesuai konstanta", () => {
-    expect(WORK_START_LABEL).toBe(
-      `${String(WORK_START_HOUR).padStart(2, "0")}.${String(WORK_START_MINUTE).padStart(2, "0")}`
-    );
+  it("jabatan lain, kosong, atau tidak dikenal jatuh ke Karyawan", () => {
+    expect(classifyWorkStartRole("Kasir")).toBe("KARYAWAN");
+    expect(classifyWorkStartRole("Kepala Marketing")).toBe("KARYAWAN");
+    expect(classifyWorkStartRole(null)).toBe("KARYAWAN");
+    expect(classifyWorkStartRole(undefined)).toBe("KARYAWAN");
+    expect(classifyWorkStartRole("")).toBe("KARYAWAN");
   });
 });
 
 describe("menit keterlambatan", () => {
-  it("nol tepat pada batas dan sebelum itu", () => {
-    expect(lateMinutesOf(wib(batas.jam, batas.menit))).toBe(0);
-    expect(lateMinutesOf(wib(batas.jam - 1, 0))).toBe(0);
+  it("nol tepat pada batas dan sebelum itu, untuk masing-masing ambang", () => {
+    expect(lateMinutesOf(wib(7, 30), "KEPALA_CABANG")).toBe(0);
+    expect(lateMinutesOf(wib(7, 0), "KEPALA_CABANG")).toBe(0);
+    expect(lateMinutesOf(wib(7, 55), "KARYAWAN")).toBe(0);
+    expect(lateMinutesOf(wib(7, 0), "KARYAWAN")).toBe(0);
   });
 
-  it("menghitung selisih menit dari batas", () => {
-    expect(lateMinutesOf(wib(batas.jam, batas.menit + 1))).toBe(1);
-    expect(lateMinutesOf(wib(batas.jam + 1, batas.menit + 5))).toBe(65);
-    expect(lateMinutesOf(wib(batas.jam + 2, batas.menit + 30))).toBe(150);
+  it("menghitung selisih menit dari batas masing-masing ambang", () => {
+    expect(lateMinutesOf(wib(7, 31), "KEPALA_CABANG")).toBe(1);
+    expect(lateMinutesOf(wib(8, 35), "KEPALA_CABANG")).toBe(65);
+    expect(lateMinutesOf(wib(7, 56), "KARYAWAN")).toBe(1);
+    expect(lateMinutesOf(wib(9, 0), "KARYAWAN")).toBe(65);
+  });
+
+  it("jam masuk yang sama dinilai berbeda antar ambang", () => {
+    // 07.45: telat untuk Kepala Cabang (batas 07.30), belum untuk Karyawan (07.55).
+    expect(lateMinutesOf(wib(7, 45), "KEPALA_CABANG")).toBe(15);
+    expect(lateMinutesOf(wib(7, 45), "KARYAWAN")).toBe(0);
   });
 
   it("tanpa jam masuk dihitung 0 menit — sama seperti SQL rule denda", () => {
-    expect(lateMinutesOf(null)).toBe(0);
-    expect(lateMinutesOf(undefined)).toBe(0);
+    expect(lateMinutesOf(null, "KARYAWAN")).toBe(0);
+    expect(lateMinutesOf(undefined, "KEPALA_CABANG")).toBe(0);
   });
 });
 
@@ -68,13 +78,12 @@ describe("ambang untuk SQL rule", () => {
    * dipakai server saat menetapkan status LATE. Kalau keduanya berbeda, slip
    * mendendakan menit yang bukan menit yang ditampilkannya.
    */
-  it("menghasilkan menit yang sama dengan WORK_START_MINUTES", () => {
-    // Ekspresinya dibaca ulang dari teksnya sendiri, lalu dihitung — memastikan
-    // yang benar-benar dikirim ke Postgres bernilai sama dengan yang dipakai
-    // TypeScript, bukan sekadar cocok sebagai string.
-    const cocok = workStartSqlExpr().match(/^\((\d+) \* 60 \+ (\d+)\)$/);
-    if (!cocok) throw new Error(`Bentuk ekspresi berubah: ${workStartSqlExpr()}`);
-    const [, jam, menit] = cocok;
-    expect(Number(jam) * 60 + Number(menit)).toBe(WORK_START_MINUTES);
+  it("menghasilkan menit yang sama dengan workStartMinutesFor, untuk kedua ambang", () => {
+    for (const role of ["KEPALA_CABANG", "KARYAWAN"] as const) {
+      const cocok = workStartSqlExprFor(role).match(/^\((\d+) \* 60 \+ (\d+)\)$/);
+      if (!cocok) throw new Error(`Bentuk ekspresi berubah: ${workStartSqlExprFor(role)}`);
+      const [, jam, menit] = cocok;
+      expect(Number(jam) * 60 + Number(menit)).toBe(workStartMinutesFor(role));
+    }
   });
 });

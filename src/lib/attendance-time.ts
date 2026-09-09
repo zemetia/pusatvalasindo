@@ -1,50 +1,88 @@
 // ─── Jam kerja & hitungan keterlambatan ─────────────────────────────────────
 // Murni, tanpa impor Prisma, supaya bisa dipakai komponen client juga. Ambang
-// keterlambatan hanya boleh ditulis sekali: server memakainya untuk menetapkan
-// status LATE, rule payroll memakainya di SQL, dan slip memakainya untuk
-// menampilkan berapa menit yang didendakan. Kalau tiga angka itu berbeda, slip
-// akan menjelaskan denda dengan angka yang bukan dasar dendanya.
+// keterlambatan hanya boleh ditulis sekali per jabatan: server memakainya
+// untuk menetapkan status LATE, rule payroll memakainya di SQL, dan slip
+// memakainya untuk menampilkan berapa menit yang didendakan. Kalau angka itu
+// berbeda antar tempat, slip akan menjelaskan denda dengan angka yang bukan
+// dasar dendanya.
+
+/** Dua ambang jam masuk yang berlaku — bukan per jabatan individual, supaya
+ *  daftarnya tetap pendek dan tidak perlu disentuh tiap kali ada jabatan baru. */
+export type WorkStartRole = "KEPALA_CABANG" | "KARYAWAN";
 
 /**
- * Jam mulai kerja (WIB). Check-in SETELAH ini dihitung terlambat; tepat pada
- * jam ini masih tepat waktu.
+ * Nama jabatan (persis `custom_role.name`, dicocokkan tanpa peduli besar/kecil
+ * huruf maupun spasi di ujung) yang memakai ambang Kepala Cabang.
  *
- * INI SATU-SATUNYA TEMPAT ANGKANYA DITULIS. Untuk mengubah jam masuk, ubah dua
- * baris di bawah dan tidak ada yang lain: label di UI, teks bantuan, dan SQL
- * rule denda semuanya diturunkan dari sini (lihat `WORK_START_LABEL` dan
- * `workStartSqlExpr()`). Yang tersisa hanyalah satu langkah yang tidak bisa
+ * "Kepala & Kasir" ikut di sini karena `ROLE_PERMISSION_MAP` di lib/permissions.ts
+ * sudah memetakan jabatan itu ke izin yang SAMA dengan "Kepala Cabang" — dua
+ * nama untuk peran yang sama, bukan jabatan tersendiri. Jabatan lain yang
+ * "setara" secara wewenang (mis. Kepala Marketing) SENGAJA tidak ikut: ambang
+ * jam masuk ini soal jam datang ke kantor, bukan cakupan izin, dan belum ada
+ * keputusan eksplisit untuk menyamakannya.
+ */
+const KEPALA_CABANG_ROLE_NAMES = new Set(["KEPALA CABANG", "KEPALA & KASIR"]);
+
+/** Nama jabatan → ambang jam masuk mana yang berlaku. Karyawan adalah default
+ *  untuk jabatan apa pun yang tidak ada di `KEPALA_CABANG_ROLE_NAMES`, termasuk
+ *  saat jabatannya kosong/tidak diketahui — fail-safe ke ambang yang LEBIH
+ *  longgar, bukan ke arah yang mendenda orang yang belum tentu Kepala Cabang. */
+export function classifyWorkStartRole(roleName: string | null | undefined): WorkStartRole {
+  if (!roleName) return "KARYAWAN";
+  return KEPALA_CABANG_ROLE_NAMES.has(roleName.trim().toUpperCase())
+    ? "KEPALA_CABANG"
+    : "KARYAWAN";
+}
+
+type WorkStart = { hour: number; minute: number };
+
+/**
+ * Jam mulai kerja (WIB) per ambang. Check-in SETELAH ini dihitung terlambat;
+ * tepat pada jam ini masih tepat waktu.
+ *
+ * INI SATU-SATUNYA TEMPAT ANGKANYA DITULIS. Untuk mengubah jam masuk, ubah di
+ * sini dan tidak ada yang lain: label di UI, teks bantuan, dan SQL rule denda
+ * semuanya diturunkan dari sini (lihat `workStartLabelFor()` dan
+ * `workStartSqlExprFor()`). Yang tersisa hanyalah satu langkah yang tidak bisa
  * dilakukan dari kode — SQL rule yang SUDAH tersimpan di database perlu
- * disimpan ulang sebagai versi baru; lihat
- * prisma/scripts/apply-jam-masuk.ts.
+ * disimpan ulang sebagai versi baru; lihat prisma/scripts/apply-jam-masuk.ts.
  */
-export const WORK_START_HOUR = 7;
-export const WORK_START_MINUTE = 40;
+export const WORK_START: Record<WorkStartRole, WorkStart> = {
+  KEPALA_CABANG: { hour: 7, minute: 30 },
+  KARYAWAN: { hour: 7, minute: 55 },
+};
 
-/** Jam mulai kerja sebagai menit-dalam-hari WIB. */
-export const WORK_START_MINUTES = WORK_START_HOUR * 60 + WORK_START_MINUTE;
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+/** Jam mulai kerja sebagai menit-dalam-hari WIB, untuk ambang yang diberikan. */
+export function workStartMinutesFor(role: WorkStartRole): number {
+  const w = WORK_START[role];
+  return w.hour * 60 + w.minute;
+}
 
 /**
- * Jam masuk untuk ditampilkan ke pengguna — "07.30".
+ * Jam masuk untuk ditampilkan ke pengguna — "07.30" atau "07.55".
  *
- * Ada supaya tidak ada satu pun teks UI yang mengetik jamnya sendiri. Dulu
- * "17.40" tertulis manual di tiga tempat, jadi mengubah jam kerja berarti
- * memburu string di seluruh proyek — dan yang terlewat akan menjelaskan denda
- * dengan jam yang bukan dasar dendanya.
+ * Ada supaya tidak ada satu pun teks UI yang mengetik jamnya sendiri.
  */
-export const WORK_START_LABEL = `${String(WORK_START_HOUR).padStart(2, "0")}.${String(
-  WORK_START_MINUTE
-).padStart(2, "0")}`;
+export function workStartLabelFor(role: WorkStartRole): string {
+  const w = WORK_START[role];
+  return `${pad2(w.hour)}.${pad2(w.minute)}`;
+}
 
 /**
  * Ambang jam masuk sebagai ekspresi menit untuk disisipkan ke SQL rule denda.
  *
- * Dituliskan sebagai `(7 * 60 + 40)` — bentuk yang sama dengan yang selama ini
+ * Dituliskan sebagai `(7 * 60 + 30)` — bentuk yang sama dengan yang selama ini
  * ditulis tangan di SQL — supaya rule yang tersimpan tetap terbaca manusia saat
- * dibuka di halaman "Rule Reward & Denda", bukan berupa angka 450 yang tidak
- * bisa ditelusuri asalnya.
+ * dibuka di halaman "Rule Reward & Denda", bukan berupa angka mentah yang
+ * tidak bisa ditelusuri asalnya.
  */
-export function workStartSqlExpr(): string {
-  return `(${WORK_START_HOUR} * 60 + ${WORK_START_MINUTE})`;
+export function workStartSqlExprFor(role: WorkStartRole): string {
+  const w = WORK_START[role];
+  return `(${w.hour} * 60 + ${w.minute})`;
 }
 
 /**
@@ -61,12 +99,19 @@ export function workStartSqlExpr(): string {
  * `checkIn` kosong adalah satu-satunya keadaan yang tidak bisa dihitung: hari
  * yang di-set manual oleh HR tanpa jam masuk. Di situ, dan HANYA di situ, kolom
  * status dipercaya — karena itu memang keputusan manusia, bukan potret ambang.
+ *
+ * `role` WAJIB diisi oleh pemanggil (bukan default diam-diam) — dua ambang
+ * berbeda sekarang berlaku, jadi menebak salah satu berarti menilai jam masuk
+ * seseorang dengan ambang milik jabatan orang lain.
  */
-export function isLateArrival(record: {
-  status: string | null | undefined;
-  checkIn: Date | null | undefined;
-}): boolean {
-  if (record.checkIn) return lateMinutesOf(record.checkIn) > 0;
+export function isLateArrival(
+  record: {
+    status: string | null | undefined;
+    checkIn: Date | null | undefined;
+  },
+  role: WorkStartRole
+): boolean {
+  if (record.checkIn) return lateMinutesOf(record.checkIn, role) > 0;
   return record.status === "LATE";
 }
 
@@ -77,11 +122,14 @@ export function isLateArrival(record: {
  * masuk — sama seperti SQL rule denda, yang memperlakukan baris begitu sebagai
  * satu pelanggaran tanpa rupiah.
  */
-export function lateMinutesOfRecord(record: {
-  status: string | null | undefined;
-  checkIn: Date | null | undefined;
-}): number {
-  return isLateArrival(record) ? lateMinutesOf(record.checkIn) : 0;
+export function lateMinutesOfRecord(
+  record: {
+    status: string | null | undefined;
+    checkIn: Date | null | undefined;
+  },
+  role: WorkStartRole
+): number {
+  return isLateArrival(record, role) ? lateMinutesOf(record.checkIn, role) : 0;
 }
 
 const JAKARTA_TIME = new Intl.DateTimeFormat("en-GB", {
@@ -129,11 +177,23 @@ export function formatJakartaTime(date: Date): string {
 }
 
 /**
+ * Jam WIB sebagai "HH:mm" (titik dua) — dipakai halaman presensi karyawan
+ * sendiri, yang labelnya sudah menulis "HH:mm" di seluruh UI-nya.
+ *
+ * Sengaja bukan zona waktu PERANGKAT: laptop yang jamnya di-set UTC (atau
+ * pengguna yang belum menyesuaikan jam) tetap harus melihat jam presensinya
+ * sendiri sebagai WIB, persis seperti alasan `jakartaMinutesOfDay` di atas.
+ */
+export function formatJakartaHm(date: Date): string {
+  return JAKARTA_TIME.format(date);
+}
+
+/**
  * Menit keterlambatan sebuah check-in. Nol kalau tepat waktu atau tanpa jam
  * masuk — persis seperti SQL rule `denda_keterlambatan`, yang memagari hasilnya
  * dengan `GREATEST(0, …)` dan memperlakukan `checkIn IS NULL` sebagai 0 menit.
  */
-export function lateMinutesOf(checkIn: Date | null | undefined): number {
+export function lateMinutesOf(checkIn: Date | null | undefined, role: WorkStartRole): number {
   if (!checkIn) return 0;
-  return Math.max(0, jakartaMinutesOfDay(checkIn) - WORK_START_MINUTES);
+  return Math.max(0, jakartaMinutesOfDay(checkIn) - workStartMinutesFor(role));
 }

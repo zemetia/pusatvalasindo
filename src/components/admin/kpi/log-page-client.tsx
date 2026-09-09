@@ -368,7 +368,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                 value={score === null ? "—" : formatPercent(score)}
                 meta={
                   result
-                    ? `Grade ${result.grade} · dihitung ${new Date(result.calculatedAt).toLocaleString("id-ID")}`
+                    ? `Grade ${result.grade} · dihitung ${new Date(result.calculatedAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`
                     : "Belum pernah dihitung untuk periode ini"
                 }
               />
@@ -441,6 +441,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                               {new Date(s.date).toLocaleDateString("id-ID", {
                                 day: "numeric",
                                 month: "short",
+                                timeZone: "UTC",
                               })}
                               {" — "}
                               {s.reason}
@@ -607,7 +608,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                     entries.map((e) => (
                       <TableRow key={e.id}>
                         <TableCell className="text-muted-foreground text-sm">
-                          {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                          {new Date(e.occurredAt).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })}
                           <span className="ml-1 text-[11px]">· mgg {e.weekOfMonth}</span>
                         </TableCell>
                         <TableCell className="font-medium">{e.roleKpi.definition.name}</TableCell>
@@ -744,7 +745,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                     <TableCell className="font-medium">{e.employee.name}</TableCell>
                     <TableCell>{e.roleKpi.definition.name}</TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {new Date(e.occurredAt).toLocaleDateString("id-ID")}
+                      {new Date(e.occurredAt).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })}
                     </TableCell>
                     <TableCell className="tabular text-right">
                       {Number(e.quantity).toLocaleString("id-ID")}

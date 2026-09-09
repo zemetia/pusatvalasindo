@@ -38,12 +38,21 @@ import { PrismaClient } from '../../src/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 import { signRule } from '../../src/backend/payroll-rules/signature'
-import {
-  WORK_START_HOUR,
-  WORK_START_LABEL,
-  WORK_START_MINUTE,
-  workStartSqlExpr,
-} from '../../src/lib/attendance-time'
+
+// Angka di bawah ini SENGAJA ditulis tetap (bukan diimpor dari
+// src/lib/attendance-time.ts): script ini memperbaiki SQL rule yang tersimpan
+// supaya sesuai jam masuk 07.40 — nilai yang berlaku SAAT insiden Juli 2026
+// terjadi, sebelum ambang berbeda per jabatan (Kepala Cabang 07.30, Karyawan
+// 07.55) diperkenalkan lewat migrasi 20260909000000. Nilai itu sudah tidak
+// ada lagi di attendance-time.ts, dan memang tidak seharusnya ada — script ini
+// adalah catatan sejarah perbaikan satu kali, bukan sesuatu yang dijalankan
+// ulang setelah ambang berubah lagi (untuk itu, lihat apply-jam-masuk.ts).
+const WORK_START_HOUR = 7
+const WORK_START_MINUTE = 40
+const WORK_START_LABEL = '07.40'
+function workStartSqlExpr(): string {
+  return `(${WORK_START_HOUR} * 60 + ${WORK_START_MINUTE})`
+}
 
 // Client dibuat di sini, bukan diimpor dari src/lib/prisma: modul itu membaca
 // DATABASE_URL saat diimpor, dan import ESM dieksekusi SEBELUM `config()` di
@@ -158,16 +167,13 @@ async function main() {
     console.log('  ✓ ditulis & ditandatangani ulang\n')
   }
 
-  // Ambang di DALAM database ikut diselaraskan: view hv_attendance_monthly dan
-  // hv_payroll_monthly menghitung late_days lewat hv_is_late(), yang membaca
-  // fungsi ini. Tanpa langkah ini dashboard memakai jam masuk lama sementara
-  // rule denda memakai yang baru.
+  // Fungsi DB `hv_work_start_minutes()` TIDAK disentuh di sini lagi — sejak
+  // migrasi 20260909000000_ambang_jam_masuk_per_role ia butuh argumen
+  // `role_name` (ambang berbeda per jabatan), jadi menulis ulang signature
+  // 0-argumen di sini hanya akan membuat fungsi zombie yang tidak dipanggil
+  // view mana pun. Untuk menyelaraskan ambang jam masuk, pakai
+  // apply-jam-masuk.ts.
   if (apply) {
-    await prisma.$executeRawUnsafe(
-      `CREATE OR REPLACE FUNCTION hv_work_start_minutes() RETURNS integer ` +
-        `LANGUAGE sql IMMUTABLE AS $fn$ SELECT ${WORK_START_HOUR} * 60 + ${WORK_START_MINUTE} $fn$;`
-    )
-    console.log(`✓ hv_work_start_minutes() diselaraskan ke ${WORK_START_LABEL} WIB`)
     console.log(
       '\nLangkah terakhir ada di aplikasi: slip yang sudah terlanjur dihitung ' +
         'harus di-Hitung Ulang supaya memakai SQL yang baru.'

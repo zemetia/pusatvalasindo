@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { classifyWorkStartRole, isLateArrival } from "@/lib/attendance-time";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconFingerprint } from "@tabler/icons-react";
 import { requireResource } from "@/backend/helpers/authz";
@@ -106,6 +107,18 @@ export default async function PresensiKaryawanPage({
 
   const rows: AttendanceRow[] = users.map((u) => {
     const att = byUser.get(u.id);
+    // Status kehadiran DITURUNKAN ulang dari checkIn — bukan dibaca apa
+    // adanya dari kolom `status`, yang cuma potret ambang jam masuk yang
+    // berlaku saat baris itu dicatat. Tanpa ini, karyawan yang masuk sebelum
+    // 07.55 bisa tampil "Terlambat" (dicatat saat ambang masih 07.40), dan
+    // Kepala Cabang yang masuk sesudah 07.30 bisa tampil "Hadir".
+    const workStartRole = classifyWorkStartRole(u.customRole?.name);
+    const status: AttendanceRow["status"] =
+      att?.status === "PRESENT" || att?.status === "LATE"
+        ? isLateArrival({ status: att.status, checkIn: att.checkIn }, workStartRole)
+          ? "LATE"
+          : "PRESENT"
+        : (att?.status ?? null);
     return {
       userId: u.id,
       name: u.name,
@@ -116,7 +129,7 @@ export default async function PresensiKaryawanPage({
       // `canWrite` dievaluasi per karyawan, bukan sekali untuk halaman:
       // sebuah jabatan bisa boleh melihat PT A+B tapi hanya mengoreksi PT A.
       canEdit: authz.canWrite(u.branch?.companyId ?? null),
-      status: att?.status ?? null,
+      status,
       checkIn: att?.checkIn ? att.checkIn.toISOString() : null,
       checkOut: att?.checkOut ? att.checkOut.toISOString() : null,
       notes: att?.notes ?? null,

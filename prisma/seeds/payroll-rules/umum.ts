@@ -5,8 +5,17 @@
 // HR menyunting lewat halaman "Rule Reward & Denda" dan file ini tidak lagi
 // berpengaruh. Acuan field: docs/tasks/spesifikasi-rule-slip-gaji.md
 
-import { WORK_START_LABEL, workStartSqlExpr } from '../../../src/lib/attendance-time'
+import { workStartLabelFor } from '../../../src/lib/attendance-time'
 import type { RuleSeed } from './types'
+
+/**
+ * Ambang jam masuk BERGANTUNG JABATAN — dibaca lewat fungsi DB
+ * `hv_work_start_minutes(role_name)` (migrasi
+ * 20260909000000_ambang_jam_masuk_per_role), bukan angka tetap. `a.role_name`
+ * datang dari view `hv_attendance`, yang sudah menjoin custom_role sejak awal.
+ * Pasangan TypeScript-nya: classifyWorkStartRole di attendance-time.ts.
+ */
+const AMBANG_MASUK = 'hv_work_start_minutes(a.role_name)'
 
 /**
  * Menit-dalam-hari jam masuk menurut WIB — dipakai untuk memilih baris DAN
@@ -39,13 +48,13 @@ export const UMUM_RULES: RuleSeed[] = [
       // ulang. Kalau angka di SQL ini berbeda dari yang dipakai server saat
       // menetapkan status LATE, slip akan mendendakan menit yang tidak sama
       // dengan menit yang ditampilkannya.
-      `CASE WHEN a."checkIn" IS NULL THEN 0 ELSE GREATEST(0, ${MENIT_MASUK} - ${workStartSqlExpr()}) END::int AS menit_telat, ` +
+      `CASE WHEN a."checkIn" IS NULL THEN 0 ELSE GREATEST(0, ${MENIT_MASUK} - ${AMBANG_MASUK}) END::int AS menit_telat, ` +
       '(ROW_NUMBER() OVER (ORDER BY a.date))::int AS urutan_pelanggaran ' +
       'FROM hv_attendance a WHERE a.user_id = :employee_id AND a.date BETWEEN :periode_awal AND :periode_akhir ' +
       // Telat ditentukan dari checkIn, BUKAN dari kolom status — kolom itu cuma
       // potret ambang saat baris dicatat. Menyaring dengannya berarti ambang
       // lama memilih baris sementara ambang baru menghitung nominalnya.
-      `AND ((a."checkIn" IS NOT NULL AND ${MENIT_MASUK} > ${workStartSqlExpr()}) ` +
+      `AND ((a."checkIn" IS NOT NULL AND ${MENIT_MASUK} > ${AMBANG_MASUK}) ` +
       `OR (a."checkIn" IS NULL AND a.status = 'LATE')) ORDER BY a.date`,
     tierField: 'urutan_pelanggaran',
     tiers: [
@@ -63,7 +72,8 @@ export const UMUM_RULES: RuleSeed[] = [
       'payroll.service.ts ke rule engine, lalu dijadikan berjenjang per bulan: ' +
       'Rp 1.000/menit untuk pelanggaran ke-1 s/d ke-3, Rp 2.000/menit untuk ke-4 ' +
       'dst. Jam masuk & toleransi berasal dari src/lib/attendance-time.ts ' +
-      `(jam masuk ${WORK_START_LABEL} WIB, tanpa toleransi). Hari berstatus ` +
+      `(Kepala Cabang ${workStartLabelFor('KEPALA_CABANG')} WIB, Karyawan ` +
+      `${workStartLabelFor('KARYAWAN')} WIB, tanpa toleransi). Hari berstatus ` +
       'LATE tanpa jam checkIn (mis. diset manual oleh HR lewat halaman kelola ' +
       'presensi tanpa mengisi jam masuk) tetap dihitung sebagai satu pelanggaran ' +
       '(0 menit, jadi tidak menambah rupiah) supaya tidak lolos diam-diam dari ' +

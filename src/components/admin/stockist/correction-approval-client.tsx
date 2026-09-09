@@ -57,7 +57,7 @@ function fmtValue(value: string, target: Target) {
 }
 
 function fmtDateTime(iso: string) {
-  return new Date(iso).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })
+  return new Date(iso).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" })
 }
 
 interface Props {

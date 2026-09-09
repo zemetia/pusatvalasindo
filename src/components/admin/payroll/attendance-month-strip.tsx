@@ -24,11 +24,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  WORK_START_LABEL,
+  classifyWorkStartRole,
   formatJakartaTime,
   isLateArrival,
   jakartaDateIso,
   lateMinutesOfRecord,
+  workStartLabelFor,
 } from "@/lib/attendance-time";
 import { daysInMonth, deriveAlphaDays, isoOf } from "@/lib/workday";
 import type { Attendance, AttendanceStatus } from "@src/generated/prisma";
@@ -93,13 +94,19 @@ export function AttendanceMonthStrip({
   month,
   year,
   joinDate,
+  roleName,
 }: {
   userId: string;
   month: number;
   year: number;
   /** Tanggal masuk kerja (ISO). Hari sebelumnya tidak dinilai alpha. */
   joinDate?: string | null;
+  /** Nama jabatan (`custom_role.name`) — menentukan ambang jam masuk mana
+   *  yang berlaku (Kepala Cabang 07.30 vs Karyawan 07.55). */
+  roleName?: string | null;
 }) {
+  const workStartRole = classifyWorkStartRole(roleName);
+  const workStartLabel = workStartLabelFor(workStartRole);
   const { data, isLoading } = useQuery({
     queryKey: ["attendance-calendar", userId, month, year],
     queryFn: async () => {
@@ -183,9 +190,14 @@ export function AttendanceMonthStrip({
       // Telat DITURUNKAN dari checkIn, bukan dibaca dari kolom status — lihat
       // isLateArrival(). `checkIn` menyeberang sebagai string ISO (JSON), bukan
       // Date; tipe Prisma di sini berbohong soal itu, jadi selalu di-parse ulang.
-      late: record ? isLateArrival({ status: record.status, checkIn: toDate(record.checkIn) }) : false,
+      late: record
+        ? isLateArrival({ status: record.status, checkIn: toDate(record.checkIn) }, workStartRole)
+        : false,
       lateMinutes: record
-        ? lateMinutesOfRecord({ status: record.status, checkIn: toDate(record.checkIn) })
+        ? lateMinutesOfRecord(
+            { status: record.status, checkIn: toDate(record.checkIn) },
+            workStartRole
+          )
         : 0,
     });
   }
@@ -228,7 +240,7 @@ export function AttendanceMonthStrip({
                   />
                 </TooltipTrigger>
                 <TooltipContent side="top" className="px-2.5 py-1.5">
-                  <TooltipBody cell={c} month={month} />
+                  <TooltipBody cell={c} month={month} workStartLabel={workStartLabel} />
                 </TooltipContent>
               </Tooltip>
             ))}
@@ -369,7 +381,15 @@ function effectiveStatusOf(cell: DayCell): AttendanceStatus | null {
   return cell.late ? "LATE" : "PRESENT";
 }
 
-function TooltipBody({ cell, month }: { cell: DayCell; month: number }) {
+function TooltipBody({
+  cell,
+  month,
+  workStartLabel,
+}: {
+  cell: DayCell;
+  month: number;
+  workStartLabel: string;
+}) {
   const efektif = effectiveStatusOf(cell);
   const style = efektif ? STATUS_STYLE[efektif] : null;
   const masuk = toDate(cell.record?.checkIn ?? null);
@@ -392,7 +412,7 @@ function TooltipBody({ cell, month }: { cell: DayCell; month: number }) {
       {cell.late && (
         <p className="tabular opacity-90">
           {cell.lateMinutes > 0
-            ? `Telat ${cell.lateMinutes} menit dari ${WORK_START_LABEL}`
+            ? `Telat ${cell.lateMinutes} menit dari ${workStartLabel}`
             : "Tanpa jam masuk — 0 menit"}
         </p>
       )}

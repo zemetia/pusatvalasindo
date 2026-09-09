@@ -1,8 +1,8 @@
 "use client";
 
 import type { Attendance, AttendanceStatus } from "@src/generated/prisma";
-import { format, differenceInMinutes } from "date-fns";
-import { id } from "date-fns/locale";
+import { differenceInMinutes } from "date-fns";
+import { classifyWorkStartRole, formatJakartaHm, isLateArrival } from "@/lib/attendance-time";
 import {
   IconClock,
   IconCalendar,
@@ -19,6 +19,9 @@ type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string
 
 interface AttendanceHistoryProps {
   records: AttendanceWithCheckInBranch[];
+  /** Nama jabatan (`custom_role.name`) pemilik riwayat ini — menentukan ambang
+   *  jam masuk mana yang berlaku (Kepala Cabang 07.30 vs Karyawan 07.55). */
+  roleName?: string | null;
 }
 
 function formatDuration(checkIn: Date, checkOut: Date): string {
@@ -29,8 +32,19 @@ function formatDuration(checkIn: Date, checkOut: Date): string {
   return `${h}j ${m}m`;
 }
 
-export function AttendanceHistory({ records }: AttendanceHistoryProps) {
+// `record.date` adalah kolom `@db.Date` (tengah malam UTC dari tanggal WIB) —
+// dirender di UTC, bukan zona waktu perangkat, supaya "Sen, 28 Jul" tidak
+// tampil sebagai "Min, 27 Jul" di perangkat dengan zona waktu berbeda.
+const RECORD_DATE = new Intl.DateTimeFormat("id-ID", {
+  weekday: "short",
+  day: "2-digit",
+  month: "short",
+  timeZone: "UTC",
+});
+
+export function AttendanceHistory({ records, roleName }: AttendanceHistoryProps) {
   const t = useTranslations("Dashboard.Attendance");
+  const workStartRole = classifyWorkStartRole(roleName);
 
   const statusConfig: Record<AttendanceStatus, { label: string; color: string; icon: any }> = {
     PRESENT:    { label: t("status.present"),    color: "bg-success-muted text-success border-success/25", icon: IconCheck },
@@ -70,10 +84,21 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
         {/* Rows */}
         <div className="divide-y divide-border">
           {records.map((record) => {
-            const config = statusConfig[record.status];
-            const StatusIcon = config.icon;
             const checkInDate  = record.checkIn  ? new Date(record.checkIn)  : null;
             const checkOutDate = record.checkOut ? new Date(record.checkOut) : null;
+            // Diturunkan ulang dari checkIn — bukan dibaca apa adanya dari
+            // kolom `status`, yang cuma potret ambang jam masuk yang berlaku
+            // saat baris itu dicatat. `checkInDate` sudah di-parse ulang di
+            // atas — `record.checkIn` sendiri sudah jadi string ISO setelah
+            // melewati JSON (tipe Prisma di sini berbohong soal itu).
+            const effectiveStatus: AttendanceStatus =
+              record.status === "PRESENT" || record.status === "LATE"
+                ? isLateArrival({ status: record.status, checkIn: checkInDate }, workStartRole)
+                  ? "LATE"
+                  : "PRESENT"
+                : record.status;
+            const config = statusConfig[effectiveStatus];
+            const StatusIcon = config.icon;
             const duration = checkInDate && checkOutDate
               ? formatDuration(checkInDate, checkOutDate)
               : null;
@@ -90,7 +115,7 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="text-foreground truncate text-sm font-medium">
-                      {format(new Date(record.date), "EEE, dd MMM", { locale: id })}
+                      {RECORD_DATE.format(new Date(record.date))}
                     </p>
                     <Badge
                       variant="outline"
@@ -108,7 +133,7 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
                       <div className="text-success flex items-center gap-1">
                         <IconLogin size={12} />
                         <span className="tabular text-sm font-medium">
-                          {format(checkInDate, "HH:mm")}
+                          {formatJakartaHm(checkInDate)}
                         </span>
                       </div>
                       {record.checkInBranch && (
@@ -138,7 +163,7 @@ export function AttendanceHistory({ records }: AttendanceHistoryProps) {
                       <div className="text-warning flex items-center gap-1">
                         <IconLogout size={12} />
                         <span className="tabular text-sm font-medium">
-                          {format(checkOutDate, "HH:mm")}
+                          {formatJakartaHm(checkOutDate)}
                         </span>
                       </div>
                       {record.checkOutPhotoUrl && (

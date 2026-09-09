@@ -33,6 +33,8 @@ import {
   type Icon,
 } from "@tabler/icons-react";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -52,6 +54,7 @@ interface NavItem {
   url: string;
   icon?: Icon;
   exact?: boolean;
+  badge?: number;
 }
 
 type SidebarUser = { name: string; email: string };
@@ -79,6 +82,23 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
   /** Tampil kalau jabatan ini boleh membuka resource-nya, apa pun PT-nya. */
   const show = (resource: string, action: "view" | "write" = "view") =>
     allows(subject, resource, action);
+
+  const canReviewKpi = show("kpi.review") || show("kpi.review", "write");
+
+  // Badge merah di "Penilaian & Persetujuan" — jumlah entri KPI yang masih
+  // menunggu approve/reject, dibatasi PT si peninjau lewat endpoint yang sama
+  // dengan halaman Log KPI. Di-poll berkala supaya angkanya tidak basi.
+  const { data: pendingKpiCount } = useQuery({
+    queryKey: ["kpi-pending-count"],
+    queryFn: async () => {
+      const res = await fetch("/api/kpi-entries/pending");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request gagal");
+      return (data.data as unknown[]).length;
+    },
+    enabled: canReviewKpi,
+    refetchInterval: 60_000,
+  });
 
   const navMain: NavItem[] = [
     {
@@ -154,11 +174,12 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
 
   // Halaman ini juga tempat menyetujui entri yang diisi sendiri karyawan, jadi
   // atasan dengan KPI_APPROVE harus bisa masuk meski tidak punya KPI_VIEW_ALL.
-  if (show("kpi.review") || show("kpi.review", "write")) {
+  if (canReviewKpi) {
     navKPI.push({
       title: "Penilaian & Persetujuan",
       url: "/dashboard/kpi/log",
       icon: IconReport,
+      badge: pendingKpiCount,
     });
   }
 

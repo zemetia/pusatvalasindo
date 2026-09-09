@@ -8,19 +8,32 @@
 // file ini tidak aman dipakai dari komponen client.
 
 import { AttendanceStatus } from "@src/generated/prisma";
-import { WORK_START_MINUTES, jakartaMinutesOfDay } from "./attendance-time";
+import { classifyWorkStartRole, jakartaMinutesOfDay, workStartMinutesFor } from "./attendance-time";
 
 export {
-  WORK_START_HOUR,
-  WORK_START_MINUTE,
-  WORK_START_MINUTES,
+  classifyWorkStartRole,
   jakartaMinutesOfDay,
   lateMinutesOf,
+  workStartLabelFor,
+  workStartMinutesFor,
+  workStartSqlExprFor,
+  type WorkStartRole,
 } from "./attendance-time";
 
-/** PRESENT atau LATE, berdasarkan jam masuk. */
-export function resolveArrivalStatus(checkIn: Date): AttendanceStatus {
-  return jakartaMinutesOfDay(checkIn) > WORK_START_MINUTES
+/**
+ * PRESENT atau LATE, berdasarkan jam masuk dan nama jabatan (`custom_role.name`).
+ *
+ * Nama jabatan diklasifikasi lewat `classifyWorkStartRole` — jabatan yang tidak
+ * dikenali jatuh ke ambang Karyawan (07.55), bukan Kepala Cabang (07.30), supaya
+ * jabatan yang belum terdaftar tidak diam-diam didenda dengan ambang yang lebih
+ * ketat.
+ */
+export function resolveArrivalStatus(
+  checkIn: Date,
+  roleName: string | null | undefined
+): AttendanceStatus {
+  const role = classifyWorkStartRole(roleName);
+  return jakartaMinutesOfDay(checkIn) > workStartMinutesFor(role)
     ? AttendanceStatus.LATE
     : AttendanceStatus.PRESENT;
 }

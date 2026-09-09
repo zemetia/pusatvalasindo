@@ -280,6 +280,7 @@ function RosterList({
         day: "numeric",
         month: "long",
         year: "numeric",
+        timeZone: "Asia/Jakarta",
       })
     : null;
 
@@ -318,6 +319,7 @@ function RosterList({
                   day: "numeric",
                   month: "short",
                   year: "numeric",
+                  timeZone: "Asia/Jakarta",
                 })
               : bulanDepan
                 ? "Bulan depan"

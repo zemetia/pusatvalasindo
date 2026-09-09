@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { IconFingerprint, IconLoader2, IconLogout } from "@tabler/icons-react";
-import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { MetricBlock } from "@/components/admin/page-shell";
+import { jakartaDateIso, formatJakartaHm } from "@/lib/attendance-time";
 
 interface BranchGeofence {
   id: string;
@@ -32,6 +32,9 @@ interface AttendanceClientProps {
   // profilnya. Array kosong = belum ada cabang ber-geofence sama sekali, jadi
   // absen tidak dibatasi lokasi.
   branchGeofences?: BranchGeofence[];
+  /** Nama jabatan (`custom_role.name`) pemilik sesi — menentukan ambang jam
+   *  masuk mana yang berlaku (Kepala Cabang 07.30 vs Karyawan 07.55). */
+  roleName?: string | null;
 }
 
 function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -63,7 +66,12 @@ function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
   });
 }
 
-export function AttendanceClient({ userId, initialRecords, branchGeofences = [] }: AttendanceClientProps) {
+export function AttendanceClient({
+  userId,
+  initialRecords,
+  branchGeofences = [],
+  roleName,
+}: AttendanceClientProps) {
   const t = useTranslations("Dashboard.Attendance");
   const [records, setRecords] = useState<AttendanceWithCheckInBranch[]>(initialRecords);
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
@@ -77,8 +85,8 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const todayRecord = useMemo(() => {
-    const today = format(new Date(), "yyyy-MM-dd");
-    return records.find((r) => format(new Date(r.date), "yyyy-MM-dd") === today);
+    const today = jakartaDateIso();
+    return records.find((r) => jakartaDateIso(new Date(r.date)) === today);
   }, [records]);
 
   const handleCapture = (file: File) => {
@@ -113,7 +121,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
 
       const { url } = await uploadRes.json();
 
-      const localDate = format(new Date(), "yyyy-MM-dd");
+      const localDate = jakartaDateIso();
       const checkoutRes = await fetch("/api/attendance", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -133,7 +141,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
       const updated = await checkoutRes.json();
       setRecords((prev) =>
         prev.map((r) =>
-          format(new Date(r.date), "yyyy-MM-dd") === localDate ? updated : r
+          jakartaDateIso(new Date(r.date)) === localDate ? updated : r
         )
       );
       setCheckoutFile(null);
@@ -196,7 +204,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
       const { url } = await uploadRes.json();
 
       // 2. Submit attendance
-      const localDate = format(new Date(), "yyyy-MM-dd");
+      const localDate = jakartaDateIso();
       const attendanceRes = await fetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -293,13 +301,13 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
                   <MetricBlock
                     label="Check In"
                     size="secondary"
-                    value={format(new Date(todayRecord.checkIn!), "HH:mm")}
+                    value={formatJakartaHm(new Date(todayRecord.checkIn!))}
                     suffix="WIB"
                   />
                   <MetricBlock
                     label="Check Out"
                     size="secondary"
-                    value={format(new Date(todayRecord.checkOut), "HH:mm")}
+                    value={formatJakartaHm(new Date(todayRecord.checkOut))}
                     suffix="WIB"
                   />
                 </div>
@@ -316,7 +324,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
                     <div>
                       <p className="text-success text-xs font-medium tracking-wide uppercase">Check In</p>
                       <p className="text-success tabular text-sm font-medium">
-                        Pukul {format(new Date(todayRecord.checkIn!), "HH:mm")} WIB
+                        Pukul {formatJakartaHm(new Date(todayRecord.checkIn!))} WIB
                       </p>
                     </div>
                   </div>
@@ -357,7 +365,7 @@ export function AttendanceClient({ userId, initialRecords, branchGeofences = [] 
 
       {/* Right Column: History */}
       <div className="lg:col-span-5">
-        <AttendanceHistory records={records} />
+        <AttendanceHistory records={records} roleName={roleName} />
       </div>
     </div>
   );

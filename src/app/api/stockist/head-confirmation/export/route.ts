@@ -23,7 +23,7 @@ const MISMATCH_FONT = "FFB42318";
  */
 function jamKlop(isMatch: boolean, iso: Date | string | null | undefined) {
   if (!isMatch || !iso) return "";
-  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
 }
 
 // GET /api/stockist/head-confirmation/export?companyId=&date=YYYY-MM-DD

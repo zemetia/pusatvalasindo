@@ -60,7 +60,7 @@ import {
   AdminFormSidebar,
   AdminFormFooter,
 } from "@/components/admin/admin-form-sidebar";
-import { WORK_START_LABEL } from "@/lib/attendance-time";
+import { classifyWorkStartRole, workStartLabelFor } from "@/lib/attendance-time";
 
 /* ── Tipe ─────────────────────────────────────────────────────────────────── */
 
@@ -207,6 +207,7 @@ function rowState(row: AttendanceRow): RowState {
 type TimeModal = {
   userId: string;
   name: string;
+  role: string;
   action: "check_in" | "check_out";
   time: string;
 };
@@ -346,6 +347,7 @@ export function PresensiPageClient({
     setTimeModal({
       userId: row.userId,
       name: row.name,
+      role: row.role,
       action,
       // Jam sekarang cuma nilai awal — pengisinya boleh menggantinya, karena
       // presensi manual biasanya dicatat belakangan.
@@ -829,7 +831,9 @@ export function PresensiPageClient({
             className="tabular h-14 text-center text-2xl font-semibold"
           />
           <p className="text-muted-foreground text-xs">
-            Waktu WIB. Jam masuk lewat {WORK_START_LABEL} otomatis dicatat terlambat.
+            Waktu WIB. Jam masuk lewat{" "}
+            {workStartLabelFor(classifyWorkStartRole(timeModal?.role))} otomatis dicatat
+            terlambat.
           </p>
 
           <AlertDialogFooter>
@@ -916,8 +920,9 @@ export function PresensiPageClient({
           </div>
 
           <p className="text-muted-foreground text-xs">
-            Kosongkan jam untuk menghapusnya. Jam masuk yang lewat batas {WORK_START_LABEL} otomatis
-            dinilai terlambat kecuali Anda memilih status lain.
+            Kosongkan jam untuk menghapusnya. Jam masuk yang lewat batas{" "}
+            {workStartLabelFor(classifyWorkStartRole(draft.row.role))} otomatis dinilai terlambat
+            kecuali Anda memilih status lain.
           </p>
 
           {(draft.status === "PERMISSION" || draft.status === "SICK") && (

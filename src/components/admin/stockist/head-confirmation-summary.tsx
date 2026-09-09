@@ -22,7 +22,7 @@ function fmt(n: number) {
 
 function fmtTime(iso: string | null) {
   if (!iso) return null
-  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+  return new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })
 }
 
 /**

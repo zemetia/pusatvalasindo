@@ -235,7 +235,7 @@ export const kpiService = {
     const source: KpiInputSource = isSelf ? "SELF" : "SUPERVISOR";
     const needsApproval = isSelf && policy.requiresApproval;
 
-    return kpiEntryRepository.create({
+    const created = await kpiEntryRepository.create({
       employeeId: input.employeeId,
       roleKpiId: input.roleKpiId,
       occurredAt: input.occurredAt,
@@ -249,6 +249,15 @@ export const kpiService = {
       status: needsApproval ? "PENDING" : "APPROVED",
       createdById: caller.id,
     });
+
+    // Entri yang langsung sah (tidak butuh persetujuan) harus segera terlihat
+    // di skor bulanan — skor tidak boleh menunggu tombol "Hitung Ulang" atau
+    // proses payroll untuk mencerminkan entri yang sudah APPROVED.
+    if (created.status === "APPROVED") {
+      await kpiService.calculateMonthlyResult(input.employeeId, month, year);
+    }
+
+    return created;
   },
 
   /**
@@ -285,11 +294,18 @@ export const kpiService = {
       throw new ValidationError("Periode ini sudah dikunci");
     }
 
-    return kpiEntryRepository.review(entryId, {
+    const reviewed = await kpiEntryRepository.review(entryId, {
       status: decision,
       reviewedById: caller.id,
       reviewNote: reviewNote ?? null,
     });
+
+    // Skor bulanan harus mengikuti keputusan ini seketika — baik entri baru
+    // disetujui (masuk hitungan) maupun ditolak (keluar dari hitungan), tanpa
+    // menunggu tombol "Hitung Ulang" atau proses payroll.
+    await kpiService.calculateMonthlyResult(entry.employeeId, entry.periodMonth, entry.periodYear);
+
+    return reviewed;
   },
 
   getPendingEntries: async (caller: AuthzCaller, limit = 200) => {

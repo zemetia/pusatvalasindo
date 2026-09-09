@@ -89,7 +89,12 @@ export async function PATCH(req: NextRequest) {
 
   const target = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, branchId: true, branch: { select: { companyId: true } } },
+    select: {
+      id: true,
+      branchId: true,
+      branch: { select: { companyId: true } },
+      customRole: { select: { name: true } },
+    },
   });
   if (!target) {
     return NextResponse.json(fail("NOT_FOUND", "Karyawan tidak ditemukan"), { status: 404 });
@@ -142,7 +147,7 @@ export async function PATCH(req: NextRequest) {
     (existing == null ||
       existing.status === AttendanceStatus.PRESENT ||
       existing.status === AttendanceStatus.LATE)
-      ? resolveArrivalStatus(finalCheckIn)
+      ? resolveArrivalStatus(finalCheckIn, target.customRole?.name ?? null)
       : undefined;
 
   const status = (body.status as AttendanceStatus | undefined) ?? autoStatus;
