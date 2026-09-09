@@ -78,6 +78,68 @@ export type PerformanceOverview = {
   rows: EmployeePerformance[];
 };
 
+/**
+ * Ringkasan KPI satu jabatan (lintas PT, kalau namanya dipakai lebih dari
+ * satu perusahaan). Beda dari `PerformanceOverview` biasa: setiap KPI
+ * berbobot milik jabatan ini punya kolomnya sendiri, bukan cuma "KPI
+ * terlemah" satu baris.
+ */
+export type RoleKpiSummary = {
+  roleName: string;
+  period: PeriodRef & { label: string };
+  historyLabels: string[];
+  /** Nama KPI berbobot milik jabatan ini, urut dari rata-rata terendah. */
+  kpiColumns: string[];
+  /** Rata-rata pencapaian tiap KPI di kolom, `null` bila tak ada data. */
+  kpiAverages: Record<string, number | null>;
+  rows: (EmployeePerformance & { kpiByName: Record<string, number | null> })[];
+  totals: PerformanceTotals;
+  byCompany: GroupPerformance[];
+};
+
+/**
+ * Bangun ringkasan per-jabatan dari baris `EmployeePerformance` yang sudah
+ * difilter ke satu nama jabatan. Dipisah dari service supaya bisa diuji
+ * tanpa database, sama seperti `aggregatePerformance`.
+ */
+export function buildRoleSummary(
+  roleName: string,
+  period: PeriodRef & { label: string },
+  historyLabels: string[],
+  matches: EmployeePerformance[]
+): RoleKpiSummary {
+  const { totals, byCompany } = aggregatePerformance(matches);
+
+  const kpiTotals = new Map<string, { sum: number; count: number }>();
+  const rows = matches.map((r) => {
+    const kpiByName: Record<string, number | null> = {};
+    for (const item of r.kpis) {
+      kpiByName[item.name] = item.achievement;
+      const agg = kpiTotals.get(item.name) ?? { sum: 0, count: 0 };
+      agg.sum += item.achievement;
+      agg.count += 1;
+      kpiTotals.set(item.name, agg);
+    }
+    return { ...r, kpiByName };
+  });
+
+  const kpiAverages: Record<string, number | null> = {};
+  for (const [name, agg] of kpiTotals) {
+    kpiAverages[name] = agg.count > 0 ? agg.sum / agg.count : null;
+  }
+
+  const kpiColumns = [...kpiTotals.keys()].sort((a, b) => {
+    const av = kpiAverages[a];
+    const bv = kpiAverages[b];
+    if (av === null && bv === null) return a.localeCompare(b, "id");
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    return av - bv;
+  });
+
+  return { roleName, period, historyLabels, kpiColumns, kpiAverages, rows, totals, byCompany };
+}
+
 export function average(values: number[]): number | null {
   if (values.length === 0) return null;
   return values.reduce((a, b) => a + b, 0) / values.length;

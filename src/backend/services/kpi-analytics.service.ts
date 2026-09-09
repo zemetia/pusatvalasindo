@@ -1,11 +1,14 @@
 import prisma from "@/lib/prisma";
+import { kpiService } from "@/backend/services/kpi.service";
 import { MONTH_NAMES } from "@/lib/kpi-utils";
 import type { KpiBreakdown } from "@/lib/kpi-utils";
-import { relativeDelta } from "@/lib/kpi-analytics";
+import { relativeDelta, buildRoleSummary } from "@/lib/kpi-analytics";
+import { slugifyRoleName } from "@/lib/kpi-utils";
 import type {
   EmployeePerformance,
   PerformanceOverview,
   PeriodRef,
+  RoleKpiSummary,
 } from "@/lib/kpi-analytics";
 
 /**
@@ -84,6 +87,13 @@ export const kpiAnalyticsService = {
     const current = periods[periods.length - 1];
     const previous = periods[periods.length - 2];
 
+    // Periode yang sedang dilihat harus selalu punya angka, terlepas dari
+    // apakah Gaji sudah dihitung atau ada yang sempat klik "Hitung Ulang" —
+    // KPI tidak boleh kosong hanya karena belum pernah dipicu. Periode
+    // riwayat di baliknya dibiarkan apa adanya, sudah pasti terisi lewat
+    // alur normal (entri disetujui / gaji bulan itu sudah berjalan).
+    await kpiService.ensureMonthlyResults(current.month, current.year);
+
     const [results, employees] = await Promise.all([
       prisma.kpiMonthlyResult.findMany({
         where: { OR: periods.map((p) => ({ month: p.month, year: p.year })) },
@@ -160,5 +170,29 @@ export const kpiAnalyticsService = {
       historyLabels: periods.map(shortLabel),
       rows,
     };
+  },
+
+  /**
+   * Ringkasan KPI satu jabatan (dicocokkan lewat slug nama, lintas PT bila
+   * ada beberapa perusahaan memakai nama jabatan yang sama). `null` kalau
+   * tidak ada jabatan dengan slug tersebut sama sekali — beda dari "ada
+   * jabatannya tapi belum ada karyawan/hasil", yang tetap mengembalikan
+   * ringkasan kosong supaya halamannya bisa menjelaskan itu.
+   */
+  getRoleSummary: async (
+    roleSlug: string,
+    month: number,
+    year: number
+  ): Promise<RoleKpiSummary | null> => {
+    const customRoles = await prisma.custom_role.findMany({ select: { name: true } });
+    const roleName = [...new Set(customRoles.map((r) => r.name))].find(
+      (n) => slugifyRoleName(n) === roleSlug
+    );
+    if (!roleName) return null;
+
+    const overview = await kpiAnalyticsService.getPerformanceOverview(month, year);
+    const matches = overview.rows.filter((r) => r.roleName === roleName);
+
+    return buildRoleSummary(roleName, overview.period, overview.historyLabels, matches);
   },
 };

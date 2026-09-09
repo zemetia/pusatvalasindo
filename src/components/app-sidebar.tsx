@@ -48,6 +48,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { allows, type AuthzSubject } from "@/lib/authz/resolve";
+import { slugifyRoleName } from "@/lib/kpi-utils";
 
 interface NavItem {
   title: string;
@@ -72,9 +73,15 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
    * jadi section "Aktivitas Saya" disembunyikan untuk mereka.
    */
   hasBranch: boolean;
+  /**
+   * Nama jabatan yang punya KPI terkonfigurasi, untuk submenu "Ringkasan KPI"
+   * per jabatan. Sudah dipastikan kosong oleh layout untuk pemanggil tanpa
+   * izin `kpi.analytics`, jadi di sini tinggal dipakai apa adanya.
+   */
+  kpiRoleNames: string[];
 }
 
-export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }: AppSidebarProps) {
   if (!user) {
     throw new Error("AppSidebar requires a user but received undefined.");
   }
@@ -240,6 +247,16 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
       icon: IconChartCandle,
     });
   }
+
+  // ── Ringkasan KPI per jabatan ────────────────────────────────────────────
+  // Satu item per nama jabatan (`kpiRoleNames`, sudah dikosongkan oleh layout
+  // untuk yang tidak punya izin `kpi.analytics`) — bukan submenu bertingkat,
+  // NavMain hanya mendukung daftar datar per section.
+  const navKpiSummary: NavItem[] = kpiRoleNames.map((name) => ({
+    title: name,
+    url: `/dashboard/kpi/summary/${slugifyRoleName(name)}`,
+    icon: IconChartHistogram,
+  }));
 
   // ── Finance Management ──────────────────────────────────────────────────
   const navFinanceManagement: NavItem[] = [];
@@ -417,6 +434,9 @@ export function AppSidebar({ user, subject, hasBranch, ...props }: AppSidebarPro
           <NavMain items={navFinanceDailyInput} label="Finance Daily Input" />
         )}
         {navLaporan.length > 0 && <NavMain items={navLaporan} label="Laporan" />}
+        {navKpiSummary.length > 0 && (
+          <NavMain items={navKpiSummary} label="Ringkasan KPI" />
+        )}
         <NavMain items={navManagement} label="Management" />
         <div className="mt-auto">
           <NavMain items={navSecondary} label="System" />

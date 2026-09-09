@@ -88,6 +88,20 @@ export function formatPercent(ratio: number, digits = 1) {
   return `${(ratio * 100).toFixed(digits).replace(".", ",")}%`;
 }
 
+/**
+ * Slug URL-aman dari nama jabatan, dipakai halaman Ringkasan KPI per jabatan
+ * (`/dashboard/kpi/summary/[roleSlug]`). Nama jabatan dari `custom_role`
+ * bukan slug — halaman itu mencocokkan slug ini balik ke nama dengan fungsi
+ * yang sama, jadi harus deterministik dan tidak bergantung pada id.
+ */
+export function slugifyRoleName(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export const SCORING_TYPE_LABELS: Record<string, string> = {
   TARGET_VALUE: "Target Nilai",
   PENALTY_POINT: "Penalti Poin",

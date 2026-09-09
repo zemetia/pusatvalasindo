@@ -27,7 +27,6 @@ import {
   IconX,
   IconLock,
   IconLockOpen,
-  IconRefresh,
   IconDownload,
 } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
@@ -234,20 +233,6 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const recalcMutation = useMutation({
-    mutationFn: () =>
-      mutateJson("/api/kpi-monthly-results", "POST", {
-        employeeId: userId,
-        month: Number(month),
-        year: Number(year),
-      }),
-    onSuccess: () => {
-      toast.success("Skor KPI dihitung ulang");
-      queryClient.invalidateQueries({ queryKey: resultKey });
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-
   const collectMutation = useMutation({
     mutationFn: (scope: "employee" | "all") =>
       mutateJson<CollectResponse>("/api/kpi-entries/collect", "POST", {
@@ -369,7 +354,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                 meta={
                   result
                     ? `Grade ${result.grade} · dihitung ${new Date(result.calculatedAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`
-                    : "Belum pernah dihitung untuk periode ini"
+                    : "Karyawan ini belum memiliki jabatan atau cabang (PT)"
                 }
               />
               <div className="flex flex-wrap items-center gap-2">
@@ -381,15 +366,6 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                 >
                   <IconDownload className="size-4" />
                   {collectMutation.isPending ? "Menarik..." : "Tarik dari Absensi"}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => recalcMutation.mutate()}
-                  disabled={recalcMutation.isPending}
-                >
-                  <IconRefresh className="size-4" />
-                  {recalcMutation.isPending ? "Menghitung..." : "Hitung Ulang"}
                 </Button>
                 <Button
                   size="sm"

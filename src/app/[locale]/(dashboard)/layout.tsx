@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import { getCallerRecord } from "@/backend/helpers/get-admin-caller";
+import { allows } from "@/lib/authz/resolve";
+import prisma from "@/lib/prisma";
 
 import { redirect } from "next/navigation";
 
@@ -49,6 +51,20 @@ export default async function layout({
   };
   const sidebarUser = { name: caller.name, email: caller.email };
 
+  // Daftar jabatan untuk submenu "Ringkasan KPI" — query tambahan ini hanya
+  // dijalankan untuk pemegang izin `kpi.analytics` (Owner/Super Admin & yang
+  // didelegasikan), bukan semua orang yang membuka dashboard.
+  let kpiRoleNames: string[] = [];
+  if (allows(subject, "kpi.analytics", "view")) {
+    const customRoles = await prisma.custom_role.findMany({
+      where: { roleKpis: { some: {} } },
+      select: { name: true },
+      distinct: ["name"],
+      orderBy: { name: "asc" },
+    });
+    kpiRoleNames = customRoles.map((r) => r.name);
+  }
+
   return (
     <SidebarProvider
       style={
@@ -58,7 +74,12 @@ export default async function layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar user={sidebarUser} subject={subject} hasBranch={caller.branchId !== null} />
+      <AppSidebar
+        user={sidebarUser}
+        subject={subject}
+        hasBranch={caller.branchId !== null}
+        kpiRoleNames={kpiRoleNames}
+      />
       <SidebarInset className="bg-surface">
         <SiteHeader />
         {/* Padding vertikal halaman hidup di sini saja; tiap halaman cukup

@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { SectionCard, EmptyState } from "@/components/admin/page-shell";
-import { IconChevronRight, IconTargetArrow } from "@tabler/icons-react";
+import { IconChartHistogram, IconChevronRight, IconTargetArrow } from "@tabler/icons-react";
+import { slugifyRoleName } from "@/lib/kpi-utils";
 
 export type CompanyRow = {
   id: string;
@@ -86,30 +88,41 @@ function KonfigurasiTab({
                 const isComplete = !!summary && Math.abs(summary.totalWeight - 1) < 0.001;
 
                 return (
-                  <button
+                  <div
                     key={role.id}
-                    type="button"
-                    onClick={() => router.push(`/dashboard/kpi/${c.id}/custom_${role.id}`)}
-                    className="bg-card hover:border-primary/40 group flex flex-col gap-3 rounded-xl border p-4 text-left shadow-sm transition-colors"
+                    className="bg-card hover:border-primary/40 group flex flex-col gap-3 rounded-xl border p-4 shadow-sm transition-colors"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-medium">{role.name}</span>
-                      <IconChevronRight className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {summary ? (
-                        <>
-                          <Badge variant="soft">{summary.kpiCount} KPI</Badge>
-                          <Badge variant={isComplete ? "success" : "warning"}>
-                            Bobot {(summary.totalWeight * 100).toFixed(0)}%
-                            {isComplete ? "" : " — belum 100%"}
-                          </Badge>
-                        </>
-                      ) : (
-                        <Badge variant="outline">Belum ada KPI</Badge>
-                      )}
-                    </div>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/dashboard/kpi/${c.id}/custom_${role.id}`)}
+                      className="flex flex-col gap-3 text-left"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-medium">{role.name}</span>
+                        <IconChevronRight className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {summary ? (
+                          <>
+                            <Badge variant="soft">{summary.kpiCount} KPI</Badge>
+                            <Badge variant={isComplete ? "success" : "warning"}>
+                              Bobot {(summary.totalWeight * 100).toFixed(0)}%
+                              {isComplete ? "" : " — belum 100%"}
+                            </Badge>
+                          </>
+                        ) : (
+                          <Badge variant="outline">Belum ada KPI</Badge>
+                        )}
+                      </div>
+                    </button>
+                    <Link
+                      href={`/dashboard/kpi/summary/${slugifyRoleName(role.name)}`}
+                      className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 self-start text-xs underline-offset-4 hover:underline"
+                    >
+                      <IconChartHistogram className="size-3.5" />
+                      Ringkasan KPI
+                    </Link>
+                  </div>
                 );
               })}
             </div>

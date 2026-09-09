@@ -355,6 +355,13 @@ export const kpiService = {
     }
 
     await kpiEntryRepository.delete(entryId);
+
+    // Entri terhapus, khususnya yang APPROVED, mengubah skor bulan itu — tidak
+    // boleh menunggu tombol manual untuk terlihat, sama seperti pencatatan dan
+    // persetujuan.
+    if (entry.status === "APPROVED") {
+      await kpiService.calculateMonthlyResult(entry.employeeId, entry.periodMonth, entry.periodYear);
+    }
   },
 
   // ── Periode ──────────────────────────────────────────────────────────────
@@ -403,11 +410,69 @@ export const kpiService = {
   },
 
   // ── Hasil bulanan ────────────────────────────────────────────────────────
-  getMonthlyResult: (employeeId: string, month: number, year: number) =>
-    kpiMonthlyResultRepository.findByEmployeePeriod(employeeId, month, year),
+  /**
+   * Skor bulanan seorang karyawan. KPI murni tidak punya konsep "hitung" yang
+   * harus dipicu manual — kalau belum pernah dihitung untuk periode ini
+   * (mis. seluruh KPI-nya bersumber SYSTEM dan belum pernah ada entri yang
+   * memicu `calculateMonthlyResult`), hitung sekarang juga alih-alih
+   * menampilkan kosong. Proses gaji tetap memanggil `calculateMonthlyResult`
+   * sendiri dan tidak lewat sini.
+   */
+  getMonthlyResult: async (employeeId: string, month: number, year: number) => {
+    const existing = await kpiMonthlyResultRepository.findByEmployeePeriod(
+      employeeId,
+      month,
+      year
+    );
+    if (existing) return existing;
+
+    try {
+      return await kpiService.calculateMonthlyResult(employeeId, month, year);
+    } catch {
+      // Karyawan belum punya jabatan/cabang — belum ada apa pun untuk dihitung.
+      return null;
+    }
+  },
 
   getMonthlyResultsByEmployee: (employeeId: string) =>
     kpiMonthlyResultRepository.findByEmployee(employeeId),
+
+  /**
+   * Pastikan seluruh karyawan aktif punya hasil KPI untuk satu periode,
+   * tanpa mengulang yang sudah ada — dipakai laporan lintas-karyawan
+   * (Analisis Kinerja) supaya karyawan yang KPI-nya murni SYSTEM tidak
+   * hilang dari daftar hanya karena belum pernah dipicu.
+   */
+  ensureMonthlyResults: async (
+    month: number,
+    year: number,
+    companyIds?: string[] | null
+  ) => {
+    const employees = await prisma.user.findMany({
+      where: {
+        isActive: true,
+        customRoleId: { not: null },
+        ...(companyIds == null ? {} : { branch: { companyId: { in: companyIds } } }),
+      },
+      select: { id: true },
+    });
+    if (employees.length === 0) return;
+
+    const existing = await prisma.kpiMonthlyResult.findMany({
+      where: { month, year, employeeId: { in: employees.map((e) => e.id) } },
+      select: { employeeId: true },
+    });
+    const already = new Set(existing.map((r) => r.employeeId));
+
+    for (const emp of employees) {
+      if (already.has(emp.id)) continue;
+      try {
+        await kpiService.calculateMonthlyResult(emp.id, month, year);
+      } catch {
+        // Karyawan tanpa jabatan/cabang lengkap — lewati, jangan gagalkan laporan.
+      }
+    }
+  },
 
   /**
    * Hitung ulang skor sebulan dari entri yang disetujui, lalu simpan.

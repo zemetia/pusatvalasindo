@@ -26,7 +26,7 @@ import {
 } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
 import { IconChartHistogram } from "@tabler/icons-react";
-import { MONTH_NAMES, formatPercent } from "@/lib/kpi-utils";
+import { MONTH_NAMES, formatPercent, slugifyRoleName } from "@/lib/kpi-utils";
 import {
   aggregatePerformance,
   NO_BRANCH,
@@ -585,7 +585,14 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
               ) : (
                 roleRows.map((r) => (
                   <TableRow key={r.key}>
-                    <TableCell className="font-medium">{r.label}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link
+                        href={`/dashboard/kpi/summary/${slugifyRoleName(r.label)}`}
+                        className="hover:text-primary underline-offset-4 hover:underline"
+                      >
+                        {r.label}
+                      </Link>
+                    </TableCell>
                     {canSplit && splitByCompany && (
                       <TableCell className="text-muted-foreground text-sm">
                         {r.subLabel}
