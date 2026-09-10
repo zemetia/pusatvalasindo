@@ -509,6 +509,19 @@ export const RESOURCES: ResourceDef[] = [
     legacy: { view: PERMISSIONS.USERS_VIEW_DETAIL },
   },
   {
+    key: "users.login-history",
+    label: "Riwayat Login",
+    group: "Manajemen",
+    description:
+      "Kapan dan dari mana setiap pengguna login ke sistem, lintas seluruh PT — untuk memantau login di luar jam kerja.",
+    page: "/dashboard/users/login-history",
+    scoping: "global",
+    readOnly: true,
+    // Sengaja TANPA peta legacy: ini data keamanan lintas seluruh pengguna,
+    // bukan sekadar daftar karyawan — default-nya hanya Super Admin/Owner
+    // sampai didelegasikan eksplisit lewat matriks izin.
+  },
+  {
     key: "companies",
     label: "PT (Perusahaan)",
     group: "Manajemen",

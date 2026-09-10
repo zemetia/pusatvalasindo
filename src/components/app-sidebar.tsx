@@ -359,6 +359,14 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
+  if (show("users.login-history")) {
+    navManagement.push({
+      title: "Riwayat Login",
+      url: "/dashboard/users/login-history",
+      icon: IconFingerprint,
+    });
+  }
+
   if (show("companies")) {
     navManagement.push({
       title: "PT",
