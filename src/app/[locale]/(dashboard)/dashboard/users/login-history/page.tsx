@@ -24,6 +24,8 @@ import {
   PageShell,
   SectionCard,
 } from "@/components/admin/page-shell";
+import { Button } from "@/components/ui/button";
+import { LoginHistoryDeleteButton } from "@/components/admin/users/login-history-delete-button";
 
 /**
  * Riwayat login: satu baris per sesi yang dibuat Better Auth (`session.createdAt`
@@ -61,6 +63,7 @@ const PERIOD_OPTIONS = [
 ] as const;
 
 const ROW_LIMIT = 1000;
+const PER_PAGE = 25;
 
 /** Ringkasan singkat user-agent — cukup untuk membedakan HP/laptop/browser
  *  tanpa menampilkan string mentah yang panjang dan tidak enak dibaca. */
@@ -77,46 +80,70 @@ function summarizeUserAgent(ua: string | null): string {
 
 type Params = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ rentang?: string; luarJamKerja?: string }>;
+  searchParams: Promise<{ rentang?: string; luarJamKerja?: string; halaman?: string }>;
 };
+
+/** Query string halaman ini, dengan bagian yang diberikan di `overrides`
+ *  ditimpa — dipakai supaya setiap tautan (periode, filter, paginasi) tetap
+ *  membawa parameter lain yang sedang aktif. */
+function buildHref(
+  current: { rentang: number; luarJamKerja: boolean; halaman: number },
+  overrides: Partial<{ rentang: number; luarJamKerja: boolean; halaman: number }>
+): string {
+  const next = { ...current, ...overrides };
+  const params = new URLSearchParams();
+  params.set("rentang", String(next.rentang));
+  if (next.luarJamKerja) params.set("luarJamKerja", "1");
+  if (next.halaman > 1) params.set("halaman", String(next.halaman));
+  return `/dashboard/users/login-history?${params.toString()}`;
+}
 
 export default async function LoginHistoryPage({ params, searchParams }: Params) {
   const { locale } = await params;
-  const { rentang, luarJamKerja } = await searchParams;
+  const { rentang, luarJamKerja, halaman } = await searchParams;
 
   // Resource lintas seluruh pengguna — bukan scoping per PT — jadi gerbangnya
   // hanya boleh/tidak boleh, tanpa dipersempit `authz.where()`.
-  await requireResource("users.login-history", "view", locale);
+  const authz = await requireResource("users.login-history", "view", locale);
+  const canDelete = authz.can("users.login-history", "write");
 
   const requestedDays = Number(rentang);
   const days = PERIOD_OPTIONS.some((o) => o.days === requestedDays) ? requestedDays : 7;
   const onlyOutside = luarJamKerja === "1";
+  const requestedPage = Number(halaman);
+  const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   let sessions;
+  let expiredCount = 0;
   try {
-    sessions = await prisma.session.findMany({
-      where: { createdAt: { gte: since } },
-      select: {
-        id: true,
-        createdAt: true,
-        ipAddress: true,
-        userAgent: true,
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            customRole: { select: { name: true } },
-            branch: { select: { name: true, company: { select: { code: true } } } },
+    [sessions, expiredCount] = await Promise.all([
+      prisma.session.findMany({
+        where: { createdAt: { gte: since } },
+        select: {
+          id: true,
+          createdAt: true,
+          ipAddress: true,
+          userAgent: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              customRole: { select: { name: true } },
+              branch: { select: { name: true, company: { select: { code: true } } } },
+            },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-      take: ROW_LIMIT,
-    });
+        orderBy: { createdAt: "desc" },
+        take: ROW_LIMIT,
+      }),
+      // Dihitung terpisah dari `days`: tombol hapus membersihkan SELURUH sesi
+      // kedaluwarsa, bukan cuma yang kebetulan ada di rentang yang sedang dilihat.
+      canDelete ? prisma.session.count({ where: { expiresAt: { lt: now } } }) : Promise.resolve(0),
+    ]);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="users/login-history/page" message={msg} />;
@@ -132,7 +159,12 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
   const today = jakartaDateIso();
   const loginsToday = rows.filter((r) => jakartaDateIso(r.createdAt) === today).length;
 
-  const visibleRows = onlyOutside ? rows.filter((r) => r.outside) : rows;
+  const filteredRows = onlyOutside ? rows.filter((r) => r.outside) : rows;
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PER_PAGE));
+  const currentPage = Math.min(page, totalPages);
+  const visibleRows = filteredRows.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const filterState = { rentang: days, luarJamKerja: onlyOutside, halaman: currentPage };
 
   return (
     <PageShell>
@@ -142,22 +174,25 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
         icon={<IconFingerprint className="size-5" />}
         description="Setiap kali seseorang login ke sistem, beserta jam WIB-nya — untuk memeriksa apakah ada yang masuk di luar jam kerja."
         action={
-          <div className="bg-muted/60 inline-flex items-center gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map((o) => (
-              <Link
-                key={o.days}
-                href={`/dashboard/users/login-history?rentang=${o.days}${onlyOutside ? "&luarJamKerja=1" : ""}`}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                  o.days === days
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {o.label}
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="bg-muted/60 inline-flex items-center gap-1 rounded-lg p-1">
+              {PERIOD_OPTIONS.map((o) => (
+                <Link
+                  key={o.days}
+                  href={buildHref(filterState, { rentang: o.days, halaman: 1 })}
+                  className={cn(
+                    "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                    o.days === days
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {o.label}
+                </Link>
+              ))}
+            </div>
+            {canDelete && <LoginHistoryDeleteButton expiredCount={expiredCount} />}
+          </>
         }
       />
 
@@ -184,7 +219,7 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
         description="Diurutkan dari yang paling baru. Baris di luar jam kerja ditandai merah."
         toolbar={
           <Link
-            href={`/dashboard/users/login-history?rentang=${days}${onlyOutside ? "" : "&luarJamKerja=1"}`}
+            href={buildHref(filterState, { luarJamKerja: !onlyOutside, halaman: 1 })}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
               onlyOutside
@@ -196,6 +231,37 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
           </Link>
         }
         padded={false}
+        footer={
+          filteredRows.length > 0 ? (
+            <div className="flex items-center justify-between gap-3">
+              <span>
+                Halaman {currentPage} dari {totalPages} · {formatCount(filteredRows.length)} baris
+              </span>
+              <div className="flex items-center gap-2">
+                <Button asChild variant="outline" size="sm">
+                  <Link
+                    href={buildHref(filterState, { halaman: currentPage - 1 })}
+                    aria-disabled={currentPage <= 1}
+                    tabIndex={currentPage <= 1 ? -1 : undefined}
+                    className={cn(currentPage <= 1 && "pointer-events-none opacity-50")}
+                  >
+                    Sebelumnya
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link
+                    href={buildHref(filterState, { halaman: currentPage + 1 })}
+                    aria-disabled={currentPage >= totalPages}
+                    tabIndex={currentPage >= totalPages ? -1 : undefined}
+                    className={cn(currentPage >= totalPages && "pointer-events-none opacity-50")}
+                  >
+                    Berikutnya
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ) : undefined
+        }
       >
         {visibleRows.length === 0 ? (
           <EmptyState

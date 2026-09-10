@@ -513,10 +513,9 @@ export const RESOURCES: ResourceDef[] = [
     label: "Riwayat Login",
     group: "Manajemen",
     description:
-      "Kapan dan dari mana setiap pengguna login ke sistem, lintas seluruh PT — untuk memantau login di luar jam kerja.",
+      "Kapan dan dari mana setiap pengguna login ke sistem, lintas seluruh PT — untuk memantau login di luar jam kerja. Tulis = boleh menghapus riwayat sesi yang sudah kedaluwarsa.",
     page: "/dashboard/users/login-history",
     scoping: "global",
-    readOnly: true,
     // Sengaja TANPA peta legacy: ini data keamanan lintas seluruh pengguna,
     // bukan sekadar daftar karyawan — default-nya hanya Super Admin/Owner
     // sampai didelegasikan eksplisit lewat matriks izin.
