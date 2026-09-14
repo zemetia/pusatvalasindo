@@ -280,6 +280,12 @@ export function StockistGridClient({
         // Pesan datang dari server: kalau ada angka koreksi, dia menyebut pengajuannya
         // menunggu persetujuan — bukan sekadar "Ditandai Beda".
         if (!silent) toast.success(data.message ?? (status === "BENAR" ? "Ditandai Benar" : "Ditandai Beda"))
+        // Kalau koreksinya langsung berlaku (correction.direct), server sudah membenarkan
+        // status sel jadi "BENAR" — sinkronkan, jangan biarkan tampilan nyangkut di "Beda".
+        const finalStatus: CheckStatus = data.data?.status ?? status
+        if (finalStatus !== status) {
+          setChecks((prev) => ({ ...prev, [key]: { ...prev[key], status: finalStatus } }))
+        }
         if (data.data?.correctionRequestId && correctedQuantity !== undefined) {
           setPendingCorrections((prev) => ({
             ...prev,
@@ -308,7 +314,7 @@ export function StockistGridClient({
           const wasBelum = prevCheck.status === "BELUM_REVIEW"
           return {
             ...prev,
-            beda: prev.beda + (status === "BEDA" ? 1 : 0) - (wasBeda ? 1 : 0),
+            beda: prev.beda + (finalStatus === "BEDA" ? 1 : 0) - (wasBeda ? 1 : 0),
             belumReview: prev.belumReview - (wasBelum ? 1 : 0),
           }
         })

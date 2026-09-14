@@ -8,6 +8,7 @@ import { withValidation } from "@/backend/middleware/with-validation";
 import { stockistService } from "@/backend/services/stockist.service";
 import { correctionService } from "@/backend/services/correction.service";
 import { stockistPocketRepository } from "@/backend/repositories/stockist-pocket.repository";
+import { stockistDailyCheckRepository } from "@/backend/repositories/stockist-daily-check.repository";
 import type { StockistCheckStatus } from "@src/generated/prisma/client";
 import { NotFoundError } from "@/backend/errors/app-error";
 import { allowsCompany } from "@/lib/authz/resolve";
@@ -56,9 +57,17 @@ export const PATCH = withValidation(markCheckSchema)(
 
       if (result.correctionRequest && canDirect) {
         await correctionService.applyDirect(result.correctionRequest.id, caller.userId);
+        // applyDirect membenarkan status sel jadi "BENAR" — `result.check` masih pegang
+        // status "BEDA" dari sebelum koreksinya berlaku, jadi dibaca ulang supaya respons
+        // (dan state di client) tidak ketinggalan.
+        const updatedCheck = await stockistDailyCheckRepository.findByPocketItemDate(
+          ctx.body.pocketId,
+          ctx.body.companyStockItemId,
+          new Date(ctx.body.date)
+        );
         return NextResponse.json(
           ok(
-            { ...result.check, correctionRequestId: null, applied: true },
+            { ...(updatedCheck ?? result.check), correctionRequestId: null, applied: true },
             "Stock langsung dikoreksi — tanpa perlu persetujuan"
           )
         );

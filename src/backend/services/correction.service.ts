@@ -17,6 +17,7 @@ import { applyMutationInTx } from "@/backend/services/stockist.service";
 async function applyStockistCorrection(req: {
   pocketId: string | null;
   companyStockItemId: string | null;
+  date: Date;
   proposedValue: unknown;
   reason: string;
   decidedBy?: string | null;
@@ -35,15 +36,22 @@ async function applyStockistCorrection(req: {
     // Saldo dibaca ulang di sini, bukan memakai `currentValue` saat pengajuan dibuat —
     // kalau ada mutasi lain sejak pengajuan, hasil akhirnya tetap persis angka usulan.
     const delta = proposed - (balance ? Number(balance.quantity) : 0);
-    if (delta === 0) return;
+    if (delta !== 0) {
+      await applyMutationInTx(tx, {
+        pocketId,
+        companyStockItemId,
+        type: StockistMutationType.ADJUSTMENT,
+        quantity: delta,
+        note: `Koreksi disetujui: ${req.reason}`,
+        createdBy: req.decidedBy ?? undefined,
+      });
+    }
 
-    await applyMutationInTx(tx, {
-      pocketId,
-      companyStockItemId,
-      type: StockistMutationType.ADJUSTMENT,
-      quantity: delta,
-      note: `Koreksi disetujui: ${req.reason}`,
-      createdBy: req.decidedBy ?? undefined,
+    // Koreksinya sudah berlaku — sel yang tadinya "Beda" targetnya memang jadi benar,
+    // sama seperti kas/bank yang balik ke verifyStatus "BENAR" begitu di-ACC.
+    await tx.stockistDailyCheck.update({
+      where: { pocketId_companyStockItemId_date: { pocketId, companyStockItemId, date: req.date } },
+      data: { status: "BENAR", reviewedAt: new Date() },
     });
   });
 }
