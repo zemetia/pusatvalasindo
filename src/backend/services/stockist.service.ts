@@ -285,22 +285,25 @@ export const stockistService = {
       },
     });
 
-    if (input.status !== StockistCheckStatus.BEDA || input.correctedQuantity === undefined) {
+    const enteredQty = Number(check.enteredQuantity);
+    if (
+      input.status !== StockistCheckStatus.BEDA ||
+      input.correctedQuantity === undefined ||
+      input.correctedQuantity === enteredQty
+    ) {
       return { check: updated, correctionRequest: null };
     }
 
-    const [pocket, item, balance] = await Promise.all([
+    const [pocket, item] = await Promise.all([
       stockistPocketRepository.findById(input.pocketId),
       companyStockItemRepository.findById(input.companyStockItemId),
-      stockistBalanceRepository.findByPocketAndItem(input.pocketId, input.companyStockItemId),
     ]);
     if (!pocket) throw new NotFoundError("Pocket tidak ditemukan");
 
-    const currentQty = balance ? Number(balance.quantity) : 0;
-    if (input.correctedQuantity === currentQty) {
-      return { check: updated, correctionRequest: null };
-    }
-
+    // `currentValue` di sini cuma jejak "angka yang diisi hari itu" untuk riwayat —
+    // bukan saldo berjalan live. Saldo live dibaca ulang saat approve/applyDirect
+    // (lihat correction.service.ts), jadi selisih dari mutasi lain sejak tanggal ini
+    // tetap terhitung benar walau di sini kita bandingkan ke enteredQty, bukan saldo.
     const ref = { pocketId: input.pocketId, companyStockItemId: input.companyStockItemId };
     const existing = await correctionRequestRepository.findPending(
       pocket.companyId,
@@ -309,7 +312,7 @@ export const stockistService = {
       input.date
     );
     const payload = {
-      currentValue: currentQty,
+      currentValue: enteredQty,
       proposedValue: input.correctedQuantity,
       reason: input.note as string,
       requestedBy: input.reviewedBy,

@@ -107,6 +107,23 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     refetchInterval: 60_000,
   });
 
+  const canReviewCorrection = show("correction");
+
+  // Badge merah di "Persetujuan Koreksi" — jumlah pengajuan koreksi yang masih
+  // menunggu approve/reject, dibatasi PT peninjau lewat endpoint yang sama
+  // dengan halaman Persetujuan Koreksi.
+  const { data: pendingCorrectionCount } = useQuery({
+    queryKey: ["correction-pending-count"],
+    queryFn: async () => {
+      const res = await fetch("/api/koreksi/pending");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Request gagal");
+      return data.data as number;
+    },
+    enabled: canReviewCorrection,
+    refetchInterval: 60_000,
+  });
+
   const navMain: NavItem[] = [
     {
       title: "Dashboard",
@@ -340,11 +357,12 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  if (show("correction")) {
+  if (canReviewCorrection) {
     navFinanceDailyInput.push({
       title: "Persetujuan Koreksi",
       url: "/dashboard/persetujuan-koreksi",
       icon: IconGavel,
+      badge: pendingCorrectionCount,
     });
   }
 
