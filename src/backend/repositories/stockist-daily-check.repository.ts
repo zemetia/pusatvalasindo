@@ -16,7 +16,7 @@ export const stockistDailyCheckRepository = {
         date,
         pocket: { companyId, isDefault: false, isActive: true, deletedAt: null },
       },
-      select: { companyStockItemId: true, enteredQuantity: true },
+      select: { pocketId: true, companyStockItemId: true, enteredQuantity: true },
     }),
 
   findByPocketItemDate: (pocketId: string, companyStockItemId: string, date: Date) =>

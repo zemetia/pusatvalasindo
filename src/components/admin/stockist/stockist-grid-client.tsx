@@ -373,17 +373,21 @@ export function StockistGridClient({
 
   // Pocket "Total" dihitung live di frontend dari isian opname (checks) tiap pocket — bukan
   // dari saldo resmi (StockistBalance) — supaya langsung ikut berubah begitu user isi/ubah cell,
-  // tanpa nunggu proses review "Benar/Beda".
+  // tanpa nunggu proses review "Benar/Beda". Sel yang sudah dikoreksi & disetujui pakai angka
+  // hasil koreksi (proposedValue), bukan angka mentah yang salah ketik — supaya begitu koreksinya
+  // di-ACC, Total ikut klop dengan Total CC alih-alih selisihnya nyangkut selamanya.
   const totalMap = useMemo(() => {
     const map: Record<string, number> = {}
     for (const p of managePockets) {
       for (const cur of currencies) {
-        const qty = checks[`${p.id}:${cur.id}`]?.enteredQuantity ?? 0
+        const key = `${p.id}:${cur.id}`
+        const corrected = approvedCorrections[key]?.proposedValue
+        const qty = corrected !== undefined ? Number(corrected) : (checks[key]?.enteredQuantity ?? 0)
         map[cur.id] = (map[cur.id] ?? 0) + qty
       }
     }
     return map
-  }, [managePockets, currencies, checks])
+  }, [managePockets, currencies, checks, approvedCorrections])
 
   // Kuantitas hitung ulang kepala cabang (halaman Cross-Check) — pembanding kolom Total.
   const ccByItem = useStockItemConfirmations(companyId, date)
@@ -610,6 +614,10 @@ export function StockistGridClient({
                   }
 
                   const approvedCorrection = approvedCorrections[key]
+                  // Sel yang sudah dikoreksi menampilkan angka HASIL koreksi sebagai angka utama
+                  // (itu yang dipakai Total/saldo sekarang) — angka yang salah ketik cuma jadi
+                  // catatan kecil di bawahnya, bukan angka utama lagi.
+                  const displayQty = approvedCorrection ? Number(approvedCorrection.proposedValue) : qty
 
                   const cellInner = (
                     <button
@@ -627,12 +635,12 @@ export function StockistGridClient({
                       }
                       className={cn(
                         "w-full h-full px-2 py-2 text-right font-mono text-sm transition-colors",
-                        approvedCorrection ? "bg-destructive/8" : stateBg(state, isLogam),
+                        approvedCorrection ? "bg-success/8" : stateBg(state, isLogam),
                         clickable && "cursor-pointer hover:brightness-95 dark:hover:brightness-110",
                         !clickable && "cursor-default"
                       )}
                     >
-                      <div>{qty === null ? "—" : fmt(qty)}</div>
+                      <div>{displayQty === null ? "—" : fmt(displayQty)}</div>
                       <div className={cn("text-[10px] font-sans font-normal", stateText(state))}>
                         {stateLabel(state)}
                       </div>
@@ -642,8 +650,8 @@ export function StockistGridClient({
                         </div>
                       )}
                       {approvedCorrection && (
-                        <div className="text-[10px] font-sans font-normal text-destructive">
-                          pernah dikoreksi
+                        <div className="text-[10px] font-sans font-normal text-muted-foreground">
+                          sebelumnya {fmt(Number(approvedCorrection.currentValue))}
                         </div>
                       )}
                     </button>

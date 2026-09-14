@@ -19,6 +19,7 @@ import { stockistTotalHeadConfirmationRepository } from "@/backend/repositories/
 import { kasHeadConfirmationRepository } from "@/backend/repositories/kas-head-confirmation.repository";
 import { bankHeadConfirmationRepository } from "@/backend/repositories/bank-head-confirmation.repository";
 import { companyHeadConfirmationTotalRepository } from "@/backend/repositories/company-head-confirmation-total.repository";
+import { correctionRequestRepository } from "@/backend/repositories/correction-request.repository";
 import { isKlopMatch } from "@/lib/money-match";
 
 // Dates flow through this module as UTC-midnight (parsed from "YYYY-MM-DD" query params), matching
@@ -75,18 +76,21 @@ type BankConfirmationRow = Awaited<
 
 // Total sistem per item = jumlah enteredQuantity teller dalam lintas pocket non-default, untuk
 // tanggal itu — sama seperti totalMap yang dihitung client-side di stockist-grid-client.tsx.
+// Sel yang sudah dikoreksi & disetujui (APPROVED) pakai angka hasil koreksi, bukan angka mentah
+// yang salah ketik — kalau tidak, Selisih terhadap Total CC akan nyangkut selamanya walau
+// koreksinya sudah di-ACC dan saldonya sudah benar.
 function buildStockRows(
   items: StockItem[],
   checks: StockCheck[],
-  confirmations: StockConfirmation[]
+  confirmations: StockConfirmation[],
+  approvedByPocketItem: Map<string, number>
 ) {
   const systemTotals = new Map<string, number>();
   for (const check of checks) {
     if (check.enteredQuantity === null) continue;
-    systemTotals.set(
-      check.companyStockItemId,
-      (systemTotals.get(check.companyStockItemId) ?? 0) + Number(check.enteredQuantity)
-    );
+    const corrected = approvedByPocketItem.get(`${check.pocketId}:${check.companyStockItemId}`);
+    const qty = corrected ?? Number(check.enteredQuantity);
+    systemTotals.set(check.companyStockItemId, (systemTotals.get(check.companyStockItemId) ?? 0) + qty);
   }
 
   const confirmationByItem = new Map(confirmations.map((c) => [c.companyStockItemId, c]));
@@ -127,6 +131,17 @@ function buildStockTotals(
     confirmedIdrValue,
     idrConfirmedAt: totalConfirmation?.confirmedAt ?? null,
   };
+}
+
+async function approvedStockCorrectionMap(companyId: string, date: Date) {
+  const approved = await correctionRequestRepository.findApprovedByCompanyDateTargets(companyId, date, [
+    "STOCKIST",
+  ]);
+  return new Map(
+    approved
+      .filter((c) => c.pocketId && c.companyStockItemId)
+      .map((c) => [`${c.pocketId}:${c.companyStockItemId}`, Number(c.proposedValue)])
+  );
 }
 
 function kasSystemTotal(pockets: KasPocketRow[], entries: KasEntryRow[]) {
@@ -212,6 +227,7 @@ export const stockistHeadConfirmationService = {
       kasEntries,
       bankConfirmation,
       bankSystemTotal,
+      approvedStockCorrections,
     ] = await Promise.all([
       companyStockItemRepository.findByCompany(companyId, true),
       stockistHeadConfirmationRepository.findByCompanyAndDate(companyId, date),
@@ -223,9 +239,10 @@ export const stockistHeadConfirmationService = {
       kasDailyEntryRepository.findByCompanyAndDate(companyId, date),
       bankHeadConfirmationRepository.findByCompanyAndDate(companyId, date),
       dailyBankEntryRepository.sumActiveByCompanyAndDate(companyId, date),
+      approvedStockCorrectionMap(companyId, date),
     ]);
 
-    const rows = buildStockRows(items, checks, stockConfirmations);
+    const rows = buildStockRows(items, checks, stockConfirmations, approvedStockCorrections);
     // Reconcile klop kas & bank jalan di sini juga: halaman cross-check ikut menandai
     // klop begitu dibuka, tanpa menunggu angkanya disimpan ulang.
     const [kas, bank] = await Promise.all([
@@ -243,12 +260,13 @@ export const stockistHeadConfirmationService = {
   },
 
   getStockConfirmationGrid: async (companyId: string, date: Date) => {
-    const [items, confirmations, checks] = await Promise.all([
+    const [items, confirmations, checks, approvedStockCorrections] = await Promise.all([
       companyStockItemRepository.findByCompany(companyId, true),
       stockistHeadConfirmationRepository.findByCompanyAndDate(companyId, date),
       stockistDailyCheckRepository.findByCompanyAndDate(companyId, date),
+      approvedStockCorrectionMap(companyId, date),
     ]);
-    return buildStockRows(items, checks, confirmations);
+    return buildStockRows(items, checks, confirmations, approvedStockCorrections);
   },
 
   /**
