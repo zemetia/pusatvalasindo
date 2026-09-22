@@ -333,3 +333,101 @@
   background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+/* ── Landing publik (Grup Pusat Valas Indo) ──────────────────────────────────
+   Namespace --lp-* supaya token admin tidak berubah. Lihat docs/blueprint/LANDING_PLAN.md */
+:root {
+  --lp-red-50:  oklch(0.977 0.013 23);
+  --lp-red-100: oklch(0.936 0.032 23);
+  --lp-red-200: oklch(0.885 0.062 23);
+  --lp-red-300: oklch(0.808 0.114 23);
+  --lp-red-400: oklch(0.704 0.170 23);
+  --lp-red-500: oklch(0.600 0.200 23);
+  --lp-red-600: oklch(0.540 0.205 23);
+  --lp-red-700: oklch(0.480 0.190 23); /* = --primary #c62828 */
+  --lp-red-800: oklch(0.410 0.160 23);
+  --lp-red-900: oklch(0.330 0.120 23);
+  --lp-red-950: oklch(0.240 0.080 23);
+
+  --lp-ink:        oklch(0.21 0.006 285);
+  --lp-ink-soft:   oklch(0.40 0.010 285);
+  --lp-ink-mute:   oklch(0.552 0.012 285);
+  --lp-line:       oklch(0.923 0.004 285);
+  --lp-paper:      oklch(0.985 0.004 80);
+  --lp-paper-2:    oklch(0.965 0.006 80);
+  --lp-night:      oklch(0.17 0.012 20);
+  --lp-night-line: oklch(0.30 0.014 20);
+  --lp-brass:      oklch(0.78 0.11 85);
+
+  --lp-up:     var(--success);
+  --lp-down:   var(--destructive);
+  --lp-open:   var(--success);
+  --lp-closed: var(--lp-ink-mute);
+
+  --lp-container: 72rem;
+  --lp-gutter: clamp(1rem, 4vw, 2rem);
+  --lp-section-y: clamp(4.5rem, 3rem + 7vw, 9rem);
+
+  --lp-radius-pill: 999px;
+  --lp-radius-lg: 1.25rem;
+  --lp-radius-sm: 0.5rem;
+
+  --lp-text-hero: clamp(2.75rem, 1.2rem + 6vw, 6rem);
+  --lp-text-h2: clamp(2rem, 1.2rem + 3vw, 3.75rem);
+  --lp-text-h3: clamp(1.25rem, 1.05rem + 1vw, 1.75rem);
+  --lp-text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
+  --lp-text-figure: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+
+  --lp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lp-dur-fast: 150ms;
+  --lp-dur-base: 280ms;
+  --lp-dur-slow: 600ms;
+}
+
+@theme inline {
+  --color-lp-red-50: var(--lp-red-50);
+  --color-lp-red-100: var(--lp-red-100);
+  --color-lp-red-200: var(--lp-red-200);
+  --color-lp-red-300: var(--lp-red-300);
+  --color-lp-red-500: var(--lp-red-500);
+  --color-lp-red-600: var(--lp-red-600);
+  --color-lp-red-700: var(--lp-red-700);
+  --color-lp-red-800: var(--lp-red-800);
+  --color-lp-red-900: var(--lp-red-900);
+  --color-lp-red-950: var(--lp-red-950);
+  --color-lp-ink: var(--lp-ink);
+  --color-lp-ink-soft: var(--lp-ink-soft);
+  --color-lp-ink-mute: var(--lp-ink-mute);
+  --color-lp-line: var(--lp-line);
+  --color-lp-paper: var(--lp-paper);
+  --color-lp-paper-2: var(--lp-paper-2);
+  --color-lp-night: var(--lp-night);
+  --color-lp-night-line: var(--lp-night-line);
+  --color-lp-brass: var(--lp-brass);
+  --text-lp-hero: var(--lp-text-hero);
+  --text-lp-h2: var(--lp-text-h2);
+  --text-lp-h3: var(--lp-text-h3);
+  --text-lp-lead: var(--lp-text-lead);
+  --text-lp-figure: var(--lp-text-figure);
+}
+
+@keyframes lp-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes lp-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.lp-marquee { animation: lp-marquee 40s linear infinite; }
+.lp-rise { animation: lp-rise var(--lp-dur-slow) var(--lp-ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  .lp-marquee, .lp-rise { animation: none; }
+}
+
+.lp-red-band {
+  background:
+    url("/noise.svg"),
+    linear-gradient(160deg, var(--lp-red-700), var(--lp-red-900));
+  background-blend-mode: soft-light, normal;
+}

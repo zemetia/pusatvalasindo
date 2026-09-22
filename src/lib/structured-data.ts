@@ -11,6 +11,7 @@
  */
 
 import { siteConfig } from '@/config/site';
+import { branches, entities, type Branch, type Entity } from '@/config/group';
 
 // ─── Type stubs (avoid @types/schema-dts as a dep) ───────────────────────────
 
@@ -20,25 +21,162 @@ interface WithContext<T> {
   [key: string]: unknown;
 }
 
+const LOGO_PATH = '/images/logo/logo-red.png';
+
+/** @id stabil supaya semua schema di semua halaman menunjuk ke entitas yang sama (graf entitas). */
+export const ORG_ID = `${siteConfig.url}/#organization`;
+export const WEBSITE_ID = `${siteConfig.url}/#website`;
+const entityId = (e: Entity) => `${siteConfig.url}/#${e.key}`;
+
 // ─── Schema builders ─────────────────────────────────────────────────────────
 
 /** Organization schema — attach once in the root layout or home page. */
 export function organizationSchema(): WithContext<unknown> {
-  const { company, name, url, ogImage } = siteConfig;
+  const { company, name, url } = siteConfig;
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': ORG_ID,
     name: company.legalName,
-    alternateName: name,
+    alternateName: [name, 'PVI'],
     url,
     logo: {
       '@type': 'ImageObject',
-      url: `${url}${ogImage}`,
+      url: `${url}${LOGO_PATH}`,
     },
     foundingDate: String(company.foundedYear),
-    email: company.contactEmail,
+    ...(company.contactEmail ? { email: company.contactEmail } : {}),
+    subOrganization: Object.values(entities)
+      .filter((e) => e.publishable)
+      .map((e) => ({
+        '@type': 'Organization',
+        '@id': entityId(e),
+        name: e.legalName,
+        ...(e.hasPage ? { url: `${url}/${e.slug}` } : {}),
+        ...(e.license
+          ? { identifier: { '@type': 'PropertyValue', name: e.license.issuer, value: e.license.number } }
+          : {}),
+      })),
+    location: allBranchRefs(),
+    areaServed: ['Cengkareng', 'Jakarta Barat', 'Tangerang', 'Kota Tangerang', 'Green Lake City'],
+    knowsAbout: ['Money changer', 'Penukaran valuta asing', 'Pengiriman uang ke luar negeri'],
     description: siteConfig.description,
     sameAs: Object.values(company.socialLinks).filter(Boolean),
+  };
+}
+
+const dayUrl = (d: string) => `https://schema.org/${d}`;
+
+const branchId = (b: Branch) => `${siteConfig.url}/lokasi/${b.slug}#branch`;
+function allBranchRefs() {
+  return branches
+    .filter((b) => entities[b.entity].publishable)
+    .map((b) => ({ '@id': branchId(b) }));
+}
+
+/** WebSite — menghubungkan semua halaman ke satu situs dan satu penerbit (Organization). */
+export function websiteSchema(): WithContext<unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': WEBSITE_ID,
+    url: siteConfig.url,
+    name: siteConfig.name,
+    inLanguage: 'id-ID',
+    publisher: { '@id': ORG_ID },
+  };
+}
+
+/**
+ * LocalBusiness per cabang — NAP harus identik dengan Google Business Profile.
+ * `CurrencyExchange` bukan tipe schema.org (Google mengabaikannya); FinancialService adalah
+ * subtipe LocalBusiness yang valid.
+ */
+export function branchSchema(branch: Branch, entity: Entity): WithContext<unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FinancialService',
+    '@id': branchId(branch),
+    name: branch.name,
+    description: `Money changer (jual beli valuta asing) ${entity.legalName} di ${branch.district}, ${branch.city}.`,
+    image: `${siteConfig.url}${LOGO_PATH}`,
+    areaServed: [branch.city, branch.district],
+    // Satu kantor untuk dua PT (PVI + PTU); pemegang izin yang tercatat adalah `entity`.
+    parentOrganization: [
+      { '@id': ORG_ID },
+      ...[entity, ...branch.coOperators.map((k) => entities[k])].map((e) => ({
+        '@type': 'Organization',
+        '@id': entityId(e),
+        name: e.legalName,
+      })),
+    ],
+    // Profil Google Business/Maps cabang: mengikat entitas web ke listing GBP (cocokkan NAP).
+    sameAs: [branch.mapsUrl],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      url: `https://wa.me/${branch.whatsapp}`,
+      availableLanguage: ['id', 'en'],
+    },
+    currenciesAccepted: 'IDR',
+    alternateName: branch.alternateNames,
+    geo: { '@type': 'GeoCoordinates', latitude: branch.geo.lat, longitude: branch.geo.lng },
+    hasMap: branch.mapsUrl,
+    url: `${siteConfig.url}/lokasi/${branch.slug}`,
+    ...(branch.telephone ? { telephone: branch.telephone } : {}),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: branch.street,
+      addressLocality: branch.city,
+      addressRegion: branch.region,
+      postalCode: branch.postalCode,
+      addressCountry: branch.country,
+    },
+    openingHoursSpecification: branch.hours.map((h) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: h.days.map(dayUrl),
+      opens: h.opens,
+      closes: h.closes,
+    })),
+    ...(entity.license
+      ? { identifier: { '@type': 'PropertyValue', name: entity.license.issuer, value: entity.license.number } }
+      : {}),
+  };
+}
+
+/** Semua cabang yang entitasnya boleh tayang. */
+export function allBranchSchemas(): WithContext<unknown>[] {
+  return branches
+    .filter((b) => entities[b.entity].publishable)
+    .map((b) => branchSchema(b, entities[b.entity]));
+}
+
+export interface ServiceSchemaOptions {
+  name: string;
+  description: string;
+  url: string;
+  serviceType: string;
+  /** Kunci entitas penyedia layanan */
+  provider: Entity;
+  areaServed?: string[];
+}
+
+/** Service schema — halaman layanan (tukar valas, kirim uang). Biaya sengaja tidak dimodelkan sebagai `price`. */
+export function serviceSchema(opts: ServiceSchemaOptions): WithContext<unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    serviceType: opts.serviceType,
+    provider: {
+      '@type': 'Organization',
+      '@id': entityId(opts.provider),
+      name: opts.provider.legalName,
+      url: `${siteConfig.url}/${opts.provider.slug}`,
+    },
+    ...(opts.areaServed ? { areaServed: opts.areaServed } : {}),
   };
 }
 
@@ -59,10 +197,12 @@ export function webPageSchema(opts: WebPageSchemaOptions): WithContext<unknown> 
     name: opts.name,
     description: opts.description,
     url: opts.url,
-    isPartOf: { '@type': 'WebSite', url: siteConfig.url, name: siteConfig.name },
+    '@id': `${opts.url}#webpage`,
+    isPartOf: { '@id': WEBSITE_ID },
+    about: { '@id': ORG_ID },
     ...(opts.datePublished ? { datePublished: opts.datePublished } : {}),
     ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
-    inLanguage: 'en',
+    inLanguage: 'id-ID',
   };
 }
 

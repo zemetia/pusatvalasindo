@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Inter, Outfit } from "next/font/google";
 import { Analytics } from "@/components/Analytics";
@@ -20,9 +20,22 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+/**
+ * Default aman: semua yang TIDAK menetapkan metadata sendiri (dashboard, login, /old, harness
+ * internal) tidak diindeks. Halaman publik memakai buildMetadata() (src/lib/seo.ts), yang
+ * menimpa `robots` menjadi index/follow.
+ */
 export const metadata: Metadata = {
-  title: "Home - Authorized Money Changer in Jakarta | Pusat Valas Indo",
-  description: "Authorized Money Changer in Jakarta. Dapatkan layanan penukaran valuta asing dan pengiriman uang ke luar negeri dengan kurs kompetitif dan transaksi aman di Jakarta. Bersertifikat Bank Indonesia (Izin 20/28/KEP.GBI/DKSP/2018).",
+  title: "Pusat Valas Indo",
+  robots: { index: false, follow: false },
+  applicationName: "Pusat Valas Indo",
+  ...(process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]
+    ? { verification: { google: process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"] } }
+    : {}),
+};
+
+export const viewport: Viewport = {
+  themeColor: "#c62828",
 };
 
 export default async function RootLayout({

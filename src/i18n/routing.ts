@@ -6,7 +6,14 @@ export const routing = defineRouting({
   locales: ['en', 'id'],
 
   // Used when no locale matches
-  defaultLocale: 'en'
+  defaultLocale: 'id',
+
+  // Indonesia tanpa prefix (/), Inggris di /en
+  localePrefix: 'as-needed',
+
+  // "/" selalu Indonesia; jangan dialihkan ke /en berdasarkan Accept-Language
+  // (crawler & pengunjung harus melihat satu URL kanonis per bahasa)
+  localeDetection: false
 });
 
 // Lightweight wrappers around Next.js' navigation APIs

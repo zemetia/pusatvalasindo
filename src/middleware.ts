@@ -11,7 +11,15 @@ const intlMiddleware = createMiddleware(routing);
 
 function extractLocale(pathname: string): string {
   const match = pathname.match(/^\/(en|id)(\/|$)/);
-  return match ? match[1] : "en";
+  return match ? match[1] : routing.defaultLocale;
+}
+
+/** Area privat: jangan pernah masuk indeks (sabuk pengaman selain meta robots & robots.txt). */
+const PRIVATE_PATH = /^(?:\/(?:en|id))?\/(?:dashboard|login|signup|logout|old|metrics-preview)(?:\/|$)/;
+
+function noIndex(response: NextResponse): NextResponse {
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
 }
 
 export async function middleware(request: NextRequest) {
@@ -70,7 +78,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = targetPathname;
       return applySecurityHeaders(NextResponse.rewrite(url));
     }
-    return applySecurityHeaders(NextResponse.next());
+    return noIndex(applySecurityHeaders(NextResponse.next()));
   }
 
   // 2. Handle Auth Redirects (locale-aware)
@@ -90,13 +98,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. Handle i18n + security headers
-  return applySecurityHeaders(intlMiddleware(request));
+  const response = applySecurityHeaders(intlMiddleware(request));
+  return PRIVATE_PATH.test(pathname) ? noIndex(response) : response;
 }
 
 export const config = {
   runtime: "nodejs",
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|opengraph-image|robots\\.txt|sitemap\\.xml|llms\\.txt|llms-full\\.txt|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
     "/api/:path*",
     "/en/api/:path*",
     "/id/api/:path*",

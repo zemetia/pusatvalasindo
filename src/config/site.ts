@@ -1,7 +1,8 @@
 /**
  * Central "company brain" — single source of truth for all SEO, GEO, and LLMs.txt.
- * Edit this file first whenever you add a page or change brand/product details.
- * Every field here propagates to: metadata, sitemap, robots.txt, structured data, llms.txt.
+ * Fakta grup ada di ./group.ts; file ini membungkusnya untuk metadata, sitemap,
+ * structured data, dan llms.txt. Daftarkan halaman baru di `pages` HANYA setelah
+ * halamannya ada (sitemap tidak boleh memuat 404).
  */
 
 import type { MetadataRoute } from 'next';
@@ -11,16 +12,15 @@ export type SitemapChangeFreq = NonNullable<
 >;
 
 export interface PageConfig {
-  /** URL path relative to root, e.g. '/about' */
+  /** URL path relative to root, e.g. '/pusat-kirim-duit' */
   path: string;
-  /** <title> for this page */
   title: string;
-  /** Meta description — be specific: include what the visitor gains */
+  /** Meta description — konkret, sebut apa yang didapat pengunjung */
   description: string;
-  /** Sitemap change frequency hint */
   changeFreq: SitemapChangeFreq;
-  /** Sitemap priority 0.0–1.0 */
   priority: number;
+  /** Tanggal terakhir KONTEN halaman berubah (YYYY-MM-DD). Perbarui hanya saat isinya berubah. */
+  lastModified: string;
 }
 
 export interface SiteConfig {
@@ -37,10 +37,10 @@ export interface SiteConfig {
     problemSolved: string;
     solution: string;
     keyBenefits: string[];
-    contactEmail: string;
+    contactEmail?: string;
     socialLinks: {
-      twitter?: string;
-      github?: string;
+      instagram?: string;
+      facebook?: string;
       linkedin?: string;
     };
   };
@@ -50,72 +50,108 @@ export interface SiteConfig {
     twitterHandle?: string;
     locale: string;
   };
-  /** Registry of all public pages — drives sitemap + LLMs.txt page index */
+  /** Locale yang kontennya sudah diterjemahkan → masuk sitemap & hreflang. Lainnya noindex. */
+  contentLocales: string[];
   pages: Record<string, PageConfig>;
 }
 
 export const siteConfig: SiteConfig = {
-  // ─── Core Identity ───────────────────────────────────────────────────────────
-  name: 'My Product',
-  tagline: 'One sentence that nails the value proposition.',
+  name: 'Pusat Valas Indo',
+  tagline: 'Money changer berizin Bank Indonesia di Jakarta Barat dan Tangerang.',
   description:
-    'Two-sentence pitch: what the product does, who it is for, and what makes it different from alternatives.',
-  url: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://example.com',
+    'Grup Pusat Valas Indo terdiri dari PT Pusat Valas Indo (money changer berizin Bank Indonesia sejak 2018), PT Pusat Tukar Uang (money changer, satu kantor dengan PVI), dan PT Pusat Kirim Duit (pengiriman uang ke luar negeri untuk pengusaha). Tanya kurs dan transaksi via WhatsApp atau datang langsung ke kantor.',
+  url: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://pusatvalasindo.com',
 
-  // ─── Brand Assets ────────────────────────────────────────────────────────────
-  ogImage: '/og.png',
+  ogImage: '/opengraph-image',
 
-  // ─── Company Details (drives Organization schema + LLMs.txt) ─────────────────
   company: {
-    legalName: 'My Company, Inc.',
-    foundedYear: 2024,
-    industry: 'Software / SaaS',
+    legalName: 'PT Pusat Valas Indo',
+    foundedYear: 2018,
+    industry: 'Money changer / penukaran valuta asing',
     targetAudience:
-      'Developers and product teams building modern web applications who need …',
+      'Individu dan pelaku usaha di Jakarta Barat, Tangerang, dan sekitarnya yang menukar valuta asing, serta pengusaha Indonesia yang mengirim uang ke luar negeri.',
     problemSolved:
-      'Most teams waste weeks bootstrapping the same infrastructure decisions — auth, state, i18n, design system — before they can ship any real product value.',
+      'Menukar valuta asing dan mengirim uang ke luar negeri membutuhkan kurs yang jelas, izin yang bisa diperiksa, dan proses yang transparan.',
     solution:
-      'My Product is a production-ready Next.js template with every architectural decision pre-made, documented, and tested, so teams can ship features from day one.',
+      'PT Pusat Valas Indo melayani jual beli valuta asing secara online (WhatsApp/transfer bank) dan langsung di kantor. PT Pusat Kirim Duit melayani pengiriman uang ke 10 negara untuk pengusaha.',
     keyBenefits: [
-      'Zero config — works out of the box with TypeScript, Tailwind v4, and next-intl',
-      'Opinionated patterns that scale — CVA components, Zustand stores, Zod validation',
-      'AI-agent friendly — every pattern is documented in machine-readable blueprint docs',
+      'Berizin Bank Indonesia No. 20/28/KEP.GBI/DKSP/2018 (PT Pusat Valas Indo)',
+      'Transaksi online via WhatsApp atau datang langsung ke kantor',
+      'Kirim uang ke 10 negara/mata uang dengan biaya tertulis jelas (PT Pusat Kirim Duit)',
     ],
-    contactEmail: 'contact@example.com',
-    socialLinks: {
-      twitter: 'https://twitter.com/handle',
-      github: 'https://github.com/org/repo',
-      linkedin: 'https://linkedin.com/company/my-company',
-    },
+    socialLinks: {},
   },
 
-  // ─── SEO Settings ────────────────────────────────────────────────────────────
+  contentLocales: ['id'],
+
   seo: {
-    titleTemplate: '%s | My Product',
-    defaultTitle: 'My Product — One sentence value prop',
-    twitterHandle: '@handle',
-    locale: 'en_US',
+    titleTemplate: '%s | Pusat Valas Indo',
+    defaultTitle: 'Pusat Valas Indo — Money Changer Berizin BI, Jakarta Barat & Tangerang',
+    locale: 'id_ID',
   },
 
-  // ─── Pages Registry ──────────────────────────────────────────────────────────
-  // Add a new entry here every time you create a new public page.
-  // Path is locale-stripped (the sitemap helper adds locale prefixes).
+  // Satu halaman kuat per topik dengan satu query utama masing-masing (tidak saling bersaing):
+  //   /                     → nama brand + "money changer Jakarta Barat / Tangerang"
+  //   /pusat-valas-indo     → "jual beli valas", "tukar dolar/ringgit/yen"
+  //   /pusat-kirim-duit     → "kirim uang ke luar negeri untuk pengusaha"
+  //   /lokasi/cengkareng    → "money changer Cengkareng / Taman Palem"
+  //   /lokasi/tangerang     → "money changer Green Lake City / Cipondoh"
+  //   /money-changer-terbaik → "money changer terbaik Cengkareng / Jakarta Barat / Jakarta" (panduan memilih)
+  // PTU (Pluit) bagian dari brand PVI: /lokasi/pluit ditambahkan saat datanya lengkap.
   pages: {
     home: {
       path: '/',
-      title: 'My Product — One sentence value prop',
+      title: 'Pusat Valas Indo — Money Changer Berizin BI, Jakarta Barat & Tangerang',
       description:
-        'My Product is a production-ready Next.js 16 template. Ship features from day one with TypeScript, Tailwind v4, next-intl, Zustand, and full SEO / GEO / LLMs.txt support.',
+        'Money changer berizin Bank Indonesia sejak 2018 di Cengkareng dan Tangerang. Tanya kurs via WhatsApp, plus layanan kirim uang ke luar negeri untuk pengusaha.',
       changeFreq: 'weekly',
       priority: 1.0,
+      lastModified: '2026-09-22',
     },
-    about: {
-      path: '/about',
-      title: 'About My Product',
+    'pusat-valas-indo': {
+      path: '/pusat-valas-indo',
+      title: 'Jual Beli Valas Berizin BI | Pusat Valas Indo',
       description:
-        'Learn the story, team, and mission behind My Product — the opinionated Next.js template built for teams who want to skip the boilerplate and focus on shipping.',
+        'Tukar dolar, dolar Singapura, euro, yen, dan valas lain di money changer berizin Bank Indonesia. Transaksi via WhatsApp atau langsung di Cengkareng dan Tangerang.',
+      changeFreq: 'monthly',
+      priority: 0.9,
+      lastModified: '2026-09-22',
+    },
+    'pusat-kirim-duit': {
+      path: '/pusat-kirim-duit',
+      title: 'Kirim Uang ke Luar Negeri | Pusat Kirim Duit',
+      description:
+        'Kirim uang ke 10 negara untuk pengusaha: minimum USD 1.000, estimasi 2–4 hari kerja, biaya tertulis jelas. Transaksi online via WhatsApp tanpa ke kantor.',
+      changeFreq: 'monthly',
+      priority: 0.9,
+      lastModified: '2026-09-22',
+    },
+    'lokasi-cengkareng': {
+      path: '/lokasi/cengkareng',
+      title: 'Money Changer Cengkareng, Jakarta Barat | Pusat Valas Indo',
+      description:
+        'Money changer berizin BI di Cengkareng, Jakarta Barat: Ruko Mutiara Taman Palem A5-27. Alamat, jam buka, cara menuju lokasi, dan WhatsApp untuk tanya kurs.',
       changeFreq: 'monthly',
       priority: 0.8,
+      lastModified: '2026-09-22',
+    },
+    'lokasi-tangerang': {
+      path: '/lokasi/tangerang',
+      title: 'Money Changer Tangerang & Green Lake City | Pusat Valas Indo',
+      description:
+        'Money changer berizin BI di Tangerang: Rukan Wallstreet, Green Lake City (Greenlake), Cipondoh. Alamat, jam buka, dan WhatsApp untuk tanya kurs.',
+      changeFreq: 'monthly',
+      priority: 0.8,
+      lastModified: '2026-09-22',
+    },
+    'money-changer-terbaik': {
+      path: '/money-changer-terbaik',
+      title: 'Money Changer Terbaik Cengkareng, Jakarta Barat & Tangerang',
+      description:
+        'Cara memilih money changer terbaik di Cengkareng, Jakarta Barat, dan Tangerang: cek izin BI, kurs, dokumen, jam buka. Termasuk profil Pusat Valas Indo.',
+      changeFreq: 'monthly',
+      priority: 0.8,
+      lastModified: '2026-09-22',
     },
   },
 };

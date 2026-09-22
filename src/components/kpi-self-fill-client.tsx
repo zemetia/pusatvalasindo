@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { Combobox } from "@/components/ui/combobox";
 import {
   Table,
@@ -455,18 +456,21 @@ export function KpiSelfFillClient({
                       {/* Entri yang sudah disetujui hanya bisa dibatalkan atasan —
                           supaya karyawan tidak menghapus penilaian atas dirinya. */}
                       {e.source === "SELF" && e.status !== "APPROVED" && !isLocked && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="text-destructive hover:text-destructive"
-                          disabled={deletingId === e.id}
-                          onClick={() => {
-                            if (!confirm("Hapus catatan ini?")) return;
-                            deleteMutation.mutate(e.id);
-                          }}
-                        >
-                          <IconTrash className="size-4" />
-                        </Button>
+                        <DeleteConfirmDialog
+                          title="Hapus catatan ini?"
+                          loading={deletingId === e.id}
+                          onConfirm={() => deleteMutation.mutate(e.id)}
+                          trigger={
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              disabled={deletingId === e.id}
+                            >
+                              <IconTrash className="size-4" />
+                            </Button>
+                          }
+                        />
                       )}
                     </TableCell>
                   </TableRow>

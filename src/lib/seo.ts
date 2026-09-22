@@ -28,7 +28,7 @@ function buildAlternates(
   path: string,
 ): Record<string, string> {
   const alts: Record<string, string> = {};
-  for (const locale of routing.locales) {
+  for (const locale of siteConfig.contentLocales) {
     const prefix =
       locale === routing.defaultLocale ? '' : `/${locale}`;
     alts[locale] = `${siteConfig.url}${prefix}${path === '/' ? '' : path}`;

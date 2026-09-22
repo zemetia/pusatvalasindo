@@ -6,6 +6,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import {
   Table,
   TableBody,
@@ -81,9 +82,6 @@ export function BankAccountsPageClient({
   }, [accounts, search, activeCompanyId]);
 
   const handleDelete = async (a: BankAccount) => {
-    if (!confirm(`Hapus rekening ${a.bankName} - ${a.accountName}? Rekening yang sudah dihapus tidak akan tampil lagi.`)) {
-      return;
-    }
     setDeletingId(a.id);
     try {
       const res = await fetch(`/api/bank-accounts/${a.id}`, { method: "DELETE" });
@@ -212,15 +210,22 @@ export function BankAccountsPageClient({
                               </Button>
                             }
                           />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Hapus"
-                            disabled={deletingId === a.id}
-                            onClick={() => handleDelete(a)}
-                          >
-                            <IconTrash className="text-destructive size-4" />
-                          </Button>
+                          <DeleteConfirmDialog
+                            title={`Hapus rekening ${a.bankName} - ${a.accountName}?`}
+                            description="Rekening yang sudah dihapus tidak akan tampil lagi."
+                            loading={deletingId === a.id}
+                            onConfirm={() => handleDelete(a)}
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title="Hapus"
+                                disabled={deletingId === a.id}
+                              >
+                                <IconTrash className="text-destructive size-4" />
+                              </Button>
+                            }
+                          />
                         </div>
                       </TableCell>
                     </TableRow>

@@ -8,7 +8,13 @@ import { getCallerRecord } from "@/backend/helpers/get-admin-caller";
 import { allows } from "@/lib/authz/resolve";
 import prisma from "@/lib/prisma";
 
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: { default: "Dashboard", template: "%s | Dashboard Pusat Valas Indo" },
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function layout({
   children,

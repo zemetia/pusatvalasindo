@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { NumberInput } from "@/components/ui/number-input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -485,11 +486,6 @@ export function HeldFundPageClient({
   }
 
   const removeRow = async (row: Row) => {
-    const confirmed = window.confirm(
-      `Hapus catatan "${row.savedName}"? Untuk hutang yang sudah dibayar, pakai tombol Lunas agar jejaknya tetap ada.`
-    )
-    if (!confirmed) return
-
     patchRow(row.id, { saveState: "saving" })
     try {
       const res = await fetch(`/api/dana-tertahan/${row.id}`, { method: "DELETE" })
@@ -1032,16 +1028,23 @@ function HeldFundRow({
             {settled ? "Batalkan" : "Lunas"}
           </Button>
           {canEditContent && (
-            <Button
-              size="icon"
-              variant="outline"
-              className="text-destructive hover:text-destructive"
-              disabled={busy}
-              onClick={() => onDelete(row)}
-              aria-label="Hapus catatan"
-            >
-              <IconTrash className="size-4" />
-            </Button>
+            <DeleteConfirmDialog
+              title={`Hapus catatan "${row.savedName}"?`}
+              description="Untuk hutang yang sudah dibayar, pakai tombol Lunas agar jejaknya tetap ada."
+              loading={busy}
+              onConfirm={() => onDelete(row)}
+              trigger={
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="text-destructive hover:text-destructive"
+                  disabled={busy}
+                  aria-label="Hapus catatan"
+                >
+                  <IconTrash className="size-4" />
+                </Button>
+              }
+            />
           )}
         </div>
       </TableCell>

@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog"
 import {
   Sheet,
   SheetContent,
@@ -83,10 +84,7 @@ export function StockistPocketSheet({ kind, companyId, pockets, onChanged }: Pro
     }
   }
 
-  const remove = async (id: string, name: string) => {
-    if (!window.confirm(`Hapus pocket "${name}"? Tindakan ini tidak bisa dibatalkan dari sini.`)) {
-      return
-    }
+  const remove = async (id: string) => {
     setBusyId(id)
     try {
       const res = await fetch(updateUrl(id), { method: "DELETE" })
@@ -198,15 +196,22 @@ export function StockistPocketSheet({ kind, companyId, pockets, onChanged }: Pro
                     "Aktifkan"
                   )}
                 </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="shrink-0 text-destructive hover:text-destructive"
-                  disabled={busyId === p.id}
-                  onClick={() => remove(p.id, p.name)}
-                >
-                  <IconTrash className="size-4" />
-                </Button>
+                <DeleteConfirmDialog
+                  title={`Hapus pocket "${p.name}"?`}
+                  description="Tindakan ini tidak bisa dibatalkan dari sini."
+                  loading={busyId === p.id}
+                  onConfirm={() => remove(p.id)}
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="shrink-0 text-destructive hover:text-destructive"
+                      disabled={busyId === p.id}
+                    >
+                      <IconTrash className="size-4" />
+                    </Button>
+                  }
+                />
               </div>
             ))}
           </div>

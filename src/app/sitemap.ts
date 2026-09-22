@@ -3,29 +3,28 @@ import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { siteConfig } from '@/config/site';
 
+const urlFor = (locale: string, path: string) => {
+  const prefix = locale === routing.defaultLocale ? '' : `/${locale}`;
+  return `${siteConfig.url}${prefix}${path === '/' ? '' : path}`;
+};
+
 /**
- * Auto-generated sitemap — driven by siteConfig.pages.
- * Add entries in src/config/site.ts, not here.
- * Produces one URL per page × locale (with 'as-needed' prefix logic).
+ * Sitemap dari siteConfig.pages — satu entri per halaman × locale, masing-masing
+ * dengan alternates hreflang. `lastModified` diambil dari tanggal edit konten nyata di
+ * `siteConfig.pages[*].lastModified` — jangan pakai new Date() (sinyal palsu tiap request).
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const entries: MetadataRoute.Sitemap = [];
-
-  for (const page of Object.values(siteConfig.pages)) {
-    for (const locale of routing.locales) {
-      const prefix =
-        locale === routing.defaultLocale ? '' : `/${locale}`;
-      const pathSegment = page.path === '/' ? '' : page.path;
-      const url = `${siteConfig.url}${prefix}${pathSegment}`;
-
-      entries.push({
-        url,
-        lastModified: new Date(),
-        changeFrequency: page.changeFreq,
-        priority: page.priority,
-      });
-    }
-  }
-
-  return entries;
+  return Object.values(siteConfig.pages).flatMap((page) => {
+    const languages = {
+      ...Object.fromEntries(siteConfig.contentLocales.map((l) => [l, urlFor(l, page.path)])),
+      'x-default': urlFor(routing.defaultLocale, page.path),
+    };
+    return siteConfig.contentLocales.map((locale) => ({
+      url: urlFor(locale, page.path),
+      lastModified: page.lastModified,
+      changeFrequency: page.changeFreq,
+      priority: page.priority,
+      alternates: { languages },
+    }));
+  });
 }
