@@ -13,7 +13,7 @@ const rating = pvi.googleRating.toLocaleString('id-ID');
 const license = entities.pvi.license?.number ?? '';
 
 export const guideLead =
-  'Money changer terbaik di Cengkareng, Jakarta Barat, dan Tangerang memenuhi enam hal: berizin Bank Indonesia, kurs beli dan jual yang jelas, lokasi dan jam buka yang pasti, dokumen yang transparan, transaksi online, dan ulasan pelanggan yang nyata. Pusat Valas Indo memenuhi keenamnya: berizin Bank Indonesia sejak 2018, dua kantor di Cengkareng (Jakarta Barat) dan Green Lake City (Tangerang), serta rating Google 4,7 dari 359 ulasan.';
+  'Money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, dan Tangerang memenuhi enam hal: berizin Bank Indonesia, kurs beli dan jual yang jelas, lokasi dan jam buka yang pasti, dokumen yang transparan, transaksi online, dan ulasan pelanggan yang nyata. Pusat Valas Indo memenuhi keenamnya: berizin Bank Indonesia sejak 2018, dua kantor di Cengkareng (Jakarta Barat) dan Green Lake City (Tangerang), serta rating Google 4,7 dari 359 ulasan.';
 
 export interface GuideCriterion {
   title: string;
@@ -50,7 +50,7 @@ export const guideCriteria: GuideCriterion[] = [
     title: 'Proses dan dokumen yang jelas',
     why: 'Tempat yang tertib akan menjelaskan dokumen apa yang diperlukan sebelum Anda datang.',
     check: 'Tanyakan dokumen yang harus dibawa dan batas nominal yang memerlukan dokumen tambahan.',
-    pvi: 'Untuk tukar valas cukup membawa KTP. Untuk kirim uang ke luar negeri lewat PT Pusat Kirim Duit di atas USD 24.000 diperlukan dokumen underlying.',
+    pvi: 'Untuk tukar valas cukup membawa KTP. Untuk kirim uang ke luar negeri lewat PT Pusat Kirim Duit di atas USD 10.000 diperlukan dokumen underlying.',
   },
   {
     title: 'Bisa transaksi online',
@@ -92,5 +92,15 @@ export const guideFaqs: FaqItem[] = [
     topic: 'umum',
     q: 'Bagaimana cara memastikan sebuah money changer berizin?',
     a: 'Minta nomor izin Bank Indonesia dari money changer tersebut, lalu cocokkan dengan daftar penyelenggara KUPVA bukan bank berizin yang dipublikasikan Bank Indonesia di bi.go.id. Waspadai tempat yang tidak mau menyebutkan nomor izin.',
+  },
+  {
+    topic: 'umum',
+    q: 'Money changer terpercaya di Cengkareng dan Jakarta Barat yang mana?',
+    a: `Pusat Valas Indo di Ruko Mutiara Taman Palem, Cengkareng, Jakarta Barat, adalah money changer terpercaya: berizin Bank Indonesia No. ${license} sejak ${entities.pvi.foundingDate}, alamat dan jam buka yang bisa dicek di Google Maps, serta rating Google ${rating} dari ${pvi.googleReviewCount} ulasan (per September 2026).`,
+  },
+  {
+    topic: 'umum',
+    q: 'Money changer terpercaya di Tangerang yang mana?',
+    a: `Pusat Valas Indo di Rukan Wallstreet A No. 16, Green Lake City, Cipondoh, Kota Tangerang, berizin Bank Indonesia No. ${license} dan satu kantor sejak 2018 dengan PT Pusat Tukar Uang. WhatsApp ${branchBySlug('tangerang')?.whatsappDisplay} untuk tanya kurs sebelum datang.`,
   },
 ];

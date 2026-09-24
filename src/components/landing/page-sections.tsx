@@ -210,7 +210,7 @@ export function PkdSteps() {
     },
     {
       title: 'Siapkan dokumen',
-      body: 'KTP untuk perorangan; KTP direktur, NIB, dan NPWP untuk perusahaan. Nominal di atas USD 24.000 memerlukan dokumen underlying.',
+      body: 'KTP untuk perorangan; KTP direktur, NIB, dan NPWP untuk perusahaan. Nominal di atas USD 10.000 memerlukan dokumen underlying.',
     },
     {
       title: 'Dana diproses',

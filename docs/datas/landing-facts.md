@@ -66,7 +66,7 @@ Catatan alamat: situs lama menulis Tangerang sebagai "DKI Jakarta 15147" — itu
 | Promo / rate khusus | Ada untuk pengiriman rutin/besar; detail ❌ | ⚠️ |
 | Cara penerima mengambil | Tarik di bank/ATM setempat | ✅ |
 | Transaksi online | Bisa, tanpa datang ke kantor (WhatsApp) | ✅ |
-| Dokumen pribadi | KTP; dokumen underlying jika nominal di atas USD 24.000 | ✅ |
+| Dokumen pribadi | KTP; dokumen underlying jika nominal di atas USD 10.000 | ✅ |
 | Dokumen perusahaan | KTP direktur, NIB, NPWP perusahaan, underlying | ✅ |
 | Alamat | Green Lake City, Rukan Wall Street Blok A No. 16, Cipondoh, Kota Tangerang, Banten 15147 | ✅ (sama dengan cabang Tangerang PVI — kemungkinan satu ruko, ⚠️ konfirmasi) |
 | WhatsApp | 0877-7169-0203 → `6287771690203` | ✅ |

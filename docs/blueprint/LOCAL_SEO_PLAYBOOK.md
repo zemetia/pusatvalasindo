@@ -1,6 +1,6 @@
 # Local SEO Playbook: web + Google Business Profile
 
-Tujuan: situs ini menopang Google Business Profile (GBP) kedua cabang untuk query **money changer Cengkareng**, **money changer Green Lake City/Greenlake**, **money changer Tangerang**, dan varian **terbaik** (Cengkareng, Jakarta Barat, Jakarta).
+Tujuan: situs ini menopang Google Business Profile (GBP) kedua cabang untuk query **money changer Cengkareng**, **money changer Green Lake City/Greenlake**, **money changer Tangerang**, **money changer Jakarta**, dan varian kepercayaan **terbaik** / **terpercaya** (Cengkareng, Jakarta Barat, Jakarta, Tangerang).
 
 Bagian 1 sudah ada di kode. Bagian 2–5 dikerjakan di luar repo (GBP, direktori, PR); tidak bisa dilakukan dari kode.
 
@@ -8,13 +8,13 @@ Bagian 1 sudah ada di kode. Bagian 2–5 dikerjakan di luar repo (GBP, direktori
 
 | Query | Halaman | Hal yang sudah dipasang |
 |---|---|---|
-| money changer cengkareng, jakarta barat, taman palem | `/lokasi/cengkareng` | title, H1, lead, `FinancialService` + NAP + geo + FAQ alamat/jam |
-| money changer tangerang, green lake city, greenlake, cipondoh | `/lokasi/tangerang` | idem; ejaan "Greenlake" di lead, deskripsi, `alternateName` |
-| money changer terbaik cengkareng / jakarta barat / jakarta | `/money-changer-terbaik` | panduan enam kriteria + FAQ per query, `Article` + `FAQPage` |
+| money changer cengkareng, jakarta barat, taman palem, **money changer terpercaya cengkareng** | `/lokasi/cengkareng` | title, H1 "terpercaya", lead, `FinancialService` + NAP + geo + FAQ alamat/jam/terpercaya |
+| money changer tangerang, green lake city, greenlake, cipondoh, **money changer terpercaya tangerang** | `/lokasi/tangerang` | idem; ejaan "Greenlake" di lead, deskripsi, `alternateName`, FAQ terpercaya |
+| money changer terbaik / **terpercaya** cengkareng / jakarta barat / jakarta / tangerang | `/money-changer-terbaik` | panduan enam kriteria + FAQ per query (termasuk FAQ "terpercaya" per kota), `Article` + `FAQPage` |
 | jual beli valas, tukar dolar/ringgit/yen | `/pusat-valas-indo` | daftar mata uang, `Service` |
 | kirim uang ke luar negeri pengusaha | `/pusat-kirim-duit` | biaya, dokumen, `Service` |
 
-Strategi "terbaik": halaman panduan mendefinisikan kriteria "money changer terbaik" lalu membuktikan PVI memenuhinya dengan fakta yang bisa diperiksa (izin BI No. 20/28/KEP.GBI/DKSP/2018, sejak 2018, 4,7 dari 359 ulasan Google). Klaim bertumpu pada bukti, sehingga bisa dikutip mesin AI dan tidak mudah dianggap spam.
+Strategi "terbaik"/"terpercaya": halaman panduan mendefinisikan kriteria "money changer terbaik" lalu membuktikan PVI memenuhinya dengan fakta yang bisa diperiksa (izin BI No. 20/28/KEP.GBI/DKSP/2018, sejak 2018, 4,7 dari 359 ulasan Google). "Terpercaya" dipakai sebagai sinonim yang sama-sama dicari orang (bukan halaman terpisah — menghindari thin/duplicate content); disisipkan di title/description/H1/FAQ halaman panduan dan halaman cabang, serta `areaServed` Organization schema (termasuk "Jakarta" polos, bukan hanya "Jakarta Barat"). Klaim bertumpu pada bukti, sehingga bisa dikutip mesin AI dan tidak mudah dianggap spam.
 
 ## 2. Jaring tautan internal (sudah dipasang)
 
@@ -55,7 +55,7 @@ Prioritas dari yang paling berpengaruh dan paling murah:
 1. **Sitasi direktori dengan NAP identik**: Bing Places, Apple Business Connect, Yelp/Foursquare, Waze, Facebook Page, Instagram bio, LinkedIn company page, Yellow Pages Indonesia. Website di tiap profil menunjuk ke halaman cabang yang sesuai (bukan beranda semua).
 2. **Situs regulator**: pastikan nama dan alamat di daftar KUPVA BB berizin Bank Indonesia sama dengan situs.
 3. **Kemitraan lokal**: pengelola Green Lake City / Taman Palem, asosiasi pengusaha atau paguyuban ruko, komunitas alumni/UMKM Tangerang dan Jakarta Barat, biro perjalanan umrah/haji dan wisata (butuh SAR, MYR, JPY), kampus (mahasiswa pertukaran), agen properti luar negeri. Tawarkan halaman "mitra" timbal balik atau artikel tamu; anchor natural ("money changer di Cengkareng").
-4. **Konten yang layak ditautkan**: panduan dokumen tukar valas dan kirim uang, ringkasan aturan underlying USD 24.000, panduan bawa valas ke luar negeri. Hanya publikasikan jika faktanya terverifikasi (`landing-facts.md`).
+4. **Konten yang layak ditautkan**: panduan dokumen tukar valas dan kirim uang, ringkasan aturan underlying USD 10.000, panduan bawa valas ke luar negeri. Hanya publikasikan jika faktanya terverifikasi (`landing-facts.md`).
 5. **PR/liputan**: rilis ulang tahun, kanal berita lokal Tangerang, wawancara pemilik tentang tips tukar valas musim liburan.
 6. **Pola anchor**: sebagian besar nama merek ("Pusat Valas Indo") dan URL polos; sisanya frasa pencarian seperti "money changer Cengkareng". Hindari anchor eksak berulang dari banyak situs.
 

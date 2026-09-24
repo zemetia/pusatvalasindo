@@ -75,7 +75,7 @@ const steps = [
   {
     num: "02",
     title: "Siapkan Dokumen",
-    desc: "KTP + data penerima. Untuk nominal di atas USD 24.000, sertakan dokumen underlying.",
+    desc: "KTP + data penerima. Untuk nominal di atas USD 10.000, sertakan dokumen underlying.",
   },
   {
     num: "03",
@@ -495,7 +495,7 @@ export default function PusatKirimDuitPage() {
                 <div className="space-y-6">
                   {[
                     "KTP (wajib)",
-                    "Underlying dokumen (wajib jika nominal di atas USD 24.000)",
+                    "Underlying dokumen (wajib jika nominal di atas USD 10.000)",
                   ].map((doc) => (
                     <div key={doc} className="flex items-start gap-4">
                       <CheckCircle2 className="w-5 h-5 text-blue-700 flex-shrink-0 mt-0.5" />

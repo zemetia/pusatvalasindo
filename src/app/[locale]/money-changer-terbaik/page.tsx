@@ -43,7 +43,7 @@ export default function MoneyChangerTerbaikPage() {
   const schemas = [
     webPageSchema({ name: page.title, description: page.description, url, dateModified: page.lastModified }),
     articleSchema({
-      headline: 'Cara memilih money changer terbaik di Cengkareng, Jakarta Barat, dan Tangerang',
+      headline: 'Cara memilih money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, dan Tangerang',
       description: page.description,
       url,
       datePublished: page.lastModified,
@@ -64,7 +64,7 @@ export default function MoneyChangerTerbaikPage() {
         eyebrow="Panduan"
         title={
           <>
-            Money changer terbaik di Cengkareng, Jakarta Barat, dan Tangerang?{' '}
+            Money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, dan Tangerang?{' '}
             <Em>Periksa enam hal ini.</Em>
           </>
         }

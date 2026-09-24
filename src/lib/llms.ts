@@ -56,7 +56,7 @@ function entityList(): string {
 const queryMap: [string, string][] = [
   ['money changer Cengkareng / Jakarta Barat / Taman Palem', '/lokasi/cengkareng'],
   ['money changer Tangerang / Green Lake City (Greenlake) / Cipondoh', '/lokasi/tangerang'],
-  ['money changer terbaik Cengkareng / Jakarta Barat / Jakarta (cara memilih, cek izin BI)', '/money-changer-terbaik'],
+  ['money changer terbaik / terpercaya Cengkareng / Jakarta Barat / Jakarta / Tangerang (cara memilih, cek izin BI)', '/money-changer-terbaik'],
   ['jual beli valas, tukar dolar / ringgit / yen', '/pusat-valas-indo'],
   ['kirim uang ke luar negeri untuk pengusaha', '/pusat-kirim-duit'],
 ];

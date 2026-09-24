@@ -214,7 +214,7 @@
         },
         "docs": {
           "title": "Siapkan Dokumen",
-          "desc": "KTP + data penerima. Untuk nominal di atas USD 24.000, sertakan dokumen underlying."
+          "desc": "KTP + data penerima. Untuk nominal di atas USD 10.000, sertakan dokumen underlying."
         },
         "finish": {
           "title": "Transfer Selesai",
@@ -255,7 +255,7 @@
       "business": "Perusahaan",
       "docs": {
         "ktp": "KTP (wajib)",
-        "underlying": "Dokumen underlying (wajib jika nominal di atas USD 24.000)",
+        "underlying": "Dokumen underlying (wajib jika nominal di atas USD 10.000)",
         "directorKtp": "KTP Direktur",
         "nib": "NIB Perusahaan",
         "npwp": "NPWP Perusahaan",

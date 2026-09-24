@@ -148,7 +148,7 @@ Urutan halaman utama `/`. Kolom "Sumber" menunjuk ke bagian di `landing-facts.md
 | 5 | **Pusat Kirim Duit** | Untuk pengusaha yang kirim ke luar negeri. 10 negara/mata uang, minimum USD 1.000, estimasi 2–4 hari kerja, kurs real-time, tarik di bank/ATM penerima. **Tabel biaya** (4 skenario). Dokumen yang disiapkan (pribadi vs perusahaan) | §3 | ⚠️ tanpa nama regulator & nomor izin sampai #1 dijawab; tafsir tarif perlu konfirmasi (#6) |
 | 6 | **Cara kerja / apa yang dibawa** | 3 langkah (Tanya kurs, Konfirmasi & bawa dokumen, Transaksi). Daftar bawaan (KTP, dst.) | §2, §3, rekomendasi.md §8 | ✅ |
 | 7 | **Lokasi & jam** | Dua cabang PVI + PKD (+PTU Pluit bila data lengkap). Alamat, peta, jam, tombol WA dengan nomor `62…` yang benar, badge buka/tutup | §2, §3 | ✅ PVI & PKD. PTU ❌ |
-| 8 | **Legal & kepercayaan** (section gelap) | Izin BI PVI (nomor), status PKD, tahun berdiri, kebijakan dokumen underlying di atas USD 24.000. Nada faktual, bukan slogan | §2, §3 | ⚠️ PKD menunggu nomor izin |
+| 8 | **Legal & kepercayaan** (section gelap) | Izin BI PVI (nomor), status PKD, tahun berdiri, kebijakan dokumen underlying di atas USD 10.000. Nada faktual, bukan slogan | §2, §3 | ⚠️ PKD menunggu nomor izin |
 | 9 | **Ulasan** | 3–4 kutipan Google asli dengan atribusi. Tautan ke Google Maps | §5 | ✅ (ambil ulang teks penuh; jangan pakai ulasan bernada personal) |
 | 10 | **FAQ** | 8–12 pertanyaan (lihat §5.4). Sumber utama GEO | semua | ✅ |
 | 11 | **CTA akhir** | Band merah: satu kalimat + tombol WhatsApp per entitas | §2, §3 | ✅ |
@@ -222,7 +222,7 @@ Semua JSON-LD dibangun dari `site.ts` lewat `structured-data.ts`, satu sumber ke
 6. Berapa minimum dan biaya kirim uang ke luar negeri lewat PKD?
 7. Berapa lama proses kirim uang PKD? (2–4 hari kerja)
 8. Ke negara mana saja PKD bisa mengirim?
-9. Dokumen underlying itu apa dan kapan diperlukan (di atas USD 24.000)?
+9. Dokumen underlying itu apa dan kapan diperlukan (di atas USD 10.000)?
 10. Bagaimana penerima mengambil uangnya? (tarik di bank/ATM)
 
 Pertanyaan dengan jawaban ❌ (maksimum kirim, izin PKD, mata uang publik) tidak ditulis sampai owner menjawab.

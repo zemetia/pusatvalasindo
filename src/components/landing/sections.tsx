@@ -1,3 +1,5 @@
+import { Building2, Check, UserRound } from 'lucide-react';
+
 import { branches, entities, pkdContact, pvi, whatsappUrl } from '@/config/group';
 import { Link } from '@/i18n/routing';
 import {
@@ -40,8 +42,8 @@ export function Hero() {
             Tukar valas dengan <Em>tenang.</Em>
           </h1>
           <p className="mt-6 max-w-xl text-lp-lead leading-[1.55] text-lp-ink-soft">
-            Pusat Valas Indo adalah money changer berizin Bank Indonesia. Kami melayani jual beli valuta asing di Cengkareng dan Tangerang. Tanya kurs
-            hari ini lewat WhatsApp, atau datang langsung ke kantor.
+            Pusat Valas Indo adalah money changer terpercaya, berizin Bank Indonesia. Kami melayani jual beli valuta asing di Cengkareng (Jakarta Barat)
+            dan Tangerang. Tanya kurs hari ini lewat WhatsApp, atau datang langsung ke kantor.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <WhatsAppButton number={hq.whatsapp} text={ASK_RATE}>
@@ -373,22 +375,37 @@ export function Pkd({ standalone = false }: { standalone?: boolean }) {
         </div>
       </div>
 
-      <div className="mt-14 grid gap-10 border-t border-lp-line pt-10 md:grid-cols-2">
-        <div>
-          <p className="font-display text-lp-h3 font-bold">Dokumen perorangan</p>
-          <ul className="mt-3 space-y-1 text-lp-ink-soft">
-            {documents.personal.map((d) => (
-              <li key={d}>{d}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p className="font-display text-lp-h3 font-bold">Dokumen perusahaan</p>
-          <ul className="mt-3 space-y-1 text-lp-ink-soft">
-            {documents.company.map((d) => (
-              <li key={d}>{d}</li>
-            ))}
-          </ul>
+      <div className="mt-14 border-t border-lp-line pt-10">
+        <p className={labelCls}>Dokumen yang perlu disiapkan</p>
+        <div className="mt-6 grid gap-10 md:grid-cols-2 md:gap-14">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <UserRound aria-hidden className="h-[18px] w-[18px] text-lp-red-700" />
+              <p className="font-display text-lp-h3 font-bold">Perorangan</p>
+            </div>
+            <ul className="mt-4 divide-y divide-lp-line border-y border-lp-line">
+              {documents.personal.map((d) => (
+                <li key={d} className="flex items-start gap-3 py-3.5 text-sm leading-relaxed text-lp-ink-soft">
+                  <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-lp-red-700" />
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <Building2 aria-hidden className="h-[18px] w-[18px] text-lp-red-700" />
+              <p className="font-display text-lp-h3 font-bold">Perusahaan</p>
+            </div>
+            <ul className="mt-4 divide-y divide-lp-line border-y border-lp-line">
+              {documents.company.map((d) => (
+                <li key={d} className="flex items-start gap-3 py-3.5 text-sm leading-relaxed text-lp-ink-soft">
+                  <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-lp-red-700" />
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       <div className="mt-10">

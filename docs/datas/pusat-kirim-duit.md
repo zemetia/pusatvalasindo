@@ -41,7 +41,7 @@ Biaya & Kurs
 Proses & Persyaratan
 
 11. Dokumen apa yang dibutuhkan pengirim? (KTP, paspor, dll.)
-    _untuk pribadi : ktp + underlying (jika nominal diatas 24.000 usd)_
+    _untuk pribadi : ktp + underlying (jika nominal diatas 10.000 usd)_
     _untuk perusahaan : ktp direktur, nib perusahaan, npwp perusahaan + underlying_
 
 12. Apakah bisa transaksi tanpa datang ke kantor (online/WhatsApp)?

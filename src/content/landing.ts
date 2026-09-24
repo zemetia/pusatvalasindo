@@ -1,4 +1,4 @@
-import type { Branch } from '@/config/group';
+import { entities, type Branch } from '@/config/group';
 
 /**
  * Copy landing (Indonesia). Setiap klaim harus ✅ di docs/datas/landing-facts.md.
@@ -75,12 +75,12 @@ export const pkdFees = [
 
 export const steps = [
   { title: 'Tanya kurs', body: 'Kirim pesan WhatsApp untuk kurs terkini dan ketersediaan mata uang.' },
-  { title: 'Siapkan dokumen', body: 'Bawa KTP. Untuk kirim uang di atas USD 24.000 siapkan juga dokumen underlying.' },
+  { title: 'Siapkan dokumen', body: 'Bawa KTP. Untuk kirim uang di atas USD 10.000 siapkan juga dokumen underlying.' },
   { title: 'Transaksi', body: 'Datang ke kantor, atau selesaikan lewat transfer bank untuk transaksi online.' },
 ];
 
 export const documents = {
-  personal: ['KTP', 'Dokumen underlying, bila nominal di atas USD 24.000'],
+  personal: ['KTP', 'Dokumen underlying, bila nominal di atas USD 10.000'],
   company: ['KTP direktur', 'NIB', 'NPWP perusahaan', 'Dokumen underlying'],
 };
 
@@ -104,7 +104,7 @@ const allFaqs: FaqItem[] = [
   {
     topic: 'umum',
     q: 'Apa bedanya PT Pusat Valas Indo, PT Pusat Tukar Uang, dan PT Pusat Kirim Duit?',
-    a: 'PT Pusat Valas Indo adalah money changer (jual beli valuta asing) berizin Bank Indonesia. PT Pusat Tukar Uang juga money changer dan beroperasi satu kantor dengan PT Pusat Valas Indo di Cengkareng dan Green Lake City. PT Pusat Kirim Duit melayani pengiriman uang ke luar negeri untuk pengusaha Indonesia.',
+    a: 'PT Pusat Valas Indo adalah money changer (jual beli valuta asing) berizin Bank Indonesia, berkantor di Cengkareng. PT Pusat Tukar Uang juga money changer, berkantor di Green Lake City. PT Pusat Kirim Duit melayani pengiriman uang (remitansi) ke luar negeri untuk pengusaha Indonesia, dengan kantor di Green Lake City.',
   },
   {
     topic: 'pvi',
@@ -129,7 +129,7 @@ const allFaqs: FaqItem[] = [
   {
     topic: 'pkd',
     q: 'Dokumen apa yang perlu disiapkan untuk kirim uang ke luar negeri?',
-    a: 'Untuk perorangan cukup KTP; untuk nominal di atas USD 24.000 diperlukan dokumen underlying. Untuk perusahaan: KTP direktur, NIB, NPWP perusahaan, dan dokumen underlying.',
+    a: 'Untuk perorangan cukup KTP; untuk nominal di atas USD 10.000 diperlukan dokumen underlying. Untuk perusahaan: KTP direktur, NIB, NPWP perusahaan, dan dokumen underlying.',
   },
   {
     topic: 'pkd',
@@ -164,13 +164,13 @@ export function faqsFor(topic: Exclude<FaqTopic, 'umum'>): FaqItem[] {
 /** Copy halaman cabang. Query utama tiap halaman berbeda supaya tidak saling bersaing. */
 export const branchCopy: Record<string, { h1: [string, string]; lead: string; area: string }> = {
   cengkareng: {
-    h1: ['Money changer di ', 'Cengkareng, Jakarta Barat'],
-    lead: 'Money changer berizin Bank Indonesia di Cengkareng. Kantor pusat Pusat Valas Indo berada di Ruko Mutiara Taman Palem, Cengkareng Timur, Jakarta Barat. Satu kantor untuk PT Pusat Valas Indo (berizin Bank Indonesia sejak 2018) dan PT Pusat Tukar Uang, melayani jual beli valuta asing secara online maupun langsung.',
+    h1: ['Money changer terpercaya di ', 'Cengkareng, Jakarta Barat'],
+    lead: 'Money changer terpercaya dan berizin Bank Indonesia di Cengkareng. Kantor pusat Pusat Valas Indo berada di Ruko Mutiara Taman Palem, Cengkareng Timur, Jakarta Barat. Satu kantor untuk PT Pusat Valas Indo (berizin Bank Indonesia sejak 2018) dan PT Pusat Tukar Uang, melayani jual beli valuta asing secara online maupun langsung.',
     area: 'Cengkareng, Jakarta Barat',
   },
   tangerang: {
-    h1: ['Money changer di ', 'Tangerang, Green Lake City'],
-    lead: 'Money changer berizin Bank Indonesia di Tangerang. Cabang Pusat Valas Indo di Rukan Wallstreet, Green Lake City (Greenlake), Cipondoh, Kota Tangerang. Satu kantor untuk PT Pusat Valas Indo dan PT Pusat Tukar Uang; tukar valas lewat WhatsApp atau datang langsung pada jam kerja.',
+    h1: ['Money changer terpercaya di ', 'Tangerang, Green Lake City'],
+    lead: 'Money changer terpercaya dan berizin Bank Indonesia di Tangerang. Cabang Pusat Valas Indo di Rukan Wallstreet, Green Lake City (Greenlake), Cipondoh, Kota Tangerang. Satu kantor untuk PT Pusat Valas Indo dan PT Pusat Tukar Uang; tukar valas lewat WhatsApp atau datang langsung pada jam kerja.',
     area: 'Green Lake City, Cipondoh, Kota Tangerang',
   },
 };
@@ -205,6 +205,11 @@ export function branchFaqs(b: Branch): FaqItem[] {
       topic: 'umum',
       q: `Bagaimana menghubungi ${b.name}?`,
       a: `Lewat ${contact}. Konsultasi kurs dan transaksi bisa dilakukan online, atau datang langsung pada jam kerja.`,
+    },
+    {
+      topic: 'umum',
+      q: `Apakah ${b.name} money changer terpercaya di ${b.district}?`,
+      a: `Ya. ${entities[b.entity].legalName} berizin Bank Indonesia No. ${entities[b.entity].license?.number} dan beroperasi sejak ${entities[b.entity].foundingDate}, dengan alamat dan jam buka yang bisa dicek di Google Maps: ${b.mapsUrl}.`,
     },
   ];
 }

@@ -214,7 +214,7 @@
         },
         "docs": {
           "title": "Prepare Documents",
-          "desc": "ID Card + recipient data. For amounts above USD 24,000, include underlying documents."
+          "desc": "ID Card + recipient data. For amounts above USD 10,000, include underlying documents."
         },
         "finish": {
           "title": "Transfer Complete",
@@ -255,7 +255,7 @@
       "business": "Business",
       "docs": {
         "ktp": "ID Card (Mandatory)",
-        "underlying": "Underlying document (Mandatory for amounts above USD 24,000)",
+        "underlying": "Underlying document (Mandatory for amounts above USD 10,000)",
         "directorKtp": "Director ID Card",
         "nib": "Business Identification Number (NIB)",
         "npwp": "Business Tax ID (NPWP)",

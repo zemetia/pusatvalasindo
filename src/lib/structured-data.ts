@@ -58,7 +58,7 @@ export function organizationSchema(): WithContext<unknown> {
           : {}),
       })),
     location: allBranchRefs(),
-    areaServed: ['Cengkareng', 'Jakarta Barat', 'Tangerang', 'Kota Tangerang', 'Green Lake City'],
+    areaServed: ['Cengkareng', 'Jakarta Barat', 'Jakarta', 'Tangerang', 'Kota Tangerang', 'Green Lake City'],
     knowsAbout: ['Money changer', 'Penukaran valuta asing', 'Pengiriman uang ke luar negeri'],
     description: siteConfig.description,
     sameAs: Object.values(company.socialLinks).filter(Boolean),

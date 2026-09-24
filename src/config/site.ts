@@ -57,7 +57,7 @@ export interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
   name: 'Pusat Valas Indo',
-  tagline: 'Money changer berizin Bank Indonesia di Jakarta Barat dan Tangerang.',
+  tagline: 'Money changer terpercaya, berizin Bank Indonesia di Jakarta Barat dan Tangerang.',
   description:
     'Grup Pusat Valas Indo terdiri dari PT Pusat Valas Indo (money changer berizin Bank Indonesia sejak 2018), PT Pusat Tukar Uang (money changer, satu kantor dengan PVI), dan PT Pusat Kirim Duit (pengiriman uang ke luar negeri untuk pengusaha). Tanya kurs dan transaksi via WhatsApp atau datang langsung ke kantor.',
   url: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://pusatvalasindo.com',
@@ -103,7 +103,7 @@ export const siteConfig: SiteConfig = {
       path: '/',
       title: 'Pusat Valas Indo — Money Changer Berizin BI, Jakarta Barat & Tangerang',
       description:
-        'Money changer berizin Bank Indonesia sejak 2018 di Cengkareng dan Tangerang. Tanya kurs via WhatsApp, plus layanan kirim uang ke luar negeri untuk pengusaha.',
+        'Money changer terpercaya berizin Bank Indonesia sejak 2018 di Cengkareng, Jakarta Barat & Tangerang. Tanya kurs via WhatsApp, plus kirim uang ke luar negeri untuk pengusaha.',
       changeFreq: 'weekly',
       priority: 1.0,
       lastModified: '2026-09-22',
@@ -130,7 +130,7 @@ export const siteConfig: SiteConfig = {
       path: '/lokasi/cengkareng',
       title: 'Money Changer Cengkareng, Jakarta Barat | Pusat Valas Indo',
       description:
-        'Money changer berizin BI di Cengkareng, Jakarta Barat: Ruko Mutiara Taman Palem A5-27. Alamat, jam buka, cara menuju lokasi, dan WhatsApp untuk tanya kurs.',
+        'Money changer terpercaya berizin BI di Cengkareng, Jakarta Barat: Ruko Mutiara Taman Palem A5-27. Alamat, jam buka, cara menuju lokasi, dan WhatsApp untuk tanya kurs.',
       changeFreq: 'monthly',
       priority: 0.8,
       lastModified: '2026-09-22',
@@ -139,7 +139,7 @@ export const siteConfig: SiteConfig = {
       path: '/lokasi/tangerang',
       title: 'Money Changer Tangerang & Green Lake City | Pusat Valas Indo',
       description:
-        'Money changer berizin BI di Tangerang: Rukan Wallstreet, Green Lake City (Greenlake), Cipondoh. Alamat, jam buka, dan WhatsApp untuk tanya kurs.',
+        'Money changer terpercaya berizin BI di Tangerang: Rukan Wallstreet, Green Lake City (Greenlake), Cipondoh. Alamat, jam buka, dan WhatsApp untuk tanya kurs.',
       changeFreq: 'monthly',
       priority: 0.8,
       lastModified: '2026-09-22',
@@ -148,7 +148,7 @@ export const siteConfig: SiteConfig = {
       path: '/money-changer-terbaik',
       title: 'Money Changer Terbaik Cengkareng, Jakarta Barat & Tangerang',
       description:
-        'Cara memilih money changer terbaik di Cengkareng, Jakarta Barat, dan Tangerang: cek izin BI, kurs, dokumen, jam buka. Termasuk profil Pusat Valas Indo.',
+        'Cara memilih money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, Jakarta & Tangerang: cek izin BI, kurs, dokumen, jam buka. Termasuk profil Pusat Valas Indo.',
       changeFreq: 'monthly',
       priority: 0.8,
       lastModified: '2026-09-22',
