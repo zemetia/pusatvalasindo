@@ -11,6 +11,7 @@ import {
   roleKpiRepository
 } from "@/backend/repositories/role-kpi.repository";
 import { roleKpiCapRepository } from "@/backend/repositories/role-kpi-cap.repository";
+import { kpiGlobalSettingRepository } from "@/backend/repositories/kpi-global-setting.repository";
 import { resolveInputPolicy as resolvePolicy } from "@/lib/kpi-policy";
 import { kpiCollectorService } from "@/backend/services/kpi-collector.service";
 import { kpiEntryRepository } from "@/backend/repositories/kpi-entry.repository";
@@ -117,6 +118,13 @@ export const kpiService = {
 
   setRoleKpiCap: (companyId: string, customRoleId: string, maxTotalScore: number | null) =>
     roleKpiCapRepository.upsert(companyId, customRoleId, maxTotalScore),
+
+  // ── Plafon skor total default (berlaku sistem, dipakai bila jabatan belum
+  //    punya RoleKpiCap sendiri) ────────────────────────────────────────────
+  getGlobalKpiCap: () => kpiGlobalSettingRepository.get(),
+
+  setGlobalKpiCap: (defaultMaxTotalScore: number | null) =>
+    kpiGlobalSettingRepository.upsert(defaultMaxTotalScore),
 
   /**
    * KPI yang berlaku untuk seorang karyawan, lengkap dengan kebijakan
@@ -497,10 +505,11 @@ export const kpiService = {
     // jadi aman dipanggil setiap kali skor dihitung.
     const collection = await kpiCollectorService.collectForEmployee(employeeId, month, year);
 
-    const [roleKpis, entries, cap] = await Promise.all([
+    const [roleKpis, entries, cap, globalSetting] = await Promise.all([
       roleKpiRepository.findActiveByCompanyRole(companyId, employee.customRoleId),
       kpiEntryRepository.findApprovedForScoring(employeeId, year, month),
       roleKpiCapRepository.findByCompanyRole(companyId, employee.customRoleId),
+      kpiGlobalSettingRepository.get(),
     ]);
 
     const entriesByRoleKpi = new Map<string, ScoringEntry[]>();
@@ -543,10 +552,14 @@ export const kpiService = {
       };
     });
 
-    const summary = computeTotalScore(
-      items,
-      cap ? toNullableNumber(cap.maxTotalScore) : null
-    );
+    // Plafon per jabatan (RoleKpiCap) selalu menang; tanpa itu jatuh ke plafon
+    // default sistem (KpiGlobalSetting) — baik nilainya maupun keberadaannya
+    // bisa diubah admin lewat setting, bukan angka tetap di kode.
+    const maxTotalScore = cap
+      ? toNullableNumber(cap.maxTotalScore)
+      : toNullableNumber(globalSetting?.defaultMaxTotalScore);
+
+    const summary = computeTotalScore(items, maxTotalScore);
 
     return kpiMonthlyResultRepository.upsert({
       employeeId,
@@ -560,7 +573,7 @@ export const kpiService = {
         // Dicatat supaya riwayat bulan itu menjelaskan kenapa totalScore lebih
         // rendah dari jumlah tertimbang item-nya, walau plafonnya berubah lagi
         // di bulan-bulan berikutnya.
-        maxTotalScore: cap ? toNullableNumber(cap.maxTotalScore) : null,
+        maxTotalScore,
         // Hasil penarikan otomatis ikut disimpan supaya halaman penilaian bisa
         // menampilkan hari mana yang dilewati kolektor dan perlu diperiksa
         // atasan — tanpa ini, hari bermasalah hilang tanpa jejak.

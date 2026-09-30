@@ -1,8 +1,10 @@
 import prisma from "@/lib/prisma";
 import { DefinitionsPageClient } from "@/components/admin/kpi/definitions-page-client";
+import { GlobalKpiCapCard } from "@/components/admin/kpi/global-kpi-cap-card";
 import { PageShell, PageHeader, ErrorPanel } from "@/components/admin/page-shell";
 import { IconListDetails } from "@tabler/icons-react";
 import { requireResource } from "@/backend/helpers/authz";
+import { kpiService } from "@/backend/services/kpi.service";
 
 export default async function KpiDefinitionsPage({
   params,
@@ -13,11 +15,15 @@ export default async function KpiDefinitionsPage({
   await requireResource("kpi.definitions", "view", locale);
 
   let definitions;
+  let globalCap;
   try {
-    definitions = await prisma.kpiDefinition.findMany({
-      orderBy: [{ isActive: "desc" }, { scoringType: "asc" }, { name: "asc" }],
-      include: { _count: { select: { roleKpis: true } } },
-    });
+    [definitions, globalCap] = await Promise.all([
+      prisma.kpiDefinition.findMany({
+        orderBy: [{ isActive: "desc" }, { scoringType: "asc" }, { name: "asc" }],
+        include: { _count: { select: { roleKpis: true } } },
+      }),
+      kpiService.getGlobalKpiCap(),
+    ]);
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return <ErrorPanel source="kpi/definitions/page" message={msg} />;
@@ -46,6 +52,11 @@ export default async function KpiDefinitionsPage({
         title="Definisi KPI"
         description="Katalog KPI: bagaimana tiap KPI dinilai dan siapa yang boleh mencatatnya. Angka target dan bobotnya disetel per jabatan."
         icon={<IconListDetails className="size-5" />}
+      />
+      <GlobalKpiCapCard
+        currentDefaultMaxTotalScore={
+          globalCap?.defaultMaxTotalScore != null ? globalCap.defaultMaxTotalScore.toString() : null
+        }
       />
       <DefinitionsPageClient definitions={serialized} />
     </PageShell>

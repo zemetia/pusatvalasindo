@@ -616,7 +616,7 @@ model RoleKpi {
   /// Plafon pencapaian KPI ini, dalam rasio (1.2 = 120%). Null = tanpa plafon,
   /// pencapaian bebas di atas 100% (perilaku default modul ini). Hanya
   /// membatasi batas atas — penalti tetap bisa jatuh negatif tanpa batas.
-  maxAchievement Decimal?
+  maxAchievement Decimal? @default(1.2)
 
   // ── Override kebijakan pengisian (null = ikut KpiDefinition) ──
   inputSource      KpiInputSource?
@@ -661,6 +661,20 @@ model RoleKpiCap {
   customRole custom_role @relation(fields: [customRoleId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, customRoleId])
+}
+
+/// Pengaturan KPI berlaku untuk seluruh sistem (bukan per PT/jabatan). Baris
+/// tunggal — id selalu "default" supaya bisa di-upsert tanpa baris ganda.
+model KpiGlobalSetting {
+  id String @id @default("default")
+
+  /// Plafon skor total default untuk jabatan yang BELUM punya RoleKpiCap
+  /// sendiri, dalam rasio (1.2 = 120%). RoleKpiCap per jabatan selalu menang
+  /// atas nilai ini. Null = tanpa plafon default (skor bebas seperti sebelum
+  /// fitur ini ada).
+  defaultMaxTotalScore Decimal? @default(1.2)
+
+  updatedAt DateTime @updatedAt
 }
 
 /// Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai

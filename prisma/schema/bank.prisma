@@ -1,20 +1,20 @@
 model BankAccount {
-  id            String           @id @default(cuid())
-  companyId     String
-  bankName      String
-  accountNumber String?
-  accountName   String
-  currencyId    String
-  balance       Decimal          @default(0)
-  isActive      Boolean          @default(true)
-  sortOrder     Int              @default(0)
-  note          String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  company       Company          @relation(fields: [companyId], references: [id])
-  currency      Currency         @relation(fields: [currencyId], references: [id])
-  mutations     BankMutation[]
-  dailyEntries  DailyBankEntry[]
+  id                String             @id @default(cuid())
+  companyId         String
+  bankName          String
+  accountNumber     String?
+  accountName       String
+  currencyId        String
+  balance           Decimal            @default(0)
+  isActive          Boolean            @default(true)
+  sortOrder         Int                @default(0)
+  note              String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  company           Company            @relation(fields: [companyId], references: [id])
+  currency          Currency           @relation(fields: [currencyId], references: [id])
+  mutations         BankMutation[]
+  dailyEntries      DailyBankEntry[]
   valasTransactions ValasTransaction[]
 
   @@index([companyId])

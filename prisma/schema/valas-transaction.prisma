@@ -38,16 +38,16 @@ model ValasTransaction {
 
   currencyId String
   // Jumlah valas yang berpindah tangan, dalam satuan mata uangnya.
-  amount     Decimal @db.Decimal(18, 4)
+  amount     Decimal  @db.Decimal(18, 4)
   // Kurs yang BENAR-BENAR dipakai (IDR per 1 unit). Boleh berbeda dari
   // `priceRate` kalau kasir menegosiasikan harga.
-  rate       Decimal @db.Decimal(18, 4)
+  rate       Decimal  @db.Decimal(18, 4)
   // Harga dari Harga Valas saat transaksi dibuat — pembanding untuk menilai
   // seberapa jauh kurs dinego. Null kalau mata uangnya belum punya harga.
   priceRate  Decimal? @db.Decimal(18, 4)
   // amount × rate, dihitung server. Disimpan supaya laporan tidak perlu
   // mengalikan ulang (dan tidak bisa berbeda dari yang tercetak di bukti).
-  totalIdr   Decimal @db.Decimal(18, 2)
+  totalIdr   Decimal  @db.Decimal(18, 2)
 
   // ── Nasabah ───────────────────────────────────────────────────────────────
   // Nama selalu wajib. Identitas (jenis + nomor) wajib di atas ambang

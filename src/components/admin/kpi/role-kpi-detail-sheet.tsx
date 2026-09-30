@@ -70,7 +70,7 @@ const empty = {
   pointPerUnit: "",
   toleranceLimit: "",
   toleranceScope: "DAILY",
-  maxAchievement: "",
+  maxAchievement: "120",
   inputSource: "",
   requiresApproval: "",
   requiresEvidence: "",

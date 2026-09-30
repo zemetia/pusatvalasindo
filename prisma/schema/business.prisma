@@ -1,25 +1,25 @@
 model Branch {
-  id                String          @id @default(cuid())
-  name              String
-  address           String?
-  phone             String?
-  isActive          Boolean         @default(true)
-  companyId         String?
+  id                 String             @id @default(cuid())
+  name               String
+  address            String?
+  phone              String?
+  isActive           Boolean            @default(true)
+  companyId          String?
   // Geofence for attendance check-in validation
-  latitude          Float?
-  longitude         Float?
-  attendanceRadiusM Int?            @default(20)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  company           Company?        @relation(fields: [companyId], references: [id])
-  currencyStocks    CurrencyStock[]
-  stockItems        StockItem[]
-  stockMutations    StockMutation[]
-  users             user[]
-  attendances       Attendance[]       @relation("AttendanceHomeBranch")
-  checkInAttendances Attendance[]      @relation("AttendanceCheckInBranch")
-  payrollSlips      PayrollSlip[]
-  valasTransactions ValasTransaction[]
+  latitude           Float?
+  longitude          Float?
+  attendanceRadiusM  Int?               @default(20)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  company            Company?           @relation(fields: [companyId], references: [id])
+  currencyStocks     CurrencyStock[]
+  stockItems         StockItem[]
+  stockMutations     StockMutation[]
+  users              user[]
+  attendances        Attendance[]       @relation("AttendanceHomeBranch")
+  checkInAttendances Attendance[]       @relation("AttendanceCheckInBranch")
+  payrollSlips       PayrollSlip[]
+  valasTransactions  ValasTransaction[]
 }
 
 model Company {
@@ -50,17 +50,17 @@ model Company {
 }
 
 model Currency {
-  id             String          @id @default(cuid())
-  code           String          @unique
-  name           String
-  symbol         String?
-  isActive       Boolean         @default(true)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  bankAccounts   BankAccount[]
-  stocks         CurrencyStock[]
-  stockMutations StockMutation[]
-  price          CurrencyPrice?
+  id                String             @id @default(cuid())
+  code              String             @unique
+  name              String
+  symbol            String?
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  bankAccounts      BankAccount[]
+  stocks            CurrencyStock[]
+  stockMutations    StockMutation[]
+  price             CurrencyPrice?
   valasTransactions ValasTransaction[]
 }
 
@@ -100,15 +100,15 @@ enum PriceSource {
 // konsumennya cuma satu dan field-nya jelas, jadi tidak dibuat tabel key-value
 // generik yang nilainya tak bertipe.
 model CurrencyPriceSyncSetting {
-  id             String   @id @default("singleton")
+  id             String    @id @default("singleton")
   // Saat true, setiap kurs SmartDeal baru yang masuk langsung disalurkan ke
   // Harga Valas lewat aturan Patokan Harga.
-  autoSync       Boolean  @default(false)
+  autoSync       Boolean   @default(false)
   lastRunAt      DateTime?
   /// Ringkasan sekali jalan, mis. "24 diperbarui · 3 terkunci · 1 dilewati".
   lastRunSummary String?
   updatedBy      String?
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime  @updatedAt
 }
 
 // Patokan Harga: manual sell/buy adjustment rules layered on top of the live

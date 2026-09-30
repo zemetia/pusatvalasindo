@@ -144,6 +144,12 @@ export type RoleKpi = $Result.DefaultSelection<Prisma.$RoleKpiPayload>
  */
 export type RoleKpiCap = $Result.DefaultSelection<Prisma.$RoleKpiCapPayload>
 /**
+ * Model KpiGlobalSetting
+ * Pengaturan KPI berlaku untuk seluruh sistem (bukan per PT/jabatan). Baris
+ * tunggal — id selalu "default" supaya bisa di-upsert tanpa baris ganda.
+ */
+export type KpiGlobalSetting = $Result.DefaultSelection<Prisma.$KpiGlobalSettingPayload>
+/**
  * Model KpiEntry
  * Satu catatan kejadian KPI pada satu TANGGAL. Semua tipe penilaian memakai
  * tabel ini: `quantity` berarti jumlah kejadian (penalti/reward), nilai rupiah
@@ -1194,6 +1200,16 @@ export class PrismaClient<
   get roleKpiCap(): Prisma.RoleKpiCapDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.kpiGlobalSetting`: Exposes CRUD operations for the **KpiGlobalSetting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more KpiGlobalSettings
+    * const kpiGlobalSettings = await prisma.kpiGlobalSetting.findMany()
+    * ```
+    */
+  get kpiGlobalSetting(): Prisma.KpiGlobalSettingDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.kpiEntry`: Exposes CRUD operations for the **KpiEntry** model.
     * Example usage:
     * ```ts
@@ -1979,6 +1995,7 @@ export namespace Prisma {
     KpiDefinition: 'KpiDefinition',
     RoleKpi: 'RoleKpi',
     RoleKpiCap: 'RoleKpiCap',
+    KpiGlobalSetting: 'KpiGlobalSetting',
     KpiEntry: 'KpiEntry',
     KpiPeriod: 'KpiPeriod',
     KpiMonthlyResult: 'KpiMonthlyResult',
@@ -2027,7 +2044,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "roleKpiCap" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
+      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "roleKpiCap" | "kpiGlobalSetting" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3730,6 +3747,80 @@ export namespace Prisma {
           count: {
             args: Prisma.RoleKpiCapCountArgs<ExtArgs>
             result: $Utils.Optional<RoleKpiCapCountAggregateOutputType> | number
+          }
+        }
+      }
+      KpiGlobalSetting: {
+        payload: Prisma.$KpiGlobalSettingPayload<ExtArgs>
+        fields: Prisma.KpiGlobalSettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.KpiGlobalSettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.KpiGlobalSettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          findFirst: {
+            args: Prisma.KpiGlobalSettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.KpiGlobalSettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          findMany: {
+            args: Prisma.KpiGlobalSettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>[]
+          }
+          create: {
+            args: Prisma.KpiGlobalSettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          createMany: {
+            args: Prisma.KpiGlobalSettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.KpiGlobalSettingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>[]
+          }
+          delete: {
+            args: Prisma.KpiGlobalSettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          update: {
+            args: Prisma.KpiGlobalSettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.KpiGlobalSettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.KpiGlobalSettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.KpiGlobalSettingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>[]
+          }
+          upsert: {
+            args: Prisma.KpiGlobalSettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KpiGlobalSettingPayload>
+          }
+          aggregate: {
+            args: Prisma.KpiGlobalSettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKpiGlobalSetting>
+          }
+          groupBy: {
+            args: Prisma.KpiGlobalSettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KpiGlobalSettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.KpiGlobalSettingCountArgs<ExtArgs>
+            result: $Utils.Optional<KpiGlobalSettingCountAggregateOutputType> | number
           }
         }
       }
@@ -6306,6 +6397,7 @@ export namespace Prisma {
     kpiDefinition?: KpiDefinitionOmit
     roleKpi?: RoleKpiOmit
     roleKpiCap?: RoleKpiCapOmit
+    kpiGlobalSetting?: KpiGlobalSettingOmit
     kpiEntry?: KpiEntryOmit
     kpiPeriod?: KpiPeriodOmit
     kpiMonthlyResult?: KpiMonthlyResultOmit
@@ -35575,6 +35667,1020 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: RoleKpiCapInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model KpiGlobalSetting
+   */
+
+  export type AggregateKpiGlobalSetting = {
+    _count: KpiGlobalSettingCountAggregateOutputType | null
+    _avg: KpiGlobalSettingAvgAggregateOutputType | null
+    _sum: KpiGlobalSettingSumAggregateOutputType | null
+    _min: KpiGlobalSettingMinAggregateOutputType | null
+    _max: KpiGlobalSettingMaxAggregateOutputType | null
+  }
+
+  export type KpiGlobalSettingAvgAggregateOutputType = {
+    defaultMaxTotalScore: Decimal | null
+  }
+
+  export type KpiGlobalSettingSumAggregateOutputType = {
+    defaultMaxTotalScore: Decimal | null
+  }
+
+  export type KpiGlobalSettingMinAggregateOutputType = {
+    id: string | null
+    defaultMaxTotalScore: Decimal | null
+    updatedAt: Date | null
+  }
+
+  export type KpiGlobalSettingMaxAggregateOutputType = {
+    id: string | null
+    defaultMaxTotalScore: Decimal | null
+    updatedAt: Date | null
+  }
+
+  export type KpiGlobalSettingCountAggregateOutputType = {
+    id: number
+    defaultMaxTotalScore: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type KpiGlobalSettingAvgAggregateInputType = {
+    defaultMaxTotalScore?: true
+  }
+
+  export type KpiGlobalSettingSumAggregateInputType = {
+    defaultMaxTotalScore?: true
+  }
+
+  export type KpiGlobalSettingMinAggregateInputType = {
+    id?: true
+    defaultMaxTotalScore?: true
+    updatedAt?: true
+  }
+
+  export type KpiGlobalSettingMaxAggregateInputType = {
+    id?: true
+    defaultMaxTotalScore?: true
+    updatedAt?: true
+  }
+
+  export type KpiGlobalSettingCountAggregateInputType = {
+    id?: true
+    defaultMaxTotalScore?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type KpiGlobalSettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KpiGlobalSetting to aggregate.
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KpiGlobalSettings to fetch.
+     */
+    orderBy?: KpiGlobalSettingOrderByWithRelationInput | KpiGlobalSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: KpiGlobalSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KpiGlobalSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KpiGlobalSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned KpiGlobalSettings
+    **/
+    _count?: true | KpiGlobalSettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: KpiGlobalSettingAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: KpiGlobalSettingSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: KpiGlobalSettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: KpiGlobalSettingMaxAggregateInputType
+  }
+
+  export type GetKpiGlobalSettingAggregateType<T extends KpiGlobalSettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateKpiGlobalSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateKpiGlobalSetting[P]>
+      : GetScalarType<T[P], AggregateKpiGlobalSetting[P]>
+  }
+
+
+
+
+  export type KpiGlobalSettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KpiGlobalSettingWhereInput
+    orderBy?: KpiGlobalSettingOrderByWithAggregationInput | KpiGlobalSettingOrderByWithAggregationInput[]
+    by: KpiGlobalSettingScalarFieldEnum[] | KpiGlobalSettingScalarFieldEnum
+    having?: KpiGlobalSettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: KpiGlobalSettingCountAggregateInputType | true
+    _avg?: KpiGlobalSettingAvgAggregateInputType
+    _sum?: KpiGlobalSettingSumAggregateInputType
+    _min?: KpiGlobalSettingMinAggregateInputType
+    _max?: KpiGlobalSettingMaxAggregateInputType
+  }
+
+  export type KpiGlobalSettingGroupByOutputType = {
+    id: string
+    defaultMaxTotalScore: Decimal | null
+    updatedAt: Date
+    _count: KpiGlobalSettingCountAggregateOutputType | null
+    _avg: KpiGlobalSettingAvgAggregateOutputType | null
+    _sum: KpiGlobalSettingSumAggregateOutputType | null
+    _min: KpiGlobalSettingMinAggregateOutputType | null
+    _max: KpiGlobalSettingMaxAggregateOutputType | null
+  }
+
+  type GetKpiGlobalSettingGroupByPayload<T extends KpiGlobalSettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<KpiGlobalSettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof KpiGlobalSettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], KpiGlobalSettingGroupByOutputType[P]>
+            : GetScalarType<T[P], KpiGlobalSettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type KpiGlobalSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    defaultMaxTotalScore?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["kpiGlobalSetting"]>
+
+  export type KpiGlobalSettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    defaultMaxTotalScore?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["kpiGlobalSetting"]>
+
+  export type KpiGlobalSettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    defaultMaxTotalScore?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["kpiGlobalSetting"]>
+
+  export type KpiGlobalSettingSelectScalar = {
+    id?: boolean
+    defaultMaxTotalScore?: boolean
+    updatedAt?: boolean
+  }
+
+  export type KpiGlobalSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defaultMaxTotalScore" | "updatedAt", ExtArgs["result"]["kpiGlobalSetting"]>
+
+  export type $KpiGlobalSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KpiGlobalSetting"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * Plafon skor total default untuk jabatan yang BELUM punya RoleKpiCap
+       * sendiri, dalam rasio (1.2 = 120%). RoleKpiCap per jabatan selalu menang
+       * atas nilai ini. Null = tanpa plafon default (skor bebas seperti sebelum
+       * fitur ini ada).
+       */
+      defaultMaxTotalScore: Prisma.Decimal | null
+      updatedAt: Date
+    }, ExtArgs["result"]["kpiGlobalSetting"]>
+    composites: {}
+  }
+
+  type KpiGlobalSettingGetPayload<S extends boolean | null | undefined | KpiGlobalSettingDefaultArgs> = $Result.GetResult<Prisma.$KpiGlobalSettingPayload, S>
+
+  type KpiGlobalSettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KpiGlobalSettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KpiGlobalSettingCountAggregateInputType | true
+    }
+
+  export interface KpiGlobalSettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KpiGlobalSetting'], meta: { name: 'KpiGlobalSetting' } }
+    /**
+     * Find zero or one KpiGlobalSetting that matches the filter.
+     * @param {KpiGlobalSettingFindUniqueArgs} args - Arguments to find a KpiGlobalSetting
+     * @example
+     * // Get one KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends KpiGlobalSettingFindUniqueArgs>(args: SelectSubset<T, KpiGlobalSettingFindUniqueArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one KpiGlobalSetting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {KpiGlobalSettingFindUniqueOrThrowArgs} args - Arguments to find a KpiGlobalSetting
+     * @example
+     * // Get one KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends KpiGlobalSettingFindUniqueOrThrowArgs>(args: SelectSubset<T, KpiGlobalSettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KpiGlobalSetting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingFindFirstArgs} args - Arguments to find a KpiGlobalSetting
+     * @example
+     * // Get one KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends KpiGlobalSettingFindFirstArgs>(args?: SelectSubset<T, KpiGlobalSettingFindFirstArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KpiGlobalSetting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingFindFirstOrThrowArgs} args - Arguments to find a KpiGlobalSetting
+     * @example
+     * // Get one KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends KpiGlobalSettingFindFirstOrThrowArgs>(args?: SelectSubset<T, KpiGlobalSettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more KpiGlobalSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all KpiGlobalSettings
+     * const kpiGlobalSettings = await prisma.kpiGlobalSetting.findMany()
+     * 
+     * // Get first 10 KpiGlobalSettings
+     * const kpiGlobalSettings = await prisma.kpiGlobalSetting.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const kpiGlobalSettingWithIdOnly = await prisma.kpiGlobalSetting.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends KpiGlobalSettingFindManyArgs>(args?: SelectSubset<T, KpiGlobalSettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a KpiGlobalSetting.
+     * @param {KpiGlobalSettingCreateArgs} args - Arguments to create a KpiGlobalSetting.
+     * @example
+     * // Create one KpiGlobalSetting
+     * const KpiGlobalSetting = await prisma.kpiGlobalSetting.create({
+     *   data: {
+     *     // ... data to create a KpiGlobalSetting
+     *   }
+     * })
+     * 
+     */
+    create<T extends KpiGlobalSettingCreateArgs>(args: SelectSubset<T, KpiGlobalSettingCreateArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many KpiGlobalSettings.
+     * @param {KpiGlobalSettingCreateManyArgs} args - Arguments to create many KpiGlobalSettings.
+     * @example
+     * // Create many KpiGlobalSettings
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends KpiGlobalSettingCreateManyArgs>(args?: SelectSubset<T, KpiGlobalSettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many KpiGlobalSettings and returns the data saved in the database.
+     * @param {KpiGlobalSettingCreateManyAndReturnArgs} args - Arguments to create many KpiGlobalSettings.
+     * @example
+     * // Create many KpiGlobalSettings
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many KpiGlobalSettings and only return the `id`
+     * const kpiGlobalSettingWithIdOnly = await prisma.kpiGlobalSetting.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends KpiGlobalSettingCreateManyAndReturnArgs>(args?: SelectSubset<T, KpiGlobalSettingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a KpiGlobalSetting.
+     * @param {KpiGlobalSettingDeleteArgs} args - Arguments to delete one KpiGlobalSetting.
+     * @example
+     * // Delete one KpiGlobalSetting
+     * const KpiGlobalSetting = await prisma.kpiGlobalSetting.delete({
+     *   where: {
+     *     // ... filter to delete one KpiGlobalSetting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends KpiGlobalSettingDeleteArgs>(args: SelectSubset<T, KpiGlobalSettingDeleteArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one KpiGlobalSetting.
+     * @param {KpiGlobalSettingUpdateArgs} args - Arguments to update one KpiGlobalSetting.
+     * @example
+     * // Update one KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends KpiGlobalSettingUpdateArgs>(args: SelectSubset<T, KpiGlobalSettingUpdateArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more KpiGlobalSettings.
+     * @param {KpiGlobalSettingDeleteManyArgs} args - Arguments to filter KpiGlobalSettings to delete.
+     * @example
+     * // Delete a few KpiGlobalSettings
+     * const { count } = await prisma.kpiGlobalSetting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends KpiGlobalSettingDeleteManyArgs>(args?: SelectSubset<T, KpiGlobalSettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KpiGlobalSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many KpiGlobalSettings
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends KpiGlobalSettingUpdateManyArgs>(args: SelectSubset<T, KpiGlobalSettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KpiGlobalSettings and returns the data updated in the database.
+     * @param {KpiGlobalSettingUpdateManyAndReturnArgs} args - Arguments to update many KpiGlobalSettings.
+     * @example
+     * // Update many KpiGlobalSettings
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more KpiGlobalSettings and only return the `id`
+     * const kpiGlobalSettingWithIdOnly = await prisma.kpiGlobalSetting.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends KpiGlobalSettingUpdateManyAndReturnArgs>(args: SelectSubset<T, KpiGlobalSettingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one KpiGlobalSetting.
+     * @param {KpiGlobalSettingUpsertArgs} args - Arguments to update or create a KpiGlobalSetting.
+     * @example
+     * // Update or create a KpiGlobalSetting
+     * const kpiGlobalSetting = await prisma.kpiGlobalSetting.upsert({
+     *   create: {
+     *     // ... data to create a KpiGlobalSetting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the KpiGlobalSetting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends KpiGlobalSettingUpsertArgs>(args: SelectSubset<T, KpiGlobalSettingUpsertArgs<ExtArgs>>): Prisma__KpiGlobalSettingClient<$Result.GetResult<Prisma.$KpiGlobalSettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of KpiGlobalSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingCountArgs} args - Arguments to filter KpiGlobalSettings to count.
+     * @example
+     * // Count the number of KpiGlobalSettings
+     * const count = await prisma.kpiGlobalSetting.count({
+     *   where: {
+     *     // ... the filter for the KpiGlobalSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends KpiGlobalSettingCountArgs>(
+      args?: Subset<T, KpiGlobalSettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], KpiGlobalSettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a KpiGlobalSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends KpiGlobalSettingAggregateArgs>(args: Subset<T, KpiGlobalSettingAggregateArgs>): Prisma.PrismaPromise<GetKpiGlobalSettingAggregateType<T>>
+
+    /**
+     * Group by KpiGlobalSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KpiGlobalSettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends KpiGlobalSettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: KpiGlobalSettingGroupByArgs['orderBy'] }
+        : { orderBy?: KpiGlobalSettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, KpiGlobalSettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKpiGlobalSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the KpiGlobalSetting model
+   */
+  readonly fields: KpiGlobalSettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for KpiGlobalSetting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__KpiGlobalSettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the KpiGlobalSetting model
+   */
+  interface KpiGlobalSettingFieldRefs {
+    readonly id: FieldRef<"KpiGlobalSetting", 'String'>
+    readonly defaultMaxTotalScore: FieldRef<"KpiGlobalSetting", 'Decimal'>
+    readonly updatedAt: FieldRef<"KpiGlobalSetting", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * KpiGlobalSetting findUnique
+   */
+  export type KpiGlobalSettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which KpiGlobalSetting to fetch.
+     */
+    where: KpiGlobalSettingWhereUniqueInput
+  }
+
+  /**
+   * KpiGlobalSetting findUniqueOrThrow
+   */
+  export type KpiGlobalSettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which KpiGlobalSetting to fetch.
+     */
+    where: KpiGlobalSettingWhereUniqueInput
+  }
+
+  /**
+   * KpiGlobalSetting findFirst
+   */
+  export type KpiGlobalSettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which KpiGlobalSetting to fetch.
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KpiGlobalSettings to fetch.
+     */
+    orderBy?: KpiGlobalSettingOrderByWithRelationInput | KpiGlobalSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KpiGlobalSettings.
+     */
+    cursor?: KpiGlobalSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KpiGlobalSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KpiGlobalSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiGlobalSettings.
+     */
+    distinct?: KpiGlobalSettingScalarFieldEnum | KpiGlobalSettingScalarFieldEnum[]
+  }
+
+  /**
+   * KpiGlobalSetting findFirstOrThrow
+   */
+  export type KpiGlobalSettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which KpiGlobalSetting to fetch.
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KpiGlobalSettings to fetch.
+     */
+    orderBy?: KpiGlobalSettingOrderByWithRelationInput | KpiGlobalSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KpiGlobalSettings.
+     */
+    cursor?: KpiGlobalSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KpiGlobalSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KpiGlobalSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiGlobalSettings.
+     */
+    distinct?: KpiGlobalSettingScalarFieldEnum | KpiGlobalSettingScalarFieldEnum[]
+  }
+
+  /**
+   * KpiGlobalSetting findMany
+   */
+  export type KpiGlobalSettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter, which KpiGlobalSettings to fetch.
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KpiGlobalSettings to fetch.
+     */
+    orderBy?: KpiGlobalSettingOrderByWithRelationInput | KpiGlobalSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing KpiGlobalSettings.
+     */
+    cursor?: KpiGlobalSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KpiGlobalSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KpiGlobalSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KpiGlobalSettings.
+     */
+    distinct?: KpiGlobalSettingScalarFieldEnum | KpiGlobalSettingScalarFieldEnum[]
+  }
+
+  /**
+   * KpiGlobalSetting create
+   */
+  export type KpiGlobalSettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to create a KpiGlobalSetting.
+     */
+    data: XOR<KpiGlobalSettingCreateInput, KpiGlobalSettingUncheckedCreateInput>
+  }
+
+  /**
+   * KpiGlobalSetting createMany
+   */
+  export type KpiGlobalSettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many KpiGlobalSettings.
+     */
+    data: KpiGlobalSettingCreateManyInput | KpiGlobalSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * KpiGlobalSetting createManyAndReturn
+   */
+  export type KpiGlobalSettingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * The data used to create many KpiGlobalSettings.
+     */
+    data: KpiGlobalSettingCreateManyInput | KpiGlobalSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * KpiGlobalSetting update
+   */
+  export type KpiGlobalSettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * The data needed to update a KpiGlobalSetting.
+     */
+    data: XOR<KpiGlobalSettingUpdateInput, KpiGlobalSettingUncheckedUpdateInput>
+    /**
+     * Choose, which KpiGlobalSetting to update.
+     */
+    where: KpiGlobalSettingWhereUniqueInput
+  }
+
+  /**
+   * KpiGlobalSetting updateMany
+   */
+  export type KpiGlobalSettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update KpiGlobalSettings.
+     */
+    data: XOR<KpiGlobalSettingUpdateManyMutationInput, KpiGlobalSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which KpiGlobalSettings to update
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * Limit how many KpiGlobalSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * KpiGlobalSetting updateManyAndReturn
+   */
+  export type KpiGlobalSettingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * The data used to update KpiGlobalSettings.
+     */
+    data: XOR<KpiGlobalSettingUpdateManyMutationInput, KpiGlobalSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which KpiGlobalSettings to update
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * Limit how many KpiGlobalSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * KpiGlobalSetting upsert
+   */
+  export type KpiGlobalSettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * The filter to search for the KpiGlobalSetting to update in case it exists.
+     */
+    where: KpiGlobalSettingWhereUniqueInput
+    /**
+     * In case the KpiGlobalSetting found by the `where` argument doesn't exist, create a new KpiGlobalSetting with this data.
+     */
+    create: XOR<KpiGlobalSettingCreateInput, KpiGlobalSettingUncheckedCreateInput>
+    /**
+     * In case the KpiGlobalSetting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<KpiGlobalSettingUpdateInput, KpiGlobalSettingUncheckedUpdateInput>
+  }
+
+  /**
+   * KpiGlobalSetting delete
+   */
+  export type KpiGlobalSettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
+    /**
+     * Filter which KpiGlobalSetting to delete.
+     */
+    where: KpiGlobalSettingWhereUniqueInput
+  }
+
+  /**
+   * KpiGlobalSetting deleteMany
+   */
+  export type KpiGlobalSettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KpiGlobalSettings to delete
+     */
+    where?: KpiGlobalSettingWhereInput
+    /**
+     * Limit how many KpiGlobalSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * KpiGlobalSetting without action
+   */
+  export type KpiGlobalSettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KpiGlobalSetting
+     */
+    select?: KpiGlobalSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KpiGlobalSetting
+     */
+    omit?: KpiGlobalSettingOmit<ExtArgs> | null
   }
 
 
@@ -76364,6 +77470,15 @@ export namespace Prisma {
   export type RoleKpiCapScalarFieldEnum = (typeof RoleKpiCapScalarFieldEnum)[keyof typeof RoleKpiCapScalarFieldEnum]
 
 
+  export const KpiGlobalSettingScalarFieldEnum: {
+    id: 'id',
+    defaultMaxTotalScore: 'defaultMaxTotalScore',
+    updatedAt: 'updatedAt'
+  };
+
+  export type KpiGlobalSettingScalarFieldEnum = (typeof KpiGlobalSettingScalarFieldEnum)[keyof typeof KpiGlobalSettingScalarFieldEnum]
+
+
   export const KpiEntryScalarFieldEnum: {
     id: 'id',
     employeeId: 'employeeId',
@@ -79685,6 +80800,50 @@ export namespace Prisma {
     maxTotalScore?: DecimalWithAggregatesFilter<"RoleKpiCap"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"RoleKpiCap"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RoleKpiCap"> | Date | string
+  }
+
+  export type KpiGlobalSettingWhereInput = {
+    AND?: KpiGlobalSettingWhereInput | KpiGlobalSettingWhereInput[]
+    OR?: KpiGlobalSettingWhereInput[]
+    NOT?: KpiGlobalSettingWhereInput | KpiGlobalSettingWhereInput[]
+    id?: StringFilter<"KpiGlobalSetting"> | string
+    defaultMaxTotalScore?: DecimalNullableFilter<"KpiGlobalSetting"> | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeFilter<"KpiGlobalSetting"> | Date | string
+  }
+
+  export type KpiGlobalSettingOrderByWithRelationInput = {
+    id?: SortOrder
+    defaultMaxTotalScore?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KpiGlobalSettingWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: KpiGlobalSettingWhereInput | KpiGlobalSettingWhereInput[]
+    OR?: KpiGlobalSettingWhereInput[]
+    NOT?: KpiGlobalSettingWhereInput | KpiGlobalSettingWhereInput[]
+    defaultMaxTotalScore?: DecimalNullableFilter<"KpiGlobalSetting"> | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeFilter<"KpiGlobalSetting"> | Date | string
+  }, "id">
+
+  export type KpiGlobalSettingOrderByWithAggregationInput = {
+    id?: SortOrder
+    defaultMaxTotalScore?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: KpiGlobalSettingCountOrderByAggregateInput
+    _avg?: KpiGlobalSettingAvgOrderByAggregateInput
+    _max?: KpiGlobalSettingMaxOrderByAggregateInput
+    _min?: KpiGlobalSettingMinOrderByAggregateInput
+    _sum?: KpiGlobalSettingSumOrderByAggregateInput
+  }
+
+  export type KpiGlobalSettingScalarWhereWithAggregatesInput = {
+    AND?: KpiGlobalSettingScalarWhereWithAggregatesInput | KpiGlobalSettingScalarWhereWithAggregatesInput[]
+    OR?: KpiGlobalSettingScalarWhereWithAggregatesInput[]
+    NOT?: KpiGlobalSettingScalarWhereWithAggregatesInput | KpiGlobalSettingScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KpiGlobalSetting"> | string
+    defaultMaxTotalScore?: DecimalNullableWithAggregatesFilter<"KpiGlobalSetting"> | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"KpiGlobalSetting"> | Date | string
   }
 
   export type KpiEntryWhereInput = {
@@ -85185,6 +86344,48 @@ export namespace Prisma {
     customRoleId?: StringFieldUpdateOperationsInput | string
     maxTotalScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KpiGlobalSettingCreateInput = {
+    id?: string
+    defaultMaxTotalScore?: Decimal | DecimalJsLike | number | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KpiGlobalSettingUncheckedCreateInput = {
+    id?: string
+    defaultMaxTotalScore?: Decimal | DecimalJsLike | number | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KpiGlobalSettingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    defaultMaxTotalScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KpiGlobalSettingUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    defaultMaxTotalScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KpiGlobalSettingCreateManyInput = {
+    id?: string
+    defaultMaxTotalScore?: Decimal | DecimalJsLike | number | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KpiGlobalSettingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    defaultMaxTotalScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KpiGlobalSettingUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    defaultMaxTotalScore?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -90726,6 +91927,32 @@ export namespace Prisma {
 
   export type RoleKpiCapSumOrderByAggregateInput = {
     maxTotalScore?: SortOrder
+  }
+
+  export type KpiGlobalSettingCountOrderByAggregateInput = {
+    id?: SortOrder
+    defaultMaxTotalScore?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KpiGlobalSettingAvgOrderByAggregateInput = {
+    defaultMaxTotalScore?: SortOrder
+  }
+
+  export type KpiGlobalSettingMaxOrderByAggregateInput = {
+    id?: SortOrder
+    defaultMaxTotalScore?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KpiGlobalSettingMinOrderByAggregateInput = {
+    id?: SortOrder
+    defaultMaxTotalScore?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KpiGlobalSettingSumOrderByAggregateInput = {
+    defaultMaxTotalScore?: SortOrder
   }
 
   export type EnumKpiEntryStatusFilter<$PrismaModel = never> = {

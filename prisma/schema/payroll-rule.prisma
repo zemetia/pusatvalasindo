@@ -69,7 +69,7 @@ model PayrollRule {
   mode PayrollRuleMode
 
   /// Query pengumpul data. Hanya SELECT, hanya dari view `hv_*`.
-  sql String
+  sql       String
   /// Kolom hasil query yang dipakai mencocokkan tier.
   tierField String
 
@@ -88,17 +88,17 @@ model PayrollRule {
   /// menentukan arah sama seperti pada tier. Ia ada karena tier hanya bisa
   /// mencocokkan RENTANG pada satu kolom; kondisi yang menyangkut kolom lain
   /// — atau menggabungkan beberapa kolom — tidak bisa dinyatakan sebagai tier.
-  guards Json?
+  guards    Json?
   /// Dipakai kalau tidak ada tier yang cocok. Wajib ada — engine tidak boleh
   /// kehabisan jawaban di tengah perhitungan gaji.
-  defaults Json
+  defaults  Json
   /// Sasaran rule (`for`): array grup `{ company, branch, roles }`.
-  targets Json
+  targets   Json
   /// Pengecualian (`except`). Selalu menang atas `targets`.
-  excepts Json?
+  excepts   Json?
 
   /// Keterangan untuk manusia — dasar kebijakan, sumber sheet, dst.
-  note String?
+  note       String?
   /// Alasan perubahan pada versi INI. Bersama `version` inilah jejak yang
   /// menggantikan pesan commit.
   changeNote String?

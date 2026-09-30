@@ -30,22 +30,22 @@ model session {
 }
 
 model custom_role {
-  id                String        @id @default(cuid())
+  id                String                   @id @default(cuid())
   name              String
   description       String?
   companyId         String?
   permissions       String[]
-  payrollCompanyIds String[]      @default([])
+  payrollCompanyIds String[]                 @default([])
   /// True setelah jabatan ini dipindahkan ke matriks izin per-resource.
   /// Penanda ini WAJIB eksplisit, tidak boleh disimpulkan dari "punya baris
   /// RoleResourcePermission atau tidak": mencabut seluruh izin sebuah jabatan
   /// menyisakan nol baris, dan tanpa penanda ini akses lamanya akan hidup lagi.
-  usesResourcePerms Boolean       @default(false)
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  usesResourcePerms Boolean                  @default(false)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
   roleKpis          RoleKpi[]
   roleKpiCaps       RoleKpiCap[]
-  company           Company?      @relation(fields: [companyId], references: [id])
+  company           Company?                 @relation(fields: [companyId], references: [id])
   users             user[]
   // Izin per-resource dengan scope PT terpisah untuk baca & tulis.
   // `permissions` di atas adalah model lama yang masih dibaca selama migrasi
@@ -57,53 +57,53 @@ model custom_role {
 }
 
 model user {
-  id                 String             @id
-  name               String
-  email              String             @unique
-  emailVerified      Boolean
-  image              String?
-  createdAt          DateTime
-  updatedAt          DateTime
-  phone              String?
-  branchId           String?
-  baseSalary         Decimal?
-  joinDate           DateTime?
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  phone         String?
+  branchId      String?
+  baseSalary    Decimal?
+  joinDate      DateTime?
 
   /// Status ikatan kerja. Dipakai rule payroll untuk menegakkan aturan
   /// manajemen "yang masih belum di kontrak belum bisa mendapatkan bonus
   /// tambahan" — tanpa kolom ini aturan itu tidak punya data untuk dicek.
   /// Default sengaja BELUM_KONTRAK: menganggap karyawan sudah berkontrak
   /// padahal belum berarti membayar bonus yang tidak berhak.
-  employmentStatus   EmploymentStatus   @default(BELUM_KONTRAK)
+  employmentStatus  EmploymentStatus @default(BELUM_KONTRAK)
   /// Tanggal mulai kontrak yang sedang berjalan. Null untuk BELUM_KONTRAK.
-  contractStartDate  DateTime?
+  contractStartDate DateTime?
   /// Tanggal berakhir kontrak. Null berarti tidak berbatas waktu — benar untuk
   /// PKWTT, dan pada PKWT berarti tanggal habisnya belum diisi.
-  contractEndDate    DateTime?
+  contractEndDate   DateTime?
 
-  isActive           Boolean            @default(true)
-  customRoleId       String?
-  kpiEntries         KpiEntry[]         @relation("KpiEntryEmployee")
-  kpiEntriesCreated  KpiEntry[]         @relation("KpiEntryCreatedBy")
-  kpiEntriesReviewed KpiEntry[]         @relation("KpiEntryReviewedBy")
-  kpiPeriods         KpiPeriod[]        @relation("KpiPeriodEmployee")
-  kpiPeriodsLocked   KpiPeriod[]        @relation("KpiPeriodLockedBy")
-  kpiMonthlyResults  KpiMonthlyResult[]
-  salaryComponents   UserSalaryComponent[]
-  attendances        Attendance[]       @relation("AttendanceEmployee")
-  attendancesEdited  Attendance[]       @relation("AttendanceEditedBy")
-  payrollSlips       PayrollSlip[]
-  payrollSlipsPaid   PayrollSlip[]      @relation("PayrollSlipPaidBy")
-  payrollRunsGenerated PayrollRun[]     @relation("PayrollRunGeneratedBy")
-  payrollRunsFinalized PayrollRun[]     @relation("PayrollRunFinalizedBy")
-  payrollRulesCreated  PayrollRule[]    @relation("PayrollRuleCreatedBy")
-  heldFundsCreated   HeldFund[]         @relation("HeldFundCreatedBy")
-  heldFundsSettled   HeldFund[]         @relation("HeldFundSettledBy")
-  samples            Sample[]
-  account            account[]
-  session            session[]
-  branch             Branch?            @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  customRole         custom_role?       @relation(fields: [customRoleId], references: [id])
+  isActive             Boolean               @default(true)
+  customRoleId         String?
+  kpiEntries           KpiEntry[]            @relation("KpiEntryEmployee")
+  kpiEntriesCreated    KpiEntry[]            @relation("KpiEntryCreatedBy")
+  kpiEntriesReviewed   KpiEntry[]            @relation("KpiEntryReviewedBy")
+  kpiPeriods           KpiPeriod[]           @relation("KpiPeriodEmployee")
+  kpiPeriodsLocked     KpiPeriod[]           @relation("KpiPeriodLockedBy")
+  kpiMonthlyResults    KpiMonthlyResult[]
+  salaryComponents     UserSalaryComponent[]
+  attendances          Attendance[]          @relation("AttendanceEmployee")
+  attendancesEdited    Attendance[]          @relation("AttendanceEditedBy")
+  payrollSlips         PayrollSlip[]
+  payrollSlipsPaid     PayrollSlip[]         @relation("PayrollSlipPaidBy")
+  payrollRunsGenerated PayrollRun[]          @relation("PayrollRunGeneratedBy")
+  payrollRunsFinalized PayrollRun[]          @relation("PayrollRunFinalizedBy")
+  payrollRulesCreated  PayrollRule[]         @relation("PayrollRuleCreatedBy")
+  heldFundsCreated     HeldFund[]            @relation("HeldFundCreatedBy")
+  heldFundsSettled     HeldFund[]            @relation("HeldFundSettledBy")
+  samples              Sample[]
+  account              account[]
+  session              session[]
+  branch               Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  customRole           custom_role?          @relation(fields: [customRoleId], references: [id])
 
   @@index([branchId])
   @@index([customRoleId])

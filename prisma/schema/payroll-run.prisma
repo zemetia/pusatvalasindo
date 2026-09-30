@@ -46,7 +46,7 @@ model PayrollRun {
   finalizedAt   DateTime?
   finalizedById String?
   /// Terisi saat run ditandai dibayar. Setelah ini isi run tidak boleh diubah.
-  paidAt DateTime?
+  paidAt        DateTime?
 
   note String?
 
@@ -97,9 +97,9 @@ model PayrollSlip {
 
   // ── Ringkasan hasil rule ────────────────────────────────────────────────
   /// Total entri bertipe BONUS. Bisa negatif (bonus yang hangus sebagian).
-  totalBonus Decimal @default(0)
+  totalBonus     Decimal @default(0)
   /// Total entri bertipe DENDA. Disimpan positif.
-  totalPenalty Decimal @default(0)
+  totalPenalty   Decimal @default(0)
   /// Total entri bertipe POTONGAN ditambah komponen gaji bertipe DEDUCTION.
   totalDeduction Decimal @default(0)
   /// Total komponen gaji tambahan bertipe ALLOWANCE.
@@ -133,9 +133,8 @@ model PayrollSlip {
   paidBy     user?              @relation("PayrollSlipPaidBy", fields: [paidById], references: [id], onDelete: SetNull)
   entries    PayrollSlipEntry[]
 
-  @@index([paidAt])
-
   @@unique([runId, userId])
+  @@index([paidAt])
   @@index([runId])
   @@index([userId])
   @@index([branchId])
@@ -156,16 +155,16 @@ model PayrollSlipEntry {
   status PayrollEntryStatus @default(APPLIED)
 
   /// `id` rule dari file .json. Null untuk entri komponen gaji tetap.
-  ruleId String?
+  ruleId            String?
   /// `versi` rule saat run dijalankan. Bersama ruleId inilah kunci untuk
   /// menemukan kembali definisi rule di git.
-  ruleVersion Int?
+  ruleVersion       Int?
   /// Komponen gaji tetap yang menjadi sumber entri, kalau source = COMPONENT.
   salaryComponentId String?
 
   /// Tier yang cocok, mis. "min:23" atau "min:1,max:3". Null kalau memakai
   /// `default` atau kalau rule di-skip.
-  tier String?
+  tier  String?
   /// Alasan yang tampil di slip. Disalin dari `label` tier — tidak pernah
   /// disusun ulang di sisi tampilan, supaya angka dan alasan tidak bisa
   /// berbeda.
@@ -179,12 +178,12 @@ model PayrollSlipEntry {
   /// konstanta rule, dan field karyawan yang dirujuk formula. Ini yang membuat
   /// slip menjelaskan dirinya sendiri, dan yang membuat generate ulang bisa
   /// dibandingkan dengan yang sudah dibayar.
-  inputs Json?
+  inputs    Json?
   /// Rincian per kejadian untuk rule mode per_baris (tanggal, tier, nominal).
   breakdown Json?
   /// Formula yang dievaluasi, apa adanya — supaya bisa dibaca tanpa membuka
   /// file rule. Null kalau tier memakai nominal tetap.
-  formula String?
+  formula   String?
 
   /// Penanda dari guard atau default, mis. "data_kosong", "butuh_review".
   flag String?

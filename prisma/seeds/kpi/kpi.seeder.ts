@@ -64,4 +64,14 @@ export async function seedKpi(prisma: PrismaClient): Promise<void> {
   }
 
   console.log(`  ✓ ${KPI_DEFINITIONS.length} definisi KPI di-seed`)
+
+  // Plafon skor total default sistem — admin bisa mengubah/menghapusnya lewat
+  // halaman Definisi KPI, ini hanya nilai awal supaya perilakunya konsisten
+  // sejak DB baru dibuat.
+  await prisma.kpiGlobalSetting.upsert({
+    where: { id: 'default' },
+    update: {},
+    create: { id: 'default', defaultMaxTotalScore: 1.2 },
+  })
+  console.log('  ✓ Plafon skor total default (120%) disetel')
 }

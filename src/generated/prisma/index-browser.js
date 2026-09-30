@@ -420,6 +420,12 @@ exports.Prisma.RoleKpiCapScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.KpiGlobalSettingScalarFieldEnum = {
+  id: 'id',
+  defaultMaxTotalScore: 'defaultMaxTotalScore',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.KpiEntryScalarFieldEnum = {
   id: 'id',
   employeeId: 'employeeId',
@@ -1215,6 +1221,7 @@ exports.Prisma.ModelName = {
   KpiDefinition: 'KpiDefinition',
   RoleKpi: 'RoleKpi',
   RoleKpiCap: 'RoleKpiCap',
+  KpiGlobalSetting: 'KpiGlobalSetting',
   KpiEntry: 'KpiEntry',
   KpiPeriod: 'KpiPeriod',
   KpiMonthlyResult: 'KpiMonthlyResult',

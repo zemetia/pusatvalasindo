@@ -11,18 +11,18 @@
 // kemudian. Karena itu total dana tertahan dijumlahkan dari SELURUH tanggal yang
 // belum lunas, bukan dari tanggal yang sedang dibuka di halaman.
 model HeldFund {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   companyId String
   // Tanggal hutangnya tercatat — bukan tanggal jatuh tempo. Inilah tanggal yang
   // dinavigasi di halaman Dana Tertahan.
-  date      DateTime @db.Date
+  date      DateTime     @db.Date
   // Arah hutangnya. Tanpa ini satu angka "dana tertahan" mencampur uang yang
   // akan MASUK dengan uang yang harus KELUAR — dua posisi yang berlawanan dan
   // tidak boleh saling menutupi. Default CREDIT karena seluruh baris yang sudah
   // ada dicatat sebagai piutang (hutang orang ke perusahaan).
   kind      HeldFundKind @default(CREDIT)
   name      String // nama orang/pihak yang uangnya belum masuk
-  amount    Decimal  @default(0)
+  amount    Decimal      @default(0)
   note      String?
 
   // Pelunasan menandai, tidak menghapus. Baris yang dihapus akan menghilangkan

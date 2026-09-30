@@ -38,15 +38,15 @@
 
 /// Daftar induk komponen gaji. `companyId` null = berlaku untuk semua PT.
 model SalaryComponent {
-  id        String              @id @default(cuid())
-  companyId String?
-  name      String
-  kind      SalaryComponentKind
+  id            String              @id @default(cuid())
+  companyId     String?
+  name          String
+  kind          SalaryComponentKind
   /// Nilai yang diusulkan saat komponen dipasang ke karyawan baru; nilai
   /// sesungguhnya selalu diambil dari UserSalaryComponent.amount.
   defaultAmount Decimal?
   note          String?
-  isActive      Boolean  @default(true)
+  isActive      Boolean             @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,7 +66,7 @@ model UserSalaryComponent {
   userId      String
   componentId String
   /// Selalu positif — arah (tambah/potong) ditentukan `component.kind`.
-  amount Decimal
+  amount      Decimal
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
