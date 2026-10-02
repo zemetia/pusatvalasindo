@@ -15,11 +15,12 @@ model Branch {
   currencyStocks     CurrencyStock[]
   stockItems         StockItem[]
   stockMutations     StockMutation[]
-  users              user[]
-  attendances        Attendance[]       @relation("AttendanceHomeBranch")
-  checkInAttendances Attendance[]       @relation("AttendanceCheckInBranch")
-  payrollSlips       PayrollSlip[]
-  valasTransactions  ValasTransaction[]
+  users               user[]
+  attendances         Attendance[]       @relation("AttendanceHomeBranch")
+  checkInAttendances  Attendance[]       @relation("AttendanceCheckInBranch")
+  checkOutAttendances Attendance[]       @relation("AttendanceCheckOutBranch")
+  payrollSlips        PayrollSlip[]
+  valasTransactions   ValasTransaction[]
 }
 
 model Company {

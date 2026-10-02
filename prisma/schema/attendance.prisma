@@ -59,6 +59,10 @@ model Attendance {
   // dengan GPS-nya saat clock-in mandiri. Null untuk presensi manual oleh
   // atasan/HR — tidak ada GPS untuk dicocokkan ke cabang mana pun.
   checkInBranchId   String?
+  // GPS & cabang saat clock-out
+  checkOutGpsLat    Float?
+  checkOutGpsLng    Float?
+  checkOutBranchId  String?
   isWithDoctorNote  Boolean          @default(false)
   status            AttendanceStatus @default(PRESENT)
   notes             String?
@@ -70,15 +74,17 @@ model Attendance {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user          user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
-  editedBy      user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
-  branch        Branch? @relation("AttendanceHomeBranch", fields: [branchId], references: [id], onDelete: SetNull)
-  checkInBranch Branch? @relation("AttendanceCheckInBranch", fields: [checkInBranchId], references: [id], onDelete: SetNull)
+  user           user    @relation("AttendanceEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  editedBy       user?   @relation("AttendanceEditedBy", fields: [editedById], references: [id], onDelete: SetNull)
+  branch         Branch? @relation("AttendanceHomeBranch", fields: [branchId], references: [id], onDelete: SetNull)
+  checkInBranch  Branch? @relation("AttendanceCheckInBranch", fields: [checkInBranchId], references: [id], onDelete: SetNull)
+  checkOutBranch Branch? @relation("AttendanceCheckOutBranch", fields: [checkOutBranchId], references: [id], onDelete: SetNull)
 
   @@unique([userId, date])
   @@index([userId])
   @@index([branchId])
   @@index([checkInBranchId])
+  @@index([checkOutBranchId])
   @@index([date])
   @@index([editedById])
 }

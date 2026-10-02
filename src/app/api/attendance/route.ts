@@ -10,7 +10,7 @@ import { userService } from "@/backend/services/user.service";
 // Flag as suspicious if GPS and manual location differ by more than this (km)
 const LOCATION_SUSPECT_THRESHOLD_KM = 0.5;
 
-function haversineKm(
+export function haversineKm(
   lat1: number,
   lng1: number,
   lat2: number,
@@ -92,7 +92,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (geofencedBranches.length > 0) {
-      if (checkInGpsLat == null || checkInGpsLng == null) {
+      if (
+        checkInGpsLat == null ||
+        checkInGpsLng == null ||
+        typeof checkInGpsLat !== "number" ||
+        typeof checkInGpsLng !== "number" ||
+        Number.isNaN(checkInGpsLat) ||
+        Number.isNaN(checkInGpsLng)
+      ) {
         return NextResponse.json(
           { error: "Lokasi GPS wajib diaktifkan untuk absen." },
           { status: 403 }
@@ -100,9 +107,13 @@ export async function POST(req: NextRequest) {
       }
 
       const withDistance = geofencedBranches
+        .filter(
+          (b): b is typeof b & { latitude: number; longitude: number } =>
+            b.latitude !== null && b.longitude !== null
+        )
         .map((b) => ({
           ...b,
-          distM: haversineKm(checkInGpsLat, checkInGpsLng, b.latitude!, b.longitude!) * 1000,
+          distM: haversineKm(checkInGpsLat, checkInGpsLng, b.latitude, b.longitude) * 1000,
         }))
         .sort((a, b) => a.distM - b.distM);
 
@@ -176,6 +187,10 @@ export async function POST(req: NextRequest) {
       status,
       notes,
     },
+    include: {
+      checkInBranch: { select: { name: true } },
+      checkOutBranch: { select: { name: true } },
+    },
   });
 
   return NextResponse.json(attendance, { status: 201 });
@@ -192,10 +207,18 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { date, checkOut, checkOutPhotoUrl } = body as {
+    const {
+      date,
+      checkOut,
+      checkOutPhotoUrl,
+      checkOutGpsLat,
+      checkOutGpsLng,
+    } = body as {
       date: string;
       checkOut: string;
       checkOutPhotoUrl?: string;
+      checkOutGpsLat?: number;
+      checkOutGpsLng?: number;
     };
 
     if (!date || !checkOut) {
@@ -205,8 +228,24 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    const attendanceDate = new Date(date);
+    if (Number.isNaN(attendanceDate.getTime())) {
+      return NextResponse.json(
+        { error: "Format date tidak sah" },
+        { status: 400 }
+      );
+    }
+
+    const checkOutTime = new Date(checkOut);
+    if (Number.isNaN(checkOutTime.getTime())) {
+      return NextResponse.json(
+        { error: "Format checkOut tidak sah" },
+        { status: 400 }
+      );
+    }
+
     const existing = await prisma.attendance.findUnique({
-      where: { userId_date: { userId: session.user.id, date: new Date(date) } },
+      where: { userId_date: { userId: session.user.id, date: attendanceDate } },
     });
 
     if (!existing) {
@@ -230,7 +269,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const checkOutTime = new Date(checkOut);
     if (checkOutTime <= existing.checkIn) {
       return NextResponse.json(
         { error: "Check-out time must be after check-in time" },
@@ -238,9 +276,79 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    // Geofence validation for check-out
+    const userWithBranch = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { branchId: true },
+    });
+
+    let checkOutBranchId: string | null = userWithBranch?.branchId ?? null;
+
+    const geofencedBranches = await prisma.branch.findMany({
+      where: {
+        isActive: true,
+        latitude: { not: null },
+        longitude: { not: null },
+      },
+      select: { id: true, name: true, latitude: true, longitude: true, attendanceRadiusM: true },
+    });
+
+    if (geofencedBranches.length > 0) {
+      if (
+        checkOutGpsLat == null ||
+        checkOutGpsLng == null ||
+        typeof checkOutGpsLat !== "number" ||
+        typeof checkOutGpsLng !== "number" ||
+        Number.isNaN(checkOutGpsLat) ||
+        Number.isNaN(checkOutGpsLng)
+      ) {
+        return NextResponse.json(
+          { error: "Lokasi GPS wajib diaktifkan untuk absen pulang." },
+          { status: 403 }
+        );
+      }
+
+      const withDistance = geofencedBranches
+        .filter(
+          (b): b is typeof b & { latitude: number; longitude: number } =>
+            b.latitude !== null && b.longitude !== null
+        )
+        .map((b) => ({
+          ...b,
+          distM: haversineKm(checkOutGpsLat, checkOutGpsLng, b.latitude, b.longitude) * 1000,
+        }))
+        .sort((a, b) => a.distM - b.distM);
+
+      const nearest = withDistance[0];
+      const matched = withDistance.find((b) => b.distM <= (b.attendanceRadiusM ?? 20));
+
+      if (!matched) {
+        return NextResponse.json(
+          {
+            error: `Anda berada ${Math.round(nearest.distM)} m dari kantor terdekat (${nearest.name}). Absen pulang hanya diizinkan dari dalam area kantor.`,
+            distanceM: Math.round(nearest.distM),
+            nearestBranch: nearest.name,
+          },
+          { status: 403 }
+        );
+      }
+
+      checkOutBranchId = matched.id;
+    }
+
     const updated = await prisma.attendance.update({
-      where: { userId_date: { userId: session.user.id, date: new Date(date) } },
-      data: { checkOut: checkOutTime, checkOutPhotoUrl },
+      where: { userId_date: { userId: session.user.id, date: attendanceDate } },
+      data: {
+        checkOut: checkOutTime,
+        checkOutPhotoUrl,
+        checkOutGpsLat,
+        checkOutGpsLng,
+        checkOutBranchId,
+      },
+      include: {
+        checkInBranch: { select: { name: true } },
+        checkOutBranch: { select: { name: true } },
+      },
     });
 
     return NextResponse.json(updated);
@@ -287,6 +395,10 @@ export async function GET(req: NextRequest) {
 
   const records = await prisma.attendance.findMany({
     where,
+    include: {
+      checkInBranch: { select: { name: true } },
+      checkOutBranch: { select: { name: true } },
+    },
     orderBy: { date: "desc" },
   });
 

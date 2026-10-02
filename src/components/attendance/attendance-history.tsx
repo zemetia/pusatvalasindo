@@ -1,5 +1,6 @@
 "use client";
 
+import type { ElementType } from "react";
 import type { Attendance, AttendanceStatus } from "@src/generated/prisma";
 import { differenceInMinutes } from "date-fns";
 import { classifyWorkStartRole, formatJakartaHm, isLateArrival } from "@/lib/attendance-time";
@@ -15,10 +16,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
 
-type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string } | null };
+type AttendanceWithBranches = Attendance & {
+  checkInBranch?: { name: string } | null;
+  checkOutBranch?: { name: string } | null;
+};
 
 interface AttendanceHistoryProps {
-  records: AttendanceWithCheckInBranch[];
+  records: AttendanceWithBranches[];
   /** Nama jabatan (`custom_role.name`) pemilik riwayat ini — menentukan ambang
    *  jam masuk mana yang berlaku (Kepala Cabang 07.30 vs Karyawan 07.55). */
   roleName?: string | null;
@@ -46,7 +50,7 @@ export function AttendanceHistory({ records, roleName }: AttendanceHistoryProps)
   const t = useTranslations("Dashboard.Attendance");
   const workStartRole = classifyWorkStartRole(roleName);
 
-  const statusConfig: Record<AttendanceStatus, { label: string; color: string; icon: any }> = {
+  const statusConfig: Record<AttendanceStatus, { label: string; color: string; icon: ElementType }> = {
     PRESENT:    { label: t("status.present"),    color: "bg-success-muted text-success border-success/25", icon: IconCheck },
     LATE:       { label: t("status.late"),        color: "bg-warning-muted text-warning-foreground border-warning/25",       icon: IconClock },
     WFH:        { label: t("status.wfh"),         color: "bg-success-muted text-success border-success/25", icon: IconCheck },
@@ -166,6 +170,11 @@ export function AttendanceHistory({ records, roleName }: AttendanceHistoryProps)
                           {formatJakartaHm(checkOutDate)}
                         </span>
                       </div>
+                      {record.checkOutBranch && (
+                        <span className="text-muted-foreground text-[10px] font-medium leading-none">
+                          {record.checkOutBranch.name}
+                        </span>
+                      )}
                       {record.checkOutPhotoUrl && (
                         <a href={record.checkOutPhotoUrl} target="_blank" rel="noopener noreferrer">
                           <img

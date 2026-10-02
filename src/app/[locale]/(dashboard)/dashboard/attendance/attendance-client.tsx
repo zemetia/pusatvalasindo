@@ -22,11 +22,14 @@ interface BranchGeofence {
   name: string;
 }
 
-type AttendanceWithCheckInBranch = Attendance & { checkInBranch?: { name: string } | null };
+type AttendanceWithBranches = Attendance & {
+  checkInBranch?: { name: string } | null;
+  checkOutBranch?: { name: string } | null;
+};
 
 interface AttendanceClientProps {
   userId: string;
-  initialRecords: AttendanceWithCheckInBranch[];
+  initialRecords: AttendanceWithBranches[];
   // Semua cabang aktif yang punya geofence, lintas PT — karyawan boleh absen
   // di kantor mana pun asal masuk radius SALAH SATU, bukan hanya cabang di
   // profilnya. Array kosong = belum ada cabang ber-geofence sama sekali, jadi
@@ -67,13 +70,13 @@ function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
 }
 
 export function AttendanceClient({
-  userId,
+  userId: _userId,
   initialRecords,
   branchGeofences = [],
   roleName,
 }: AttendanceClientProps) {
   const t = useTranslations("Dashboard.Attendance");
-  const [records, setRecords] = useState<AttendanceWithCheckInBranch[]>(initialRecords);
+  const [records, setRecords] = useState<AttendanceWithBranches[]>(initialRecords);
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -82,6 +85,7 @@ export function AttendanceClient({
   // Checkout state
   const [checkoutFile, setCheckoutFile] = useState<File | null>(null);
   const [checkoutImage, setCheckoutImage] = useState<string | null>(null);
+  const [checkoutLocation, setCheckoutLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const todayRecord = useMemo(() => {
@@ -97,14 +101,42 @@ export function AttendanceClient({
     setLocation({ lat, lng });
   }, []);
 
+  const handleCheckoutLocationChange = useCallback((lat: number, lng: number) => {
+    setCheckoutLocation({ lat, lng });
+  }, []);
+
   const handleCheckout = async () => {
     if (!checkoutFile) {
       toast.error("Ambil foto dulu sebelum checkout.");
       return;
     }
+    if (!checkoutLocation) {
+      toast.error("Lokasi GPS wajib diaktifkan untuk checkout.");
+      return;
+    }
 
     setIsCheckingOut(true);
     try {
+      // Re-check the GPS position right now, at the moment of checkout submit
+      const currentLoc = await getCurrentLocation();
+      setCheckoutLocation(currentLoc);
+
+      if (branchGeofences.length > 0) {
+        const withinAnyBranch = branchGeofences.some((geofence) => {
+          const distM = haversineMeters(
+            currentLoc.lat,
+            currentLoc.lng,
+            geofence.latitude,
+            geofence.longitude
+          );
+          return distM <= geofence.radiusM;
+        });
+        if (!withinAnyBranch) {
+          toast.error("Tidak bisa checkout karena berada di luar area kantor.");
+          return;
+        }
+      }
+
       const formData = new FormData();
       formData.append("photo", checkoutFile);
 
@@ -129,6 +161,8 @@ export function AttendanceClient({
           date: localDate,
           checkOut: new Date().toISOString(),
           checkOutPhotoUrl: url,
+          checkOutGpsLat: currentLoc.lat,
+          checkOutGpsLng: currentLoc.lng,
         }),
       });
 
@@ -147,9 +181,9 @@ export function AttendanceClient({
       setCheckoutFile(null);
       setCheckoutImage(null);
       toast.success("Checkout berhasil!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message);
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setIsCheckingOut(false);
     }
@@ -231,9 +265,9 @@ export function AttendanceClient({
       setCapturedFile(null);
       setCapturedImage(null);
       toast.success(t("alerts.success"));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message);
+      toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -301,14 +335,16 @@ export function AttendanceClient({
                   <MetricBlock
                     label="Check In"
                     size="secondary"
-                    value={formatJakartaHm(new Date(todayRecord.checkIn!))}
+                    value={todayRecord.checkIn ? formatJakartaHm(new Date(todayRecord.checkIn)) : "-"}
                     suffix="WIB"
+                    meta={todayRecord.checkInBranch?.name}
                   />
                   <MetricBlock
                     label="Check Out"
                     size="secondary"
                     value={formatJakartaHm(new Date(todayRecord.checkOut))}
                     suffix="WIB"
+                    meta={todayRecord.checkOutBranch?.name}
                   />
                 </div>
                 <p className="text-muted-foreground mt-6 text-sm">Presensi hari ini selesai.</p>
@@ -324,7 +360,8 @@ export function AttendanceClient({
                     <div>
                       <p className="text-success text-xs font-medium tracking-wide uppercase">Check In</p>
                       <p className="text-success tabular text-sm font-medium">
-                        Pukul {formatJakartaHm(new Date(todayRecord.checkIn!))} WIB
+                        Pukul {todayRecord.checkIn ? formatJakartaHm(new Date(todayRecord.checkIn)) : "-"} WIB
+                        {todayRecord.checkInBranch?.name ? ` · ${todayRecord.checkInBranch.name}` : ""}
                       </p>
                     </div>
                   </div>
@@ -336,12 +373,18 @@ export function AttendanceClient({
                     onCapture={setCheckoutFile}
                     capturedImage={checkoutImage}
                     setCapturedImage={setCheckoutImage}
+                    placeholder="Ambil foto diri untuk check out"
                   />
                 </div>
 
+                <LocationStatus
+                  onLocationChange={handleCheckoutLocationChange}
+                  geofences={branchGeofences}
+                />
+
                 <Button
                   onClick={handleCheckout}
-                  disabled={isCheckingOut || !checkoutFile}
+                  disabled={isCheckingOut || !checkoutFile || !checkoutLocation}
                   variant="secondary"
                   className="bg-warning hover:bg-warning/90 text-warning-foreground h-14 w-full rounded-2xl text-lg font-bold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >

@@ -15,6 +15,7 @@ interface CameraCaptureProps {
   onCapture: (file: File) => void;
   capturedImage: string | null;
   setCapturedImage: (url: string | null) => void;
+  placeholder?: string;
 }
 
 type CameraState = "idle" | "requesting" | "active" | "error";
@@ -37,6 +38,7 @@ export function CameraCapture({
   onCapture,
   capturedImage,
   setCapturedImage,
+  placeholder = "Ambil foto diri untuk memulai presensi",
 }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -203,7 +205,7 @@ export function CameraCapture({
                   <IconCamera size={48} className="text-muted-foreground" />
                 </div>
                 <p className="text-sm text-muted-foreground font-medium">
-                  Ambil foto diri untuk memulai presensi
+                  {placeholder}
                 </p>
                 <Button onClick={startCamera} className="rounded-full px-8">
                   Buka Kamera

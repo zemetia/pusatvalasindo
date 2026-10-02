@@ -81,6 +81,8 @@ export type AttendanceRow = {
   branchName: string;
   /** Cabang tempat clock-in benar-benar terjadi (rotasi antar cabang); null bila belum absen atau presensi manual. */
   checkInBranchName: string | null;
+  /** Cabang tempat clock-out benar-benar terjadi (rotasi antar cabang); null bila belum checkout atau presensi manual. */
+  checkOutBranchName: string | null;
   companyId: string | null;
   /** Dihitung per karyawan di server, mengikuti scope tulis per PT. */
   canEdit: boolean;
@@ -704,7 +706,14 @@ export function PresensiPageClient({
                       </TableCell>
                       <TableCell className="tabular text-center text-sm">
                         {row.checkOut ? (
-                          toWibTime(row.checkOut)
+                          <>
+                            <div>{toWibTime(row.checkOut)}</div>
+                            {row.checkOutBranchName && row.checkOutBranchName !== row.branchName && (
+                              <div className="text-warning-foreground text-[10px] font-medium leading-none mt-0.5">
+                                Pulang di {row.checkOutBranchName}
+                              </div>
+                            )}
+                          </>
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}

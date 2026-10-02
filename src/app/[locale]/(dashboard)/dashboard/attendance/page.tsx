@@ -60,7 +60,10 @@ export default async function AttendancePage({
           userId: session.user.id,
           date: { gte: startOfMonth, lte: endOfMonth },
         },
-        include: { checkInBranch: { select: { name: true } } },
+        include: {
+          checkInBranch: { select: { name: true } },
+          checkOutBranch: { select: { name: true } },
+        },
         orderBy: { date: "desc" },
       }),
       prisma.branch.findMany({
@@ -82,13 +85,18 @@ export default async function AttendancePage({
     initialRecords = records;
     roleName = me?.customRole?.name ?? null;
 
-    branchGeofences = branches.map((b) => ({
-      id: b.id,
-      latitude: b.latitude!,
-      longitude: b.longitude!,
-      radiusM: b.attendanceRadiusM ?? 20,
-      name: b.name,
-    }));
+    branchGeofences = branches
+      .filter(
+        (b): b is typeof b & { latitude: number; longitude: number } =>
+          b.latitude !== null && b.longitude !== null
+      )
+      .map((b) => ({
+        id: b.id,
+        latitude: b.latitude,
+        longitude: b.longitude,
+        radiusM: b.attendanceRadiusM ?? 20,
+        name: b.name,
+      }));
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     return (

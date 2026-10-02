@@ -93,6 +93,7 @@ export default async function PresensiKaryawanPage({
           // Cabang tempat clock-in benar-benar terjadi — beda dari cabang
           // profil (branchName) saat karyawan absen di cabang lain (rotasi).
           checkInBranch: { select: { name: true } },
+          checkOutBranch: { select: { name: true } },
         },
       }),
     ]);
@@ -125,6 +126,7 @@ export default async function PresensiKaryawanPage({
       role: u.customRole?.name ?? "Karyawan",
       branchName: u.branch?.name ?? "—",
       checkInBranchName: att?.checkInBranch?.name ?? null,
+      checkOutBranchName: att?.checkOutBranch?.name ?? null,
       companyId: u.branch?.companyId ?? null,
       // `canWrite` dievaluasi per karyawan, bukan sekali untuk halaman:
       // sebuah jabatan bisa boleh melihat PT A+B tapi hanya mengoreksi PT A.

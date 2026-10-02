@@ -6826,6 +6826,7 @@ export namespace Prisma {
     users: number
     attendances: number
     checkInAttendances: number
+    checkOutAttendances: number
     payrollSlips: number
     valasTransactions: number
   }
@@ -6837,6 +6838,7 @@ export namespace Prisma {
     users?: boolean | BranchCountOutputTypeCountUsersArgs
     attendances?: boolean | BranchCountOutputTypeCountAttendancesArgs
     checkInAttendances?: boolean | BranchCountOutputTypeCountCheckInAttendancesArgs
+    checkOutAttendances?: boolean | BranchCountOutputTypeCountCheckOutAttendancesArgs
     payrollSlips?: boolean | BranchCountOutputTypeCountPayrollSlipsArgs
     valasTransactions?: boolean | BranchCountOutputTypeCountValasTransactionsArgs
   }
@@ -6891,6 +6893,13 @@ export namespace Prisma {
    * BranchCountOutputType without action
    */
   export type BranchCountOutputTypeCountCheckInAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountCheckOutAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AttendanceWhereInput
   }
 
@@ -8646,6 +8655,8 @@ export namespace Prisma {
     checkInGpsLng: number | null
     checkInManualLat: number | null
     checkInManualLng: number | null
+    checkOutGpsLat: number | null
+    checkOutGpsLng: number | null
   }
 
   export type AttendanceSumAggregateOutputType = {
@@ -8653,6 +8664,8 @@ export namespace Prisma {
     checkInGpsLng: number | null
     checkInManualLat: number | null
     checkInManualLng: number | null
+    checkOutGpsLat: number | null
+    checkOutGpsLng: number | null
   }
 
   export type AttendanceMinAggregateOutputType = {
@@ -8670,6 +8683,9 @@ export namespace Prisma {
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
     checkInBranchId: string | null
+    checkOutGpsLat: number | null
+    checkOutGpsLng: number | null
+    checkOutBranchId: string | null
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
@@ -8694,6 +8710,9 @@ export namespace Prisma {
     checkInManualLng: number | null
     isLocationSuspect: boolean | null
     checkInBranchId: string | null
+    checkOutGpsLat: number | null
+    checkOutGpsLng: number | null
+    checkOutBranchId: string | null
     isWithDoctorNote: boolean | null
     status: $Enums.AttendanceStatus | null
     notes: string | null
@@ -8718,6 +8737,9 @@ export namespace Prisma {
     checkInManualLng: number
     isLocationSuspect: number
     checkInBranchId: number
+    checkOutGpsLat: number
+    checkOutGpsLng: number
+    checkOutBranchId: number
     isWithDoctorNote: number
     status: number
     notes: number
@@ -8734,6 +8756,8 @@ export namespace Prisma {
     checkInGpsLng?: true
     checkInManualLat?: true
     checkInManualLng?: true
+    checkOutGpsLat?: true
+    checkOutGpsLng?: true
   }
 
   export type AttendanceSumAggregateInputType = {
@@ -8741,6 +8765,8 @@ export namespace Prisma {
     checkInGpsLng?: true
     checkInManualLat?: true
     checkInManualLng?: true
+    checkOutGpsLat?: true
+    checkOutGpsLng?: true
   }
 
   export type AttendanceMinAggregateInputType = {
@@ -8758,6 +8784,9 @@ export namespace Prisma {
     checkInManualLng?: true
     isLocationSuspect?: true
     checkInBranchId?: true
+    checkOutGpsLat?: true
+    checkOutGpsLng?: true
+    checkOutBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8782,6 +8811,9 @@ export namespace Prisma {
     checkInManualLng?: true
     isLocationSuspect?: true
     checkInBranchId?: true
+    checkOutGpsLat?: true
+    checkOutGpsLng?: true
+    checkOutBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8806,6 +8838,9 @@ export namespace Prisma {
     checkInManualLng?: true
     isLocationSuspect?: true
     checkInBranchId?: true
+    checkOutGpsLat?: true
+    checkOutGpsLng?: true
+    checkOutBranchId?: true
     isWithDoctorNote?: true
     status?: true
     notes?: true
@@ -8917,6 +8952,9 @@ export namespace Prisma {
     checkInManualLng: number | null
     isLocationSuspect: boolean
     checkInBranchId: string | null
+    checkOutGpsLat: number | null
+    checkOutGpsLng: number | null
+    checkOutBranchId: string | null
     isWithDoctorNote: boolean
     status: $Enums.AttendanceStatus
     notes: string | null
@@ -8960,6 +8998,9 @@ export namespace Prisma {
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
     checkInBranchId?: boolean
+    checkOutGpsLat?: boolean
+    checkOutGpsLng?: boolean
+    checkOutBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8971,6 +9012,7 @@ export namespace Prisma {
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8988,6 +9030,9 @@ export namespace Prisma {
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
     checkInBranchId?: boolean
+    checkOutGpsLat?: boolean
+    checkOutGpsLng?: boolean
+    checkOutBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -8999,6 +9044,7 @@ export namespace Prisma {
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -9016,6 +9062,9 @@ export namespace Prisma {
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
     checkInBranchId?: boolean
+    checkOutGpsLat?: boolean
+    checkOutGpsLng?: boolean
+    checkOutBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -9027,6 +9076,7 @@ export namespace Prisma {
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
   export type AttendanceSelectScalar = {
@@ -9044,6 +9094,9 @@ export namespace Prisma {
     checkInManualLng?: boolean
     isLocationSuspect?: boolean
     checkInBranchId?: boolean
+    checkOutGpsLat?: boolean
+    checkOutGpsLng?: boolean
+    checkOutBranchId?: boolean
     isWithDoctorNote?: boolean
     status?: boolean
     notes?: boolean
@@ -9053,24 +9106,27 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "checkInBranchId" | "isWithDoctorNote" | "status" | "notes" | "editedById" | "editedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "date" | "checkIn" | "checkOut" | "checkInPhotoUrl" | "checkOutPhotoUrl" | "checkInGpsLat" | "checkInGpsLng" | "checkInManualLat" | "checkInManualLng" | "isLocationSuspect" | "checkInBranchId" | "checkOutGpsLat" | "checkOutGpsLng" | "checkOutBranchId" | "isWithDoctorNote" | "status" | "notes" | "editedById" | "editedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }
   export type AttendanceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }
   export type AttendanceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
     editedBy?: boolean | Attendance$editedByArgs<ExtArgs>
     branch?: boolean | Attendance$branchArgs<ExtArgs>
     checkInBranch?: boolean | Attendance$checkInBranchArgs<ExtArgs>
+    checkOutBranch?: boolean | Attendance$checkOutBranchArgs<ExtArgs>
   }
 
   export type $AttendancePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9080,6 +9136,7 @@ export namespace Prisma {
       editedBy: Prisma.$userPayload<ExtArgs> | null
       branch: Prisma.$BranchPayload<ExtArgs> | null
       checkInBranch: Prisma.$BranchPayload<ExtArgs> | null
+      checkOutBranch: Prisma.$BranchPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9096,6 +9153,9 @@ export namespace Prisma {
       checkInManualLng: number | null
       isLocationSuspect: boolean
       checkInBranchId: string | null
+      checkOutGpsLat: number | null
+      checkOutGpsLng: number | null
+      checkOutBranchId: string | null
       isWithDoctorNote: boolean
       status: $Enums.AttendanceStatus
       notes: string | null
@@ -9501,6 +9561,7 @@ export namespace Prisma {
     editedBy<T extends Attendance$editedByArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$editedByArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     branch<T extends Attendance$branchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$branchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     checkInBranch<T extends Attendance$checkInBranchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$checkInBranchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    checkOutBranch<T extends Attendance$checkOutBranchArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$checkOutBranchArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9544,6 +9605,9 @@ export namespace Prisma {
     readonly checkInManualLng: FieldRef<"Attendance", 'Float'>
     readonly isLocationSuspect: FieldRef<"Attendance", 'Boolean'>
     readonly checkInBranchId: FieldRef<"Attendance", 'String'>
+    readonly checkOutGpsLat: FieldRef<"Attendance", 'Float'>
+    readonly checkOutGpsLng: FieldRef<"Attendance", 'Float'>
+    readonly checkOutBranchId: FieldRef<"Attendance", 'String'>
     readonly isWithDoctorNote: FieldRef<"Attendance", 'Boolean'>
     readonly status: FieldRef<"Attendance", 'AttendanceStatus'>
     readonly notes: FieldRef<"Attendance", 'String'>
@@ -9993,6 +10057,25 @@ export namespace Prisma {
    * Attendance.checkInBranch
    */
   export type Attendance$checkInBranchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Branch
+     */
+    select?: BranchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Branch
+     */
+    omit?: BranchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BranchInclude<ExtArgs> | null
+    where?: BranchWhereInput
+  }
+
+  /**
+   * Attendance.checkOutBranch
+   */
+  export type Attendance$checkOutBranchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Branch
      */
@@ -21409,6 +21492,7 @@ export namespace Prisma {
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
     checkInAttendances?: boolean | Branch$checkInAttendancesArgs<ExtArgs>
+    checkOutAttendances?: boolean | Branch$checkOutAttendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
     valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
@@ -21467,6 +21551,7 @@ export namespace Prisma {
     users?: boolean | Branch$usersArgs<ExtArgs>
     attendances?: boolean | Branch$attendancesArgs<ExtArgs>
     checkInAttendances?: boolean | Branch$checkInAttendancesArgs<ExtArgs>
+    checkOutAttendances?: boolean | Branch$checkOutAttendancesArgs<ExtArgs>
     payrollSlips?: boolean | Branch$payrollSlipsArgs<ExtArgs>
     valasTransactions?: boolean | Branch$valasTransactionsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
@@ -21488,6 +21573,7 @@ export namespace Prisma {
       users: Prisma.$userPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       checkInAttendances: Prisma.$AttendancePayload<ExtArgs>[]
+      checkOutAttendances: Prisma.$AttendancePayload<ExtArgs>[]
       payrollSlips: Prisma.$PayrollSlipPayload<ExtArgs>[]
       valasTransactions: Prisma.$ValasTransactionPayload<ExtArgs>[]
     }
@@ -21904,6 +21990,7 @@ export namespace Prisma {
     users<T extends Branch$usersArgs<ExtArgs> = {}>(args?: Subset<T, Branch$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendances<T extends Branch$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     checkInAttendances<T extends Branch$checkInAttendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$checkInAttendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkOutAttendances<T extends Branch$checkOutAttendancesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$checkOutAttendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrollSlips<T extends Branch$payrollSlipsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$payrollSlipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollSlipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     valasTransactions<T extends Branch$valasTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$valasTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ValasTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -22489,6 +22576,30 @@ export namespace Prisma {
    * Branch.checkInAttendances
    */
   export type Branch$checkInAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Attendance
+     */
+    select?: AttendanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Attendance
+     */
+    omit?: AttendanceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceInclude<ExtArgs> | null
+    where?: AttendanceWhereInput
+    orderBy?: AttendanceOrderByWithRelationInput | AttendanceOrderByWithRelationInput[]
+    cursor?: AttendanceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.checkOutAttendances
+   */
+  export type Branch$checkOutAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Attendance
      */
@@ -77128,6 +77239,9 @@ export namespace Prisma {
     checkInManualLng: 'checkInManualLng',
     isLocationSuspect: 'isLocationSuspect',
     checkInBranchId: 'checkInBranchId',
+    checkOutGpsLat: 'checkOutGpsLat',
+    checkOutGpsLng: 'checkOutGpsLng',
+    checkOutBranchId: 'checkOutBranchId',
     isWithDoctorNote: 'isWithDoctorNote',
     status: 'status',
     notes: 'notes',
@@ -78814,6 +78928,9 @@ export namespace Prisma {
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
     checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
+    checkOutGpsLat?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutGpsLng?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -78825,6 +78942,7 @@ export namespace Prisma {
     editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     checkInBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    checkOutBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }
 
   export type AttendanceOrderByWithRelationInput = {
@@ -78842,6 +78960,9 @@ export namespace Prisma {
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
     checkInBranchId?: SortOrderInput | SortOrder
+    checkOutGpsLat?: SortOrderInput | SortOrder
+    checkOutGpsLng?: SortOrderInput | SortOrder
+    checkOutBranchId?: SortOrderInput | SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -78853,6 +78974,7 @@ export namespace Prisma {
     editedBy?: userOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     checkInBranch?: BranchOrderByWithRelationInput
+    checkOutBranch?: BranchOrderByWithRelationInput
   }
 
   export type AttendanceWhereUniqueInput = Prisma.AtLeast<{
@@ -78874,6 +78996,9 @@ export namespace Prisma {
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
     checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
+    checkOutGpsLat?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutGpsLng?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -78885,6 +79010,7 @@ export namespace Prisma {
     editedBy?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     branch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
     checkInBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
+    checkOutBranch?: XOR<BranchNullableScalarRelationFilter, BranchWhereInput> | null
   }, "id" | "userId_date">
 
   export type AttendanceOrderByWithAggregationInput = {
@@ -78902,6 +79028,9 @@ export namespace Prisma {
     checkInManualLng?: SortOrderInput | SortOrder
     isLocationSuspect?: SortOrder
     checkInBranchId?: SortOrderInput | SortOrder
+    checkOutGpsLat?: SortOrderInput | SortOrder
+    checkOutGpsLng?: SortOrderInput | SortOrder
+    checkOutBranchId?: SortOrderInput | SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -78934,6 +79063,9 @@ export namespace Prisma {
     checkInManualLng?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolWithAggregatesFilter<"Attendance"> | boolean
     checkInBranchId?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
+    checkOutGpsLat?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
+    checkOutGpsLng?: FloatNullableWithAggregatesFilter<"Attendance"> | number | null
+    checkOutBranchId?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolWithAggregatesFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusWithAggregatesFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
@@ -79795,6 +79927,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
     checkInAttendances?: AttendanceListRelationFilter
+    checkOutAttendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
     valasTransactions?: ValasTransactionListRelationFilter
   }
@@ -79818,6 +79951,7 @@ export namespace Prisma {
     users?: userOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
     checkInAttendances?: AttendanceOrderByRelationAggregateInput
+    checkOutAttendances?: AttendanceOrderByRelationAggregateInput
     payrollSlips?: PayrollSlipOrderByRelationAggregateInput
     valasTransactions?: ValasTransactionOrderByRelationAggregateInput
   }
@@ -79844,6 +79978,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     attendances?: AttendanceListRelationFilter
     checkInAttendances?: AttendanceListRelationFilter
+    checkOutAttendances?: AttendanceListRelationFilter
     payrollSlips?: PayrollSlipListRelationFilter
     valasTransactions?: ValasTransactionListRelationFilter
   }, "id">
@@ -84088,6 +84223,8 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -84098,6 +84235,7 @@ export namespace Prisma {
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
     checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
+    checkOutBranch?: BranchCreateNestedOneWithoutCheckOutAttendancesInput
   }
 
   export type AttendanceUncheckedCreateInput = {
@@ -84115,6 +84253,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -84136,6 +84277,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -84146,6 +84289,7 @@ export namespace Prisma {
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
     checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
+    checkOutBranch?: BranchUpdateOneWithoutCheckOutAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateInput = {
@@ -84163,6 +84307,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -84187,6 +84334,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -84208,6 +84358,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -84231,6 +84383,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -85196,6 +85351,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -85218,6 +85374,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -85240,6 +85397,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -85262,6 +85420,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -90043,6 +90202,9 @@ export namespace Prisma {
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
     checkInBranchId?: SortOrder
+    checkOutGpsLat?: SortOrder
+    checkOutGpsLng?: SortOrder
+    checkOutBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -90057,6 +90219,8 @@ export namespace Prisma {
     checkInGpsLng?: SortOrder
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
+    checkOutGpsLat?: SortOrder
+    checkOutGpsLng?: SortOrder
   }
 
   export type AttendanceMaxOrderByAggregateInput = {
@@ -90074,6 +90238,9 @@ export namespace Prisma {
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
     checkInBranchId?: SortOrder
+    checkOutGpsLat?: SortOrder
+    checkOutGpsLng?: SortOrder
+    checkOutBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -90098,6 +90265,9 @@ export namespace Prisma {
     checkInManualLng?: SortOrder
     isLocationSuspect?: SortOrder
     checkInBranchId?: SortOrder
+    checkOutGpsLat?: SortOrder
+    checkOutGpsLng?: SortOrder
+    checkOutBranchId?: SortOrder
     isWithDoctorNote?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -90112,6 +90282,8 @@ export namespace Prisma {
     checkInGpsLng?: SortOrder
     checkInManualLat?: SortOrder
     checkInManualLng?: SortOrder
+    checkOutGpsLat?: SortOrder
+    checkOutGpsLng?: SortOrder
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -94517,6 +94689,12 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
+  export type BranchCreateNestedOneWithoutCheckOutAttendancesInput = {
+    create?: XOR<BranchCreateWithoutCheckOutAttendancesInput, BranchUncheckedCreateWithoutCheckOutAttendancesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutCheckOutAttendancesInput
+    connect?: BranchWhereUniqueInput
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -94573,6 +94751,16 @@ export namespace Prisma {
     delete?: BranchWhereInput | boolean
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutCheckInAttendancesInput, BranchUpdateWithoutCheckInAttendancesInput>, BranchUncheckedUpdateWithoutCheckInAttendancesInput>
+  }
+
+  export type BranchUpdateOneWithoutCheckOutAttendancesNestedInput = {
+    create?: XOR<BranchCreateWithoutCheckOutAttendancesInput, BranchUncheckedCreateWithoutCheckOutAttendancesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutCheckOutAttendancesInput
+    upsert?: BranchUpsertWithoutCheckOutAttendancesInput
+    disconnect?: BranchWhereInput | boolean
+    delete?: BranchWhereInput | boolean
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutCheckOutAttendancesInput, BranchUpdateWithoutCheckOutAttendancesInput>, BranchUncheckedUpdateWithoutCheckOutAttendancesInput>
   }
 
   export type userCreateNestedOneWithoutAccountInput = {
@@ -95979,6 +96167,13 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
+  export type AttendanceCreateNestedManyWithoutCheckOutBranchInput = {
+    create?: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput> | AttendanceCreateWithoutCheckOutBranchInput[] | AttendanceUncheckedCreateWithoutCheckOutBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckOutBranchInput | AttendanceCreateOrConnectWithoutCheckOutBranchInput[]
+    createMany?: AttendanceCreateManyCheckOutBranchInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
   export type PayrollSlipCreateNestedManyWithoutBranchInput = {
     create?: XOR<PayrollSlipCreateWithoutBranchInput, PayrollSlipUncheckedCreateWithoutBranchInput> | PayrollSlipCreateWithoutBranchInput[] | PayrollSlipUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
@@ -96032,6 +96227,13 @@ export namespace Prisma {
     create?: XOR<AttendanceCreateWithoutCheckInBranchInput, AttendanceUncheckedCreateWithoutCheckInBranchInput> | AttendanceCreateWithoutCheckInBranchInput[] | AttendanceUncheckedCreateWithoutCheckInBranchInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutCheckInBranchInput | AttendanceCreateOrConnectWithoutCheckInBranchInput[]
     createMany?: AttendanceCreateManyCheckInBranchInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
+  export type AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput = {
+    create?: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput> | AttendanceCreateWithoutCheckOutBranchInput[] | AttendanceUncheckedCreateWithoutCheckOutBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckOutBranchInput | AttendanceCreateOrConnectWithoutCheckOutBranchInput[]
+    createMany?: AttendanceCreateManyCheckOutBranchInputEnvelope
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
@@ -96151,6 +96353,20 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
+  export type AttendanceUpdateManyWithoutCheckOutBranchNestedInput = {
+    create?: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput> | AttendanceCreateWithoutCheckOutBranchInput[] | AttendanceUncheckedCreateWithoutCheckOutBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckOutBranchInput | AttendanceCreateOrConnectWithoutCheckOutBranchInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutCheckOutBranchInput | AttendanceUpsertWithWhereUniqueWithoutCheckOutBranchInput[]
+    createMany?: AttendanceCreateManyCheckOutBranchInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutCheckOutBranchInput | AttendanceUpdateWithWhereUniqueWithoutCheckOutBranchInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutCheckOutBranchInput | AttendanceUpdateManyWithWhereWithoutCheckOutBranchInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
   export type PayrollSlipUpdateManyWithoutBranchNestedInput = {
     create?: XOR<PayrollSlipCreateWithoutBranchInput, PayrollSlipUncheckedCreateWithoutBranchInput> | PayrollSlipCreateWithoutBranchInput[] | PayrollSlipUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: PayrollSlipCreateOrConnectWithoutBranchInput | PayrollSlipCreateOrConnectWithoutBranchInput[]
@@ -96260,6 +96476,20 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
     update?: AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput | AttendanceUpdateWithWhereUniqueWithoutCheckInBranchInput[]
     updateMany?: AttendanceUpdateManyWithWhereWithoutCheckInBranchInput | AttendanceUpdateManyWithWhereWithoutCheckInBranchInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput = {
+    create?: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput> | AttendanceCreateWithoutCheckOutBranchInput[] | AttendanceUncheckedCreateWithoutCheckOutBranchInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutCheckOutBranchInput | AttendanceCreateOrConnectWithoutCheckOutBranchInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutCheckOutBranchInput | AttendanceUpsertWithWhereUniqueWithoutCheckOutBranchInput[]
+    createMany?: AttendanceCreateManyCheckOutBranchInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutCheckOutBranchInput | AttendanceUpdateWithWhereUniqueWithoutCheckOutBranchInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutCheckOutBranchInput | AttendanceUpdateManyWithWhereWithoutCheckOutBranchInput[]
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
@@ -100314,6 +100544,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -100335,6 +100566,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -100361,6 +100593,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -100382,6 +100615,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -100389,6 +100623,55 @@ export namespace Prisma {
   export type BranchCreateOrConnectWithoutCheckInAttendancesInput = {
     where: BranchWhereUniqueInput
     create: XOR<BranchCreateWithoutCheckInAttendancesInput, BranchUncheckedCreateWithoutCheckInAttendancesInput>
+  }
+
+  export type BranchCreateWithoutCheckOutAttendancesInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company?: CompanyCreateNestedOneWithoutBranchesInput
+    currencyStocks?: CurrencyStockCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
+    users?: userCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutCheckOutAttendancesInput = {
+    id?: string
+    name: string
+    address?: string | null
+    phone?: string | null
+    isActive?: boolean
+    companyId?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    attendanceRadiusM?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    currencyStocks?: CurrencyStockUncheckedCreateNestedManyWithoutBranchInput
+    stockItems?: StockItemUncheckedCreateNestedManyWithoutBranchInput
+    stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
+    users?: userUncheckedCreateNestedManyWithoutBranchInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
+    checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
+    valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutCheckOutAttendancesInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutCheckOutAttendancesInput, BranchUncheckedCreateWithoutCheckOutAttendancesInput>
   }
 
   export type userUpsertWithoutAttendancesInput = {
@@ -100589,6 +100872,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -100610,6 +100894,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -100642,6 +100927,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -100663,6 +100949,62 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
+    payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUpsertWithoutCheckOutAttendancesInput = {
+    update: XOR<BranchUpdateWithoutCheckOutAttendancesInput, BranchUncheckedUpdateWithoutCheckOutAttendancesInput>
+    create: XOR<BranchCreateWithoutCheckOutAttendancesInput, BranchUncheckedCreateWithoutCheckOutAttendancesInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutCheckOutAttendancesInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutCheckOutAttendancesInput, BranchUncheckedUpdateWithoutCheckOutAttendancesInput>
+  }
+
+  export type BranchUpdateWithoutCheckOutAttendancesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: CompanyUpdateOneWithoutBranchesNestedInput
+    currencyStocks?: CurrencyStockUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
+    users?: userUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
+    valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutCheckOutAttendancesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    companyId?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    attendanceRadiusM?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currencyStocks?: CurrencyStockUncheckedUpdateManyWithoutBranchNestedInput
+    stockItems?: StockItemUncheckedUpdateManyWithoutBranchNestedInput
+    stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
+    users?: userUncheckedUpdateManyWithoutBranchNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
+    checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -101836,6 +102178,8 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -101845,6 +102189,7 @@ export namespace Prisma {
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
     checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
+    checkOutBranch?: BranchCreateNestedOneWithoutCheckOutAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutUserInput = {
@@ -101861,6 +102206,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -101892,6 +102240,8 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -101901,6 +102251,7 @@ export namespace Prisma {
     user: userCreateNestedOneWithoutAttendancesInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
     checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
+    checkOutBranch?: BranchCreateNestedOneWithoutCheckOutAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutEditedByInput = {
@@ -101918,6 +102269,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -102421,6 +102775,7 @@ export namespace Prisma {
     stockMutations?: StockMutationCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -102442,6 +102797,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -102700,6 +103056,9 @@ export namespace Prisma {
     checkInManualLng?: FloatNullableFilter<"Attendance"> | number | null
     isLocationSuspect?: BoolFilter<"Attendance"> | boolean
     checkInBranchId?: StringNullableFilter<"Attendance"> | string | null
+    checkOutGpsLat?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutGpsLng?: FloatNullableFilter<"Attendance"> | number | null
+    checkOutBranchId?: StringNullableFilter<"Attendance"> | string | null
     isWithDoctorNote?: BoolFilter<"Attendance"> | boolean
     status?: EnumAttendanceStatusFilter<"Attendance"> | $Enums.AttendanceStatus
     notes?: StringNullableFilter<"Attendance"> | string | null
@@ -103032,6 +103391,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -103053,6 +103413,7 @@ export namespace Prisma {
     stockMutations?: StockMutationUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -104037,6 +104398,8 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -104046,6 +104409,7 @@ export namespace Prisma {
     user: userCreateNestedOneWithoutAttendancesInput
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
+    checkOutBranch?: BranchCreateNestedOneWithoutCheckOutAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutBranchInput = {
@@ -104062,6 +104426,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -104093,6 +104460,8 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -104102,6 +104471,7 @@ export namespace Prisma {
     user: userCreateNestedOneWithoutAttendancesInput
     editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
     branch?: BranchCreateNestedOneWithoutAttendancesInput
+    checkOutBranch?: BranchCreateNestedOneWithoutCheckOutAttendancesInput
   }
 
   export type AttendanceUncheckedCreateWithoutCheckInBranchInput = {
@@ -104118,6 +104488,9 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -104134,6 +104507,68 @@ export namespace Prisma {
 
   export type AttendanceCreateManyCheckInBranchInputEnvelope = {
     data: AttendanceCreateManyCheckInBranchInput | AttendanceCreateManyCheckInBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AttendanceCreateWithoutCheckOutBranchInput = {
+    id?: string
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: userCreateNestedOneWithoutAttendancesInput
+    editedBy?: userCreateNestedOneWithoutAttendancesEditedInput
+    branch?: BranchCreateNestedOneWithoutAttendancesInput
+    checkInBranch?: BranchCreateNestedOneWithoutCheckInAttendancesInput
+  }
+
+  export type AttendanceUncheckedCreateWithoutCheckOutBranchInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateOrConnectWithoutCheckOutBranchInput = {
+    where: AttendanceWhereUniqueInput
+    create: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput>
+  }
+
+  export type AttendanceCreateManyCheckOutBranchInputEnvelope = {
+    data: AttendanceCreateManyCheckOutBranchInput | AttendanceCreateManyCheckOutBranchInput[]
     skipDuplicates?: boolean
   }
 
@@ -104467,6 +104902,22 @@ export namespace Prisma {
     data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutCheckInBranchInput>
   }
 
+  export type AttendanceUpsertWithWhereUniqueWithoutCheckOutBranchInput = {
+    where: AttendanceWhereUniqueInput
+    update: XOR<AttendanceUpdateWithoutCheckOutBranchInput, AttendanceUncheckedUpdateWithoutCheckOutBranchInput>
+    create: XOR<AttendanceCreateWithoutCheckOutBranchInput, AttendanceUncheckedCreateWithoutCheckOutBranchInput>
+  }
+
+  export type AttendanceUpdateWithWhereUniqueWithoutCheckOutBranchInput = {
+    where: AttendanceWhereUniqueInput
+    data: XOR<AttendanceUpdateWithoutCheckOutBranchInput, AttendanceUncheckedUpdateWithoutCheckOutBranchInput>
+  }
+
+  export type AttendanceUpdateManyWithWhereWithoutCheckOutBranchInput = {
+    where: AttendanceScalarWhereInput
+    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutCheckOutBranchInput>
+  }
+
   export type PayrollSlipUpsertWithWhereUniqueWithoutBranchInput = {
     where: PayrollSlipWhereUniqueInput
     update: XOR<PayrollSlipUpdateWithoutBranchInput, PayrollSlipUncheckedUpdateWithoutBranchInput>
@@ -104552,6 +105003,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -104573,6 +105025,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -109405,6 +109858,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
 
@@ -109426,6 +109880,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
 
@@ -109763,6 +110218,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
 
@@ -109784,6 +110240,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
 
@@ -111674,6 +112131,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -111695,6 +112153,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -111765,6 +112224,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -111786,6 +112246,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -111846,6 +112307,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -111867,6 +112329,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -111937,6 +112400,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -111958,6 +112422,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -112056,6 +112521,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionCreateNestedManyWithoutBranchInput
   }
@@ -112077,6 +112543,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
     valasTransactions?: ValasTransactionUncheckedCreateNestedManyWithoutBranchInput
   }
@@ -112148,6 +112615,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -112169,6 +112637,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
@@ -114080,6 +114549,7 @@ export namespace Prisma {
     users?: userCreateNestedManyWithoutBranchInput
     attendances?: AttendanceCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipCreateNestedManyWithoutBranchInput
   }
 
@@ -114101,6 +114571,7 @@ export namespace Prisma {
     users?: userUncheckedCreateNestedManyWithoutBranchInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutBranchInput
     checkInAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckInBranchInput
+    checkOutAttendances?: AttendanceUncheckedCreateNestedManyWithoutCheckOutBranchInput
     payrollSlips?: PayrollSlipUncheckedCreateNestedManyWithoutBranchInput
   }
 
@@ -114273,6 +114744,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
   }
 
@@ -114294,6 +114766,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
   }
 
@@ -114863,6 +115336,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -114887,6 +115363,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -115390,6 +115869,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115399,6 +115880,7 @@ export namespace Prisma {
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
     checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
+    checkOutBranch?: BranchUpdateOneWithoutCheckOutAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutUserInput = {
@@ -115415,6 +115897,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115438,6 +115923,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115459,6 +115947,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115468,6 +115958,7 @@ export namespace Prisma {
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
     checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
+    checkOutBranch?: BranchUpdateOneWithoutCheckOutAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutEditedByInput = {
@@ -115485,6 +115976,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115508,6 +116002,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116334,6 +116831,9 @@ export namespace Prisma {
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
     checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -116357,6 +116857,35 @@ export namespace Prisma {
     checkInManualLat?: number | null
     checkInManualLng?: number | null
     isLocationSuspect?: boolean
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
+    checkOutBranchId?: string | null
+    isWithDoctorNote?: boolean
+    status?: $Enums.AttendanceStatus
+    notes?: string | null
+    editedById?: string | null
+    editedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateManyCheckOutBranchInput = {
+    id?: string
+    userId: string
+    branchId?: string | null
+    date: Date | string
+    checkIn?: Date | string | null
+    checkOut?: Date | string | null
+    checkInPhotoUrl?: string | null
+    checkOutPhotoUrl?: string | null
+    checkInGpsLat?: number | null
+    checkInGpsLng?: number | null
+    checkInManualLat?: number | null
+    checkInManualLng?: number | null
+    isLocationSuspect?: boolean
+    checkInBranchId?: string | null
+    checkOutGpsLat?: number | null
+    checkOutGpsLng?: number | null
     isWithDoctorNote?: boolean
     status?: $Enums.AttendanceStatus
     notes?: string | null
@@ -116623,6 +117152,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116632,6 +117163,7 @@ export namespace Prisma {
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
+    checkOutBranch?: BranchUpdateOneWithoutCheckOutAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutBranchInput = {
@@ -116648,6 +117180,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116671,6 +117206,9 @@ export namespace Prisma {
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
     checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116692,6 +117230,8 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116701,6 +117241,7 @@ export namespace Prisma {
     user?: userUpdateOneRequiredWithoutAttendancesNestedInput
     editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
     branch?: BranchUpdateOneWithoutAttendancesNestedInput
+    checkOutBranch?: BranchUpdateOneWithoutCheckOutAttendancesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutCheckInBranchInput = {
@@ -116717,6 +117258,9 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116740,6 +117284,87 @@ export namespace Prisma {
     checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
     checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUpdateWithoutCheckOutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: userUpdateOneRequiredWithoutAttendancesNestedInput
+    editedBy?: userUpdateOneWithoutAttendancesEditedNestedInput
+    branch?: BranchUpdateOneWithoutAttendancesNestedInput
+    checkInBranch?: BranchUpdateOneWithoutCheckInAttendancesNestedInput
+  }
+
+  export type AttendanceUncheckedUpdateWithoutCheckOutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    editedById?: NullableStringFieldUpdateOperationsInput | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutCheckOutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkIn?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOut?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkInPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkInManualLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    isLocationSuspect?: BoolFieldUpdateOperationsInput | boolean
+    checkInBranchId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkOutGpsLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    checkOutGpsLng?: NullableFloatFieldUpdateOperationsInput | number | null
     isWithDoctorNote?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -117210,6 +117835,7 @@ export namespace Prisma {
     users?: userUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUpdateManyWithoutBranchNestedInput
   }
@@ -117231,6 +117857,7 @@ export namespace Prisma {
     users?: userUncheckedUpdateManyWithoutBranchNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutBranchNestedInput
     checkInAttendances?: AttendanceUncheckedUpdateManyWithoutCheckInBranchNestedInput
+    checkOutAttendances?: AttendanceUncheckedUpdateManyWithoutCheckOutBranchNestedInput
     payrollSlips?: PayrollSlipUncheckedUpdateManyWithoutBranchNestedInput
     valasTransactions?: ValasTransactionUncheckedUpdateManyWithoutBranchNestedInput
   }
