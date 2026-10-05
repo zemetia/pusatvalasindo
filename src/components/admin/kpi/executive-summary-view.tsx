@@ -482,7 +482,8 @@ function RoleSectionCard({
     section.category === "KEPALA_CABANG" ||
     section.category === "KEPALA_MARKETING" ||
     section.category === "MARKETING" ||
-    section.category === "TELLER_LUAR";
+    section.category === "TELLER_LUAR" ||
+    section.category === "TELLER_DALAM";
 
   return (
     <SectionCard
@@ -587,23 +588,6 @@ function RoleSectionCard({
           </div>
         )}
 
-        {/* Box 2 Khusus Teller Dalam */}
-        {section.category === "TELLER_DALAM" && (
-          <div className="flex flex-col justify-between rounded-xl border bg-card p-3.5 shadow-2xs">
-            <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
-              Operasional Kas & Closing
-            </span>
-            <div className="mt-1">
-              <span className="text-2xl font-bold tracking-tight text-foreground">
-                {section.employees.length}{" "}
-                <span className="text-sm font-normal text-muted-foreground">teller aktif</span>
-              </span>
-            </div>
-            <span className="text-muted-foreground text-[0.75rem] mt-1">
-              Kepatuhan closing tepat waktu & toleransi kas
-            </span>
-          </div>
-        )}
       </div>
 
       {/* ── 1. Tampilan Khusus MARKETING (Tim & Kontribusi Personil) ── */}
