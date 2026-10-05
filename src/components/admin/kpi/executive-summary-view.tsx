@@ -268,34 +268,24 @@ export function ExecutiveSummaryView({
                 <div className="flex flex-wrap items-center gap-6">
                   {currentOmzetTarget > 0 && (
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">
-                        Omzet: Realisasi / Target
+                      <div className="text-xs text-muted-foreground">Total Omzet</div>
+                      <div className="text-base font-bold text-primary">
+                        {formatCurrency(currentOmzetActual)}
                       </div>
-                      <div className="text-sm font-semibold">
-                        <span className="text-primary font-bold">
-                          {formatCurrency(currentOmzetActual)}
-                        </span>
-                        <span className="text-muted-foreground mx-1">/</span>
-                        <span className="text-muted-foreground">
-                          {formatCurrency(currentOmzetTarget)}
-                        </span>{" "}
-                        <Badge
-                          variant={
-                            currentOmzetActual >= currentOmzetTarget
-                              ? "success"
-                              : "warning"
-                          }
-                          className="ml-1 text-[0.7rem]"
-                        >
+                      <div className="flex items-center justify-end gap-1.5 text-xs text-muted-foreground">
+                        <span className="font-semibold text-foreground tabular">
                           {formatPercent(currentOmzetActual / currentOmzetTarget)}
-                        </Badge>
+                        </span>
+                        <span className="text-[0.75rem] tabular">
+                          dari target {formatCurrency(currentOmzetTarget)}
+                        </span>
                       </div>
                     </div>
                   )}
 
                   <div className="text-right border-l pl-4">
-                    <div className="text-xs text-muted-foreground">Rata-rata Skor</div>
-                    <div className="text-lg font-bold">
+                    <div className="text-xs text-muted-foreground">Pencapaian</div>
+                    <div className="text-xl font-bold">
                       {currentAvgScore !== null ? formatPercent(currentAvgScore) : "—"}
                     </div>
                   </div>
@@ -396,6 +386,85 @@ export function ExecutiveSummaryView({
   );
 }
 
+function OmzetValueCell({
+  actual,
+  target,
+  achievement,
+  align = "right",
+}: {
+  actual: number | null | undefined;
+  target: number | null | undefined;
+  achievement: number | null | undefined;
+  align?: "left" | "right";
+}) {
+  const hasActual = actual !== null && actual !== undefined;
+  const hasTarget = target !== null && target !== undefined && target > 0;
+
+  if (!hasActual && !hasTarget) {
+    return <span className="text-muted-foreground text-xs">—</span>;
+  }
+
+  const isSuspicious = hasActual && actual === 1 && hasTarget && (target ?? 0) > 1000;
+  const isZeroNoData = hasActual && actual === 0 && hasTarget;
+
+  return (
+    <div
+      className={`flex flex-col ${
+        align === "right" ? "items-end text-right" : "items-start text-left"
+      } gap-0.5`}
+    >
+      {/* 1. Value Omzet */}
+      <div className="font-semibold text-sm tabular text-foreground">
+        {hasActual ? (
+          isSuspicious ? (
+            <span className="text-amber-600 dark:text-amber-400 font-mono text-xs">
+              1 (Nilai Belum Valid)
+            </span>
+          ) : isZeroNoData ? (
+            <span className="text-muted-foreground font-mono">Rp 0</span>
+          ) : (
+            formatCurrency(actual)
+          )
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </div>
+
+      {/* 2. Di bawahnya: Percentage dari target */}
+      {hasTarget ? (
+        <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          {achievement !== null && achievement !== undefined ? (
+            <span
+              className={`font-semibold tabular ${
+                achievement >= 1
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : achievement > 0
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {formatPercent(achievement)}
+            </span>
+          ) : null}
+          <span className="text-[0.75rem] tabular">
+            dari target {formatCurrency(target)}
+          </span>
+          {isZeroNoData && (
+            <span className="text-destructive text-[0.65rem] italic">(belum diisi)</span>
+          )}
+          {isSuspicious && (
+            <span className="text-amber-600 dark:text-amber-400 text-[0.65rem] italic">
+              (perlu diverifikasi)
+            </span>
+          )}
+        </div>
+      ) : hasActual ? (
+        <span className="text-muted-foreground text-[0.7rem]">(tanpa target terpisah)</span>
+      ) : null}
+    </div>
+  );
+}
+
 function RoleSectionCard({
   section,
   openKurirLogs,
@@ -435,98 +504,120 @@ function RoleSectionCard({
           ? "Pencapaian pengiriman, hari aktif, dan ringkasan rute dari catatan log."
           : `Rangkuman kinerja jabatan ${section.title} untuk periode aktif.`
       }
-      toolbar={
-        <div className="flex items-center gap-4 text-sm">
-          {section.category === "KURIR" && (
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">Total Pengiriman:</span>
-              <span className="font-semibold text-foreground">
-                {section.kurirTotalVolume ?? 0} paket
-              </span>
-              <span className="text-muted-foreground mx-1">·</span>
-              <span className="text-muted-foreground">Hari Aktif:</span>
-              <span className="font-semibold text-foreground">
-                {section.kurirTotalActiveDays ?? 0} hari
-              </span>
-            </div>
-          )}
-
-          {hasOmzetSection && section.category !== "KURIR" && (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-xs">Total Omzet:</span>
-              <span className="font-semibold text-foreground">
-                {formatCurrency(section.totalActual)}
-              </span>
-              {section.totalTarget > 0 && (
-                <>
-                  <span className="text-muted-foreground text-xs">
-                    / {formatCurrency(section.totalTarget)}
-                  </span>
-                  {section.omzetAchievement !== null && (
-                    <Badge
-                      variant={section.omzetAchievement >= 1 ? "success" : "soft"}
-                      className="text-xs"
-                    >
-                      {formatPercent(section.omzetAchievement)}
-                    </Badge>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center gap-1.5 pl-3 border-l">
-            <span className="text-muted-foreground text-xs">Pencapaian:</span>
-            <span className="font-bold text-foreground">
-              {section.avgScore !== null ? formatPercent(section.avgScore) : "—"}
-            </span>
-          </div>
-        </div>
-      }
       padded={false}
     >
+      {/* ── 2 Box Metrik Utama: PENCAPAIAN dan TOTAL OMZET ── */}
+      <div className="grid gap-3 sm:grid-cols-2 p-4 bg-muted/20 border-b">
+        {/* Box 1: PENCAPAIAN */}
+        <div className="flex flex-col justify-between rounded-xl border bg-card p-3.5 shadow-2xs">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            {section.category === "KURIR" ? "Pencapaian Persentase" : "Pencapaian"}
+          </span>
+          <div className="flex items-baseline justify-between mt-1">
+            <span className="text-2xl font-bold tracking-tight text-foreground">
+              {section.avgScore !== null ? formatPercent(section.avgScore) : "—"}
+            </span>
+            <Badge variant="outline" className="text-xs">
+              {section.employees.length} personil
+            </Badge>
+          </div>
+          <span className="text-muted-foreground text-[0.75rem] mt-1">
+            {section.category === "KURIR"
+              ? "Rata-rata skor ketepatan pengiriman & SOP kurir"
+              : `Rata-rata skor kinerja ${section.title}`}
+          </span>
+        </div>
+
+        {/* Box 2: TOTAL OMZET (Value di atas, Percentage dari Target di bawah) */}
+        {hasOmzetSection && section.category !== "KURIR" && (
+          <div className="flex flex-col justify-between rounded-xl border bg-card p-3.5 shadow-2xs">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+              Total Omzet
+            </span>
+            <div className="mt-1">
+              <span className="text-2xl font-bold tracking-tight text-primary">
+                {formatCurrency(section.totalActual)}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 mt-1 text-xs">
+              {section.totalTarget > 0 ? (
+                <>
+                  <span
+                    className={`font-bold tabular ${
+                      (section.omzetAchievement ?? 0) >= 1
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-foreground"
+                    }`}
+                  >
+                    {section.omzetAchievement !== null
+                      ? formatPercent(section.omzetAchievement)
+                      : "0%"}
+                  </span>
+                  <span className="text-muted-foreground text-[0.75rem] tabular">
+                    dari target {formatCurrency(section.totalTarget)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-muted-foreground text-[0.75rem]">
+                  Target omzet belum ditentukan
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Box 2 Khusus Kurir: PENGIRIMAN & BREAKDOWN RUTE */}
+        {section.category === "KURIR" && (
+          <div className="flex flex-col justify-between rounded-xl border bg-card p-3.5 shadow-2xs">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+              Total Pengiriman & Rute
+            </span>
+            <div className="mt-1">
+              <span className="text-2xl font-bold tracking-tight text-primary">
+                {section.kurirTotalVolume ?? 0}{" "}
+                <span className="text-sm font-normal text-muted-foreground">paket</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+              <IconCalendarEvent className="size-3.5 text-muted-foreground" />
+              <span>{section.kurirTotalActiveDays ?? 0} hari aktif total</span>
+              <span>·</span>
+              <span>Breakdown rute per kurir di bawah</span>
+            </div>
+          </div>
+        )}
+
+        {/* Box 2 Khusus Teller Dalam */}
+        {section.category === "TELLER_DALAM" && (
+          <div className="flex flex-col justify-between rounded-xl border bg-card p-3.5 shadow-2xs">
+            <span className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
+              Operasional Kas & Closing
+            </span>
+            <div className="mt-1">
+              <span className="text-2xl font-bold tracking-tight text-foreground">
+                {section.employees.length}{" "}
+                <span className="text-sm font-normal text-muted-foreground">teller aktif</span>
+              </span>
+            </div>
+            <span className="text-muted-foreground text-[0.75rem] mt-1">
+              Kepatuhan closing tepat waktu & toleransi kas
+            </span>
+          </div>
+        )}
+      </div>
+
       {/* ── 1. Tampilan Khusus MARKETING (Tim & Kontribusi Personil) ── */}
       {section.category === "MARKETING" && section.marketingContributions && (
         <div className="flex flex-col">
-          {(section.totalTarget > 0 || section.totalActual > 0) && (
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b bg-muted/20 px-4 py-3">
-              <div className="flex items-center gap-2">
-                {section.totalTarget > 0 && (
-                  <>
-                    <span className="text-xs text-muted-foreground">Target Tim:</span>
-                    <span className="font-semibold text-xs text-foreground">
-                      {formatCurrency(section.totalTarget)}
-                    </span>
-                    <span className="text-muted-foreground text-xs mx-1">·</span>
-                  </>
-                )}
-                <span className="text-xs text-muted-foreground">Realisasi Tim:</span>
-                <span className="font-semibold text-xs text-primary">
-                  {formatCurrency(section.totalActual)}
-                </span>
-              </div>
-              {section.totalTarget > 0 && (
-                <div className="text-xs">
-                  Pencapaian Omzet Tim:{" "}
-                  <span className="font-bold text-foreground">
-                    {formatPercent(section.totalActual / section.totalTarget)}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">#</TableHead>
                 <TableHead>Personil Marketing</TableHead>
                 <TableHead>Cabang</TableHead>
-                <TableHead className="text-right">Skor KPI</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead className="text-right">Target Omzet</TableHead>
-                <TableHead className="text-right">Realisasi Omzet</TableHead>
                 <TableHead className="text-right">Pencapaian</TableHead>
+                <TableHead>Grade</TableHead>
+                <TableHead className="text-right">Total Omzet</TableHead>
                 <TableHead className="w-48 text-right">Kontribusi ke Tim</TableHead>
               </TableRow>
             </TableHeader>
@@ -555,23 +646,12 @@ function RoleSectionCard({
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right text-muted-foreground text-sm tabular">
-                    {m.target ? formatCurrency(m.target) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right font-medium text-foreground text-sm tabular">
-                    {m.actual !== null ? formatCurrency(m.actual) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right font-medium text-sm tabular">
-                    {m.achievement !== null ? (
-                      <Badge
-                        variant={m.achievement >= 1 ? "success" : "soft"}
-                        className="text-[0.7rem]"
-                      >
-                        {formatPercent(m.achievement)}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
-                    )}
+                  <TableCell className="text-right">
+                    <OmzetValueCell
+                      actual={m.actual}
+                      target={m.target}
+                      achievement={m.achievement}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -670,7 +750,7 @@ function RoleSectionCard({
                 <div className="rounded-lg bg-muted/40 p-3 mt-1">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                     <IconRoute className="size-3.5" />
-                    <span>Ringkasan Rute Pengiriman (Log KpiEntry)</span>
+                    <span>Breakdown Rute Pengiriman (Log KpiEntry)</span>
                   </div>
 
                   {ks && ks.routes.length > 0 ? (
@@ -729,7 +809,7 @@ function RoleSectionCard({
                             <TableBody className="text-xs">
                               {ks.recentLogs.map((log, i) => (
                                 <TableRow key={i}>
-                                  <TableCell className="text-muted-foreground tabular font-mono">
+                                   <TableCell className="text-muted-foreground tabular font-mono">
                                     {log.date}
                                   </TableCell>
                                   <TableCell className="text-right font-medium tabular">
@@ -761,14 +841,10 @@ function RoleSectionCard({
               <TableHead className="w-12">#</TableHead>
               <TableHead>Personil</TableHead>
               <TableHead>Cabang</TableHead>
-              <TableHead className="text-right">Skor Pencapaian</TableHead>
+              <TableHead className="text-right">Pencapaian</TableHead>
               <TableHead>Grade</TableHead>
               {hasOmzetSection && (
-                <>
-                  <TableHead className="text-right">Target Omzet</TableHead>
-                  <TableHead className="text-right">Realisasi Omzet</TableHead>
-                  <TableHead className="text-right">Pencapaian Omzet</TableHead>
-                </>
+                <TableHead className="text-right">Total Omzet</TableHead>
               )}
               <TableHead>Fokus Utama</TableHead>
             </TableRow>
@@ -799,28 +875,13 @@ function RoleSectionCard({
                   )}
                 </TableCell>
                 {hasOmzetSection && (
-                  <>
-                    <TableCell className="text-right text-muted-foreground text-sm tabular">
-                      {emp.omzetTarget ? formatCurrency(emp.omzetTarget) : "—"}
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-foreground text-sm tabular">
-                      {emp.omzetActual !== null && emp.omzetActual !== undefined
-                        ? formatCurrency(emp.omzetActual)
-                        : "—"}
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-sm tabular">
-                      {emp.omzetAchievement !== null && emp.omzetAchievement !== undefined ? (
-                        <Badge
-                          variant={emp.omzetAchievement >= 1 ? "success" : "soft"}
-                          className="text-[0.7rem]"
-                        >
-                          {formatPercent(emp.omzetAchievement)}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                  </>
+                  <TableCell className="text-right">
+                    <OmzetValueCell
+                      actual={emp.omzetActual}
+                      target={emp.omzetTarget}
+                      achievement={emp.omzetAchievement}
+                    />
+                  </TableCell>
                 )}
                 <TableCell className="text-xs text-muted-foreground">
                   {emp.kpis[0] ? (
