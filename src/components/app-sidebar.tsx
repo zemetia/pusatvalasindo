@@ -234,20 +234,8 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // ── Laporan (dashboard laporan/analisis untuk Karyawan/KPI, Finance, Watcher Valas) ──
+  // ── Laporan (dashboard laporan/analisis untuk Finance & Watcher Valas) ────
   const navLaporan: NavItem[] = [];
-
-  // Seluruh item di section ini adalah resource `scoping: "global"`: isinya
-  // laporan lintas PT, jadi izinnya tidak punya dimensi PT — hanya boleh atau
-  // tidak. Default-nya Owner & Super Admin, dan hanya mereka yang boleh
-  // mendelegasikannya lewat matriks izin.
-  if (show("kpi.analytics")) {
-    navLaporan.push({
-      title: "Analisis Kinerja",
-      url: "/dashboard/kpi/analisis",
-      icon: IconChartHistogram,
-    });
-  }
 
   if (show("finance.report")) {
     navLaporan.push({
@@ -265,15 +253,26 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // ── Ringkasan KPI per jabatan ────────────────────────────────────────────
-  // Satu item per nama jabatan (`kpiRoleNames`, sudah dikosongkan oleh layout
-  // untuk yang tidak punya izin `kpi.analytics`) — bukan submenu bertingkat,
-  // NavMain hanya mendukung daftar datar per section.
-  const navKpiSummary: NavItem[] = kpiRoleNames.map((name) => ({
-    title: name,
-    url: `/dashboard/kpi/summary/${slugifyRoleName(name)}`,
-    icon: IconChartHistogram,
-  }));
+  // ── Ringkasan KPI (Analisis Kinerja & per jabatan) ────────────────────────
+  const navKpiSummary: NavItem[] = [];
+
+  // Analisis Kinerja ditaruh sebagai menu utama di Ringkasan KPI
+  if (show("kpi.analytics")) {
+    navKpiSummary.push({
+      title: "Analisis Kinerja",
+      url: "/dashboard/kpi/analisis",
+      icon: IconChartHistogram,
+      exact: true,
+    });
+  }
+
+  for (const name of kpiRoleNames) {
+    navKpiSummary.push({
+      title: name,
+      url: `/dashboard/kpi/summary/${slugifyRoleName(name)}`,
+      icon: IconChartHistogram,
+    });
+  }
 
   // ── Finance Management ──────────────────────────────────────────────────
   const navFinanceManagement: NavItem[] = [];

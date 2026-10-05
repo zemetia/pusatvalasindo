@@ -26,7 +26,12 @@ import {
 import { SearchInput } from "@/components/admin/search-input";
 import { IconChartHistogram } from "@tabler/icons-react";
 import { MONTH_NAMES, formatPercent } from "@/lib/kpi-utils";
-import { NO_COMPANY, type RoleKpiSummary } from "@/lib/kpi-analytics";
+import { MonthPicker } from "./month-picker";
+import {
+  aggregatePerformance,
+  NO_COMPANY,
+  type RoleKpiSummary,
+} from "@/lib/kpi-analytics";
 
 const GRADE_VARIANT: Record<string, BadgeVariant> = {
   A: "success",
@@ -43,7 +48,7 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const { period, kpiColumns, kpiAverages, rows, totals, byCompany } = summary;
+  const { period, kpiColumns, rows, totals, byCompany, kpiAverages } = summary;
 
   const [company, setCompany] = useState(ALL);
   const [search, setSearch] = useState("");
@@ -55,18 +60,52 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
     startTransition(() => router.push(`${pathname}?${params.toString()}`));
   };
 
-  const companyOptions = useMemo(
-    () =>
-      byCompany
+  const companyOptions = useMemo(() => {
+    if (byCompany && byCompany.length > 0) {
+      return byCompany
         .map((c) => ({ value: c.key, label: c.label }))
-        .sort((a, b) => a.label.localeCompare(b.label, "id")),
-    [byCompany]
-  );
+        .sort((a, b) => a.label.localeCompare(b.label, "id"));
+    }
+    const map = new Map<string, string>();
+    for (const r of rows) {
+      const key = r.companyId ?? NO_COMPANY;
+      const label = r.companyName || r.companyCode || "Tanpa PT";
+      map.set(key, label);
+    }
+    return [...map.entries()]
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, "id"));
+  }, [byCompany, rows]);
 
   const scoped = useMemo(
     () => (company === ALL ? rows : rows.filter((r) => (r.companyId ?? NO_COMPANY) === company)),
     [rows, company]
   );
+
+  const scopedMetrics = useMemo(() => {
+    if (company === ALL) {
+      return { totals, kpiAverages };
+    }
+    const { totals: aggTotals } = aggregatePerformance(scoped);
+    const kpiTotals = new Map<string, { sum: number; count: number }>();
+    for (const r of scoped) {
+      for (const item of r.kpis) {
+        const prev = kpiTotals.get(item.name) ?? { sum: 0, count: 0 };
+        prev.sum += item.achievement;
+        prev.count += 1;
+        kpiTotals.set(item.name, prev);
+      }
+    }
+    const aggKpiAverages: Record<string, number | null> = {};
+    for (const col of kpiColumns) {
+      const entry = kpiTotals.get(col);
+      aggKpiAverages[col] = entry && entry.count > 0 ? entry.sum / entry.count : null;
+    }
+    return { totals: aggTotals, kpiAverages: aggKpiAverages };
+  }, [company, scoped, totals, kpiAverages, kpiColumns]);
+
+  const activeTotals = scopedMetrics.totals;
+  const activeKpiAverages = scopedMetrics.kpiAverages;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -75,35 +114,18 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
     );
   }, [scoped, search]);
 
-  const canSplit = byCompany.length > 1;
+  const canSplit = companyOptions.length > 1;
 
   return (
     <div className={isPending ? "opacity-60 transition-opacity" : undefined}>
       {/* ── Filter ── */}
       <div className="flex flex-wrap items-end gap-3 pb-2">
         <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">Bulan</Label>
-          <Combobox
-            value={String(period.month)}
-            onValueChange={(v) => setPeriod({ month: Number(v) })}
-            options={MONTH_NAMES.slice(1).map((name, i) => ({
-              value: String(i + 1),
-              label: name,
-            }))}
-            searchPlaceholder="Cari bulan..."
-            className="w-36"
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">Tahun</Label>
-          <Combobox
-            value={String(period.year)}
-            onValueChange={(v) => setPeriod({ year: Number(v) })}
-            options={Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map((y) => ({
-              value: String(y),
-              label: String(y),
-            }))}
-            className="w-24"
+          <Label className="text-muted-foreground text-xs">Periode</Label>
+          <MonthPicker
+            month={period.month}
+            year={period.year}
+            onSelect={setPeriod}
           />
         </div>
         {canSplit && (
@@ -131,17 +153,17 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
         <div className="min-w-0">
           <MetricLabel>Rata-rata Skor · {summary.roleName}</MetricLabel>
           <MetricValue size="hero" className="mt-2">
-            {totals.avgScore === null ? "—" : formatPercent(totals.avgScore)}
+            {activeTotals.avgScore === null ? "—" : formatPercent(activeTotals.avgScore)}
           </MetricValue>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <DeltaPill value={totals.avgDeltaPct} />
+            <DeltaPill value={activeTotals.avgDeltaPct} />
             <span className="text-muted-foreground text-xs">vs bulan lalu</span>
           </div>
           <p className="text-muted-foreground mt-1.5 text-xs">
             {period.label} ·{" "}
-            {totals.avgScore === null
+            {activeTotals.avgScore === null
               ? "belum ada karyawan yang dinilai pada jabatan ini"
-              : `dihitung dari ${totals.scored} dari ${totals.employees} karyawan`}
+              : `dihitung dari ${activeTotals.scored} dari ${activeTotals.employees} karyawan`}
           </p>
         </div>
       </section>
@@ -150,30 +172,30 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
         <MetricBlock
           label="Sudah Dinilai"
           size="secondary"
-          value={totals.scored}
-          suffix={`/ ${totals.employees}`}
+          value={activeTotals.scored}
+          suffix={`/ ${activeTotals.employees}`}
           meta="karyawan jabatan ini"
         />
         <MetricBlock
           label="Grade A–B"
           size="secondary"
-          tone={totals.gradeCounts.A + totals.gradeCounts.B > 0 ? "success" : "muted"}
-          value={totals.gradeCounts.A + totals.gradeCounts.B}
+          tone={activeTotals.gradeCounts.A + activeTotals.gradeCounts.B > 0 ? "success" : "muted"}
+          value={activeTotals.gradeCounts.A + activeTotals.gradeCounts.B}
           meta="karyawan bergrade baik"
         />
         <MetricBlock
           label="Perlu Perhatian"
           size="secondary"
-          tone={totals.gradeCounts.D > 0 ? "destructive" : "muted"}
-          value={totals.gradeCounts.D}
+          tone={activeTotals.gradeCounts.D > 0 ? "destructive" : "muted"}
+          value={activeTotals.gradeCounts.D}
           meta="karyawan bergrade D"
         />
         <MetricBlock
           label="Belum Dinilai"
           size="secondary"
-          tone={totals.unscored > 0 ? "warning" : "muted"}
-          value={totals.unscored}
-          meta={totals.unscored > 0 ? "skornya belum pernah dihitung" : "semua sudah dihitung"}
+          tone={activeTotals.unscored > 0 ? "warning" : "muted"}
+          value={activeTotals.unscored}
+          meta={activeTotals.unscored > 0 ? "skornya belum pernah dihitung" : "semua sudah dihitung"}
         />
       </MetricRow>
 
@@ -190,7 +212,7 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
               label={name}
               size="secondary"
               value={
-                kpiAverages[name] === null ? "—" : formatPercent(kpiAverages[name] as number)
+                activeKpiAverages[name] === null ? "—" : formatPercent(activeKpiAverages[name] as number)
               }
               meta="rata-rata pencapaian"
             />

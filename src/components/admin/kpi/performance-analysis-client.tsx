@@ -34,6 +34,7 @@ import {
   type PerformanceOverview,
 } from "@/lib/kpi-analytics";
 import { ExecutiveSummaryView } from "./executive-summary-view";
+import { MonthPicker } from "./month-picker";
 
 /* ── Skala bersama untuk sparkline ──────────────────────────────────────────
  * Domain sama untuk semua baris (bukan min–max tiap baris) supaya garisnya bisa
@@ -367,28 +368,11 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="grid gap-1">
-            <Combobox
-              value={String(period.month)}
-              onValueChange={(v) => setPeriod({ month: Number(v) })}
-              options={MONTH_NAMES.slice(1).map((name, i) => ({
-                value: String(i + 1),
-                label: name,
-              }))}
-              searchPlaceholder="Cari bulan..."
-              className="w-36 h-8 text-xs"
-            />
-          </div>
-          <div className="grid gap-1">
-            <Combobox
-              value={String(period.year)}
-              onValueChange={(v) => setPeriod({ year: Number(v) })}
-              options={Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map(
-                (y) => ({ value: String(y), label: String(y) })
-              )}
-              className="w-24 h-8 text-xs"
-            />
-          </div>
+          <MonthPicker
+            month={period.month}
+            year={period.year}
+            onSelect={setPeriod}
+          />
         </div>
       </div>
 
