@@ -8,9 +8,33 @@
  * baris yang lolos filter, di server maupun di client, lewat fungsi yang sama.
  */
 
+import type { ScoredKpiItem } from "@/lib/kpi-scoring";
+
 export type PeriodRef = { month: number; year: number };
 
 export type KpiHighlight = { name: string; achievement: number };
+
+export type KurirRouteLog = {
+  date: string;
+  quantity: number;
+  note: string;
+};
+
+export type KurirRouteSummary = {
+  route: string;
+  count: number;
+  volume: number;
+};
+
+export type KurirSummary = {
+  totalVolume: number;
+  activeDays: number;
+  deliveryTarget: number | null;
+  deliveryActual: number | null;
+  deliveryAchievement: number | null;
+  routes: KurirRouteSummary[];
+  recentLogs: KurirRouteLog[];
+};
 
 /** Karyawan tanpa cabang (mis. jabatan global) tetap harus bisa difilter. */
 export const NO_COMPANY = "__none__";
@@ -36,6 +60,16 @@ export type EmployeePerformance = {
   kpis: KpiHighlight[];
   /** Skor 6 bulan terakhir, urut lama → baru. `null` untuk bulan tanpa hasil. */
   history: (number | null)[];
+  /** Nilai target omzet / currency bulanan dalam rupiah. */
+  omzetTarget?: number | null;
+  /** Realisasi omzet / currency bulanan dalam rupiah. */
+  omzetActual?: number | null;
+  /** Rasio pencapaian omzet (realisasi / target). */
+  omzetAchievement?: number | null;
+  /** Rangkuman pengiriman & rute kurir dari breakdownJson & kpiEntry. */
+  kurirSummary?: KurirSummary | null;
+  /** Daftar seluruh item KPI berbobot yang sudah dinilai. */
+  breakdownItems?: ScoredKpiItem[];
 };
 
 export type GroupPerformance = {
@@ -290,3 +324,548 @@ export function aggregatePerformance(rows: EmployeePerformance[]): PerformanceAg
     ).sort(byScoreAsc),
   };
 }
+
+/* ── Rangkuman Eksekutif per Cabang & Jabatan ─────────────────────────────── */
+
+export type CanonicalRoleCategory =
+  | "KEPALA_CABANG"
+  | "KEPALA_MARKETING"
+  | "MARKETING"
+  | "TELLER_LUAR"
+  | "KURIR"
+  | "TELLER_DALAM"
+  | "LAINNYA";
+
+export const ROLE_CATEGORY_META: Record<
+  CanonicalRoleCategory,
+  { label: string; order: number }
+> = {
+  KEPALA_CABANG: { label: "Kepala Cabang", order: 1 },
+  KEPALA_MARKETING: { label: "Kepala Marketing", order: 2 },
+  MARKETING: { label: "Marketing", order: 3 },
+  TELLER_LUAR: { label: "Teller Luar", order: 4 },
+  KURIR: { label: "Kurir", order: 5 },
+  TELLER_DALAM: { label: "Teller Dalam", order: 6 },
+  LAINNYA: { label: "Jabatan Lainnya", order: 7 },
+};
+
+export function categorizeRole(roleName: string): CanonicalRoleCategory {
+  const clean = roleName.trim().toLowerCase();
+  if (
+    clean.includes("kepala cabang") ||
+    clean.includes("branch manager") ||
+    clean.includes("kacab")
+  ) {
+    return "KEPALA_CABANG";
+  }
+  if (
+    clean.includes("kepala marketing") ||
+    clean.includes("head of marketing") ||
+    clean.includes("marketing head")
+  ) {
+    return "KEPALA_MARKETING";
+  }
+  if (
+    clean.includes("marketing") ||
+    clean.includes("sales") ||
+    clean.includes("account executive")
+  ) {
+    return "MARKETING";
+  }
+  if (clean.includes("teller luar")) {
+    return "TELLER_LUAR";
+  }
+  if (clean.includes("teller dalam") || clean.includes("kasir") || clean.includes("teller")) {
+    return "TELLER_DALAM";
+  }
+  if (
+    clean.includes("kurir") ||
+    clean.includes("courier") ||
+    clean.includes("logistik") ||
+    clean.includes("delivery")
+  ) {
+    return "KURIR";
+  }
+  return "LAINNYA";
+}
+
+export function extractOmzetStats(items: ScoredKpiItem[] | undefined | null): {
+  target: number | null;
+  actual: number | null;
+  achievement: number | null;
+} {
+  if (!Array.isArray(items) || items.length === 0) {
+    return { target: null, actual: null, achievement: null };
+  }
+  // Only TARGET_VALUE KPIs represent omzet / sales turnover / profit margin.
+  // TOLERANCE_LIMIT (e.g. kesesuaian-jumlah-kas) is a cash discrepancy tolerance, NOT turnover.
+  const omzetItems = items.filter((i) => {
+    if (i.scoringType !== "TARGET_VALUE") return false;
+    const code = i.kpiCode?.toLowerCase() ?? "";
+    const name = i.kpiName?.toLowerCase() ?? "";
+    return (
+      code === "jumlah-omzet" ||
+      code === "net-profit-margin" ||
+      name.includes("omzet") ||
+      name.includes("profit margin") ||
+      (i.unit === "CURRENCY" && !name.includes("kas"))
+    );
+  });
+
+  if (omzetItems.length === 0) {
+    return { target: null, actual: null, achievement: null };
+  }
+
+  const hasTarget = omzetItems.some((i) => i.reference !== null && i.reference !== undefined);
+  const hasActual = omzetItems.some((i) => i.actual !== null && i.actual !== undefined);
+
+  const target = hasTarget
+    ? omzetItems.reduce((acc, i) => acc + (Number(i.reference) || 0), 0)
+    : null;
+  const actual = hasActual
+    ? omzetItems.reduce((acc, i) => acc + (Number(i.actual) || 0), 0)
+    : null;
+
+  let achievement: number | null = null;
+  if (target !== null && target > 0 && actual !== null) {
+    achievement = actual / target;
+  } else if (omzetItems[0].achievement !== null && omzetItems[0].achievement !== undefined) {
+    achievement = Number(omzetItems[0].achievement);
+  }
+
+  return { target, actual, achievement };
+}
+
+export function extractKurirStats(
+  roleName: string,
+  items: ScoredKpiItem[] | undefined | null,
+  entries: { quantity: number; note: string | null; occurredAt: Date | string }[]
+): KurirSummary | null {
+  const isKurir =
+    roleName.toLowerCase().includes("kurir") ||
+    roleName.toLowerCase().includes("courier") ||
+    roleName.toLowerCase().includes("logistik") ||
+    roleName.toLowerCase().includes("delivery");
+
+  if (!isKurir && entries.length === 0) {
+    return null;
+  }
+
+  const deliveryItem = Array.isArray(items)
+    ? items.find(
+        (i) =>
+          i.kpiCode === "ketepatan-pengiriman" ||
+          i.kpiName.toLowerCase().includes("pengiriman") ||
+          i.kpiCode.includes("pengiriman")
+      )
+    : null;
+
+  const totalVolumeFromEntries = entries.reduce(
+    (sum, e) => sum + (Number(e.quantity) || 0),
+    0
+  );
+
+  const activeDaysSet = new Set<string>();
+  const routeMap = new Map<string, { route: string; count: number; volume: number }>();
+  const recentLogs: KurirRouteLog[] = [];
+
+  for (const en of entries) {
+    const qty = Number(en.quantity) || 0;
+    const dateStr =
+      en.occurredAt instanceof Date
+        ? en.occurredAt.toISOString().slice(0, 10)
+        : String(en.occurredAt).slice(0, 10);
+
+    if (qty > 0) {
+      activeDaysSet.add(dateStr);
+    }
+
+    const rawNote = en.note?.trim();
+    if (rawNote) {
+      // Normalize whitespace and case-insensitive deduplication of routes
+      const cleanNote = rawNote.replace(/\s+/g, " ");
+      const normalizedKey = cleanNote.toLowerCase();
+      const cur = routeMap.get(normalizedKey) ?? { route: cleanNote, count: 0, volume: 0 };
+      cur.count += 1;
+      cur.volume += qty;
+      routeMap.set(normalizedKey, cur);
+    }
+
+    if (recentLogs.length < 50) {
+      recentLogs.push({
+        date: dateStr,
+        quantity: qty,
+        note: rawNote || "Pengiriman",
+      });
+    }
+  }
+
+  recentLogs.sort((a, b) => b.date.localeCompare(a.date));
+
+  const routes: KurirRouteSummary[] = [...routeMap.values()]
+    .map((val) => ({
+      route: val.route,
+      count: val.count,
+      volume: val.volume,
+    }))
+    .sort((a, b) => b.volume - a.volume || b.count - a.count);
+
+  const deliveryTarget =
+    deliveryItem && deliveryItem.reference !== null && deliveryItem.reference !== undefined
+      ? Number(deliveryItem.reference)
+      : null;
+
+  const deliveryActual =
+    deliveryItem && deliveryItem.actual !== null && deliveryItem.actual !== undefined
+      ? Number(deliveryItem.actual)
+      : totalVolumeFromEntries;
+
+  const deliveryAchievement =
+    deliveryItem && deliveryItem.achievement !== null && deliveryItem.achievement !== undefined
+      ? Number(deliveryItem.achievement)
+      : deliveryTarget && deliveryTarget > 0
+      ? deliveryActual / deliveryTarget
+      : null;
+
+  return {
+    totalVolume: deliveryActual,
+    activeDays: activeDaysSet.size,
+    deliveryTarget,
+    deliveryActual,
+    deliveryAchievement,
+    routes,
+    recentLogs,
+  };
+}
+
+export type MarketingContribution = {
+  employeeId: string;
+  name: string;
+  branchName: string;
+  score: number | null;
+  grade: string | null;
+  target: number | null;
+  actual: number | null;
+  achievement: number | null;
+  contributionPct: number;
+};
+
+export type KurirPersonilDetail = {
+  employeeId: string;
+  name: string;
+  branchName: string;
+  score: number | null;
+  grade: string | null;
+  summary: KurirSummary;
+};
+
+export type RoleSectionSummary = {
+  category: CanonicalRoleCategory;
+  title: string;
+  employees: EmployeePerformance[];
+  avgScore: number | null;
+  totalTarget: number;
+  totalActual: number;
+  omzetAchievement: number | null;
+  marketingContributions?: MarketingContribution[];
+  kurirBreakdowns?: KurirPersonilDetail[];
+  kurirTotalVolume?: number;
+  kurirTotalActiveDays?: number;
+};
+
+export type BranchExecutiveSummary = {
+  branchId: string;
+  branchName: string;
+  companyId: string | null;
+  companyCode: string;
+  companyName: string;
+  employeeCount: number;
+  scoredCount: number;
+  avgScore: number | null;
+  totalOmzetTarget: number;
+  totalOmzetActual: number;
+  sections: RoleSectionSummary[];
+};
+
+export type CompanyExecutiveSummary = {
+  companyId: string;
+  companyCode: string;
+  companyName: string;
+  employeeCount: number;
+  scoredCount: number;
+  avgScore: number | null;
+  totalOmzetTarget: number;
+  totalOmzetActual: number;
+  sections: RoleSectionSummary[];
+  branches: BranchExecutiveSummary[];
+};
+
+export type ExecutiveSummary = {
+  companies: CompanyExecutiveSummary[];
+  overallTotals: {
+    employeeCount: number;
+    scoredCount: number;
+    avgScore: number | null;
+    totalOmzetTarget: number;
+    totalOmzetActual: number;
+  };
+};
+
+export function buildRoleSection(
+  category: CanonicalRoleCategory,
+  employees: EmployeePerformance[]
+): RoleSectionSummary | null {
+  if (employees.length === 0) return null;
+
+  const title = ROLE_CATEGORY_META[category].label;
+  const scored = employees.filter((e) => e.score !== null);
+  const avgScore = average(scored.map((e) => e.score as number));
+
+  let totalTarget = 0;
+  let totalActual = 0;
+  let hasOmzet = false;
+
+  for (const e of employees) {
+    if (e.omzetTarget !== null && e.omzetTarget !== undefined) {
+      totalTarget += e.omzetTarget;
+      hasOmzet = true;
+    }
+    if (e.omzetActual !== null && e.omzetActual !== undefined) {
+      totalActual += e.omzetActual;
+      hasOmzet = true;
+    }
+  }
+
+  const omzetAchievement =
+    hasOmzet && totalTarget > 0 ? totalActual / totalTarget : null;
+
+  let marketingContributions: MarketingContribution[] | undefined;
+  if (category === "MARKETING") {
+    marketingContributions = employees.map((e) => {
+      const actual = e.omzetActual ?? null;
+      const target = e.omzetTarget ?? null;
+      const achievement =
+        e.omzetAchievement ??
+        (target && target > 0 && actual !== null ? actual / target : null);
+      const contributionPct =
+        totalActual > 0 && actual !== null && actual > 0
+          ? (actual / totalActual) * 100
+          : 0;
+
+      return {
+        employeeId: e.employeeId,
+        name: e.name,
+        branchName: e.branchName,
+        score: e.score,
+        grade: e.grade,
+        target,
+        actual,
+        achievement,
+        contributionPct,
+      };
+    });
+  }
+
+  let kurirBreakdowns: KurirPersonilDetail[] | undefined;
+  let kurirTotalVolume: number | undefined;
+  let kurirTotalActiveDays: number | undefined;
+
+  if (category === "KURIR") {
+    const kurirList: KurirPersonilDetail[] = [];
+    let vol = 0;
+    let days = 0;
+    for (const e of employees) {
+      if (e.kurirSummary) {
+        kurirList.push({
+          employeeId: e.employeeId,
+          name: e.name,
+          branchName: e.branchName,
+          score: e.score,
+          grade: e.grade,
+          summary: e.kurirSummary,
+        });
+        vol += e.kurirSummary.totalVolume;
+        days += e.kurirSummary.activeDays;
+      }
+    }
+    kurirBreakdowns = kurirList;
+    kurirTotalVolume = vol;
+    kurirTotalActiveDays = days;
+  }
+
+  return {
+    category,
+    title,
+    employees,
+    avgScore,
+    totalTarget,
+    totalActual,
+    omzetAchievement,
+    marketingContributions,
+    kurirBreakdowns,
+    kurirTotalVolume,
+    kurirTotalActiveDays,
+  };
+}
+
+export function buildExecutiveSummary(rows: EmployeePerformance[]): ExecutiveSummary {
+  const companyMap = new Map<
+    string,
+    { code: string; name: string; rows: EmployeePerformance[] }
+  >();
+
+  for (const r of rows) {
+    const cid = r.companyId ?? NO_COMPANY;
+    const existing = companyMap.get(cid) ?? {
+      code: r.companyCode,
+      name: r.companyName,
+      rows: [],
+    };
+    existing.rows.push(r);
+    companyMap.set(cid, existing);
+  }
+
+  const roleCategoriesOrder: CanonicalRoleCategory[] = [
+    "KEPALA_CABANG",
+    "KEPALA_MARKETING",
+    "MARKETING",
+    "TELLER_LUAR",
+    "KURIR",
+    "TELLER_DALAM",
+    "LAINNYA",
+  ];
+
+  const companies: CompanyExecutiveSummary[] = [];
+
+  for (const [companyId, comp] of companyMap.entries()) {
+    const compRows = comp.rows;
+    const scoredComp = compRows.filter((r) => r.score !== null);
+    const avgScore = average(scoredComp.map((r) => r.score as number));
+
+    // Role sections at company level
+    const compSections: RoleSectionSummary[] = [];
+    for (const cat of roleCategoriesOrder) {
+      const catEmployees = compRows.filter((r) => categorizeRole(r.roleName) === cat);
+      const section = buildRoleSection(cat, catEmployees);
+      if (section) {
+        compSections.push(section);
+      }
+    }
+
+    // Branch breakdowns within company
+    const branchMap = new Map<string, { name: string; rows: EmployeePerformance[] }>();
+    for (const r of compRows) {
+      const bid = r.branchId ?? NO_BRANCH;
+      const bExisting = branchMap.get(bid) ?? {
+        name: r.branchName,
+        rows: [],
+      };
+      bExisting.rows.push(r);
+      branchMap.set(bid, bExisting);
+    }
+
+    const branches: BranchExecutiveSummary[] = [];
+    for (const [branchId, b] of branchMap.entries()) {
+      const bRows = b.rows;
+      const bScored = bRows.filter((r) => r.score !== null);
+      const bAvgScore = average(bScored.map((r) => r.score as number));
+
+      // If branch has Kepala Cabang with omzet, that defines the branch target & actual omzet.
+      // Otherwise, sum omzet from the sales / operational roles in this branch.
+      const kacabInBranch = bRows.find(
+        (r) =>
+          categorizeRole(r.roleName) === "KEPALA_CABANG" &&
+          (r.omzetTarget != null || r.omzetActual != null)
+      );
+      let bOmzetTarget = 0;
+      let bOmzetActual = 0;
+      if (kacabInBranch) {
+        bOmzetTarget = kacabInBranch.omzetTarget ?? 0;
+        bOmzetActual = kacabInBranch.omzetActual ?? 0;
+      } else {
+        for (const r of bRows) {
+          if (r.omzetTarget) bOmzetTarget += r.omzetTarget;
+          if (r.omzetActual) bOmzetActual += r.omzetActual;
+        }
+      }
+
+      const bSections: RoleSectionSummary[] = [];
+      for (const cat of roleCategoriesOrder) {
+        const catEmployees = bRows.filter((r) => categorizeRole(r.roleName) === cat);
+        const section = buildRoleSection(cat, catEmployees);
+        if (section) {
+          bSections.push(section);
+        }
+      }
+
+      branches.push({
+        branchId,
+        branchName: b.name,
+        companyId: companyId === NO_COMPANY ? null : companyId,
+        companyCode: comp.code,
+        companyName: comp.name,
+        employeeCount: bRows.length,
+        scoredCount: bScored.length,
+        avgScore: bAvgScore,
+        totalOmzetTarget: bOmzetTarget,
+        totalOmzetActual: bOmzetActual,
+        sections: bSections,
+      });
+    }
+
+    branches.sort((a, b) => a.branchName.localeCompare(b.branchName, "id"));
+
+    // Company level omzet: sum of its branch omzets (or fallback to row sum if no branches)
+    let compTotalTarget = branches.reduce((sum, b) => sum + b.totalOmzetTarget, 0);
+    let compTotalActual = branches.reduce((sum, b) => sum + b.totalOmzetActual, 0);
+
+    if (branches.length === 0) {
+      for (const r of compRows) {
+        if (r.omzetTarget) compTotalTarget += r.omzetTarget;
+        if (r.omzetActual) compTotalActual += r.omzetActual;
+      }
+    }
+
+    companies.push({
+      companyId: companyId === NO_COMPANY ? "" : companyId,
+      companyCode: comp.code,
+      companyName: comp.name,
+      employeeCount: compRows.length,
+      scoredCount: scoredComp.length,
+      avgScore,
+      totalOmzetTarget: compTotalTarget,
+      totalOmzetActual: compTotalActual,
+      sections: compSections,
+      branches,
+    });
+  }
+
+  const companyPriority: Record<string, number> = {
+    PVI: 1,
+    PTU: 2,
+    PKD: 3,
+  };
+  companies.sort((a, b) => {
+    const prioA = companyPriority[a.companyCode] ?? 99;
+    const prioB = companyPriority[b.companyCode] ?? 99;
+    if (prioA !== prioB) return prioA - prioB;
+    return a.companyName.localeCompare(b.companyName, "id");
+  });
+
+  const allScored = rows.filter((r) => r.score !== null);
+  const overallAvgScore = average(allScored.map((r) => r.score as number));
+  const overallTarget = companies.reduce((sum, c) => sum + c.totalOmzetTarget, 0);
+  const overallActual = companies.reduce((sum, c) => sum + c.totalOmzetActual, 0);
+
+  return {
+    companies,
+    overallTotals: {
+      employeeCount: rows.length,
+      scoredCount: allScored.length,
+      avgScore: overallAvgScore,
+      totalOmzetTarget: overallTarget,
+      totalOmzetActual: overallActual,
+    },
+  };
+}
+

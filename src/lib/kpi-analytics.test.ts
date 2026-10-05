@@ -3,6 +3,10 @@ import {
   aggregatePerformance,
   NO_COMPANY,
   type EmployeePerformance,
+  categorizeRole,
+  extractOmzetStats,
+  extractKurirStats,
+  buildExecutiveSummary,
 } from "./kpi-analytics";
 
 /**
@@ -140,5 +144,230 @@ describe("aggregatePerformance", () => {
     expect(totals.history).toEqual([]);
     expect(byCompany).toEqual([]);
     expect(byRole).toEqual([]);
+  });
+});
+
+describe("categorizeRole", () => {
+  it("mengidentifikasi peran-peran standar dengan benar", () => {
+    expect(categorizeRole("Kepala Cabang")).toBe("KEPALA_CABANG");
+    expect(categorizeRole("Kepala Cabang Cengkareng")).toBe("KEPALA_CABANG");
+    expect(categorizeRole("Branch Manager")).toBe("KEPALA_CABANG");
+
+    expect(categorizeRole("Kepala Marketing")).toBe("KEPALA_MARKETING");
+    expect(categorizeRole("Head of Marketing")).toBe("KEPALA_MARKETING");
+
+    expect(categorizeRole("Marketing")).toBe("MARKETING");
+    expect(categorizeRole("Sales")).toBe("MARKETING");
+    expect(categorizeRole("Account Executive")).toBe("MARKETING");
+
+    expect(categorizeRole("Teller Luar")).toBe("TELLER_LUAR");
+    expect(categorizeRole("Teller Dalam")).toBe("TELLER_DALAM");
+    expect(categorizeRole("Kasir")).toBe("TELLER_DALAM");
+
+    expect(categorizeRole("Kurir")).toBe("KURIR");
+    expect(categorizeRole("Courier Delivery")).toBe("KURIR");
+
+    expect(categorizeRole("IT Specialist")).toBe("LAINNYA");
+  });
+});
+
+describe("extractOmzetStats", () => {
+  it("menghitung target, actual, dan rasio pencapaian dari ScoredKpiItem", () => {
+    const stats = extractOmzetStats([
+      {
+        kpiCode: "jumlah-omzet",
+        kpiName: "Jumlah Omzet",
+        reference: 1_000_000_000,
+        actual: 1_200_000_000,
+        achievement: 1.2,
+        weightedScore: 0.36,
+        scoringType: "TARGET_VALUE",
+        unit: "CURRENCY",
+        weight: 0.3,
+        entryCount: 1,
+        noData: false,
+        explanation: "",
+        weeklyTotals: [0, 0, 0, 0, 0],
+        roleKpiId: "rk1",
+        kpiId: "k1",
+        inputSource: "SYSTEM",
+      },
+    ]);
+
+    expect(stats.target).toBe(1_000_000_000);
+    expect(stats.actual).toBe(1_200_000_000);
+    expect(stats.achievement).toBeCloseTo(1.2);
+  });
+
+  it("mengabaikan KPI selisih kas / TOLERANCE_LIMIT dari perhitungan omzet", () => {
+    const stats = extractOmzetStats([
+      {
+        kpiCode: "kesesuaian-jumlah-kas",
+        kpiName: "Kesesuaian Jumlah Kas",
+        reference: 100_000,
+        actual: 0,
+        achievement: 1,
+        weightedScore: 0.35,
+        scoringType: "TOLERANCE_LIMIT",
+        unit: "CURRENCY",
+        weight: 0.35,
+        entryCount: 0,
+        noData: true,
+        explanation: "",
+        weeklyTotals: [0, 0, 0, 0, 0],
+        roleKpiId: "rk2",
+        kpiId: "k2",
+        inputSource: "SELF",
+      },
+    ]);
+
+    expect(stats.target).toBeNull();
+    expect(stats.actual).toBeNull();
+    expect(stats.achievement).toBeNull();
+  });
+
+  it("mengembalikan null jika tidak ada KPI omzet", () => {
+    const stats = extractOmzetStats([]);
+    expect(stats.target).toBeNull();
+    expect(stats.actual).toBeNull();
+    expect(stats.achievement).toBeNull();
+  });
+});
+
+describe("extractKurirStats", () => {
+  it("merangkum volume pengiriman, hari aktif, dan rute dari entri", () => {
+    const kurir = extractKurirStats("Kurir", [], [
+      {
+        quantity: 10,
+        note: "Jakarta Barat - Pluit",
+        occurredAt: "2026-10-01",
+      },
+      {
+        quantity: 15,
+        note: "jakarta barat - pluit", // Casing berbeda harus digabung
+        occurredAt: "2026-10-02",
+      },
+      {
+        quantity: 8,
+        note: "Bandara Soetta",
+        occurredAt: "2026-10-02",
+      },
+    ]);
+
+    expect(kurir).not.toBeNull();
+    expect(kurir?.totalVolume).toBe(33);
+    expect(kurir?.activeDays).toBe(2);
+    expect(kurir?.routes).toHaveLength(2);
+    // Route "jakarta barat - pluit" dan "Jakarta Barat - Pluit" digabung
+    const pluitRoute = kurir?.routes.find((r) => r.route.toLowerCase().includes("pluit"));
+    expect(pluitRoute?.count).toBe(2);
+    expect(pluitRoute?.volume).toBe(25);
+  });
+
+  it("mempertahankan deliveryActual bernilai 0 bila eksplisit dari ScoredKpiItem", () => {
+    const kurir = extractKurirStats(
+      "Kurir",
+      [
+        {
+          kpiCode: "ketepatan-pengiriman",
+          kpiName: "Ketepatan Waktu & Jumlah Pengiriman",
+          reference: 900,
+          actual: 0,
+          achievement: 0,
+          weightedScore: 0,
+          scoringType: "TARGET_VALUE",
+          unit: "OCCURRENCE",
+          weight: 0.7,
+          entryCount: 0,
+          noData: true,
+          explanation: "",
+          weeklyTotals: [0, 0, 0, 0, 0],
+          roleKpiId: "rk3",
+          kpiId: "k3",
+          inputSource: "SELF",
+        },
+      ],
+      []
+    );
+
+    expect(kurir).not.toBeNull();
+    expect(kurir?.deliveryActual).toBe(0);
+    expect(kurir?.deliveryTarget).toBe(900);
+    expect(kurir?.deliveryAchievement).toBe(0);
+  });
+
+  it("mengembalikan null jika bukan kurir dan tidak ada entri pengiriman", () => {
+    expect(extractKurirStats("Marketing", [], [])).toBeNull();
+  });
+});
+
+describe("buildExecutiveSummary", () => {
+  it("mengelompokkan karyawan per perusahaan dan cabang secara dinamis", () => {
+    const summary = buildExecutiveSummary([
+      row({
+        employeeId: "m1",
+        name: "Marketing 1",
+        roleName: "Marketing",
+        companyCode: "PVI",
+        companyName: "Pusat Valas Indo",
+        branchName: "Cengkareng",
+        score: 0.95,
+        grade: "A",
+        omzetTarget: 500_000_000,
+        omzetActual: 600_000_000,
+      }),
+      row({
+        employeeId: "m2",
+        name: "Marketing 2",
+        roleName: "Marketing",
+        companyCode: "PVI",
+        companyName: "Pusat Valas Indo",
+        branchName: "Cengkareng",
+        score: 0.85,
+        grade: "B",
+        omzetTarget: 500_000_000,
+        omzetActual: 400_000_000,
+      }),
+      row({
+        employeeId: "kc",
+        name: "Kepala Cabang",
+        roleName: "Kepala Cabang",
+        companyId: "c2",
+        companyCode: "PTU",
+        companyName: "Pusat Tukar Uang",
+        branchId: "b2",
+        branchName: "Pluit",
+        score: 1.05,
+        grade: "A",
+        omzetTarget: 2_000_000_000,
+        omzetActual: 2_100_000_000,
+      }),
+    ]);
+
+    expect(summary.companies).toHaveLength(2);
+    // PVI urutan pertama
+    expect(summary.companies[0].companyCode).toBe("PVI");
+    expect(summary.companies[1].companyCode).toBe("PTU");
+
+    // Periksa kontribusi marketing di PVI
+    const pvi = summary.companies[0];
+    const marketingSec = pvi.sections.find((s) => s.category === "MARKETING");
+    expect(marketingSec).toBeDefined();
+    expect(marketingSec?.totalTarget).toBe(1_000_000_000);
+    expect(marketingSec?.totalActual).toBe(1_000_000_000);
+    expect(marketingSec?.marketingContributions).toHaveLength(2);
+
+    // M1 omzet 600jt dari total 1M = 60%
+    const m1 = marketingSec?.marketingContributions?.find((c) => c.employeeId === "m1");
+    expect(m1?.contributionPct).toBe(60);
+
+    // M2 omzet 400jt dari total 1M = 40%
+    const m2 = marketingSec?.marketingContributions?.find((c) => c.employeeId === "m2");
+    expect(m2?.contributionPct).toBe(40);
+
+    // PTU memiliki Kepala Cabang omzet 2 Miliar
+    const ptu = summary.companies[1];
+    expect(ptu.totalOmzetTarget).toBe(2_000_000_000);
+    expect(ptu.totalOmzetActual).toBe(2_100_000_000);
   });
 });

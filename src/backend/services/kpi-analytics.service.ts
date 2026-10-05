@@ -2,7 +2,13 @@ import prisma from "@/lib/prisma";
 import { kpiService } from "@/backend/services/kpi.service";
 import { MONTH_NAMES } from "@/lib/kpi-utils";
 import type { KpiBreakdown } from "@/lib/kpi-utils";
-import { relativeDelta, buildRoleSummary } from "@/lib/kpi-analytics";
+import type { ScoredKpiItem } from "@/lib/kpi-scoring";
+import {
+  relativeDelta,
+  buildRoleSummary,
+  extractOmzetStats,
+  extractKurirStats,
+} from "@/lib/kpi-analytics";
 import { slugifyRoleName } from "@/lib/kpi-utils";
 import type {
   EmployeePerformance,
@@ -18,15 +24,8 @@ import type {
  * seluruh karyawan dalam satu periode, plus riwayat beberapa bulan ke belakang
  * supaya angka bulan ini punya konteks.
  *
- * Sengaja hanya **dua query** untuk seluruh halaman (hasil KPI + daftar
- * karyawan), sisanya dihitung di memori. Database-nya remote, jadi jumlah
- * round-trip yang menentukan waktu buka halaman, bukan besar datanya: satu
- * periode paling banter puluhan baris per bulan.
- *
- * Yang dikirim ke halaman hanya baris per karyawan. Ringkasan per PT, per
- * jabatan, dan totalnya dihitung dari baris yang lolos filter di layar
- * (`aggregatePerformance` di `@/lib/kpi-analytics`) — kalau dihitung di sini,
- * memfilter satu PT akan tetap menampilkan rata-rata seluruh perusahaan.
+ * Sengaja hanya beberapa query untuk seluruh halaman (hasil KPI, daftar
+ * karyawan, dan log entri bulan berjalan), sisanya dihitung di memori.
  */
 
 const HISTORY_MONTHS = 6;
@@ -94,7 +93,7 @@ export const kpiAnalyticsService = {
     // alur normal (entri disetujui / gaji bulan itu sudah berjalan).
     await kpiService.ensureMonthlyResults(current.month, current.year);
 
-    const [results, employees] = await Promise.all([
+    const [results, employees, entries] = await Promise.all([
       prisma.kpiMonthlyResult.findMany({
         where: { OR: periods.map((p) => ({ month: p.month, year: p.year })) },
         select: {
@@ -111,7 +110,13 @@ export const kpiAnalyticsService = {
         select: {
           id: true,
           name: true,
-          customRole: { select: { name: true } },
+          customRole: {
+            select: {
+              name: true,
+              companyId: true,
+              company: { select: { name: true, code: true } },
+            },
+          },
           branch: {
             select: {
               id: true,
@@ -123,6 +128,21 @@ export const kpiAnalyticsService = {
         },
         orderBy: { name: "asc" },
       }),
+      prisma.kpiEntry.findMany({
+        where: {
+          periodMonth: current.month,
+          periodYear: current.year,
+          status: "APPROVED",
+        },
+        select: {
+          employeeId: true,
+          quantity: true,
+          note: true,
+          occurredAt: true,
+          status: true,
+        },
+        orderBy: { occurredAt: "desc" },
+      }),
     ]);
 
     // employeeId → periodKey → hasil
@@ -131,6 +151,20 @@ export const kpiAnalyticsService = {
       const perPeriod = byEmployee.get(r.employeeId) ?? new Map();
       perPeriod.set(periodKey(r), r);
       byEmployee.set(r.employeeId, perPeriod);
+    }
+
+    const entriesByEmployee = new Map<
+      string,
+      Array<{ quantity: number; note: string | null; occurredAt: Date }>
+    >();
+    for (const entry of entries) {
+      const list = entriesByEmployee.get(entry.employeeId) ?? [];
+      list.push({
+        quantity: Number(entry.quantity),
+        note: entry.note,
+        occurredAt: entry.occurredAt,
+      });
+      entriesByEmployee.set(entry.employeeId, list);
     }
 
     const currentKey = periodKey(current);
@@ -144,15 +178,28 @@ export const kpiAnalyticsService = {
       const score = now ? Number(now.totalScore) : null;
       const prevScore = before ? Number(before.totalScore) : null;
 
+      const empEntries = entriesByEmployee.get(e.id) ?? [];
+      const breakdown = now?.breakdownJson as KpiBreakdown | null;
+      const scoredItems = Array.isArray(breakdown?.items)
+        ? (breakdown.items as ScoredKpiItem[])
+        : [];
+
+      const omzetStats = extractOmzetStats(scoredItems);
+      const kurirSummary = extractKurirStats(
+        e.customRole?.name ?? "",
+        scoredItems,
+        empEntries
+      );
+
       return {
         employeeId: e.id,
         name: e.name,
         roleName: e.customRole?.name ?? "—",
         branchId: e.branch?.id ?? null,
         branchName: e.branch?.name ?? "Tanpa cabang",
-        companyId: e.branch?.companyId ?? null,
-        companyCode: e.branch?.company?.code ?? "—",
-        companyName: e.branch?.company?.name ?? "Tanpa PT",
+        companyId: e.branch?.companyId ?? e.customRole?.companyId ?? null,
+        companyCode: e.branch?.company?.code ?? e.customRole?.company?.code ?? "—",
+        companyName: e.branch?.company?.name ?? e.customRole?.company?.name ?? "Tanpa PT",
         score,
         grade: now?.grade ?? null,
         prevScore,
@@ -162,6 +209,11 @@ export const kpiAnalyticsService = {
           const r = perPeriod?.get(periodKey(p));
           return r ? Number(r.totalScore) : null;
         }),
+        omzetTarget: omzetStats.target,
+        omzetActual: omzetStats.actual,
+        omzetAchievement: omzetStats.achievement,
+        kurirSummary,
+        breakdownItems: scoredItems,
       };
     });
 

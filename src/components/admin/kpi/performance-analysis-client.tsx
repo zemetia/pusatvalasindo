@@ -25,7 +25,7 @@ import {
   DeltaPill,
 } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
-import { IconChartHistogram } from "@tabler/icons-react";
+import { IconChartHistogram, IconBriefcase } from "@tabler/icons-react";
 import { MONTH_NAMES, formatPercent, slugifyRoleName } from "@/lib/kpi-utils";
 import {
   aggregatePerformance,
@@ -33,6 +33,7 @@ import {
   NO_COMPANY,
   type PerformanceOverview,
 } from "@/lib/kpi-analytics";
+import { ExecutiveSummaryView } from "./executive-summary-view";
 
 /* ── Skala bersama untuk sparkline ──────────────────────────────────────────
  * Domain sama untuk semua baris (bukan min–max tiap baris) supaya garisnya bisa
@@ -158,6 +159,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey>("skor-desc");
   const [splitByCompany, setSplitByCompany] = useState(true);
+  const [viewMode, setViewMode] = useState<"executive" | "ranking">("executive");
 
   const { period, historyLabels, rows } = overview;
 
@@ -341,74 +343,103 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
 
   return (
     <div className={isPending ? "opacity-60 transition-opacity" : undefined}>
-      {/* ── Filter: menentukan seluruh angka di halaman ── */}
-      <div className="flex flex-wrap items-end gap-3 pb-2">
-        <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">Bulan</Label>
-          <Combobox
-            value={String(period.month)}
-            onValueChange={(v) => setPeriod({ month: Number(v) })}
-            options={MONTH_NAMES.slice(1).map((name, i) => ({
-              value: String(i + 1),
-              label: name,
-            }))}
-            searchPlaceholder="Cari bulan..."
-            className="w-36"
-          />
+      {/* ── View Switcher & Periode ── */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-6">
+        <div className="inline-flex rounded-lg border bg-muted/40 p-1">
+          <Button
+            size="sm"
+            variant={viewMode === "executive" ? "default" : "ghost"}
+            onClick={() => setViewMode("executive")}
+            className="gap-2 text-xs h-8"
+          >
+            <IconBriefcase className="size-4" />
+            <span>Rangkuman Eksekutif (Cabang &amp; Jabatan)</span>
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === "ranking" ? "default" : "ghost"}
+            onClick={() => setViewMode("ranking")}
+            className="gap-2 text-xs h-8"
+          >
+            <IconChartHistogram className="size-4" />
+            <span>Peringkat &amp; Detail Karyawan</span>
+          </Button>
         </div>
-        <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">Tahun</Label>
-          <Combobox
-            value={String(period.year)}
-            onValueChange={(v) => setPeriod({ year: Number(v) })}
-            options={Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map(
-              (y) => ({ value: String(y), label: String(y) })
-            )}
-            className="w-24"
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">PT</Label>
-          <Combobox
-            value={company}
-            onValueChange={changeCompany}
-            options={[{ value: ALL, label: "Semua PT" }, ...companyOptions]}
-            searchPlaceholder="Cari PT..."
-            className="w-44"
-          />
-        </div>
-        {/* Cabang baru muncul setelah PT dipilih — lihat `branchOptions`. */}
-        {company !== ALL && (
-          <div className="grid gap-1.5">
-            <Label className="text-muted-foreground text-xs">Cabang</Label>
+
+        <div className="flex items-center gap-2.5">
+          <div className="grid gap-1">
             <Combobox
-              value={branch}
-              onValueChange={setBranch}
-              options={[{ value: ALL, label: "Semua cabang" }, ...branchOptions]}
-              searchPlaceholder="Cari cabang..."
-              className="w-44"
+              value={String(period.month)}
+              onValueChange={(v) => setPeriod({ month: Number(v) })}
+              options={MONTH_NAMES.slice(1).map((name, i) => ({
+                value: String(i + 1),
+                label: name,
+              }))}
+              searchPlaceholder="Cari bulan..."
+              className="w-36 h-8 text-xs"
             />
           </div>
-        )}
-        <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">Jabatan</Label>
-          <Combobox
-            value={role}
-            onValueChange={setRole}
-            options={[
-              { value: ALL, label: "Semua jabatan" },
-              ...roleOptions.map((r) => ({ value: r, label: r })),
-            ]}
-            searchPlaceholder="Cari jabatan..."
-            className="w-44"
-          />
+          <div className="grid gap-1">
+            <Combobox
+              value={String(period.year)}
+              onValueChange={(v) => setPeriod({ year: Number(v) })}
+              options={Array.from({ length: 5 }, (_, i) => period.year - 2 + i).map(
+                (y) => ({ value: String(y), label: String(y) })
+              )}
+              className="w-24 h-8 text-xs"
+            />
+          </div>
         </div>
-        {filtersActive && (
-          <Button variant="ghost" size="sm" onClick={resetFilters}>
-            Reset filter
-          </Button>
-        )}
       </div>
+
+      {viewMode === "executive" ? (
+        <ExecutiveSummaryView rows={rows} period={period} />
+      ) : (
+        <>
+          {/* ── Filter: menentukan seluruh angka di halaman ── */}
+          <div className="flex flex-wrap items-end gap-3 pb-2 border-t pt-4">
+            <div className="grid gap-1.5">
+              <Label className="text-muted-foreground text-xs">PT</Label>
+              <Combobox
+                value={company}
+                onValueChange={changeCompany}
+                options={[{ value: ALL, label: "Semua PT" }, ...companyOptions]}
+                searchPlaceholder="Cari PT..."
+                className="w-44"
+              />
+            </div>
+            {/* Cabang baru muncul setelah PT dipilih — lihat `branchOptions`. */}
+            {company !== ALL && (
+              <div className="grid gap-1.5">
+                <Label className="text-muted-foreground text-xs">Cabang</Label>
+                <Combobox
+                  value={branch}
+                  onValueChange={setBranch}
+                  options={[{ value: ALL, label: "Semua cabang" }, ...branchOptions]}
+                  searchPlaceholder="Cari cabang..."
+                  className="w-44"
+                />
+              </div>
+            )}
+            <div className="grid gap-1.5">
+              <Label className="text-muted-foreground text-xs">Jabatan</Label>
+              <Combobox
+                value={role}
+                onValueChange={setRole}
+                options={[
+                  { value: ALL, label: "Semua jabatan" },
+                  ...roleOptions.map((r) => ({ value: r, label: r })),
+                ]}
+                searchPlaceholder="Cari jabatan..."
+                className="w-44"
+              />
+            </div>
+            {filtersActive && (
+              <Button variant="ghost" size="sm" onClick={resetFilters}>
+                Reset filter
+              </Button>
+            )}
+          </div>
 
       {/* ── Angka utama halaman, mengikuti filter ── */}
       <section className="border-border flex flex-wrap items-end justify-between gap-6 border-y py-8">
@@ -758,6 +789,8 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
           .
         </p>
       </div>
+        </>
+      )}
     </div>
   );
 }
