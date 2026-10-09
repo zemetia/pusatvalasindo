@@ -12,6 +12,9 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#fbfaf8',
     theme_color: '#c62828',
     lang: 'id-ID',
-    icons: [{ src: '/images/logo/logo-red.png', sizes: '358x108', type: 'image/png' }],
+    icons: [
+      { src: '/logo PVI.png', sizes: 'any', type: 'image/png' },
+      { src: '/images/logo/logo-red.png', sizes: '358x108', type: 'image/png' },
+    ],
   };
 }

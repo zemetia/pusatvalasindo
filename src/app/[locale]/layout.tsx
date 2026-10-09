@@ -29,6 +29,14 @@ export const metadata: Metadata = {
   title: "Pusat Valas Indo",
   robots: { index: false, follow: false },
   applicationName: "Pusat Valas Indo",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/logo PVI.png', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/logo PVI.png',
+  },
   ...(process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]
     ? { verification: { google: process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"] } }
     : {}),
@@ -48,7 +56,7 @@ export default async function RootLayout({
   const { locale } = await params;
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 

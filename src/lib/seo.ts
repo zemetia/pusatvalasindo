@@ -73,6 +73,15 @@ export function buildMetadata({
     description: resolvedDescription,
     metadataBase: new URL(siteConfig.url),
 
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/logo PVI.png', type: 'image/png' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: '/logo PVI.png',
+    },
+
     alternates: {
       canonical: canonicalUrl,
       languages: buildAlternates(path),
