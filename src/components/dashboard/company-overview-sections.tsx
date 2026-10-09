@@ -8,11 +8,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { IconArrowUpRight, IconArrowDownRight, IconAlertTriangle, IconUserOff, IconClockCheck } from "@tabler/icons-react";
-import { SectionCard, EmptyState, MetricRow, MetricBlock, MetricLabel, DeltaPill } from "@/components/admin/page-shell";
+import {
+  IconArrowUpRight,
+  IconArrowDownRight,
+  IconAlertTriangle,
+  IconUserOff,
+  IconClockCheck,
+  IconArrowRight,
+} from "@tabler/icons-react";
+import {
+  SectionCard,
+  EmptyState,
+  MetricRow,
+  MetricBlock,
+  DeltaPill,
+  MoneyDisplay,
+} from "@/components/admin/page-shell";
 import {
   fmtRate,
-  fmtCurrency,
   fmtAmount,
   currencySymbol,
   latestBalanceByAccount,
@@ -23,6 +36,7 @@ import {
   type getCompanyOverview,
 } from "@/backend/services/dashboard-data.service";
 import { formatJakartaTime } from "@/lib/attendance-time";
+import { cn } from "@/lib/utils";
 
 type Overview = Awaited<ReturnType<typeof getCompanyOverview>>;
 
@@ -53,19 +67,28 @@ export function CompanyOverviewSections({
   // dengan metrik "Saldo Bank" di atas. `BankAccount.balance` (buku mutasi) tidak dipakai.
   const dailyBalanceByAccount = latestBalanceByAccount(overview.dailyBankBalances);
 
-  const showBentoOverview = flags.usersCount || flags.branchesCount || flags.attendanceAll || flags.kpiAll || flags.bank || flags.payrollTeam;
+  const showBentoOverview =
+    flags.usersCount ||
+    flags.branchesCount ||
+    flags.attendanceAll ||
+    flags.kpiAll ||
+    flags.bank ||
+    flags.payrollTeam;
 
   return (
     <>
       {/* Alert: Presensi Mencurigakan */}
       {flags.suspicious && overview.suspectAttendance.length > 0 && (
-        <Card className="border-warning/40 gap-0 overflow-hidden py-0">
-          <CardHeader className="bg-warning-muted/60 border-b py-4">
-            <div className="flex items-center gap-2">
-              <IconAlertTriangle className="text-warning size-5" />
-              <CardTitle className="text-warning-foreground text-sm">
-                Presensi Lokasi Mencurigakan — {overview.suspectAttendance.length} karyawan
-              </CardTitle>
+        <Card className="border-warning/30 bg-card gap-0 overflow-hidden py-0 shadow-xs">
+          <CardHeader className="bg-warning-muted/40 border-b border-warning/20 py-3.5 px-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <IconAlertTriangle className="text-warning size-5 shrink-0" />
+                <CardTitle className="text-warning-foreground text-sm font-semibold">
+                  Presensi Lokasi Mencurigakan
+                </CardTitle>
+              </div>
+              <Badge variant="warning">{overview.suspectAttendance.length} karyawan</Badge>
             </div>
           </CardHeader>
           <CardContent className="p-0">
@@ -81,9 +104,13 @@ export function CompanyOverviewSections({
               <TableBody>
                 {overview.suspectAttendance.map((att) => (
                   <TableRow key={att.id}>
-                    <TableCell className="font-medium text-sm">{att.user.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{att.user.branch?.name ?? "-"}</TableCell>
-                    <TableCell className="text-sm font-mono">
+                    <TableCell className="font-medium text-sm text-foreground">
+                      {att.user.name}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {att.user.branch?.name ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-sm font-mono tabular">
                       {att.checkIn ? formatJakartaTime(att.checkIn) : "-"}
                     </TableCell>
                     <TableCell>
@@ -99,18 +126,23 @@ export function CompanyOverviewSections({
 
       {/* Alert: Pengajuan Koreksi Pending */}
       {flags.corrections && overview.pendingCorrections.length > 0 && (
-        <Card className="border-info/40 gap-0 overflow-hidden py-0">
-          <CardHeader className="bg-info-muted/60 border-b py-4">
+        <Card className="border-info/30 bg-card gap-0 overflow-hidden py-0 shadow-xs">
+          <CardHeader className="bg-info-muted/40 border-b border-info/20 py-3.5 px-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <IconClockCheck className="text-info size-5" />
-                <CardTitle className="text-sm">Pengajuan Koreksi Menunggu — {overview.pendingCorrections.length}</CardTitle>
+              <div className="flex items-center gap-2.5">
+                <IconClockCheck className="text-info size-5 shrink-0" />
+                <CardTitle className="text-sm font-semibold">
+                  Pengajuan Koreksi Menunggu Verifikasi
+                </CardTitle>
               </div>
-              {canApproveCorrections && (
-                <Button size="sm" variant="outline" asChild>
-                  <Link href="/dashboard/persetujuan-koreksi">Tinjau →</Link>
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                <Badge variant="info">{overview.pendingCorrections.length} usulan</Badge>
+                {canApproveCorrections && (
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/dashboard/persetujuan-koreksi">Tinjau →</Link>
+                  </Button>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
@@ -119,28 +151,59 @@ export function CompanyOverviewSections({
                 <TableRow>
                   <TableHead>Target</TableHead>
                   <TableHead>Tanggal</TableHead>
-                  <TableHead className="text-right">Nilai Saat Ini</TableHead>
-                  <TableHead className="text-right">Usulan</TableHead>
+                  <TableHead className="text-right">Perubahan Kurs (Saat Ini → Usulan)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {overview.pendingCorrections.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium text-sm">{c.targetLabel}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {c.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", timeZone: "Asia/Jakarta" })}
-                    </TableCell>
-                    <TableCell className="text-right font-mono text-sm">{fmtRate(c.currentValue)}</TableCell>
-                    <TableCell className="text-right font-mono text-sm">{fmtRate(c.proposedValue)}</TableCell>
-                  </TableRow>
-                ))}
+                {overview.pendingCorrections.map((c) => {
+                  const currentVal = c.currentValue != null ? Number(c.currentValue.toString()) : null;
+                  const proposedVal = c.proposedValue != null ? Number(c.proposedValue.toString()) : null;
+                  const diff =
+                    currentVal != null && proposedVal != null && !Number.isNaN(currentVal) && !Number.isNaN(proposedVal)
+                      ? proposedVal - currentVal
+                      : null;
+
+                  return (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-medium text-sm text-foreground">
+                        {c.targetLabel}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {c.date.toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "short",
+                          timeZone: "Asia/Jakarta",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="inline-flex items-center justify-end gap-2 font-mono text-sm tabular">
+                          <span className="text-muted-foreground">{fmtRate(c.currentValue)}</span>
+                          <IconArrowRight className="size-3 text-muted-foreground/60 shrink-0" />
+                          <span className="font-semibold text-foreground">{fmtRate(c.proposedValue)}</span>
+                          {diff != null && diff !== 0 && (
+                            <span
+                              className={cn(
+                                "text-[11px] font-semibold px-2 py-0.5 rounded-full border tabular ml-1",
+                                diff > 0
+                                  ? "border-success/20 bg-success-muted text-success dark:bg-success/15 dark:text-success"
+                                  : "border-destructive/20 bg-destructive/10 text-destructive dark:bg-destructive/15 dark:text-destructive"
+                              )}
+                            >
+                              {diff > 0 ? `+${diff.toLocaleString("id-ID")}` : diff.toLocaleString("id-ID")}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       )}
 
-      {/* Ringkasan Bisnis — metrik utama, dipisah garis rambut bukan kartu */}
+      {/* Ringkasan Bisnis — metrik utama terstruktur bersih */}
       {showBentoOverview && (
         <MetricRow title="Ringkasan Bisnis" columns={4} className="-mt-px">
           {flags.bank && primaryBankGroup && (
@@ -152,9 +215,11 @@ export function CompanyOverviewSections({
               period="vs isian sebelumnya"
               meta={
                 <>
-                  {primaryBankGroup.filledCount < primaryBankGroup.count
-                    ? `${primaryBankGroup.filledCount} dari ${primaryBankGroup.count} rekening ${primaryBankGroup.code} terisi`
-                    : `${primaryBankGroup.count} rekening ${primaryBankGroup.code}`}
+                  <span className="font-medium text-foreground">
+                    {primaryBankGroup.filledCount < primaryBankGroup.count
+                      ? `${primaryBankGroup.filledCount}/${primaryBankGroup.count} rekening ${primaryBankGroup.code} terisi`
+                      : `${primaryBankGroup.count} rekening ${primaryBankGroup.code}`}
+                  </span>
                   {bankGroups.length > 1 && (
                     <span className="text-muted-foreground">
                       {" · "}
@@ -173,20 +238,38 @@ export function CompanyOverviewSections({
             <MetricBlock
               label="Presensi Hari Ini"
               value={overview.todayAttendanceCount.toLocaleString("id-ID")}
-              suffix={`dari ${overview.totalUsers}`}
-              meta={overview.attendancePct != null ? `${overview.attendancePct.toFixed(0)}% karyawan hadir` : "Belum ada data kehadiran"}
+              suffix={`/ ${overview.totalUsers}`}
+              meta={
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold tabular",
+                      overview.attendancePct != null && overview.attendancePct >= 80
+                        ? "border-success/20 bg-success-muted text-success dark:bg-success/15 dark:text-success"
+                        : "border-warning/25 bg-warning-muted text-warning-foreground"
+                    )}
+                  >
+                    {overview.attendancePct != null ? `${overview.attendancePct.toFixed(0)}% kehadiran` : "—"}
+                  </span>
+                  <span className="text-muted-foreground text-xs">karyawan hadir</span>
+                </div>
+              }
             />
           )}
 
           {flags.kpiAll && (
             <MetricBlock
               label="KPI Bulan Ini"
-              value={overview.kpiAvgThisMonth != null ? overview.kpiAvgThisMonth.toFixed(1) : overview.kpiLogsThisMonth}
+              value={
+                overview.kpiAvgThisMonth != null
+                  ? overview.kpiAvgThisMonth.toFixed(1).replace(".", ",")
+                  : overview.kpiLogsThisMonth
+              }
               delta={overview.kpiTrendPct}
               period="vs bulan lalu"
               meta={
                 overview.kpiAvgThisMonth != null
-                  ? `Rata-rata skor tim · ${overview.kpiLogsThisMonth} entri`
+                  ? `Rata-rata skor tim · ${overview.kpiLogsThisMonth} entri tercatat`
                   : `${overview.kpiLogsThisMonth} entri KPI tercatat`
               }
             />
@@ -198,7 +281,7 @@ export function CompanyOverviewSections({
               value={overview.payrollDoneCount.toLocaleString("id-ID")}
               suffix={`/ ${overview.payrollTotalEmployees}`}
               delta={overview.highPerformerTrendPct}
-              period={`${overview.highPerformersThisMonth} skor ≥80% vs bulan lalu`}
+              period={`${overview.highPerformersThisMonth} skor ≥80% vs bln lalu`}
               meta="karyawan sudah dihitung"
               action={
                 canManagePayroll && overview.payrollDoneCount < overview.payrollTotalEmployees ? (
@@ -218,15 +301,25 @@ export function CompanyOverviewSections({
       {(flags.usersCount || flags.branchesCount) && (
         <MetricRow title="Organisasi" columns={2} className="-mt-px">
           {flags.usersCount && (
-            <MetricBlock label="Karyawan Aktif" size="secondary" value={overview.totalUsers.toLocaleString("id-ID")} meta="Total karyawan terdaftar" />
+            <MetricBlock
+              label="Karyawan Aktif"
+              size="secondary"
+              value={overview.totalUsers.toLocaleString("id-ID")}
+              meta="Total karyawan terdaftar di sistem"
+            />
           )}
           {flags.branchesCount && (
-            <MetricBlock label="Cabang Aktif" size="secondary" value={overview.totalBranches.toLocaleString("id-ID")} meta="Cabang beroperasi" />
+            <MetricBlock
+              label="Cabang Aktif"
+              size="secondary"
+              value={overview.totalBranches.toLocaleString("id-ID")}
+              meta="Cabang beroperasi saat ini"
+            />
           )}
         </MetricRow>
       )}
 
-      {/* Currency Rates */}
+      {/* Currency Rates Cards */}
       {flags.stock && (
         <SectionCard
           title="Kurs Mata Uang"
@@ -251,37 +344,112 @@ export function CompanyOverviewSections({
               }
             />
           ) : (
-            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 @2xl/main:grid-cols-3">
-              {currencyCards.map((c) => (
-                <div key={c.currencyId} className="border-border border-t pt-4">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <div className="flex min-w-0 items-baseline gap-2">
-                      <span className="font-mono text-sm font-medium">{c.code}</span>
-                      <span className="text-muted-foreground truncate text-xs">{c.name}</span>
-                    </div>
-                    <DeltaPill value={c.trendPct} />
-                  </div>
-                  <div className="mt-3 flex items-start gap-8">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {currencyCards.map((c) => {
+                const buyVal = c.avgBuy != null ? Number(c.avgBuy.toString()) : null;
+                const sellVal = c.avgSell != null ? Number(c.avgSell.toString()) : null;
+                const spread =
+                  sellVal != null && buyVal != null && !Number.isNaN(sellVal) && !Number.isNaN(buyVal)
+                    ? sellVal - buyVal
+                    : null;
+
+                return (
+                  <div
+                    key={c.currencyId}
+                    className="group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-xs"
+                  >
                     <div>
-                      <MetricLabel>Beli</MetricLabel>
-                      <p className="tabular mt-1 text-xl leading-none font-semibold tracking-tight">{fmtRate(c.avgBuy)}</p>
+                      {/* Header Kartu: Kode, Nama, dan Trend Pill */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-2.5 py-1 font-mono text-xs font-bold tracking-wider text-primary border border-primary/20 shrink-0">
+                            {c.code}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-foreground">
+                              {c.name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {c.branchCount} cabang aktif
+                            </p>
+                          </div>
+                        </div>
+                        <DeltaPill value={c.trendPct} />
+                      </div>
+
+                      {/* Pilar Kurs: Beli & Jual */}
+                      <div className="mt-3.5 grid grid-cols-2 gap-2">
+                        <div className="rounded-lg bg-muted/40 p-2.5 border border-border/50">
+                          <div className="flex items-center justify-between text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">
+                            <span>Beli</span>
+                            <span className="text-[9px] text-muted-foreground/70 font-normal">KAMI BELI</span>
+                          </div>
+                          <div className="mt-1 font-semibold text-base sm:text-lg tabular tracking-tight text-foreground">
+                            {buyVal != null ? (
+                              <>
+                                <span className="text-xs text-muted-foreground/75 font-normal mr-1 select-none">
+                                  Rp
+                                </span>
+                                <span>{buyVal.toLocaleString("id-ID")}</span>
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground font-normal text-sm">—</span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="rounded-lg bg-muted/40 p-2.5 border border-border/50">
+                          <div className="flex items-center justify-between text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">
+                            <span>Jual</span>
+                            <span className="text-[9px] text-muted-foreground/70 font-normal">KAMI JUAL</span>
+                          </div>
+                          <div className="mt-1 font-semibold text-base sm:text-lg tabular tracking-tight text-foreground">
+                            {sellVal != null ? (
+                              <>
+                                <span className="text-xs text-muted-foreground/75 font-normal mr-1 select-none">
+                                  Rp
+                                </span>
+                                <span>{sellVal.toLocaleString("id-ID")}</span>
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground font-normal text-sm">—</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <MetricLabel>Jual</MetricLabel>
-                      <p className="tabular mt-1 text-xl leading-none font-semibold tracking-tight">{fmtRate(c.avgSell)}</p>
+
+                    {/* Footer Kartu: Spread/Margin & Stok */}
+                    <div className="mt-3.5 pt-2.5 border-t border-border/60 flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {c.marginPct != null && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-semibold tabular",
+                              c.marginPct >= 0
+                                ? "border-success/20 bg-success-muted text-success dark:bg-success/15 dark:text-success"
+                                : "border-destructive/20 bg-destructive/10 text-destructive dark:bg-destructive/15 dark:text-destructive"
+                            )}
+                          >
+                            Margin {c.marginPct.toFixed(1).replace(".", ",")}%
+                          </span>
+                        )}
+                        {spread != null && spread > 0 && (
+                          <span className="text-[11px] text-muted-foreground tabular">
+                            Spread Rp {spread.toLocaleString("id-ID")}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-muted-foreground text-[11px] tabular font-medium text-right shrink-0">
+                        Stok:{" "}
+                        <span className="text-foreground font-semibold">
+                          {c.quantity.toLocaleString("id-ID")}
+                        </span>
+                      </span>
                     </div>
                   </div>
-                  <p className="text-muted-foreground mt-3 text-xs">
-                    {c.branchCount} cabang · stok {c.quantity.toLocaleString("id-ID")}
-                    {c.marginPct != null && (
-                      <>
-                        {" · "}
-                        <span className="text-foreground font-medium">margin {c.marginPct.toFixed(1).replace(".", ",")}%</span>
-                      </>
-                    )}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </SectionCard>
@@ -294,8 +462,12 @@ export function CompanyOverviewSections({
             title="Belum Absen Hari Ini"
             icon={<IconUserOff className="size-4" />}
             padded={false}
-            className={overview.notYetAbsent.length > 0 ? "border-warning/40" : ""}
-            action={overview.notYetAbsent.length > 0 ? <Badge variant="warning">{overview.notYetAbsent.length} karyawan</Badge> : undefined}
+            className={overview.notYetAbsent.length > 0 ? "border-warning/30" : ""}
+            action={
+              overview.notYetAbsent.length > 0 ? (
+                <Badge variant="warning">{overview.notYetAbsent.length} karyawan</Badge>
+              ) : undefined
+            }
           >
             {overview.notYetAbsent.length === 0 ? (
               <EmptyState title="✓ Semua karyawan sudah absen" />
@@ -310,8 +482,17 @@ export function CompanyOverviewSections({
                 <TableBody>
                   {overview.notYetAbsent.map((u) => (
                     <TableRow key={u.id}>
-                      <TableCell className="font-medium text-sm">{u.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{u.branch?.name ?? "-"}</TableCell>
+                      <TableCell className="font-medium text-sm text-foreground">
+                        <div className="flex items-center gap-2.5">
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                            {u.name.charAt(0)}
+                          </span>
+                          <span>{u.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {u.branch?.name ?? "-"}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -343,13 +524,30 @@ export function CompanyOverviewSections({
                 <TableBody>
                   {overview.todayAttendanceList.map((att) => (
                     <TableRow key={att.id}>
-                      <TableCell className="font-medium text-sm">{att.user.name}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{att.user.branch?.name ?? "-"}</TableCell>
-                      <TableCell className="text-sm font-mono">
+                      <TableCell className="font-medium text-sm text-foreground">
+                        <div className="flex items-center gap-2.5">
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                            {att.user.name.charAt(0)}
+                          </span>
+                          <span>{att.user.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {att.user.branch?.name ?? "-"}
+                      </TableCell>
+                      <TableCell className="text-sm font-mono tabular">
                         {att.checkIn ? formatJakartaTime(att.checkIn) : "-"}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={att.status === "PRESENT" ? "success" : att.status === "LATE" ? "warning" : "soft"}>
+                        <Badge
+                          variant={
+                            att.status === "PRESENT"
+                              ? "success"
+                              : att.status === "LATE"
+                                ? "warning"
+                                : "soft"
+                          }
+                        >
                           {statusLabel[att.status] ?? att.status}
                         </Badge>
                       </TableCell>
@@ -380,38 +578,57 @@ export function CompanyOverviewSections({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Bank / Cabang</TableHead>
+                    <TableHead>Bank / Perusahaan</TableHead>
                     <TableHead>Jenis</TableHead>
                     <TableHead className="text-right">Jumlah</TableHead>
                     <TableHead>Tanggal</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {overview.recentMutations.map((mut) => (
-                    <TableRow key={mut.id}>
-                      <TableCell className="text-sm">
-                        <div className="font-medium">{mut.bankAccount.bankName}</div>
-                        <div className="text-xs text-muted-foreground">{mut.bankAccount.company.name}</div>
-                      </TableCell>
-                      <TableCell>
-                        {mut.type === "CREDIT" ? (
-                          <span className="text-success flex items-center gap-1 text-sm font-medium">
-                            <IconArrowUpRight className="size-3.5" />
-                            Masuk
-                          </span>
-                        ) : (
-                          <span className="text-destructive flex items-center gap-1 text-sm font-medium">
-                            <IconArrowDownRight className="size-3.5" />
-                            Keluar
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="tabular text-right">{fmtCurrency(mut.amount, mut.bankAccount.currency.code)}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {mut.createdAt.toLocaleDateString("id-ID", { day: "2-digit", month: "short", timeZone: "Asia/Jakarta" })}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {overview.recentMutations.map((mut) => {
+                    const isCredit = mut.type === "CREDIT";
+                    return (
+                      <TableRow key={mut.id}>
+                        <TableCell className="text-sm">
+                          <div className="font-semibold text-foreground">
+                            {mut.bankAccount.bankName}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {mut.bankAccount.company.name}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {isCredit ? (
+                            <span className="inline-flex items-center gap-1 rounded-md border border-success/20 bg-success-muted px-2 py-0.5 text-xs font-semibold text-success dark:bg-success/15 dark:text-success">
+                              <IconArrowUpRight className="size-3.5" />
+                              Masuk
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-md border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive dark:bg-destructive/15 dark:text-destructive">
+                              <IconArrowDownRight className="size-3.5" />
+                              Keluar
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="tabular text-right">
+                          <MoneyDisplay
+                            amount={mut.amount}
+                            currency={mut.bankAccount.currency.code}
+                            showSign
+                            tone={isCredit ? "success" : "destructive"}
+                            size="inline"
+                          />
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs tabular">
+                          {mut.createdAt.toLocaleDateString("id-ID", {
+                            day: "2-digit",
+                            month: "short",
+                            timeZone: "Asia/Jakarta",
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}
@@ -433,27 +650,34 @@ export function CompanyOverviewSections({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>PT</TableHead>
-                    <TableHead>Bank</TableHead>
+                    <TableHead>PT / Bank</TableHead>
                     <TableHead>Mata Uang</TableHead>
-                    <TableHead className="text-right">Saldo</TableHead>
+                    <TableHead className="text-right">Saldo Saat Ini</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {overview.bankAccounts.map((acc) => (
                     <TableRow key={acc.id}>
-                      <TableCell className="text-sm">{acc.company.name}</TableCell>
-                      <TableCell className="font-medium text-sm">{acc.bankName}</TableCell>
+                      <TableCell className="text-sm">
+                        <div className="font-semibold text-foreground">{acc.bankName}</div>
+                        <div className="text-xs text-muted-foreground">{acc.company.name}</div>
+                      </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-mono">
+                        <Badge variant="outline" className="font-mono text-xs">
                           {acc.currency.code}
                         </Badge>
                       </TableCell>
-                      <TableCell className="tabular text-right font-medium">
+                      <TableCell className="tabular text-right">
                         {dailyBalanceByAccount.has(acc.id) ? (
-                          fmtCurrency(dailyBalanceByAccount.get(acc.id), acc.currency.code)
+                          <MoneyDisplay
+                            amount={dailyBalanceByAccount.get(acc.id)}
+                            currency={acc.currency.code}
+                            size="inline"
+                          />
                         ) : (
-                          <span className="text-muted-foreground font-normal">Belum diisi</span>
+                          <span className="text-muted-foreground font-normal text-xs">
+                            Belum diisi
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -469,7 +693,11 @@ export function CompanyOverviewSections({
       {flags.kpiAll && overview.kpiResults.length > 0 && (
         <SectionCard
           title="Hasil KPI Bulan Ini"
-          description={`Top performers — ${now.toLocaleDateString("id-ID", { month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}`}
+          description={`Top performers — ${now.toLocaleDateString("id-ID", {
+            month: "long",
+            year: "numeric",
+            timeZone: "Asia/Jakarta",
+          })}`}
           padded={false}
           action={
             <Button variant="ghost" size="sm" asChild>
@@ -480,25 +708,63 @@ export function CompanyOverviewSections({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-10">#</TableHead>
+                <TableHead className="w-12 text-center">Rank</TableHead>
                 <TableHead>Karyawan</TableHead>
                 <TableHead>Cabang</TableHead>
-                <TableHead className="text-right">Total Skor</TableHead>
-                <TableHead>Grade</TableHead>
+                <TableHead className="text-right">Pencapaian</TableHead>
+                <TableHead className="text-center">Grade</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {overview.kpiResults.map((r, i) => (
-                <TableRow key={r.id}>
-                  <TableCell className="text-muted-foreground tabular">{i + 1}</TableCell>
-                  <TableCell className="font-medium">{r.employee.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{r.employee.branch?.name ?? "-"}</TableCell>
-                  <TableCell className="tabular text-right font-medium">{(Number(r.totalScore) * 100).toFixed(1)}%</TableCell>
-                  <TableCell>
-                    <Badge variant={r.grade === "A" || r.grade === "B" ? "success" : "soft"}>{r.grade}</Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {overview.kpiResults.map((r, i) => {
+                const rank = i + 1;
+                const scorePct = Number(r.totalScore) * 100;
+                return (
+                  <TableRow key={r.id}>
+                    <TableCell className="text-center tabular">
+                      {rank === 1 ? (
+                        <span className="inline-flex size-6 items-center justify-center rounded-full bg-warning-muted text-warning-foreground font-bold text-xs border border-warning/30">
+                          1
+                        </span>
+                      ) : rank === 2 ? (
+                        <span className="inline-flex size-6 items-center justify-center rounded-full bg-muted text-foreground font-semibold text-xs border border-border">
+                          2
+                        </span>
+                      ) : rank === 3 ? (
+                        <span className="inline-flex size-6 items-center justify-center rounded-full bg-muted/60 text-muted-foreground font-semibold text-xs border border-border/60">
+                          3
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">{rank}</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-semibold text-sm text-foreground">
+                      {r.employee.name}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {r.employee.branch?.name ?? "-"}
+                    </TableCell>
+                    <TableCell className="tabular text-right">
+                      <span className="font-bold text-sm text-foreground">
+                        {scorePct.toFixed(1).replace(".", ",")}%
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge
+                        variant={
+                          r.grade === "A" || r.grade === "B"
+                            ? "success"
+                            : r.grade === "C"
+                              ? "warning"
+                              : "soft"
+                        }
+                      >
+                        Grade {r.grade}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </SectionCard>

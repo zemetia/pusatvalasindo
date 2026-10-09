@@ -303,6 +303,8 @@ const metricSize = {
   primary: "text-3xl font-semibold",
   /** Metrik pendukung (per cabang, per mata uang). */
   secondary: "text-2xl font-medium",
+  /** Angka dalam tabel, kartu pendukung, list. */
+  inline: "text-sm font-semibold",
 } as const;
 
 export type MetricTone = keyof typeof metricTone;
@@ -311,20 +313,23 @@ export type MetricSize = keyof typeof metricSize;
 /** Label kecil di atas angka — satu-satunya bentuk label metrik yang dipakai. */
 export function MetricLabel({
   children,
+  icon,
   className,
 }: {
   children: ReactNode;
+  icon?: ReactNode;
   className?: string;
 }) {
   return (
-    <p
+    <div
       className={cn(
-        "text-muted-foreground text-xs font-medium tracking-wide uppercase",
+        "text-muted-foreground/80 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase select-none",
         className
       )}
     >
-      {children}
-    </p>
+      {icon && <span className="text-muted-foreground/70 shrink-0">{icon}</span>}
+      <span>{children}</span>
+    </div>
   );
 }
 
@@ -349,20 +354,20 @@ export function MetricValue({
   return (
     <p
       className={cn(
-        "tabular leading-none tracking-tight",
+        "tabular leading-none tracking-tight inline-flex items-baseline",
         metricSize[size],
         metricTone[tone],
         className
       )}
     >
       {prefix && (
-        <span className="text-muted-foreground mr-1 text-[0.55em] font-normal align-baseline">
+        <span className="text-muted-foreground/75 mr-1.5 text-[0.62em] font-normal tracking-normal select-none">
           {prefix}
         </span>
       )}
-      {children}
+      <span className="tabular">{children}</span>
       {suffix && (
-        <span className="text-muted-foreground ml-1 text-[0.55em] font-normal align-baseline">
+        <span className="text-muted-foreground/75 ml-1.5 text-[0.58em] font-normal tracking-normal select-none">
           {suffix}
         </span>
       )}
@@ -371,7 +376,97 @@ export function MetricValue({
 }
 
 /**
- * Pil persentase — satu-satunya permukaan berwarna di dalam blok metrik.
+ * Tampilan uang modern & bersih dengan pemisahan prefix mata uang,
+ * penanganan nilai negatif, dan pemformatan ribuan terstandarisasi.
+ */
+export type MoneyAmount =
+  | number
+  | string
+  | { toString(): string; toNumber?: () => number }
+  | null
+  | undefined;
+
+export function MoneyDisplay({
+  amount,
+  currency = "IDR",
+  size = "primary",
+  tone = "default",
+  showSign = false,
+  className,
+}: {
+  amount: MoneyAmount;
+  currency?: string;
+  size?: MetricSize;
+  tone?: MetricTone;
+  showSign?: boolean;
+  className?: string;
+}) {
+  if (amount == null) {
+    return <span className={cn("text-muted-foreground tabular", className)}>—</span>;
+  }
+
+  let num: number;
+  if (typeof amount === "number") {
+    num = amount;
+  } else if (typeof (amount as { toNumber?: unknown }).toNumber === "function") {
+    num = (amount as { toNumber: () => number }).toNumber();
+  } else {
+    num = Number(String(amount).replace(/,/g, "."));
+  }
+
+  if (!Number.isFinite(num)) {
+    return <span className={cn("text-muted-foreground tabular", className)}>—</span>;
+  }
+
+  const isNeg = num < 0;
+  const absVal = Math.abs(num);
+  const isIDR = currency === "IDR";
+  const formatted = isIDR
+    ? Math.round(absVal).toLocaleString("id-ID")
+    : absVal.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+  const resolvedTone =
+    tone !== "default"
+      ? metricTone[tone]
+      : showSign && isNeg
+        ? metricTone.destructive
+        : showSign && num > 0
+          ? metricTone.success
+          : metricTone.default;
+
+  return (
+    <span
+      className={cn(
+        "tabular leading-none tracking-tight inline-flex items-baseline",
+        metricSize[size],
+        resolvedTone,
+        className
+      )}
+    >
+      {isNeg && <span className="mr-0.5 font-semibold text-destructive">-</span>}
+      {!isNeg && showSign && num > 0 && (
+        <span className="mr-0.5 font-semibold text-success">+</span>
+      )}
+      {isIDR && (
+        <span className="text-muted-foreground/75 mr-1 text-[0.62em] font-normal tracking-normal select-none">
+          Rp
+        </span>
+      )}
+      <span className="tabular">{formatted}</span>
+      {!isIDR && (
+        <span className="text-muted-foreground/75 ml-1 text-[0.62em] font-normal tracking-normal select-none">
+          {currency}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * Pil persentase — permukaan berwarna modern & tactile di dalam blok metrik.
  *
  * `goodWhen` memisahkan *arah* dari *tanda*: untuk metrik terbalik (biaya,
  * selisih kas, keterlambatan) angka turun justru bagus, jadi harus hijau.
@@ -389,11 +484,11 @@ export function DeltaPill({
   className?: string;
 }) {
   const base =
-    "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular";
+    "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] leading-tight font-semibold tracking-tight tabular transition-colors select-none";
 
   if (value == null || !Number.isFinite(value)) {
     return (
-      <span className={cn(base, "text-muted-foreground px-0", className)}>—</span>
+      <span className={cn(base, "border-transparent bg-transparent text-muted-foreground px-0", className)}>—</span>
     );
   }
 
@@ -402,38 +497,67 @@ export function DeltaPill({
   const good = goodWhen === "up" ? up : !up;
 
   const tone = flat
-    ? "bg-muted text-muted-foreground"
+    ? "border-border/60 bg-muted text-muted-foreground font-medium"
     : good
-      ? "bg-success-muted text-success"
-      : "bg-destructive/10 text-destructive";
+      ? "border-success/20 bg-success-muted text-success dark:bg-success/15 dark:text-success"
+      : "border-destructive/20 bg-destructive/10 text-destructive dark:bg-destructive/15 dark:text-destructive";
 
   return (
     <span className={cn(base, tone, className)}>
-      {!flat && (
+      {!flat && up && (
         <svg
-          viewBox="0 0 24 24"
+          viewBox="0 0 16 16"
           fill="none"
           stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn("size-3", !up && "rotate-90")}
+          className="size-2.5 shrink-0"
           aria-hidden="true"
         >
-          <path d="M7 17 17 7" />
-          <path d="M9 7h8v8" />
+          <path d="M4 12 12 4" />
+          <path d="M6 4h6v6" />
         </svg>
       )}
-      {up && !flat ? "+" : ""}
-      {value.toFixed(1).replace(".", ",")}
+      {!flat && !up && (
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-2.5 shrink-0"
+          aria-hidden="true"
+        >
+          <path d="M4 4 12 12" />
+          <path d="M12 6v6H6" />
+        </svg>
+      )}
+      {flat && (
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          className="size-2.5 shrink-0"
+          aria-hidden="true"
+        >
+          <path d="M4 8h8" />
+        </svg>
+      )}
+      {Math.abs(value).toFixed(1).replace(".", ",")}
       {suffix}
     </span>
   );
 }
 
-interface MetricBlockProps {
+export interface MetricBlockProps {
   label: ReactNode;
   value: ReactNode;
+  icon?: ReactNode;
+  badge?: ReactNode;
   /** Simbol mata uang, dirender kecil & muted di depan angka. */
   prefix?: ReactNode;
   /** Unit/pembagi, mis. `USD` atau `/40`. */
@@ -460,6 +584,8 @@ interface MetricBlockProps {
 export function MetricBlock({
   label,
   value,
+  icon,
+  badge,
   prefix,
   suffix,
   delta,
@@ -474,19 +600,36 @@ export function MetricBlock({
   const showDelta = delta !== undefined || Boolean(period);
 
   return (
-    <div className={cn("min-w-0", className)}>
-      <MetricLabel>{label}</MetricLabel>
-      <MetricValue size={size} tone={tone} prefix={prefix} suffix={suffix} className="mt-2">
-        {value}
-      </MetricValue>
-      {showDelta && (
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          {delta !== undefined && <DeltaPill value={delta} goodWhen={deltaGoodWhen} />}
-          {period && <span className="text-muted-foreground text-xs">{period}</span>}
+    <div className={cn("min-w-0 flex flex-col justify-between", className)}>
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <MetricLabel icon={icon}>{label}</MetricLabel>
+          {badge}
+        </div>
+        <MetricValue size={size} tone={tone} prefix={prefix} suffix={suffix} className="mt-2.5">
+          {value}
+        </MetricValue>
+        {showDelta && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            {delta !== undefined && <DeltaPill value={delta} goodWhen={deltaGoodWhen} />}
+            {period && (
+              <span className="text-muted-foreground text-xs leading-none font-medium">
+                {period}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      {(meta || action) && (
+        <div className="mt-2.5 space-y-2">
+          {meta && (
+            <div className="text-muted-foreground text-xs leading-relaxed font-normal">
+              {meta}
+            </div>
+          )}
+          {action && <div className="pt-0.5">{action}</div>}
         </div>
       )}
-      {meta && <div className="text-muted-foreground mt-1.5 text-xs">{meta}</div>}
-      {action && <div className="mt-3">{action}</div>}
     </div>
   );
 }
@@ -514,11 +657,11 @@ export function MetricRow({
   className?: string;
 }) {
   return (
-    <section className={cn(bordered && "border-border border-y py-8", className)}>
+    <section className={cn(bordered && "border-border/80 border-y py-7", className)}>
       {(title || action) && (
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
           {title && (
-            <h2 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+            <h2 className="text-muted-foreground/80 text-xs font-semibold tracking-wider uppercase">
               {title}
             </h2>
           )}
@@ -527,11 +670,11 @@ export function MetricRow({
       )}
       <div
         className={cn(
-          "grid grid-cols-1 gap-8 sm:grid-cols-2",
+          "grid grid-cols-1 gap-7 sm:grid-cols-2",
           columns === 3 && "lg:grid-cols-3",
           columns === 4 && "lg:grid-cols-4",
           divided &&
-            "lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8"
+            "lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-7 lg:[&>*:not(:last-child)]:pr-7"
         )}
       >
         {children}
