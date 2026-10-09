@@ -57,9 +57,15 @@ export function CompaniesPageClient({ companies, canManage }: Props) {
         <MetricBlock
           label="Total PT"
           value={nf.format(companies.length)}
-          meta={`${nf.format(activeCount)} aktif`}
+          progress={companies.length > 0 ? activeCount / companies.length : 0}
+          meta={`${nf.format(activeCount)} aktif dari ${nf.format(companies.length)} PT`}
         />
-        <MetricBlock label="PT Nonaktif" value={nf.format(companies.length - activeCount)} />
+        <MetricBlock
+          label="PT Nonaktif"
+          value={nf.format(companies.length - activeCount)}
+          tone={companies.length - activeCount > 0 ? "warning" : "default"}
+          progress={companies.length > 0 ? (companies.length - activeCount) / companies.length : 0}
+        />
         <MetricBlock label="Cabang" value={nf.format(totalBranches)} meta="Seluruh PT" />
         <MetricBlock label="Pengguna" value={nf.format(totalUsers)} meta="Melalui cabangnya" />
       </MetricRow>

@@ -205,9 +205,9 @@ export function CorrectionApprovalClient({
               <TableHead className="sticky top-0 z-20 bg-background">Target</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background text-right">Tersimpan</TableHead>
               <TableHead className="sticky top-0 z-20 bg-background text-right">Usulan</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background">Alasan</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background">Diajukan</TableHead>
-              <TableHead className="sticky top-0 z-20 bg-background w-52">Status</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background min-w-[240px] max-w-sm">Alasan</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background min-w-[160px]">Diajukan</TableHead>
+              <TableHead className="sticky top-0 z-20 bg-background min-w-[180px] w-52">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -255,8 +255,10 @@ export function CorrectionApprovalClient({
                       {delta.toLocaleString("id-ID", { maximumFractionDigits: 2 })}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-56 text-sm">{r.reason}</TableCell>
-                  <TableCell className="whitespace-nowrap text-sm">
+                  <TableCell className="min-w-[240px] max-w-sm whitespace-normal break-words text-sm leading-relaxed">
+                    {r.reason}
+                  </TableCell>
+                  <TableCell className="min-w-[160px] whitespace-nowrap text-sm">
                     {r.requestedByName}
                     <div className="text-[10px] text-muted-foreground">
                       {fmtDateTime(r.requestedAt)}
@@ -292,7 +294,7 @@ export function CorrectionApprovalClient({
                           {r.decidedAt ? ` · ${fmtDateTime(r.decidedAt)}` : ""}
                         </span>
                         {r.decisionNote && (
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] text-muted-foreground whitespace-normal break-words">
                             &quot;{r.decisionNote}&quot;
                           </span>
                         )}

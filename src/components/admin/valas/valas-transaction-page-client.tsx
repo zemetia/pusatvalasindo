@@ -343,34 +343,41 @@ export function ValasTransactionPageClient({
       </div>
 
       {/* ── Rekap hari itu ──────────────────────────────────────────────── */}
-      <MetricRow columns={4} title={`${companyName} · ${date}`}>
-        <MetricBlock
-          label="Beli dari nasabah"
-          value={formatIdr(summary.buy.total)}
-          meta={`${summary.buy.count} transaksi · valas masuk`}
-        />
-        <MetricBlock
-          label="Jual ke nasabah"
-          value={formatIdr(summary.sell.total)}
-          meta={`${summary.sell.count} transaksi · valas keluar`}
-        />
-        <MetricBlock
-          label="Selisih rupiah"
-          value={formatIdr(summary.net)}
-          tone={summary.net < 0 ? "destructive" : "default"}
-          meta="Rupiah keluar untuk beli dikurangi rupiah masuk dari jual — bukan laba"
-        />
-        <MetricBlock
-          label="Total transaksi"
-          value={String(summary.buy.count + summary.sell.count)}
-          size="secondary"
-          meta={
-            rows.some((r) => r.status === "VOID")
-              ? `${rows.filter((r) => r.status === "VOID").length} dibatalkan (tidak dihitung)`
-              : "Belum ada yang dibatalkan"
-          }
-        />
-      </MetricRow>
+      {(() => {
+        const totalVolume = summary.buy.total + summary.sell.total;
+        return (
+          <MetricRow columns={4} title={`${companyName} · ${date}`}>
+            <MetricBlock
+              label="Beli dari nasabah"
+              value={formatIdr(summary.buy.total)}
+              progress={totalVolume > 0 ? (summary.buy.total / totalVolume) * 100 : null}
+              meta={`${summary.buy.count} transaksi · valas masuk`}
+            />
+            <MetricBlock
+              label="Jual ke nasabah"
+              value={formatIdr(summary.sell.total)}
+              progress={totalVolume > 0 ? (summary.sell.total / totalVolume) * 100 : null}
+              meta={`${summary.sell.count} transaksi · valas keluar`}
+            />
+            <MetricBlock
+              label="Selisih rupiah"
+              value={formatIdr(summary.net)}
+              tone={summary.net < 0 ? "destructive" : "default"}
+              meta="Rupiah keluar untuk beli dikurangi rupiah masuk dari jual — bukan laba"
+            />
+            <MetricBlock
+              label="Total transaksi"
+              value={String(summary.buy.count + summary.sell.count)}
+              size="secondary"
+              meta={
+                rows.some((r) => r.status === "VOID")
+                  ? `${rows.filter((r) => r.status === "VOID").length} dibatalkan (tidak dihitung)`
+                  : "Belum ada yang dibatalkan"
+              }
+            />
+          </MetricRow>
+        );
+      })()}
 
       {/* ── Daftar transaksi ────────────────────────────────────────────── */}
       <SectionCard

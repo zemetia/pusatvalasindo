@@ -360,8 +360,8 @@ export function StockistHeadConfirmationClient({
 
       {companyId && (
         <>
-          <section className="border-border border-y py-8">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+          <section className="rounded-xl border bg-card p-5 shadow-xs">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-6 lg:[&>*:not(:last-child)]:pr-6">
               <MetricBlock
                 label="Total Keseluruhan IDR PT"
                 size="hero"
@@ -374,18 +374,24 @@ export function StockistHeadConfirmationClient({
                 size="secondary"
                 prefix="Rp"
                 value={fmt(stockIdr?.confirmedIdrValue ?? 0)}
+                progress={companyTotal > 0 ? ((stockIdr?.confirmedIdrValue ?? 0) / companyTotal) * 100 : 0}
+                meta={companyTotal > 0 ? `${(((stockIdr?.confirmedIdrValue ?? 0) / companyTotal) * 100).toFixed(1).replace(".", ",")}% dari total aset` : undefined}
               />
               <MetricBlock
                 label="Total Kas"
                 size="secondary"
                 prefix="Rp"
                 value={fmt(kas?.confirmedIdrValue ?? 0)}
+                progress={companyTotal > 0 ? ((kas?.confirmedIdrValue ?? 0) / companyTotal) * 100 : 0}
+                meta={companyTotal > 0 ? `${(((kas?.confirmedIdrValue ?? 0) / companyTotal) * 100).toFixed(1).replace(".", ",")}% dari total aset` : undefined}
               />
               <MetricBlock
                 label="Total Bank"
                 size="secondary"
                 prefix="Rp"
                 value={fmt(bank?.confirmedIdrValue ?? 0)}
+                progress={companyTotal > 0 ? ((bank?.confirmedIdrValue ?? 0) / companyTotal) * 100 : 0}
+                meta={companyTotal > 0 ? `${(((bank?.confirmedIdrValue ?? 0) / companyTotal) * 100).toFixed(1).replace(".", ",")}% dari total aset` : undefined}
               />
             </div>
           </section>

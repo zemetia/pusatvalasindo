@@ -30,6 +30,14 @@ import {
   IconDownload,
 } from "@tabler/icons-react";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { MetricBlock } from "@/components/admin/page-shell";
 import {
   MONTH_NAMES,
@@ -146,6 +154,9 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
   const [occurredAt, setOccurredAt] = useState(now.toISOString().slice(0, 10));
   const [quantity, setQuantity] = useState("1");
   const [note, setNote] = useState("");
+  const [selectedPending, setSelectedPending] = useState<EntryRow | null>(null);
+  const [isRejectMode, setIsRejectMode] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const selectedUser = users.find((u) => u.id === userId);
 
@@ -219,6 +230,9 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
       mutateJson(`/api/kpi-entries/${id}/review`, "POST", { decision, reviewNote }),
     onSuccess: (_d, vars) => {
       toast.success(vars.decision === "APPROVED" ? "Entri disetujui" : "Entri ditolak");
+      setSelectedPending(null);
+      setIsRejectMode(false);
+      setRejectReason("");
       invalidateAll();
     },
     onError: (err: Error) => toast.error(err.message),
@@ -345,12 +359,13 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
         ) : (
           <>
             {/* Ringkasan skor */}
-            <section className="border-border flex flex-wrap items-end justify-between gap-4 border-y py-6">
+            <section className="rounded-xl border bg-card p-5 shadow-xs flex flex-wrap items-end justify-between gap-4">
               <MetricBlock
                 label={`Skor KPI ${MONTH_NAMES[Number(month)]} ${year}`}
                 size="primary"
                 tone={grade?.tone ?? "default"}
                 value={score === null ? "—" : formatPercent(score)}
+                progress={score !== null ? score : null}
                 meta={
                   result
                     ? `Grade ${result.grade} · dihitung ${new Date(result.calculatedAt).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`
@@ -604,7 +619,7 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                             {STATUS_META[e.status].label}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-sm">
+                        <TableCell className="text-muted-foreground text-sm max-w-xs whitespace-normal break-words">
                           {e.note ?? "—"}
                           {e.evidenceUrl && (
                             <>
@@ -702,8 +717,8 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                 <TableHead>KPI</TableHead>
                 <TableHead>Tanggal</TableHead>
                 <TableHead className="text-right">Jumlah</TableHead>
-                <TableHead>Keterangan</TableHead>
-                <TableHead />
+                <TableHead className="min-w-[180px] max-w-[260px]">Keterangan</TableHead>
+                <TableHead className="text-right w-44">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -718,28 +733,42 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
               ) : (
                 pending.map((e) => (
                   <TableRow key={e.id}>
-                    <TableCell className="font-medium">{e.employee.name}</TableCell>
-                    <TableCell>{e.roleKpi.definition.name}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    <TableCell className="font-medium whitespace-nowrap">{e.employee.name}</TableCell>
+                    <TableCell className="whitespace-nowrap">{e.roleKpi.definition.name}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
                       {new Date(e.occurredAt).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta" })}
                     </TableCell>
-                    <TableCell className="tabular text-right">
+                    <TableCell className="tabular text-right whitespace-nowrap">
                       {Number(e.quantity).toLocaleString("id-ID")}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {e.note ?? "—"}
+                    <TableCell className="min-w-[180px] max-w-[260px]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPending(e);
+                          setIsRejectMode(false);
+                          setRejectReason("");
+                        }}
+                        className="group flex flex-col items-start gap-0.5 text-left w-full cursor-pointer"
+                        title="Klik untuk melihat detail & menyetujui"
+                      >
+                        <span className="truncate max-w-full text-sm text-foreground/90 group-hover:text-primary transition-colors">
+                          {e.note || <span className="text-muted-foreground italic">Tanpa keterangan</span>}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground/70 group-hover:text-primary transition-colors">
+                          Klik untuk detail & persetujuan
+                        </span>
+                      </button>
                       {e.evidenceUrl && (
-                        <>
-                          {" "}
-                          <a
-                            href={e.evidenceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary underline"
-                          >
-                            bukti
-                          </a>
-                        </>
+                        <a
+                          href={e.evidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary underline text-xs inline-block mt-0.5"
+                          onClick={(ev) => ev.stopPropagation()}
+                        >
+                          bukti
+                        </a>
                       )}
                     </TableCell>
                     <TableCell>
@@ -759,13 +788,9 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
                           className="text-destructive hover:text-destructive"
                           disabled={reviewMutation.isPending}
                           onClick={() => {
-                            const reason = prompt("Alasan penolakan (opsional):");
-                            if (reason === null) return;
-                            reviewMutation.mutate({
-                              id: e.id,
-                              decision: "REJECTED",
-                              reviewNote: reason || undefined,
-                            });
+                            setSelectedPending(e);
+                            setIsRejectMode(true);
+                            setRejectReason("");
                           }}
                         >
                           <IconX className="size-4" />
@@ -779,6 +804,170 @@ export function LogPageClient({ users }: { users: UserRow[] }) {
             </TableBody>
           </Table>
         </div>
+
+        <Dialog
+          open={!!selectedPending}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedPending(null);
+              setIsRejectMode(false);
+              setRejectReason("");
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Detail Persetujuan KPI</DialogTitle>
+              <DialogDescription>
+                Tinjau rincian catatan KPI sebelum memberikan keputusan persetujuan.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedPending && (
+              <div className="flex flex-col gap-4 py-2">
+                <div className="grid grid-cols-2 gap-2.5 rounded-lg border bg-muted/40 p-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground block text-[11px]">Karyawan</span>
+                    <span className="font-semibold text-foreground text-sm">{selectedPending.employee.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-[11px]">Tanggal Kejadian</span>
+                    <span className="font-medium text-foreground text-sm">
+                      {new Date(selectedPending.occurredAt).toLocaleDateString("id-ID", {
+                        dateStyle: "medium",
+                        timeZone: "Asia/Jakarta",
+                      })}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-[11px]">Indikator KPI</span>
+                    <span className="font-medium text-foreground">{selectedPending.roleKpi.definition.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-[11px]">Jumlah / Nilai</span>
+                    <span className="font-semibold font-mono text-foreground text-sm">
+                      {Number(selectedPending.quantity).toLocaleString("id-ID")}
+                      {selectedPending.roleKpi.definition.unit === "CURRENCY"
+                        ? " (Rp)"
+                        : ` ${selectedPending.roleKpi.definition.unit ?? ""}`}
+                    </span>
+                  </div>
+                  {selectedPending.createdBy && (
+                    <div className="col-span-2 border-t pt-2 text-muted-foreground text-[11px]">
+                      Dicatat oleh: <span className="font-medium text-foreground">{selectedPending.createdBy.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Keterangan Lengkap</Label>
+                  <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/20 p-3 text-sm whitespace-pre-wrap break-words leading-relaxed text-foreground">
+                    {selectedPending.note || (
+                      <span className="italic text-muted-foreground">Tidak ada keterangan yang dicantumkan.</span>
+                    )}
+                  </div>
+                </div>
+
+                {selectedPending.evidenceUrl && (
+                  <div className="flex items-center justify-between rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-xs">
+                    <span className="font-medium">Bukti terlampir:</span>
+                    <a
+                      href={selectedPending.evidenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-primary underline"
+                    >
+                      Buka Tautan Bukti ↗
+                    </a>
+                  </div>
+                )}
+
+                {isRejectMode && (
+                  <div className="flex flex-col gap-1.5 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                    <Label className="text-xs font-medium text-destructive">Alasan Penolakan (Opsional)</Label>
+                    <Textarea
+                      rows={2}
+                      placeholder="Tuliskan catatan alasan penolakan..."
+                      value={rejectReason}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectReason(e.target.value)}
+                      className="text-sm bg-background"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-between items-center w-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={reviewMutation.isPending}
+                onClick={() => {
+                  setSelectedPending(null);
+                  setIsRejectMode(false);
+                  setRejectReason("");
+                }}
+              >
+                Tutup
+              </Button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                {!isRejectMode ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      disabled={reviewMutation.isPending}
+                      onClick={() => setIsRejectMode(true)}
+                    >
+                      <IconX className="size-4" />
+                      Tolak
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={reviewMutation.isPending}
+                      onClick={() => {
+                        if (!selectedPending) return;
+                        reviewMutation.mutate({ id: selectedPending.id, decision: "APPROVED" });
+                      }}
+                    >
+                      <IconCheck className="size-4" />
+                      {reviewMutation.isPending ? "Menyetujui..." : "Setujui"}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={reviewMutation.isPending}
+                      onClick={() => setIsRejectMode(false)}
+                    >
+                      Batal
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      disabled={reviewMutation.isPending}
+                      onClick={() => {
+                        if (!selectedPending) return;
+                        reviewMutation.mutate({
+                          id: selectedPending.id,
+                          decision: "REJECTED",
+                          reviewNote: rejectReason.trim() || undefined,
+                        });
+                      }}
+                    >
+                      <IconX className="size-4" />
+                      {reviewMutation.isPending ? "Menolak..." : "Konfirmasi Tolak"}
+                    </Button>
+                  </>
+                )}
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </TabsContent>
     </Tabs>
   );

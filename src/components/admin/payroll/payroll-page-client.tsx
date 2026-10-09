@@ -76,7 +76,7 @@ const ENTRY_TYPE_LABEL: Record<string, string> = {
 function RewardPunishmentSection({ rules }: { rules: PayrollResult["rules"] }) {
   if (rules.entries.length === 0) {
     return (
-      <section className="border-border border-y py-8">
+      <section className="rounded-xl border bg-card p-5 shadow-xs">
         <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
           Reward & Punishment
         </p>
@@ -90,8 +90,8 @@ function RewardPunishmentSection({ rules }: { rules: PayrollResult["rules"] }) {
   }
 
   return (
-    <section className="border-border border-y py-8">
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+    <section className="rounded-xl border bg-card p-5 shadow-xs">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-6 lg:[&>*:not(:last-child)]:pr-6">
         <MetricBlock
           label="Reward"
           prefix="Rp"
@@ -378,9 +378,9 @@ export function PayrollPageClient({ me }: { me: UserRow }) {
 
       {!hasSavedSlip && result && !calculateMutation.isPending && (
         <>
-          {/* Sorotan hasil perhitungan — blok data editorial, bukan kartu */}
-          <section className="border-border border-y py-8">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+          {/* Sorotan hasil perhitungan — blok data editorial */}
+          <section className="rounded-xl border bg-card p-5 shadow-xs">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-6 lg:[&>*:not(:last-child)]:pr-6">
               <MetricBlock
                 label="Total Gaji Bulan Ini"
                 size="hero"
@@ -398,6 +398,7 @@ export function PayrollPageClient({ me }: { me: UserRow }) {
                 size="secondary"
                 value={(kpiScore * 100).toFixed(1).replace(".", ",")}
                 suffix="%"
+                progress={kpiScore}
                 meta={grade.label}
               />
               <MetricBlock

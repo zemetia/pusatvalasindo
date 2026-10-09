@@ -298,11 +298,11 @@ const metricTone = {
 
 const metricSize = {
   /** Satu angka utama yang jadi alasan halaman ini ada. */
-  hero: "text-4xl sm:text-5xl font-semibold",
+  hero: "text-3xl sm:text-4xl font-bold",
   /** Metrik baris ringkasan. */
-  primary: "text-3xl font-semibold",
+  primary: "text-xl sm:text-2xl font-bold",
   /** Metrik pendukung (per cabang, per mata uang). */
-  secondary: "text-2xl font-medium",
+  secondary: "text-xl font-bold",
   /** Angka dalam tabel, kartu pendukung, list. */
   inline: "text-sm font-semibold",
 } as const;
@@ -323,7 +323,7 @@ export function MetricLabel({
   return (
     <div
       className={cn(
-        "text-muted-foreground/80 flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase select-none",
+        "text-muted-foreground text-xs font-medium tracking-wider uppercase select-none flex items-center gap-1.5",
         className
       )}
     >
@@ -572,14 +572,17 @@ export interface MetricBlockProps {
   meta?: ReactNode;
   /** Tautan/tombol kecil di bawah blok — dipakai saat metrik butuh aksi. */
   action?: ReactNode;
+  /** Nilai progres 0-1 atau 0-100, atau objek dengan target. Menampilkan progress bar seperti di KPI Analisis. */
+  progress?: number | { value: number; max?: number; tone?: string } | null;
   size?: MetricSize;
   tone?: MetricTone;
   className?: string;
 }
 
 /**
- * Blok data tanpa wadah. Urutan tetap: label → angka → delta inline → meta.
- * Tidak punya padding sendiri; jarak dimiliki oleh `MetricRow`.
+ * Blok data editorial terpadu.
+ * Gaya seragam mengacu pada kartu ringkasan eksekutif KPI:
+ * Label kapital kecil -> Nilai tebal kontras -> Opsional Progress Bar -> Delta & Keterangan.
  */
 export function MetricBlock({
   label,
@@ -593,11 +596,23 @@ export function MetricBlock({
   period,
   meta,
   action,
+  progress,
   size = "primary",
   tone = "default",
   className,
 }: MetricBlockProps) {
   const showDelta = delta !== undefined || Boolean(period);
+
+  const progressPercent =
+    progress != null
+      ? typeof progress === "number"
+        ? progress <= 1 && progress >= 0
+          ? progress * 100
+          : progress
+        : progress.max && progress.max > 0
+          ? (progress.value / progress.max) * 100
+          : 0
+      : null;
 
   return (
     <div className={cn("min-w-0 flex flex-col justify-between", className)}>
@@ -606,11 +621,36 @@ export function MetricBlock({
           <MetricLabel icon={icon}>{label}</MetricLabel>
           {badge}
         </div>
-        <MetricValue size={size} tone={tone} prefix={prefix} suffix={suffix} className="mt-2.5">
-          {value}
-        </MetricValue>
+        <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+          <MetricValue size={size} tone={tone} prefix={prefix} suffix={suffix}>
+            {value}
+          </MetricValue>
+        </div>
+        {progressPercent != null && (
+          <div className="w-full bg-muted rounded-full h-1.5 mt-2 overflow-hidden">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all",
+                typeof progress === "object" && progress?.tone
+                  ? progress.tone
+                  : tone === "success"
+                    ? "bg-success"
+                    : tone === "destructive"
+                      ? "bg-destructive"
+                      : tone === "warning"
+                        ? "bg-warning"
+                        : tone === "info"
+                          ? "bg-info"
+                          : "bg-primary"
+              )}
+              style={{
+                width: `${Math.min(100, Math.max(0, progressPercent))}%`,
+              }}
+            />
+          </div>
+        )}
         {showDelta && (
-          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             {delta !== undefined && <DeltaPill value={delta} goodWhen={deltaGoodWhen} />}
             {period && (
               <span className="text-muted-foreground text-xs leading-none font-medium">
@@ -621,7 +661,7 @@ export function MetricBlock({
         )}
       </div>
       {(meta || action) && (
-        <div className="mt-2.5 space-y-2">
+        <div className="mt-2 space-y-1.5">
           {meta && (
             <div className="text-muted-foreground text-xs leading-relaxed font-normal">
               {meta}
@@ -635,33 +675,39 @@ export function MetricBlock({
 }
 
 /**
- * Baris sorotan editorial: beberapa `MetricBlock` dalam satu ruang, dipisah
- * garis rambut di layar lebar dan hanya oleh jarak di layar sempit.
+ * Kartu ringkasan metrik global (mengadopsi gaya dashboard/kpi/analisis):
+ * Wadah terstruktur rounded-xl berlatar card dengan border dan shadow halus,
+ * berisi grid metrik yang teratur dan responsif.
  */
 export function MetricRow({
   children,
   title,
   action,
   columns = 4,
-  divided = true,
-  /** Matikan garis atas/bawah saat baris sudah berada di dalam section lain. */
+  divided = false,
   bordered = true,
   className,
 }: {
   children: ReactNode;
   title?: ReactNode;
   action?: ReactNode;
-  columns?: 2 | 3 | 4;
+  columns?: 1 | 2 | 3 | 4 | 5 | 6;
   divided?: boolean;
   bordered?: boolean;
   className?: string;
 }) {
   return (
-    <section className={cn(bordered && "border-border/80 border-y py-7", className)}>
+    <section
+      className={cn(
+        "rounded-xl border bg-card p-5 shadow-xs transition-shadow",
+        !bordered && "border-transparent bg-transparent p-0 shadow-none",
+        className
+      )}
+    >
       {(title || action) && (
-        <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <header className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b pb-3.5">
           {title && (
-            <h2 className="text-muted-foreground/80 text-xs font-semibold tracking-wider uppercase">
+            <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
               {title}
             </h2>
           )}
@@ -670,11 +716,15 @@ export function MetricRow({
       )}
       <div
         className={cn(
-          "grid grid-cols-1 gap-7 sm:grid-cols-2",
+          "grid grid-cols-1 gap-5 sm:grid-cols-2",
+          columns === 1 && "sm:grid-cols-1",
+          columns === 2 && "lg:grid-cols-2",
           columns === 3 && "lg:grid-cols-3",
           columns === 4 && "lg:grid-cols-4",
+          columns === 5 && "lg:grid-cols-5",
+          columns === 6 && "lg:grid-cols-6",
           divided &&
-            "lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-7 lg:[&>*:not(:last-child)]:pr-7"
+            "lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-6 lg:[&>*:not(:last-child)]:pr-6"
         )}
       >
         {children}

@@ -26,7 +26,7 @@ import {
 } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
 import { IconChartHistogram, IconBriefcase } from "@tabler/icons-react";
-import { MONTH_NAMES, formatPercent, slugifyRoleName } from "@/lib/kpi-utils";
+import { formatPercent, slugifyRoleName } from "@/lib/kpi-utils";
 import {
   aggregatePerformance,
   NO_BRANCH,
@@ -426,7 +426,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
           </div>
 
       {/* ── Angka utama halaman, mengikuti filter ── */}
-      <section className="border-border flex flex-wrap items-end justify-between gap-6 border-y py-8">
+      <section className="rounded-xl border bg-card p-5 shadow-xs flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0">
           <MetricLabel>Rata-rata Skor · {scopeLabel}</MetricLabel>
           <MetricValue size="hero" className="mt-2">
@@ -462,12 +462,13 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
         </div>
       </section>
 
-      <MetricRow columns={4} className="-mt-px">
+      <MetricRow columns={4} className="mt-6">
         <MetricBlock
           label="Sudah Dinilai"
           size="secondary"
           value={totals.scored}
           suffix={`/ ${totals.employees}`}
+          progress={totals.employees > 0 ? totals.scored / totals.employees : 0}
           meta="karyawan aktif berjabatan"
         />
         <MetricBlock
@@ -475,6 +476,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
           size="secondary"
           tone={goodCount > 0 ? "success" : "muted"}
           value={goodCount}
+          progress={gradeTotal > 0 ? goodCount / gradeTotal : 0}
           meta={
             gradeTotal > 0
               ? `${formatPercent(goodCount / gradeTotal, 0)} dari yang dinilai`
@@ -501,7 +503,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
 
       {/* ── Distribusi grade ── */}
       {gradeTotal > 0 && (
-        <section className="border-border -mt-px flex flex-col gap-4 border-y py-8">
+        <section className="rounded-xl border bg-card p-5 shadow-xs flex flex-col gap-4 mt-6">
           <MetricLabel>Distribusi Grade</MetricLabel>
           <div className="bg-muted flex h-2 gap-px overflow-hidden rounded-full">
             {GRADE_ORDER.map((g) =>
@@ -536,7 +538,7 @@ export function PerformanceAnalysisClient({ overview }: { overview: PerformanceO
         <MetricRow
           title={role === ALL ? "Rata-rata per PT" : `Rata-rata per PT · ${role}`}
           columns={byCompany.length >= 3 ? 3 : 2}
-          className="-mt-px"
+          className="mt-6"
         >
           {byCompany.map((c) => (
             <MetricBlock

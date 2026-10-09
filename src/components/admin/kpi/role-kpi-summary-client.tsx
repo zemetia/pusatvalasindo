@@ -25,7 +25,7 @@ import {
 } from "@/components/admin/page-shell";
 import { SearchInput } from "@/components/admin/search-input";
 import { IconChartHistogram } from "@tabler/icons-react";
-import { MONTH_NAMES, formatPercent } from "@/lib/kpi-utils";
+import { formatPercent } from "@/lib/kpi-utils";
 import { MonthPicker } from "./month-picker";
 import {
   aggregatePerformance,
@@ -149,7 +149,7 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
       </div>
 
       {/* ── Angka utama ── */}
-      <section className="border-border flex flex-wrap items-end justify-between gap-6 border-y py-8">
+      <section className="rounded-xl border bg-card p-5 shadow-xs flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0">
           <MetricLabel>Rata-rata Skor · {summary.roleName}</MetricLabel>
           <MetricValue size="hero" className="mt-2">
@@ -168,12 +168,13 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
         </div>
       </section>
 
-      <MetricRow columns={4} className="-mt-px">
+      <MetricRow columns={4} className="mt-6">
         <MetricBlock
           label="Sudah Dinilai"
           size="secondary"
           value={activeTotals.scored}
           suffix={`/ ${activeTotals.employees}`}
+          progress={activeTotals.employees > 0 ? activeTotals.scored / activeTotals.employees : 0}
           meta="karyawan jabatan ini"
         />
         <MetricBlock
@@ -181,6 +182,11 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
           size="secondary"
           tone={activeTotals.gradeCounts.A + activeTotals.gradeCounts.B > 0 ? "success" : "muted"}
           value={activeTotals.gradeCounts.A + activeTotals.gradeCounts.B}
+          progress={
+            activeTotals.scored > 0
+              ? (activeTotals.gradeCounts.A + activeTotals.gradeCounts.B) / activeTotals.scored
+              : 0
+          }
           meta="karyawan bergrade baik"
         />
         <MetricBlock
@@ -204,7 +210,7 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
         <MetricRow
           title={`Rata-rata per KPI · ${period.label}`}
           columns={kpiColumns.length >= 3 ? 3 : 2}
-          className="-mt-px"
+          className="mt-6"
         >
           {kpiColumns.map((name) => (
             <MetricBlock
@@ -213,6 +219,11 @@ export function RoleKpiSummaryClient({ summary }: { summary: RoleKpiSummary }) {
               size="secondary"
               value={
                 activeKpiAverages[name] === null ? "—" : formatPercent(activeKpiAverages[name] as number)
+              }
+              progress={
+                activeKpiAverages[name] !== null
+                  ? (activeKpiAverages[name] as number)
+                  : null
               }
               meta="rata-rata pencapaian"
             />

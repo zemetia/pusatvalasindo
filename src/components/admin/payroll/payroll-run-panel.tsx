@@ -290,6 +290,7 @@ function RosterList({
         <MetricBlock
           label="Karyawan dihitung"
           value={`${jumlahDihitung}/${roster.length}`}
+          progress={roster.length > 0 ? jumlahDihitung / roster.length : 0}
           meta={run ? `${sudahDibayarCount}/${jumlahDihitung} sudah dibayar` : "Belum ada yang dihitung"}
         />
         <MetricBlock
@@ -303,6 +304,11 @@ function RosterList({
           value={run?.jumlahPerluReview ?? 0}
           size="secondary"
           tone={(run?.jumlahPerluReview ?? 0) > 0 ? "warning" : "default"}
+          progress={
+            run && run.jumlahPerluReview > 0
+              ? { value: run.jumlahPerluReview, max: roster.length || 1, tone: "bg-warning" }
+              : null
+          }
           meta={
             !run
               ? undefined

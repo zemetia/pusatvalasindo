@@ -385,12 +385,14 @@ export function PayrollSlipDetailClient({
           label="Bonus"
           prefix="Rp"
           tone={slip.totalBonus > 0 ? "success" : "muted"}
+          progress={slip.grossPay > 0 && slip.totalBonus > 0 ? (slip.totalBonus / slip.grossPay) * 100 : null}
           value={formatAmount(slip.totalBonus)}
         />
         <MetricBlock
           label="Potongan & denda"
           prefix="Rp"
           tone={totalPengurangan > 0 ? "destructive" : "muted"}
+          progress={slip.grossPay > 0 && totalPengurangan > 0 ? (totalPengurangan / slip.grossPay) * 100 : null}
           value={formatAmount(totalPengurangan)}
         />
         <MetricBlock
@@ -398,6 +400,7 @@ export function PayrollSlipDetailClient({
           prefix="Rp"
           size="secondary"
           value={formatAmount(slip.netPay)}
+          progress={slip.grossPay > 0 ? (slip.netPay / slip.grossPay) * 100 : null}
           meta={
             <>
               {STATUS_LABEL[slip.runStatus] ?? slip.runStatus}

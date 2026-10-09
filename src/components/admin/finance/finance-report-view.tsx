@@ -88,7 +88,7 @@ export function FinanceReportView({
   return (
     <>
       {/* ── Sorotan utama ────────────────────────────────────────────────── */}
-      <section className="border-border grid grid-cols-1 gap-8 border-y py-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:pl-8 lg:[&>*:not(:last-child)]:pr-8">
+      <section className="rounded-xl border bg-card p-5 shadow-xs grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))] lg:gap-0 lg:[&>*:not(:first-child)]:border-l lg:[&>*:not(:first-child)]:border-border/70 lg:[&>*:not(:first-child)]:pl-6 lg:[&>*:not(:last-child)]:pr-6">
         <MetricBlock
           size="hero"
           label="Total Aset Konsolidasi"
@@ -152,13 +152,14 @@ export function FinanceReportView({
           size="secondary"
           label="Hari Terkonfirmasi"
           value={formatCount(group.confirmedDays)}
-          suffix={`/ ${range.days}`}
+          suffix={`/ ${range.days} Hari`}
+          progress={range.days > 0 ? group.confirmedDays / range.days : 0}
           tone={group.confirmedDays === 0 ? "muted" : "default"}
           meta="Hari yang punya konfirmasi kepala cabang di periode ini"
         />
       </section>
 
-      <p className="text-muted-foreground -mt-6 max-w-3xl text-xs leading-relaxed">
+      <p className="text-muted-foreground mt-1 max-w-3xl text-xs leading-relaxed">
         Angka di halaman ini adalah <strong className="font-medium">posisi aset</strong> (stock +
         kas + bank), bukan laba rugi. &ldquo;Perubahan bersih&rdquo; adalah selisih posisi akhir dan
         posisi awal periode — indikator hasil usaha yang belum dikurangi biaya operasional dan belum
@@ -185,6 +186,7 @@ export function FinanceReportView({
             value={formatIdr(group.closing.stock)}
             delta={pctChange(group.opening.stock, group.closing.stock)}
             period="vs awal periode"
+            progress={group.closing.total && group.closing.stock != null ? (group.closing.stock / group.closing.total) * 100 : null}
             meta={`${formatPercent(share(group.closing.stock, group.closing.total))} dari total aset`}
           />
           <MetricBlock
@@ -194,6 +196,7 @@ export function FinanceReportView({
             value={formatIdr(group.closing.kas)}
             delta={pctChange(group.opening.kas, group.closing.kas)}
             period="vs awal periode"
+            progress={group.closing.total && group.closing.kas != null ? (group.closing.kas / group.closing.total) * 100 : null}
             meta={`${formatPercent(share(group.closing.kas, group.closing.total))} dari total aset`}
           />
           <MetricBlock
@@ -203,6 +206,7 @@ export function FinanceReportView({
             value={formatIdr(group.closing.bank)}
             delta={pctChange(group.opening.bank, group.closing.bank)}
             period="vs awal periode"
+            progress={group.closing.total && group.closing.bank != null ? (group.closing.bank / group.closing.total) * 100 : null}
             meta={`${formatPercent(share(group.closing.bank, group.closing.total))} dari total aset`}
           />
         </MetricRow>

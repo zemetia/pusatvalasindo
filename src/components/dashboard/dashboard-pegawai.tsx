@@ -154,6 +154,7 @@ export async function DashboardPegawai({
               size="secondary"
               tone={ownSummary.ownKpiThisMonth ? "default" : "muted"}
               value={ownSummary.ownKpiThisMonth ? `${(Number(ownSummary.ownKpiThisMonth.totalScore) * 100).toFixed(1).replace(".", ",")}%` : "—"}
+              progress={ownSummary.ownKpiThisMonth ? Number(ownSummary.ownKpiThisMonth.totalScore) : null}
               meta={
                 ownSummary.ownKpiThisMonth ? (
                   <Badge variant="soft">Grade {ownSummary.ownKpiThisMonth.grade}</Badge>

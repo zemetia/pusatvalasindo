@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MoneyDisplay, DeltaPill, MetricValue } from "./page-shell";
+import { MoneyDisplay, DeltaPill, MetricValue, MetricBlock, MetricRow } from "./page-shell";
 
 describe("MoneyDisplay", () => {
   it("renders em dash when amount is null or undefined or invalid", () => {
@@ -107,3 +107,87 @@ describe("MetricValue", () => {
     expect(screen.getByText("/bln")).toBeDefined();
   });
 });
+
+describe("MetricBlock", () => {
+  it("renders label, value, meta, and action", () => {
+    render(
+      <MetricBlock
+        label="Total Omzet"
+        value="1.500.000"
+        meta="dari target 2.000.000"
+        action={<button>Detail</button>}
+      />
+    );
+    expect(screen.getByText("Total Omzet")).toBeDefined();
+    expect(screen.getByText("1.500.000")).toBeDefined();
+    expect(screen.getByText("dari target 2.000.000")).toBeDefined();
+    expect(screen.getByText("Detail")).toBeDefined();
+  });
+
+  it("renders progress bar with 0..1 fraction and clamps to 100%", () => {
+    const { container } = render(
+      <MetricBlock
+        label="Pencapaian"
+        value="44,5%"
+        progress={0.445}
+      />
+    );
+    const bar = container.querySelector(".bg-primary");
+    expect(bar).not.toBeNull();
+    expect(bar?.getAttribute("style")).toContain("width: 44.5%");
+  });
+
+  it("renders progress bar with tone mapping", () => {
+    const { container } = render(
+      <MetricBlock
+        label="Denda"
+        value="Rp 50.000"
+        tone="destructive"
+        progress={0.25}
+      />
+    );
+    const bar = container.querySelector(".bg-destructive");
+    expect(bar).not.toBeNull();
+    expect(bar?.getAttribute("style")).toContain("width: 25%");
+  });
+
+  it("renders progress bar with object format { value, max, tone }", () => {
+    const { container } = render(
+      <MetricBlock
+        label="Penilaian"
+        value="24/26"
+        progress={{ value: 24, max: 26, tone: "bg-success" }}
+      />
+    );
+    const bar = container.querySelector(".bg-success");
+    expect(bar).not.toBeNull();
+    expect(bar?.getAttribute("style")).toContain("width: 92.3076923076923%");
+  });
+});
+
+describe("MetricRow", () => {
+  it("renders with rounded-xl border bg-card p-5 card styling", () => {
+    const { container } = render(
+      <MetricRow title="Ringkasan Bisnis" columns={4}>
+        <MetricBlock label="Metrik 1" value="100" />
+      </MetricRow>
+    );
+    const section = container.querySelector("section");
+    expect(section).toHaveClass("rounded-xl");
+    expect(section).toHaveClass("border");
+    expect(section).toHaveClass("bg-card");
+    expect(section).toHaveClass("p-5");
+    expect(screen.getByText("Ringkasan Bisnis")).toBeDefined();
+  });
+
+  it("allows unbordered mode when bordered=false", () => {
+    const { container } = render(
+      <MetricRow bordered={false}>
+        <MetricBlock label="Metrik 1" value="100" />
+      </MetricRow>
+    );
+    const section = container.querySelector("section");
+    expect(section).toHaveClass("border-transparent");
+  });
+});
+

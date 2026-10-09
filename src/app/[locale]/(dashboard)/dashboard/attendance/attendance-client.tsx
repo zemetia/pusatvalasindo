@@ -330,8 +330,8 @@ export function AttendanceClient({
               </>
             ) : todayRecord.checkOut ? (
               /* Already checked in AND checked out */
-              <section className="border-border animate-in fade-in border-y py-8 duration-500">
-                <div className="grid grid-cols-2 gap-8 sm:gap-0 sm:[&>*:last-child]:border-l sm:[&>*:last-child]:pl-8">
+              <section className="rounded-xl border bg-card p-5 shadow-xs animate-in fade-in duration-500">
+                <div className="grid grid-cols-2 gap-6 sm:gap-0 sm:[&>*:last-child]:border-l sm:[&>*:last-child]:border-border/70 sm:[&>*:last-child]:pl-6">
                   <MetricBlock
                     label="Check In"
                     size="secondary"
@@ -347,7 +347,7 @@ export function AttendanceClient({
                     meta={todayRecord.checkOutBranch?.name}
                   />
                 </div>
-                <p className="text-muted-foreground mt-6 text-sm">Presensi hari ini selesai.</p>
+                <p className="text-muted-foreground mt-4 text-xs">Presensi hari ini selesai.</p>
               </section>
             ) : (
               /* Checked in, waiting for checkout */

@@ -374,6 +374,7 @@ export function HargaValasPageClient({
           label="Mata uang berharga"
           value={summary.priced}
           suffix={`/ ${summary.total}`}
+          progress={summary.total > 0 ? summary.priced / summary.total : 0}
           meta={
             summary.priced < summary.total
               ? `${summary.total - summary.priced} mata uang belum diisi harganya`
@@ -390,6 +391,8 @@ export function HargaValasPageClient({
           label="Terkunci"
           value={summary.locked}
           suffix={`/ ${summary.priced}`}
+          progress={summary.priced > 0 ? summary.locked / summary.priced : 0}
+          tone={summary.locked > 0 ? "warning" : "default"}
           meta="Baris terkunci kebal terhadap sinkronisasi"
         />
       </MetricRow>

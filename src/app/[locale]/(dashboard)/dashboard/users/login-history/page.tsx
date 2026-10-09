@@ -196,7 +196,7 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
         }
       />
 
-      <MetricRow columns={3} bordered={false} className="border-b pb-8">
+      <MetricRow columns={3}>
         <MetricBlock
           label={`Total Login — ${PERIOD_OPTIONS.find((o) => o.days === days)?.label}`}
           value={formatCount(rows.length)}
@@ -205,11 +205,14 @@ export default async function LoginHistoryPage({ params, searchParams }: Params)
         <MetricBlock
           label="Login Hari Ini"
           value={formatCount(loginsToday)}
+          progress={rows.length > 0 ? loginsToday / rows.length : 0}
+          meta={rows.length > 0 ? `${((loginsToday / rows.length) * 100).toFixed(1).replace(".", ",")}% dari total periode` : undefined}
         />
         <MetricBlock
           label="Login di Luar Jam Kerja"
           value={formatCount(outsideCount)}
           tone={outsideCount > 0 ? "destructive" : "default"}
+          progress={rows.length > 0 ? outsideCount / rows.length : 0}
           meta={`Dari ${formatCount(uniqueUsers)} pengguna berbeda · di luar 05.00–22.00 WIB`}
         />
       </MetricRow>

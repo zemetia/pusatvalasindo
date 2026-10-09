@@ -49,12 +49,12 @@ export default function MetricsPreviewPage() {
         />
       </MetricRow>
 
-      <MetricRow title="Organisasi" columns={2} className="-mt-px">
+      <MetricRow title="Organisasi" columns={2} className="mt-6">
         <MetricBlock label="Karyawan Aktif" size="secondary" value="42" meta="Total karyawan terdaftar" />
         <MetricBlock label="Cabang Aktif" size="secondary" value="6" meta="Cabang beroperasi" />
       </MetricRow>
 
-      <section className="border-border grid gap-8 border-y py-8 sm:grid-cols-3 -mt-px">
+      <section className="rounded-xl border bg-card p-5 shadow-xs grid gap-8 sm:grid-cols-3 mt-6">
         <div className="sm:col-span-2">
           <MetricBlock
             label="Saldo Saat Ini"

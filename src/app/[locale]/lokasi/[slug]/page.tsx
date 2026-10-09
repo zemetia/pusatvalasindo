@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import { branchBySlug, branches, entities } from '@/config/group';
 import { siteConfig } from '@/config/site';
+import { routing } from '@/i18n/routing';
 import { branchCopy, branchFaqs } from '@/content/landing';
 import { Faq, FinalCta } from '@/components/landing/sections';
 import { PageIntro } from '@/components/landing/page-intro';
@@ -29,10 +30,11 @@ interface Props {
 /** Hanya cabang yang entitasnya boleh tayang (data lengkap). */
 const published = () => branches.filter((b) => entities[b.entity].publishable);
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
-  return published().map((b) => ({ slug: b.slug }));
+  const branchList = published();
+  return routing.locales.flatMap((locale) =>
+    branchList.map((b) => ({ locale, slug: b.slug }))
+  );
 }
 
 function pageOf(slug: string) {
@@ -41,6 +43,7 @@ function pageOf(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
+  if (slug === 'tanggerang') return {};
   const page = pageOf(slug);
   if (!page) return {};
   return buildMetadata({
@@ -53,7 +56,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BranchPage({ params }: Props) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  if (slug === 'tanggerang') {
+    permanentRedirect(locale === 'en' ? '/en/lokasi/tangerang' : '/lokasi/tangerang');
+  }
+
   const branch = branchBySlug(slug);
   const page = pageOf(slug);
   const copy = branchCopy[slug];

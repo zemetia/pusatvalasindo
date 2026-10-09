@@ -162,7 +162,7 @@ export function RoleKpiDetailClient({
       </div>
 
       {activeKpis.length > 0 && (
-        <section className="border-border flex flex-col gap-4 border-y py-6">
+        <section className="rounded-xl border bg-card p-5 shadow-xs flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <MetricBlock
               label="Distribusi Bobot"
@@ -170,6 +170,7 @@ export function RoleKpiDetailClient({
               tone={isComplete ? "default" : "destructive"}
               value={totalPct}
               suffix="%"
+              progress={totalPct}
               meta={
                 isComplete
                   ? `${activeKpis.length} KPI aktif · bobot lengkap`

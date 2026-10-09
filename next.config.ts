@@ -18,10 +18,14 @@ const nextConfig: NextConfig = {
       ["services", "/pusat-valas-indo"],
       ["contact", "/lokasi/cengkareng"],
     ];
-    return moved.flatMap(([from, to]) => [
-      { source: `/${from}`, destination: to, permanent: true },
-      { source: `/:locale(en|id)/${from}`, destination: to, permanent: true },
-    ]);
+    return [
+      ...moved.flatMap(([from, to]) => [
+        { source: `/${from}`, destination: to, permanent: true },
+        { source: `/:locale(en|id)/${from}`, destination: to, permanent: true },
+      ]),
+      { source: '/lokasi/tanggerang', destination: '/lokasi/tangerang', permanent: true },
+      { source: '/:locale(en|id)/lokasi/tanggerang', destination: '/:locale/lokasi/tangerang', permanent: true },
+    ];
   },
 };
 

@@ -641,13 +641,14 @@ function ringkasanRule(
       />
 
       {/* Angka utama halaman ini. */}
-      <section className="border-border border-y py-8">
+      <section className="rounded-xl border bg-card p-5 shadow-xs">
         {heroIsKpi && latestScore !== null && latestGrade ? (
           <MetricBlock
             size="hero"
             tone={latestGrade.tone}
             label={`Skor KPI ${periodLabel}`}
             value={formatPercent(latestScore * 100)}
+            progress={latestScore !== null ? latestScore : null}
             delta={pctChange(previousScore, latestScore)}
             period="vs bulan sebelumnya"
             meta={
@@ -662,6 +663,7 @@ function ringkasanRule(
             size="hero"
             label={`Kehadiran ${year}`}
             value={attendanceRate === null ? "—" : formatPercent(attendanceRate)}
+            progress={attendanceRate !== null ? attendanceRate : null}
             meta={
               attendanceRate === null
                 ? "Belum ada catatan absensi tahun ini"

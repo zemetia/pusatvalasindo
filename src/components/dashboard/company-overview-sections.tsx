@@ -205,7 +205,7 @@ export function CompanyOverviewSections({
 
       {/* Ringkasan Bisnis — metrik utama terstruktur bersih */}
       {showBentoOverview && (
-        <MetricRow title="Ringkasan Bisnis" columns={4} className="-mt-px">
+        <MetricRow title="Ringkasan Bisnis" columns={4}>
           {flags.bank && primaryBankGroup && (
             <MetricBlock
               label="Saldo Bank"
@@ -238,15 +238,20 @@ export function CompanyOverviewSections({
             <MetricBlock
               label="Presensi Hari Ini"
               value={overview.todayAttendanceCount.toLocaleString("id-ID")}
-              suffix={`/ ${overview.totalUsers}`}
+              suffix={`/ ${overview.totalUsers} Karyawan`}
+              progress={
+                overview.totalUsers > 0
+                  ? overview.todayAttendanceCount / overview.totalUsers
+                  : 0
+              }
               meta={
                 <div className="flex items-center gap-2">
                   <span
                     className={cn(
-                      "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold tabular",
+                      "font-semibold tabular",
                       overview.attendancePct != null && overview.attendancePct >= 80
-                        ? "border-success/20 bg-success-muted text-success dark:bg-success/15 dark:text-success"
-                        : "border-warning/25 bg-warning-muted text-warning-foreground"
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-amber-600 dark:text-amber-400"
                     )}
                   >
                     {overview.attendancePct != null ? `${overview.attendancePct.toFixed(0)}% kehadiran` : "—"}
@@ -265,6 +270,12 @@ export function CompanyOverviewSections({
                   ? overview.kpiAvgThisMonth.toFixed(1).replace(".", ",")
                   : overview.kpiLogsThisMonth
               }
+              suffix={overview.kpiAvgThisMonth != null ? "%" : undefined}
+              progress={
+                overview.kpiAvgThisMonth != null
+                  ? overview.kpiAvgThisMonth / 100
+                  : null
+              }
               delta={overview.kpiTrendPct}
               period="vs bulan lalu"
               meta={
@@ -279,7 +290,12 @@ export function CompanyOverviewSections({
             <MetricBlock
               label="Payroll Bulan Ini"
               value={overview.payrollDoneCount.toLocaleString("id-ID")}
-              suffix={`/ ${overview.payrollTotalEmployees}`}
+              suffix={`/ ${overview.payrollTotalEmployees} Karyawan`}
+              progress={
+                overview.payrollTotalEmployees > 0
+                  ? overview.payrollDoneCount / overview.payrollTotalEmployees
+                  : 0
+              }
               delta={overview.highPerformerTrendPct}
               period={`${overview.highPerformersThisMonth} skor ≥80% vs bln lalu`}
               meta="karyawan sudah dihitung"
@@ -299,7 +315,7 @@ export function CompanyOverviewSections({
 
       {/* Organisasi */}
       {(flags.usersCount || flags.branchesCount) && (
-        <MetricRow title="Organisasi" columns={2} className="-mt-px">
+        <MetricRow title="Organisasi" columns={2}>
           {flags.usersCount && (
             <MetricBlock
               label="Karyawan Aktif"

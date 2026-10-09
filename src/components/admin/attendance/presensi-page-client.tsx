@@ -522,30 +522,36 @@ export function PresensiPageClient({
         )}
       </div>
 
-      {/* Ringkasan hari itu — blok data tanpa wadah (DATA_PRESENTATION) */}
+      {/* Ringkasan hari itu — kartu ringkasan eksekutif terpadu */}
       <MetricRow title={formatDateKey(dateKey)} columns={4}>
         <MetricBlock
           label="Hadir"
           value={summary.hadir.toLocaleString("id-ID")}
           suffix={<span className="text-muted-foreground text-sm">/ {summary.total}</span>}
+          progress={summary.total > 0 ? summary.hadir / summary.total : 0}
           meta={`Terlambat ${summary.late} · WFH ${summary.wfh}`}
           tone={summary.hadir > 0 ? "success" : "default"}
         />
         <MetricBlock
           label="Tidak Masuk"
           value={summary.berhalangan.toLocaleString("id-ID")}
+          progress={summary.total > 0 ? summary.berhalangan / summary.total : 0}
           meta={`Izin ${summary.izin} · Sakit ${summary.sakit} · Cuti ${summary.cuti}`}
+          tone={summary.berhalangan > 0 ? "warning" : "default"}
         />
         <MetricBlock
           label="Alpa"
           value={summary.alpa.toLocaleString("id-ID")}
+          progress={summary.total > 0 ? summary.alpa / summary.total : 0}
           meta={`Libur ${summary.libur}`}
           tone={summary.alpa > 0 ? "destructive" : "default"}
         />
         <MetricBlock
           label="Belum Absen"
           value={summary.unrecorded.toLocaleString("id-ID")}
+          progress={summary.total > 0 ? summary.unrecorded / summary.total : 0}
           meta="Belum ada catatan sama sekali"
+          tone={summary.unrecorded > 0 ? "muted" : "default"}
         />
       </MetricRow>
 

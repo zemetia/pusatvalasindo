@@ -67,19 +67,28 @@ export default async function PayrollRulesPage({
           label="Rule Berlaku"
           value={aktif.length}
           size="hero"
+          progress={set.rules.length > 0 ? aktif.length / set.rules.length : 0}
           meta={`dari ${set.rules.length} versi rule tersimpan`}
         />
-        <MetricBlock label="Reward" value={reward} tone="success" meta="menambah gaji" />
+        <MetricBlock
+          label="Reward"
+          value={reward}
+          tone="success"
+          progress={aktif.length > 0 ? reward / aktif.length : 0}
+          meta="menambah gaji"
+        />
         <MetricBlock
           label="Denda & Potongan"
           value={sanksi}
           tone="warning"
+          progress={aktif.length > 0 ? sanksi / aktif.length : 0}
           meta="mengurangi gaji"
         />
         <MetricBlock
           label="Bermasalah"
           value={bermasalah}
           tone={bermasalah > 0 ? "destructive" : "muted"}
+          progress={set.rules.length > 0 && bermasalah > 0 ? bermasalah / set.rules.length : null}
           meta={bermasalah > 0 ? "tidak ikut dihitung" : "semua lolos validasi"}
         />
       </MetricRow>

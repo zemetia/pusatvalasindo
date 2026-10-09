@@ -587,32 +587,40 @@ export function HeldFundPageClient({
       {companyId && (
         <>
           {/* ── Posisi ────────────────────────────────────────────────────── */}
-          <MetricRow columns={3}>
-            <MetricBlock
-              size="hero"
-              label="Credit — Akan Masuk"
-              prefix="Rp"
-              tone={outstanding.credit.total > 0 ? "warning" : "muted"}
-              value={fmt(outstanding.credit.total)}
-              meta={`${fmt(outstanding.credit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
-            />
-            <MetricBlock
-              size="hero"
-              label="Debit — Akan Keluar"
-              prefix="Rp"
-              tone={outstanding.debit.total > 0 ? "destructive" : "muted"}
-              value={fmt(outstanding.debit.total)}
-              meta={`${fmt(outstanding.debit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
-            />
-            <MetricBlock
-              size="secondary"
-              label="Belum Lunas Tanggal Ini"
-              prefix="Rp"
-              tone={totals.belumLunas > 0 ? "warning" : "muted"}
-              value={fmt(totals.belumLunas)}
-              meta={`${fmt(totals.jumlahBelumLunas)} dari ${fmt(rows.length)} catatan tanggal ${fmtDate(date)}`}
-            />
-          </MetricRow>
+          {(() => {
+            const totalOutstanding = outstanding.credit.total + outstanding.debit.total;
+            return (
+              <MetricRow columns={3}>
+                <MetricBlock
+                  size="hero"
+                  label="Credit — Akan Masuk"
+                  prefix="Rp"
+                  tone={outstanding.credit.total > 0 ? "warning" : "muted"}
+                  value={fmt(outstanding.credit.total)}
+                  progress={totalOutstanding > 0 ? (outstanding.credit.total / totalOutstanding) * 100 : null}
+                  meta={`${fmt(outstanding.credit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
+                />
+                <MetricBlock
+                  size="hero"
+                  label="Debit — Akan Keluar"
+                  prefix="Rp"
+                  tone={outstanding.debit.total > 0 ? "destructive" : "muted"}
+                  value={fmt(outstanding.debit.total)}
+                  progress={totalOutstanding > 0 ? (outstanding.debit.total / totalOutstanding) * 100 : null}
+                  meta={`${fmt(outstanding.debit.count)} catatan belum lunas · seluruh tanggal · ${companyName}`}
+                />
+                <MetricBlock
+                  size="secondary"
+                  label="Belum Lunas Tanggal Ini"
+                  prefix="Rp"
+                  tone={totals.belumLunas > 0 ? "warning" : "muted"}
+                  value={fmt(totals.belumLunas)}
+                  progress={rows.length > 0 ? (totals.jumlahBelumLunas / rows.length) * 100 : null}
+                  meta={`${fmt(totals.jumlahBelumLunas)} dari ${fmt(rows.length)} catatan tanggal ${fmtDate(date)}`}
+                />
+              </MetricRow>
+            );
+          })()}
 
           <Tabs defaultValue="outstanding" className="gap-4">
             <TabsList>
