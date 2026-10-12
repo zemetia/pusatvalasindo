@@ -61,11 +61,11 @@ export default function MoneyChangerTerbaikPage() {
     <InnerPage id="guide" schemas={schemas}>
       <PageIntro
         crumbs={[{ name: 'Beranda', href: '/' }, { name: 'Money changer terbaik' }]}
-        eyebrow="Panduan"
+        eyebrow="Panduan & Layanan"
         title={
           <>
-            Money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, dan Tangerang?{' '}
-            <Em>Periksa enam hal ini.</Em>
+            Money changer terbaik di Jakarta &amp; Tangerang?{' '}
+            <Em>Bebas repot antar kurir &amp; berizin resmi.</Em>
           </>
         }
         lead={guideLead}

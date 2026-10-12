@@ -118,8 +118,18 @@ const allFaqs: FaqItem[] = [
   },
   {
     topic: 'pvi',
+    q: 'Apakah melayani tukar valas untuk wilayah Jakarta Selatan, Jakarta Pusat, dan luar Jakarta Barat?',
+    a: 'Ya, tentu. Walaupun kantor fisik kami berlokasi di Cengkareng (Jakarta Barat) dan Green Lake City (Tangerang), kami melayani nasabah di seluruh wilayah DKI Jakarta (Jakarta Selatan, Jakarta Pusat, Jakarta Barat, Jakarta Utara, Jakarta Timur) hingga Tangerang. Anda dapat menukar valas online tanpa perlu repot datang ke kantor melalui sistem transfer bank resmi dan pengantaran kurir aman ke alamat Anda.',
+  },
+  {
+    topic: 'pvi',
+    q: 'Bagaimana cara tukar valas online bebas repot dengan sistem kurir atau transfer?',
+    a: 'Cukup hubungi WhatsApp kami untuk menanyakan kurs terkini dan ketersediaan mata uang. Setelah nominal dan kurs disepakati, pembayaran dilakukan via transfer bank resmi, dan valas dapat langsung dikirimkan melalui layanan kurir terpercaya atau diambil di kantor sesuai preferensi Anda.',
+  },
+  {
+    topic: 'pvi',
     q: 'Apakah bisa transaksi online tanpa datang ke kantor?',
-    a: 'Bisa. Konsultasi kurs dan transaksi dapat dilakukan lewat WhatsApp dengan pembayaran melalui transfer bank. Anda juga bisa datang langsung untuk transaksi tunai.',
+    a: 'Bisa. Konsultasi kurs dan transaksi dapat dilakukan lewat WhatsApp dengan pembayaran melalui transfer bank serta pengiriman via kurir. Anda juga tetap bisa datang langsung untuk transaksi tunai di kantor.',
   },
   {
     topic: 'pvi',

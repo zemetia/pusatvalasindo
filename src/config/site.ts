@@ -57,9 +57,9 @@ export interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
   name: 'Pusat Valas Indo',
-  tagline: 'Money changer terpercaya, berizin Bank Indonesia di Jakarta Barat dan Tangerang.',
+  tagline: 'Money changer terbaik & terpercaya di Jakarta & Tangerang, berizin Bank Indonesia.',
   description:
-    'Grup Pusat Valas Indo terdiri dari PT Pusat Valas Indo (money changer berizin Bank Indonesia sejak 2018), PT Pusat Tukar Uang (money changer, satu kantor dengan PVI), dan PT Pusat Kirim Duit (pengiriman uang ke luar negeri untuk pengusaha). Tanya kurs dan transaksi via WhatsApp atau datang langsung ke kantor.',
+    'Pusat Valas Indo adalah money changer berizin Bank Indonesia (sejak 2018) melayani jual beli valas online bebas repot untuk wilayah Jakarta (Jakarta Barat, Jakarta Selatan, Jakarta Pusat, Jakarta Utara, Jakarta Timur) hingga Tangerang dengan sistem kurir & transfer bank tanpa perlu datang ke kantor, serta kantor fisik di Cengkareng dan Green Lake City.',
   url: process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://pusatvalasindo.com',
 
   ogImage: '/opengraph-image',
@@ -69,15 +69,16 @@ export const siteConfig: SiteConfig = {
     foundedYear: 2018,
     industry: 'Money changer / penukaran valuta asing',
     targetAudience:
-      'Individu dan pelaku usaha di Jakarta Barat, Tangerang, dan sekitarnya yang menukar valuta asing, serta pengusaha Indonesia yang mengirim uang ke luar negeri.',
+      'Individu, profesional, ekspatriat, dan pelaku usaha di seluruh DKI Jakarta (Jakarta Selatan, Jakarta Pusat, Jakarta Barat, Jakarta Utara, Jakarta Timur) dan Tangerang yang menginginkan penukaran valas cepat, aman, dan tanpa repot via layanan kurir / transfer antar-bank maupun transaksi langsung di kantor.',
     problemSolved:
-      'Menukar valuta asing dan mengirim uang ke luar negeri membutuhkan kurs yang jelas, izin yang bisa diperiksa, dan proses yang transparan.',
+      'Tukar valas di Jakarta sering memakan waktu akibat macet, antrean panjang, dan ketidakpastian izin. Pusat Valas Indo menghadirkan solusi tukar valas online bebas repot dengan pengantaran kurir terpercaya dan transfer bank resmi.',
     solution:
-      'PT Pusat Valas Indo melayani jual beli valuta asing secara online (WhatsApp/transfer bank) dan langsung di kantor. PT Pusat Kirim Duit melayani pengiriman uang ke 10 negara untuk pengusaha.',
+      'PT Pusat Valas Indo melayani jual beli valuta asing secara online bebas repot dengan sistem kurir dan transfer bank ke seluruh Jakarta (Jakarta Selatan, Jakarta Pusat, Barat, Utara, Timur) dan Tangerang, maupun transaksi tunai di kantor Cengkareng & Green Lake City.',
     keyBenefits: [
-      'Berizin Bank Indonesia No. 20/28/KEP.GBI/DKSP/2018 (PT Pusat Valas Indo)',
-      'Transaksi online via WhatsApp atau datang langsung ke kantor',
-      'Kirim uang ke 10 negara/mata uang dengan biaya tertulis jelas (PT Pusat Kirim Duit)',
+      'Berizin resmi Bank Indonesia No. 20/28/KEP.GBI/DKSP/2018 (PT Pusat Valas Indo)',
+      'Layanan valas online bebas repot se-Jakarta & Tangerang via kurir aman atau transfer bank',
+      'Ulasan Google terverifikasi bintang 4,7 dari ratusan ulasan nasabah',
+      'Kirim uang ke 10 negara/mata uang dengan biaya transparan (PT Pusat Kirim Duit)',
     ],
     socialLinks: {},
   },
@@ -86,36 +87,35 @@ export const siteConfig: SiteConfig = {
 
   seo: {
     titleTemplate: '%s | Pusat Valas Indo',
-    defaultTitle: 'Pusat Valas Indo — Money Changer Berizin BI, Jakarta Barat & Tangerang',
+    defaultTitle: 'Pusat Valas Indo — Money Changer Terbaik di Jakarta & Tangerang (Berizin BI)',
     locale: 'id_ID',
   },
 
   // Satu halaman kuat per topik dengan satu query utama masing-masing (tidak saling bersaing):
-  //   /                     → nama brand + "money changer Jakarta Barat / Tangerang"
-  //   /pusat-valas-indo     → "jual beli valas", "tukar dolar/ringgit/yen"
+  //   /                     → "money changer terbaik di jakarta", nama brand, layanan online kurir & transfer
+  //   /pusat-valas-indo     → "jual beli valas jakarta", "tukar valas online jakarta", "tukar dolar/ringgit/yen"
   //   /pusat-kirim-duit     → "kirim uang ke luar negeri untuk pengusaha"
-  //   /lokasi/cengkareng    → "money changer Cengkareng / Taman Palem"
-  //   /lokasi/tangerang     → "money changer Green Lake City / Cipondoh"
-  //   /money-changer-terbaik → "money changer terbaik Cengkareng / Jakarta Barat / Jakarta" (panduan memilih)
-  // PTU (Pluit) bagian dari brand PVI: /lokasi/pluit ditambahkan saat datanya lengkap.
+  //   /lokasi/cengkareng    → "money changer Cengkareng / Taman Palem / Jakarta Barat"
+  //   /lokasi/tangerang     → "money changer Tangerang / Green Lake City / Cipondoh"
+  //   /money-changer-terbaik → "money changer terbaik di jakarta" (panduan memilih + layanan kurir online)
   pages: {
     home: {
       path: '/',
-      title: 'Pusat Valas Indo — Money Changer Berizin BI, Jakarta Barat & Tangerang',
+      title: 'Money Changer Terbaik di Jakarta & Tangerang | Pusat Valas Indo',
       description:
-        'Money changer terpercaya berizin Bank Indonesia sejak 2018 di Cengkareng, Jakarta Barat & Tangerang. Tanya kurs via WhatsApp, plus kirim uang ke luar negeri untuk pengusaha.',
+        'Money changer terbaik di Jakarta berizin Bank Indonesia sejak 2018. Layanan tukar valas online bebas repot via kurir / transfer untuk Jakarta Selatan, Jakarta Pusat, Jakarta Barat, hingga Tangerang tanpa perlu datang ke kantor.',
       changeFreq: 'weekly',
       priority: 1.0,
-      lastModified: '2026-09-22',
+      lastModified: '2026-10-12',
     },
     'pusat-valas-indo': {
       path: '/pusat-valas-indo',
-      title: 'Jual Beli Valas Berizin BI | Pusat Valas Indo',
+      title: 'Tukar Valas Online Bebas Repot Jakarta & Tangerang | Pusat Valas Indo',
       description:
-        'Tukar dolar, dolar Singapura, euro, yen, dan valas lain di money changer berizin Bank Indonesia. Transaksi via WhatsApp atau langsung di Cengkareng dan Tangerang.',
+        'Tukar dolar, SGD, EUR, JPY, dan valas lainnya di money changer terbaik berizin BI. Layanan antar kurir & transfer bank untuk Jakarta Selatan, Jakarta Pusat, Jakarta Barat, dan Tangerang.',
       changeFreq: 'monthly',
       priority: 0.9,
-      lastModified: '2026-09-22',
+      lastModified: '2026-10-12',
     },
     'pusat-kirim-duit': {
       path: '/pusat-kirim-duit',
@@ -130,10 +130,10 @@ export const siteConfig: SiteConfig = {
       path: '/lokasi/cengkareng',
       title: 'Money Changer Cengkareng, Jakarta Barat | Pusat Valas Indo',
       description:
-        'Money changer terpercaya berizin BI di Cengkareng, Jakarta Barat: Ruko Mutiara Taman Palem A5-27. Alamat, jam buka, cara menuju lokasi, dan WhatsApp untuk tanya kurs.',
+        'Money changer terpercaya berizin BI di Cengkareng, Jakarta Barat: Ruko Mutiara Taman Palem A5-27. Melayani datang langsung atau order online via kurir ke seluruh Jakarta.',
       changeFreq: 'monthly',
       priority: 0.8,
-      lastModified: '2026-09-22',
+      lastModified: '2026-10-12',
     },
     'lokasi-tangerang': {
       path: '/lokasi/tangerang',
@@ -146,12 +146,12 @@ export const siteConfig: SiteConfig = {
     },
     'money-changer-terbaik': {
       path: '/money-changer-terbaik',
-      title: 'Money Changer Terbaik Cengkareng, Jakarta Barat & Tangerang',
+      title: 'Money Changer Terbaik di Jakarta & Tangerang (Berizin Bank Indonesia)',
       description:
-        'Cara memilih money changer terbaik dan terpercaya di Cengkareng, Jakarta Barat, Jakarta & Tangerang: cek izin BI, kurs, dokumen, jam buka. Termasuk profil Pusat Valas Indo.',
+        'Panduan money changer terbaik di Jakarta (Jakarta Selatan, Pusat, Barat) & Tangerang: izin resmi BI, kurs transparan, serta layanan online bebas repot dengan sistem kurir & transfer bank tanpa perlu datang ke lokasi.',
       changeFreq: 'monthly',
       priority: 0.8,
-      lastModified: '2026-09-22',
+      lastModified: '2026-10-12',
     },
   },
 };

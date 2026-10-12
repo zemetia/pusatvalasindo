@@ -54,7 +54,17 @@ export default function PusatValasIndoPage() {
       url,
       serviceType: 'Penukaran valuta asing',
       provider: entities.pvi,
-      areaServed: ['Jakarta Barat', 'Kota Tangerang'],
+      areaServed: [
+        'DKI Jakarta',
+        'Jakarta',
+        'Jakarta Selatan',
+        'Jakarta Pusat',
+        'Jakarta Barat',
+        'Jakarta Utara',
+        'Jakarta Timur',
+        'Kota Tangerang',
+        'Tangerang',
+      ],
     }),
     faqSchema(faqs.map((f) => ({ question: f.q, answer: f.a }))),
   ];
@@ -66,10 +76,10 @@ export default function PusatValasIndoPage() {
         eyebrow="PT Pusat Valas Indo"
         title={
           <>
-            Jual beli valas di money changer <em className="not-italic text-lp-red-700">berizin Bank Indonesia.</em>
+            Jual beli valas online bebas repot di money changer <em className="not-italic text-lp-red-700">berizin Bank Indonesia.</em>
           </>
         }
-        lead={`PT Pusat Valas Indo adalah money changer berizin Bank Indonesia (No. ${entities.pvi.license?.number}) yang beroperasi sejak ${entities.pvi.foundingDate} di Cengkareng, Jakarta Barat dan Cipondoh, Kota Tangerang.`}
+        lead={`PT Pusat Valas Indo adalah money changer berizin Bank Indonesia (No. ${entities.pvi.license?.number}) sejak ${entities.pvi.foundingDate}. Melayani penukaran valas online dengan sistem transfer bank & pengantaran kurir aman untuk wilayah Jakarta Selatan, Jakarta Pusat, Jakarta Barat, hingga Tangerang tanpa perlu repot datang ke kantor.`}
       >
         {branches.map((b, i) => (
           <WhatsAppButton key={b.slug} number={b.whatsapp} text={ASK_RATE} variant={i === 0 ? 'primary' : 'outline'}>

@@ -106,22 +106,22 @@ export function PviChannels() {
   const channels = [
     {
       n: '01',
-      name: 'Online',
-      body: 'Tidak perlu datang ke kantor.',
+      name: 'Online & Antar Kurir',
+      body: 'Bebas repot untuk wilayah Jakarta Selatan, Jakarta Pusat, Jakarta Barat, Jakarta Utara, Jakarta Timur, hingga Tangerang tanpa perlu datang ke kantor.',
       steps: [
-        'Kirim pesan WhatsApp ke cabang terdekat.',
-        'Tanyakan kurs beli atau jual dan ketersediaan mata uangnya.',
-        'Selesaikan pembayaran melalui transfer bank.',
+        'Kirim pesan WhatsApp untuk cek kurs real-time & ketersediaan stok mata uang.',
+        'Kunci rate dan selesaikan pembayaran aman via transfer bank resmi.',
+        'Uang valas dikirimkan langsung ke alamat Anda dengan sistem kurir terpercaya, atau bisa diambil di kantor bila diinginkan.',
       ],
     },
     {
       n: '02',
-      name: 'On the spot',
+      name: 'On the spot (Datang ke Kantor)',
       body: 'Transaksi tunai langsung di kantor.',
       steps: [
-        'Datang ke Cengkareng (Jakarta Barat) atau Green Lake City (Tangerang).',
+        'Datang ke kantor Cengkareng (Ruko Mutiara Taman Palem, Jakarta Barat) atau Green Lake City (Rukan Wallstreet, Tangerang).',
         'Kunjungi pada jam kerja: Senin–Jumat 08.00–16.30, Sabtu 08.00–14.00 WIB.',
-        'Lakukan penukaran secara langsung.',
+        'Lakukan penghitungan dan penukaran valas secara langsung di kasir.',
       ],
     },
   ];
@@ -129,7 +129,7 @@ export function PviChannels() {
     <Section tone="paper2">
       <Eyebrow>Cara bertransaksi</Eyebrow>
       <H2 className="mt-3 max-w-3xl">
-        Dua cara tukar valas: <Em>online</Em> atau langsung.
+        Dua cara tukar valas: <Em>online antar kurir</Em> atau langsung di kantor.
       </H2>
       <div className="mt-14 divide-y divide-lp-line border-y border-lp-ink">
         {channels.map((c) => (

@@ -36,21 +36,20 @@ export function Hero() {
         <div className="lp-rise flex flex-col justify-center">
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-lp-ink-mute">
             <span aria-hidden className="h-px w-8 bg-lp-red-700" />
-            Berizin Bank Indonesia · sejak 2018
+            Money Changer Terbaik di Jakarta · Berizin Bank Indonesia sejak 2018
           </p>
           <h1 className="mt-6 font-display text-[clamp(2.5rem,1rem+4.6vw,5rem)] font-bold leading-[0.98] tracking-[-0.035em] text-balance">
-            Tukar valas dengan <Em>tenang.</Em>
+            Tukar valas online <Em>bebas repot.</Em>
           </h1>
           <p className="mt-6 max-w-xl text-lp-lead leading-[1.55] text-lp-ink-soft">
-            Pusat Valas Indo adalah money changer terpercaya, berizin Bank Indonesia. Kami melayani jual beli valuta asing di Cengkareng (Jakarta Barat)
-            dan Tangerang. Tanya kurs hari ini lewat WhatsApp, atau datang langsung ke kantor.
+            Pusat Valas Indo melayani tukar valas online bebas repot untuk wilayah <strong>Jakarta Selatan, Jakarta Pusat, Jakarta Barat</strong>, hingga <strong>Tangerang</strong> dengan sistem transfer bank dan kurir terpercaya. Tidak perlu macet dan antre di kantor—cukup hubungi WhatsApp, kami antarkan atau proses langsung.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <WhatsAppButton number={hq.whatsapp} text={ASK_RATE}>
               Tanya kurs via WhatsApp
             </WhatsAppButton>
             <a href="#lokasi" className={linkCls}>
-              Lihat lokasi &amp; jam →
+              Lokasi kantor (Cengkareng &amp; Tangerang) →
             </a>
           </div>
           <dl className="mt-14 grid max-w-xl gap-y-5 border-t border-lp-line pt-6 sm:grid-cols-2 sm:gap-x-8">
@@ -192,20 +191,20 @@ export function Services() {
   const paths = [
     {
       n: '01',
-      name: 'Online',
-      body: 'Konsultasi kurs dan transaksi lewat WhatsApp, pembayaran melalui transfer bank. Tidak perlu datang ke kantor.',
+      name: 'Online & Antar Kurir',
+      body: 'Konsultasi kurs via WhatsApp, pembayaran via transfer bank resmi, dan valas dapat diantarkan langsung dengan kurir aman ke Jakarta Selatan, Jakarta Pusat, Barat, hingga Tangerang tanpa perlu repot datang ke kantor.',
     },
     {
       n: '02',
-      name: 'On the spot',
-      body: 'Datang ke kantor dan bertransaksi tunai langsung, di Cengkareng atau Tangerang.',
+      name: 'On the spot (Di Kantor)',
+      body: 'Datang langsung ke kantor kami di Cengkareng (Jakarta Barat) atau Green Lake City (Tangerang) untuk bertransaksi tunai dengan aman dan nyaman.',
     },
   ];
   return (
     <Section id="layanan" tone="paper2">
       <Eyebrow>Layanan PT Pusat Valas Indo</Eyebrow>
       <H2 className="mt-3 max-w-3xl">
-        Dua cara tukar valas: <Em>online</Em> atau langsung.
+        Dua cara tukar valas: <Em>online antar kurir</Em> atau langsung di kantor.
       </H2>
 
       <div className="mt-14 divide-y divide-lp-line border-y border-lp-ink">
