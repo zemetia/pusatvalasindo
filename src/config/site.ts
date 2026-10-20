@@ -153,5 +153,17 @@ export const siteConfig: SiteConfig = {
       priority: 0.8,
       lastModified: '2026-10-12',
     },
+    // Indeks blog. Daftar & tanggal terakhirnya dinamis (dari database) — sitemap.ts
+    // menimpa lastModified dengan tanggal artikel terbaru dan MELEWATKAN halaman ini
+    // selama belum ada artikel terbit (indeks kosong = thin content).
+    blog: {
+      path: '/blog',
+      title: 'Blog Valas: Tips Tukar Uang & Kirim Uang | Pusat Valas Indo',
+      description:
+        'Artikel dan panduan seputar tukar valas, kurs, dan kirim uang ke luar negeri dari money changer berizin Bank Indonesia di Jakarta & Tangerang.',
+      changeFreq: 'weekly',
+      priority: 0.7,
+      lastModified: '2026-10-20',
+    },
   },
 };

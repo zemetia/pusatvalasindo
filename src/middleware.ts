@@ -58,11 +58,16 @@ export async function middleware(request: NextRequest) {
   //                   not a session cookie, so it must bypass the session gate here.
   // /api/scrape     — triggered by an external scheduler with no session cookie;
   //                   checks `Authorization: Bearer $CRON_SECRET` itself (see route.ts).
+  // /api/blog-view  — public page-view beacon fired by blog readers (who have no
+  //                   session). It only ever INSERTs an anonymous view for a live
+  //                   post; validation, bot filtering and dedup live in the route.
+  //                   Matched exactly (not a prefix) so `/api/blog/*` stays gated.
   if (
     isApi &&
     !targetPathname.startsWith("/api/auth") &&
     !targetPathname.startsWith("/api/mcp") &&
-    !targetPathname.startsWith("/api/scrape")
+    !targetPathname.startsWith("/api/scrape") &&
+    targetPathname !== "/api/blog-view"
   ) {
     if (!sessionCookie) {
       return applySecurityHeaders(

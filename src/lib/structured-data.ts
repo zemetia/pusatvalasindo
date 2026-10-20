@@ -302,11 +302,82 @@ export function articleSchema(opts: ArticleSchemaOptions): WithContext<unknown> 
   };
 }
 
+export interface BlogPostingSchemaOptions {
+  headline: string;
+  description: string;
+  url: string;
+  datePublished: string;
+  dateModified: string;
+  /** URL absolut gambar sampul; kosong → gambar OG default situs. */
+  image?: string;
+  section?: string;
+  wordCount?: number;
+}
+
+/**
+ * BlogPosting untuk satu artikel blog. Penulisnya sengaja organisasi, bukan nama
+ * staf: situs publik tidak menampilkan akun internal, dan Google menerima Organization
+ * sebagai author untuk konten korporat.
+ */
+export function blogPostingSchema(opts: BlogPostingSchemaOptions): WithContext<unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${opts.url}#article`,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': opts.url },
+    headline: opts.headline,
+    description: opts.description,
+    url: opts.url,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified,
+    inLanguage: 'id-ID',
+    author: { '@id': ORG_ID },
+    publisher: { '@id': ORG_ID },
+    image: opts.image ?? `${siteConfig.url}${siteConfig.ogImage}`,
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(opts.section ? { articleSection: opts.section } : {}),
+    ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
+  };
+}
+
+/** Halaman indeks blog: koleksi artikel terbaru. */
+export function blogSchema(opts: {
+  name: string;
+  description: string;
+  url: string;
+  posts: Array<{ headline: string; url: string; datePublished: string }>;
+}): WithContext<unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': `${opts.url}#blog`,
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    inLanguage: 'id-ID',
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    blogPost: opts.posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.headline,
+      url: p.url,
+      datePublished: p.datePublished,
+    })),
+  };
+}
+
 // ─── Serialization helper ─────────────────────────────────────────────────────
 
 /**
- * Serialize a schema to a safe JSON string for dangerouslySetInnerHTML.
- * JSON.stringify escapes all HTML special characters — no XSS risk.
+ * Serialize a schema to a JSON string that is safe inside an inline
+ * `<script type="application/ld+json">` via dangerouslySetInnerHTML.
+ *
+ * `JSON.stringify` alone is NOT enough: it leaves `<` untouched, so a value such as
+ * `</script><script>…` (blog titles come from the database / MCP agents) would end the
+ * script element and inject markup. `<` is therefore emitted as a JSON unicode escape
+ * (backslash, "u003c"), which JSON parsers decode back to `<` — the structured data is
+ * unchanged, but the HTML parser can never see a closing tag. U+2028/U+2029 are escaped
+ * the same way for older JS parsers.
  *
  * Usage in a Server Component (page.tsx):
  * ```tsx
@@ -314,18 +385,24 @@ export function articleSchema(opts: ArticleSchemaOptions): WithContext<unknown> 
  *
  * export default function Page() {
  *   return (
- *     <>
- *       <script
- *         id="webpage-schema"
- *         type="application/ld+json"
- *         dangerouslySetInnerHTML={{ __html: serializeSchema(webPageSchema({ ... })) }}
- *       />
- *       {/* page content *\/}
- *     </>
+ *     <script
+ *       id="webpage-schema"
+ *       type="application/ld+json"
+ *       dangerouslySetInnerHTML={{ __html: serializeSchema(webPageSchema({ ... })) }}
+ *     />
  *   );
  * }
  * ```
  */
+const BACKSLASH = String.fromCharCode(92);
+/** `<` (menutup <script>) serta pemisah baris U+2028/U+2029 (merusak parser JS lama). */
+const SCRIPT_UNSAFE = new RegExp(
+  '[<' + String.fromCharCode(0x2028) + String.fromCharCode(0x2029) + ']',
+  'g'
+);
+const escapeUnsafe = (ch: string) =>
+  BACKSLASH + 'u' + ch.charCodeAt(0).toString(16).padStart(4, '0');
+
 export function serializeSchema(schema: WithContext<unknown> | WithContext<unknown>[]): string {
-  return JSON.stringify(schema);
+  return JSON.stringify(schema).replace(SCRIPT_UNSAFE, escapeUnsafe);
 }

@@ -30,6 +30,7 @@ import {
   IconReportMoney,
   IconCurrencyDollar,
   IconCoins,
+  IconArticle,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -365,6 +366,17 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
+  // ── Konten (blog situs publik) ─────────────────────────────────────────────
+  const navKonten: NavItem[] = [];
+
+  if (show("blog")) {
+    navKonten.push({
+      title: "Blog",
+      url: "/dashboard/blog",
+      icon: IconArticle,
+    });
+  }
+
   // ── Management ─────────────────────────────────────────────────────────────
   const navManagement: NavItem[] = [];
 
@@ -459,6 +471,7 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
           <NavMain items={navFinanceDailyInput} label="Finance Daily Input" />
         )}
         {navLaporan.length > 0 && <NavMain items={navLaporan} label="Laporan" />}
+        {navKonten.length > 0 && <NavMain items={navKonten} label="Konten" />}
         {navKpiSummary.length > 0 && (
           <NavMain items={navKpiSummary} label="Ringkasan KPI" />
         )}

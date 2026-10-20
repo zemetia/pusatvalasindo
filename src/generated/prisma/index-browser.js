@@ -276,6 +276,49 @@ exports.Prisma.DailyBankEntryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BlogCategoryScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BlogPostScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  excerpt: 'excerpt',
+  content: 'content',
+  coverImageUrl: 'coverImageUrl',
+  coverImageAlt: 'coverImageAlt',
+  metaTitle: 'metaTitle',
+  metaDescription: 'metaDescription',
+  status: 'status',
+  publishedAt: 'publishedAt',
+  readingMinutes: 'readingMinutes',
+  viewCount: 'viewCount',
+  categoryId: 'categoryId',
+  authorId: 'authorId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BlogPostViewScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  viewedAt: 'viewedAt',
+  visitorHash: 'visitorHash',
+  referrerHost: 'referrerHost'
+};
+
+exports.Prisma.BlogPostSlugHistoryScalarFieldEnum = {
+  slug: 'slug',
+  postId: 'postId',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.BranchScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -990,6 +1033,12 @@ exports.DailyVerifyStatus = exports.$Enums.DailyVerifyStatus = {
   BEDA: 'BEDA'
 };
 
+exports.BlogPostStatus = exports.$Enums.BlogPostStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+};
+
 exports.PriceSource = exports.$Enums.PriceSource = {
   MANUAL: 'MANUAL',
   SYNCED: 'SYNCED'
@@ -1212,6 +1261,10 @@ exports.Prisma.ModelName = {
   BankAccount: 'BankAccount',
   BankMutation: 'BankMutation',
   DailyBankEntry: 'DailyBankEntry',
+  BlogCategory: 'BlogCategory',
+  BlogPost: 'BlogPost',
+  BlogPostView: 'BlogPostView',
+  BlogPostSlugHistory: 'BlogPostSlugHistory',
   Branch: 'Branch',
   Company: 'Company',
   Currency: 'Currency',

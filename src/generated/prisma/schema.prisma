@@ -191,6 +191,7 @@ model user {
   heldFundsCreated     HeldFund[]            @relation("HeldFundCreatedBy")
   heldFundsSettled     HeldFund[]            @relation("HeldFundSettledBy")
   samples              Sample[]
+  blogPosts            BlogPost[]            @relation("BlogPostAuthor")
   account              account[]
   session              session[]
   branch               Branch?               @relation(fields: [branchId], references: [id], onDelete: SetNull)
@@ -316,6 +317,92 @@ model DailyBankEntry {
 enum BankMutationType {
   CREDIT
   DEBIT
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogCategory {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  posts       BlogPost[]
+}
+
+/// Artikel blog publik. Isi ditulis dalam Markdown dan dirender di server.
+///
+/// "Terjadwal" bukan status tersendiri: itu PUBLISHED dengan `publishedAt` di
+/// masa depan. Halaman publik hanya menampilkan PUBLISHED yang `publishedAt`-nya
+/// sudah lewat, jadi artikel terjadwal muncul sendiri tanpa cron.
+model BlogPost {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  excerpt         String
+  /// Markdown mentah — TIDAK PERNAH dirender sebagai HTML mentah (lihat components/blog/markdown.tsx).
+  content         String         @db.Text
+  coverImageUrl   String?
+  coverImageAlt   String?
+  metaTitle       String?
+  metaDescription String?
+  status          BlogPostStatus @default(DRAFT)
+  /// Tanggal terbit pertama. Dipertahankan saat artikel ditarik lalu diterbitkan lagi
+  /// supaya `datePublished` di structured data tidak berubah-ubah.
+  publishedAt     DateTime?
+  readingMinutes  Int            @default(1)
+  /// Total tampilan sepanjang masa, didenormalisasi dari BlogPostView supaya
+  /// daftar & pengurutan tidak perlu meng-agregat jutaan baris.
+  viewCount       Int            @default(0)
+  categoryId      String?
+  authorId        String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  category    BlogCategory?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author      user?                 @relation("BlogPostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  views       BlogPostView[]
+  slugHistory BlogPostSlugHistory[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([authorId])
+}
+
+/// Satu baris = satu tampilan halaman yang lolos penyaringan bot & dedup.
+/// Tidak menyimpan IP atau user-agent mentah: `visitorHash` adalah hash harian
+/// (IP + UA + tanggal + rahasia server), jadi pengunjung tidak bisa dilacak
+/// lintas hari maupun dipulihkan dari tabel ini.
+model BlogPostView {
+  id           String   @id @default(cuid())
+  postId       String
+  viewedAt     DateTime @default(now())
+  visitorHash  String
+  /// Host asal kunjungan (mis. "www.google.com"); null = langsung / internal.
+  referrerHost String?
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, viewedAt])
+  @@index([viewedAt])
+  @@index([postId, visitorHash, viewedAt])
+}
+
+/// Slug lama artikel yang pernah tayang — dipakai untuk 301 ke slug baru supaya
+/// URL yang sudah terindeks tidak menjadi 404 saat judul/slug diubah.
+model BlogPostSlugHistory {
+  slug      String   @id
+  postId    String
+  createdAt DateTime @default(now())
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
 }
 
 model Branch {

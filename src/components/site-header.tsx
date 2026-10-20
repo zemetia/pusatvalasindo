@@ -35,6 +35,9 @@ const SEGMENT_LABELS: Record<string, string> = {
   account: "Account",
   attendance: "Presensi",
   "bank-accounts": "Rekening Bank",
+  blog: "Blog",
+  baru: "Artikel Baru",
+  kategori: "Kategori",
   branches: "Cabang",
   employees: "Karyawan",
   items: "Item",
@@ -61,7 +64,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 function labelFor(segment: string) {
   if (SEGMENT_LABELS[segment]) return SEGMENT_LABELS[segment];
   // Ruas dinamis (id) — tampilkan potongan pendek saja daripada UUID penuh.
-  if (/^[0-9a-f-]{16,}$/i.test(segment)) return "Detail";
+  if (/^[0-9a-f-]{16,}$/i.test(segment) || /^c[a-z0-9]{20,}$/.test(segment)) return "Detail";
   return segment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 

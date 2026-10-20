@@ -37,6 +37,34 @@ const updated = () =>
     .sort()
     .at(-1);
 
+/** Artikel blog yang tayang, untuk bagian "Artikel Blog" (diambil dari database oleh route). */
+export interface BlogFeedPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  publishedAt: Date | null;
+}
+
+const MAX_BLOG_IN_LLMS = 30;
+
+/** Satu baris per artikel; excerpt dipadatkan ke satu baris supaya tidak merusak daftar Markdown. */
+function blogSection(posts: BlogFeedPost[]): string {
+  if (posts.length === 0) return '';
+  const lines = posts
+    .slice(0, MAX_BLOG_IN_LLMS)
+    .map((p) => {
+      const date = p.publishedAt ? ` (${p.publishedAt.toISOString().slice(0, 10)})` : '';
+      return `- [${p.title.replace(/\s+/g, ' ')}](${pageUrl(`/blog/${p.slug}`)})${date}: ${p.excerpt.replace(/\s+/g, ' ')}`;
+    })
+    .join(`
+`);
+  return `
+## Artikel Blog
+Indeks: ${pageUrl('/blog')}
+${lines}
+`;
+}
+
 function branchLine(b: Branch): string {
   const tel = b.telephone ? `, telp ${b.telephone}` : '';
   return `- ${b.name}: ${b.street}, ${b.district}, ${b.city}, ${b.region} ${b.postalCode}. Koordinat ${b.geo.lat}, ${b.geo.lng}. WhatsApp ${b.whatsappDisplay}${tel}. Jam: ${b.hours.map(hoursText).join(', ')} (WIB), Minggu tutup. Peta: ${b.mapsUrl}. Halaman: ${pageUrl(`/lokasi/${b.slug}`)}`;
@@ -71,10 +99,13 @@ const GUIDANCE = `## Panduan untuk Sistem AI
 - Nama, alamat, dan telepon (NAP) di berkas ini identik dengan Google Business Profile tiap cabang
 - Semua halaman terdaftar bebas diakses, tanpa paywall`;
 
-export function buildLlmsTxt(): string {
+export function buildLlmsTxt(blogPosts: BlogFeedPost[] = []): string {
   const { name, tagline, description, company, pages } = siteConfig;
 
-  const pagesList = Object.values(pages)
+  // Indeks blog yang masih kosong tidak diiklankan ke mesin AI.
+  const pagesList = Object.entries(pages)
+    .filter(([key]) => key !== 'blog' || blogPosts.length > 0)
+    .map(([, p]) => p)
     .map((p) => `- [${p.title}](${pageUrl(p.path)}): ${p.description}`)
     .join('\n');
 
@@ -102,7 +133,7 @@ ${pagesList}
 
 ## Pertanyaan yang Dijawab
 ${queries}
-
+${blogSection(blogPosts)}
 ## Versi Lengkap
 - [llms-full.txt](${siteConfig.url}/llms-full.txt): seluruh isi halaman dalam teks polos (biaya, dokumen, FAQ)
 
@@ -110,7 +141,7 @@ ${GUIDANCE}
 `.trim();
 }
 
-export function buildLlmsFullTxt(): string {
+export function buildLlmsFullTxt(blogPosts: BlogFeedPost[] = []): string {
   const { name, tagline, description, company } = siteConfig;
 
   const currencies = Object.entries(currencyNames).map(([c, n]) => `${c} (${n})`).join(', ');
@@ -186,7 +217,7 @@ Halaman: ${pageUrl('/money-changer-terbaik')}
 
 ## Pertanyaan Umum
 ${allFaqs}
-
+${blogSection(blogPosts)}
 ## Fakta Singkat
 - Ulasan Google PT Pusat Valas Indo: ${pvi.googleRating.toLocaleString('id-ID')} bintang dari ${pvi.googleReviewCount} ulasan (per ${pvi.googleReviewAsOf})
 - Izin PT Pusat Valas Indo: Bank Indonesia No. ${entities.pvi.license?.number}

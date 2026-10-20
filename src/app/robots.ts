@@ -8,6 +8,7 @@ const AI_ALLOWED = [
   '/pusat-valas-indo',
   '/pusat-kirim-duit',
   '/money-changer-terbaik',
+  '/blog',
   '/lokasi/',
   '/llms.txt',
   '/llms-full.txt',

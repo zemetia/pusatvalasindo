@@ -12,6 +12,7 @@ export const nav = [
   { href: '/lokasi/cengkareng', label: 'Cengkareng' },
   { href: '/lokasi/tangerang', label: 'Tangerang' },
   { href: '/money-changer-terbaik', label: 'Cara Memilih' },
+  { href: '/blog', label: 'Blog' },
   { href: '/#faq', label: 'FAQ' },
 ];
 

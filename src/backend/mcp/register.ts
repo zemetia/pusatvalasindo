@@ -6,6 +6,7 @@ import { canAny } from "@/lib/permissions";
 import type { McpCaller } from "@/backend/mcp/auth";
 import { READ_TOOLS, runReadTool, runReadQuery, type ReadTool } from "@/backend/mcp/read-tools";
 import { OPERATE_TOOLS } from "@/backend/mcp/operate-tools";
+import { BLOG_TOOLS, assertBlogAccess } from "@/backend/mcp/blog-tools";
 
 const RUN_QUERY_TOOL = "run_read_query";
 
@@ -119,6 +120,19 @@ export function registerAllTools(server: McpServer): void {
         if (!canAny(caller.permissions, tool.permission)) {
           throw new AppError(`Tidak punya izin untuk tool "${tool.name}"`, 403, "FORBIDDEN");
         }
+        return tool.handler(args, caller);
+      })
+    );
+  }
+
+  // Blog tools (through blog.service). Global keys only — the blog is a global
+  // resource with no legacy permission, so there is no per-permission check here.
+  for (const tool of BLOG_TOOLS) {
+    server.registerTool(
+      tool.name,
+      { description: tool.description, inputSchema: tool.inputSchema },
+      guard(async (args, caller) => {
+        assertBlogAccess(caller);
         return tool.handler(args, caller);
       })
     );

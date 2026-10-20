@@ -484,6 +484,26 @@ export const RESOURCES: ResourceDef[] = [
     // Tanpa peta legacy: wewenangnya harus diberikan eksplisit lewat matriks.
   },
 
+  // ── Konten ─────────────────────────────────────────────────────────────────
+  {
+    key: "blog",
+    label: "Blog",
+    group: "Konten",
+    description:
+      "Artikel blog di situs publik beserta kategori dan statistik tampilannya. Tulis = boleh membuat, mengubah, menerbitkan, mengarsipkan, dan menghapus artikel.",
+    page: "/dashboard/blog",
+    apis: ["/api/blog"],
+    // Global: blog adalah satu terbitan untuk seluruh grup — artikel tidak dimiliki
+    // PT mana pun, jadi memecah izinnya per PT akan menjanjikan penyaringan yang
+    // tidak ada. Tanpa peta legacy: modul baru, jadi sebelum didelegasikan lewat
+    // matriks izin hanya Owner & Super Admin yang berhak (mis. diberikan ke staf
+    // konten/marketing).
+    //
+    // Sengaja satu resource untuk daftar, editor, kategori, DAN analitik: yang
+    // boleh menulis artikel wajar boleh melihat performanya.
+    scoping: "global",
+  },
+
   // ── Manajemen ──────────────────────────────────────────────────────────────
   {
     key: "users",
