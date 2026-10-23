@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { post, category, view } = vi.hoisted(() => ({
+const { post, category, view, vote } = vi.hoisted(() => ({
   post: {
     findById: vi.fn(),
     slugTaken: vi.fn(),
@@ -16,11 +16,13 @@ const { post, category, view } = vi.hoisted(() => ({
   },
   category: { findById: vi.fn(), findBySlug: vi.fn(), create: vi.fn() },
   view: { hasViewSince: vi.fn(), record: vi.fn() },
+  vote: { recordVote: vi.fn(), getCounts: vi.fn(), findUserVote: vi.fn() },
 }));
 
 vi.mock("@/backend/repositories/blog-post.repository", () => ({ blogPostRepository: post }));
 vi.mock("@/backend/repositories/blog-category.repository", () => ({ blogCategoryRepository: category }));
 vi.mock("@/backend/repositories/blog-view.repository", () => ({ blogViewRepository: view }));
+vi.mock("@/backend/repositories/blog-vote.repository", () => ({ blogVoteRepository: vote }));
 
 import { blogService, resolvePublishedAt, VIEW_DEDUP_WINDOW_MS } from "./blog.service";
 import { ConflictError, NotFoundError, ValidationError } from "@/backend/errors/app-error";
@@ -258,6 +260,43 @@ describe("recordView", () => {
     expect(hash).not.toContain("1.2.3.4");
     expect(ref).toBe("google.com");
     expect(at).toEqual(NOW);
+  });
+});
+
+
+describe("recordVote & getVoteStatus", () => {
+  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+  const input = { postId: "p1", vote: "up" as const, ip: "1.2.3.4", userAgent: UA };
+
+  it("bot tidak dicatat", async () => {
+    const res = await blogService.recordVote({ ...input, userAgent: "Googlebot/2.1" }, NOW);
+    expect(res.status).toBe("bot");
+    expect(post.findLiveId).not.toHaveBeenCalled();
+  });
+
+  it("artikel yang tidak tayang mengembalikan not_found", async () => {
+    post.findLiveId.mockResolvedValue(null);
+    const res = await blogService.recordVote(input, NOW);
+    expect(res.status).toBe("not_found");
+    expect(vote.recordVote).not.toHaveBeenCalled();
+  });
+
+  it("mencatat vote dan mengembalikan jumlah vote terbaru", async () => {
+    post.findLiveId.mockResolvedValue({ id: "p1", viewCount: 5 });
+    vote.recordVote.mockResolvedValue({ upvoteCount: 1, downvoteCount: 0, userVote: "up" });
+    const res = await blogService.recordVote(input, NOW);
+    expect(res.status).toBe("counted");
+    expect(res.data).toEqual({ upvoteCount: 1, downvoteCount: 0, userVote: "up" });
+    expect(vote.recordVote).toHaveBeenCalledWith("p1", expect.any(String), "up");
+  });
+
+  it("getVoteStatus mengambil status dan jumlah terkini", async () => {
+    post.findLiveId.mockResolvedValue({ id: "p1", viewCount: 5 });
+    vote.getCounts.mockResolvedValue({ upvoteCount: 3, downvoteCount: 1 });
+    vote.findUserVote.mockResolvedValue("up");
+    const res = await blogService.getVoteStatus("p1", "1.2.3.4", UA, NOW);
+    expect(res.status).toBe("ok");
+    expect(res.data).toEqual({ upvoteCount: 3, downvoteCount: 1, userVote: "up" });
   });
 });
 

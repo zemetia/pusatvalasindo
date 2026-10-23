@@ -359,6 +359,8 @@ model BlogPost {
   /// Total tampilan sepanjang masa, didenormalisasi dari BlogPostView supaya
   /// daftar & pengurutan tidak perlu meng-agregat jutaan baris.
   viewCount       Int            @default(0)
+  upvoteCount     Int            @default(0)
+  downvoteCount   Int            @default(0)
   categoryId      String?
   authorId        String?
   createdAt       DateTime       @default(now())
@@ -367,6 +369,7 @@ model BlogPost {
   category    BlogCategory?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   author      user?                 @relation("BlogPostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   views       BlogPostView[]
+  votes       BlogPostVote[]
   slugHistory BlogPostSlugHistory[]
 
   @@index([status, publishedAt])
@@ -402,6 +405,22 @@ model BlogPostSlugHistory {
 
   post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
 
+  @@index([postId])
+}
+
+/// Tanggapan pembaca ("Apakah artikel ini membantu?").
+/// Satu pengunjung (hash anonim) hanya punya 1 catatan per artikel (bisa upvote atau downvote, atau diubah/dibatalkan).
+model BlogPostVote {
+  id          String   @id @default(cuid())
+  postId      String
+  visitorHash String
+  isUpvote    Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  post BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, visitorHash])
   @@index([postId])
 }
 
@@ -654,7 +673,8 @@ model KpiDefinition {
   /// Kolom "Objective" pada sheet KPI, mis. "Meningkatkan Pelayanan Kepada Customer".
   objective   String?
   /// Penjelasan aturan mainnya untuk karyawan, mis. "-3 poin setiap kesalahan hitung".
-  description String?
+  /// Dibatasi VarChar(10000) — cukup untuk uraian panjang tanpa jadi TEXT tak terbatas.
+  description String? @db.VarChar(10000)
 
   scoringType KpiScoringType
   unit        KpiUnit        @default(OCCURRENCE)

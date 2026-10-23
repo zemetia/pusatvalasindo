@@ -1,4 +1,4 @@
-import { IconCategory, IconPlus } from "@tabler/icons-react";
+import { IconCategory, IconExternalLink, IconPlus } from "@tabler/icons-react";
 
 import { requireResource } from "@/backend/helpers/authz";
 import { blogService } from "@/backend/services/blog.service";
@@ -12,10 +12,9 @@ import {
   SectionCard,
 } from "@/components/admin/page-shell";
 import { BlogPostsTable } from "@/components/admin/blog/blog-posts-table";
-import { BlogViewsChart } from "@/components/admin/blog/blog-views-chart";
+import { BlogViewsChartLazy } from "@/components/admin/blog/blog-views-chart-lazy";
 import { describeBlogError, toCategoryDTO, toRowDTO } from "@/components/admin/blog/mappers";
 import { buttonVariants } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "@/i18n/routing";
 import { RANGE_OPTIONS, parseRangeDays } from "@/lib/blog/analytics-range";
 import { formatInt } from "@/lib/blog/format";
@@ -55,11 +54,19 @@ export default async function BlogDashboardPage({
   return (
     <PageShell>
       <PageHeader
-        eyebrow="Konten"
-        title="Blog"
-        description="Tulis dan kelola artikel di situs publik, lalu pantau berapa banyak yang membacanya. Tampilan bot dan kunjungan ulang dalam 30 menit tidak dihitung."
+        eyebrow="Blog Studio"
+        title="Dashboard Blog"
+        description="Tulis dan kelola artikel di situs publik, lalu pantau berapa banyak yang membacanya. Bot dan kunjungan ulang dalam 30 menit tidak dihitung. Urutkan tabel menurut tampilan untuk melihat artikel terpopuler."
         action={
           <>
+            <Link
+              href="/blog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
+            >
+              <IconExternalLink className="size-4" /> Lihat Situs Publik
+            </Link>
             <Link href="/dashboard/blog/kategori" className={buttonVariants({ variant: "outline", size: "sm" })}>
               <IconCategory className="size-4" /> Kategori
             </Link>
@@ -102,44 +109,13 @@ export default async function BlogDashboardPage({
         <MetricBlock label="Total tampilan" value={formatInt(o.allTimeViews)} meta="sepanjang masa, semua artikel" />
       </MetricRow>
 
-      <SectionCard
-        title="Tampilan per hari"
-        description="Garis tegas = tampilan, garis putus-putus = pengunjung unik per hari (WIB)."
-        action={<span className="tabular text-sm font-semibold">{formatInt(o.views)} tampilan</span>}
-      >
-        <BlogViewsChart data={o.daily} />
-      </SectionCard>
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <SectionCard title="Artikel terpopuler" description={`${days} hari terakhir`} padded={false}>
-          {o.topPosts.length === 0 ? (
-            <EmptyState title="Belum ada tampilan" description="Daftar muncul setelah artikel yang terbit dibaca pengunjung." />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="text-muted-foreground pl-5 text-xs font-medium tracking-wide uppercase">Artikel</TableHead>
-                  <TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">Tampilan</TableHead>
-                  <TableHead className="text-muted-foreground pr-5 text-right text-xs font-medium tracking-wide uppercase">
-                    Pengunjung
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {o.topPosts.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className="max-w-[22rem] truncate pl-5">
-                      <Link href={`/dashboard/blog/${p.id}`} className="text-sm font-medium hover:underline" title={p.title}>
-                        {p.title}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="tabular text-right text-sm font-medium">{formatInt(p.views)}</TableCell>
-                    <TableCell className="tabular text-muted-foreground pr-5 text-right text-sm">{formatInt(p.visitors)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <SectionCard
+          title="Tampilan per hari"
+          description="Garis tegas = tampilan, putus-putus = pengunjung unik (WIB)."
+          action={<span className="tabular text-sm font-semibold">{formatInt(o.views)} tampilan</span>}
+        >
+          <BlogViewsChartLazy data={o.daily} />
         </SectionCard>
 
         <SectionCard title="Sumber trafik" description="Dari mana pembaca datang">

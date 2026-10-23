@@ -299,6 +299,8 @@ exports.Prisma.BlogPostScalarFieldEnum = {
   publishedAt: 'publishedAt',
   readingMinutes: 'readingMinutes',
   viewCount: 'viewCount',
+  upvoteCount: 'upvoteCount',
+  downvoteCount: 'downvoteCount',
   categoryId: 'categoryId',
   authorId: 'authorId',
   createdAt: 'createdAt',
@@ -317,6 +319,15 @@ exports.Prisma.BlogPostSlugHistoryScalarFieldEnum = {
   slug: 'slug',
   postId: 'postId',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.BlogPostVoteScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  visitorHash: 'visitorHash',
+  isUpvote: 'isUpvote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.BranchScalarFieldEnum = {
@@ -1265,6 +1276,7 @@ exports.Prisma.ModelName = {
   BlogPost: 'BlogPost',
   BlogPostView: 'BlogPostView',
   BlogPostSlugHistory: 'BlogPostSlugHistory',
+  BlogPostVote: 'BlogPostVote',
   Branch: 'Branch',
   Company: 'Company',
   Currency: 'Currency',

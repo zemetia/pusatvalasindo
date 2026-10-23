@@ -5,13 +5,19 @@ import { blogService } from '@/backend/services/blog.service';
 import { siteConfig } from '@/config/site';
 import { FinalCta } from '@/components/landing/sections';
 import { PageIntro } from '@/components/landing/page-intro';
-import { InnerPage } from '@/components/landing/page-sections';
+import { InnerPage, RelatedLinks } from '@/components/landing/page-sections';
 import { Section } from '@/components/landing/ui';
 import { CategoryNav } from '@/components/blog/category-nav';
-import { PostCard } from '@/components/blog/post-card';
+import { FeaturedPostCard, PostCard } from '@/components/blog/post-card';
 import { Link } from '@/i18n/routing';
 import { buildMetadata } from '@/lib/seo';
-import { blogSchema, breadcrumbSchema, webPageSchema } from '@/lib/structured-data';
+import {
+  blogSchema,
+  breadcrumbSchema,
+  organizationSchema,
+  webPageSchema,
+  websiteSchema,
+} from '@/lib/structured-data';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -37,6 +43,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     description: page.description,
     path: data.page > 1 ? `${page.path}?halaman=${data.page}` : page.path,
     locale,
+    keywords: [
+      'blog valas',
+      'tips tukar valas',
+      'kurs dollar hari ini',
+      'money changer jakarta',
+      'kirim uang ke luar negeri',
+      'tukar uang tanpa antre',
+    ],
     // Indeks kosong = thin content; jangan diindeks sebelum ada artikel.
     noIndex: !siteConfig.contentLocales.includes(locale) || data.total === 0,
   });
@@ -50,6 +64,8 @@ export default async function BlogIndexPage({ searchParams }: Props) {
 
   const url = `${siteConfig.url}${page.path}`;
   const schemas = [
+    organizationSchema(),
+    websiteSchema(),
     webPageSchema({ name: page.title, description: page.description, url, dateModified: page.lastModified }),
     breadcrumbSchema([
       { name: 'Beranda', url: siteConfig.url },
@@ -76,7 +92,7 @@ export default async function BlogIndexPage({ searchParams }: Props) {
         lead="Cara tukar uang yang aman, membaca kurs, hingga kirim uang ke luar negeri — ditulis oleh tim money changer berizin Bank Indonesia."
       />
 
-      <Section tone="paper2">
+      <Section tone="paper">
         {items.length === 0 ? (
           <p className="max-w-xl text-lg leading-8 text-lp-ink-soft">
             Belum ada artikel yang terbit. Sementara itu, tanyakan kurs hari ini langsung lewat WhatsApp di bawah.
@@ -90,8 +106,11 @@ export default async function BlogIndexPage({ searchParams }: Props) {
             <p className="mb-8 text-sm text-lp-ink-mute">
               {total} artikel{totalPages > 1 ? ` · halaman ${current} dari ${totalPages}` : ''}
             </p>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((post) => (
+            {current === 1 && (
+              <FeaturedPostCard post={items[0]} className="mb-14 border-b border-lp-line pb-14" />
+            )}
+            <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+              {(current === 1 ? items.slice(1) : items).map((post) => (
                 <PostCard key={post.slug} post={post} />
               ))}
             </div>
@@ -124,6 +143,7 @@ export default async function BlogIndexPage({ searchParams }: Props) {
           </>
         )}
       </Section>
+      <RelatedLinks currentPath="/blog" tone="paper2" />
       <FinalCta />
     </InnerPage>
   );

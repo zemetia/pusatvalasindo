@@ -67,7 +67,8 @@ export async function middleware(request: NextRequest) {
     !targetPathname.startsWith("/api/auth") &&
     !targetPathname.startsWith("/api/mcp") &&
     !targetPathname.startsWith("/api/scrape") &&
-    targetPathname !== "/api/blog-view"
+    targetPathname !== "/api/blog-view" &&
+    targetPathname !== "/api/blog-vote"
   ) {
     if (!sessionCookie) {
       return applySecurityHeaders(
@@ -110,7 +111,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   runtime: "nodejs",
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|opengraph-image|robots\\.txt|sitemap\\.xml|llms\\.txt|llms-full\\.txt|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|opengraph-image|robots\\.txt|sitemap\\.xml|feed\\.xml|llms\\.txt|llms-full\\.txt|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)).*)',
     "/api/:path*",
     "/en/api/:path*",
     "/id/api/:path*",

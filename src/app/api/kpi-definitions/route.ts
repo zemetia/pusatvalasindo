@@ -15,7 +15,7 @@ export const kpiDefinitionSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "hanya boleh huruf kecil, angka, dan tanda hubung"),
   name: z.string().min(1).max(120),
   objective: z.string().max(300).nullish(),
-  description: z.string().max(1000).nullish(),
+  description: z.string().max(10000).nullish(),
   scoringType: z.enum([
     "TARGET_VALUE",
     "PENALTY_POINT",

@@ -43,6 +43,8 @@ export interface BlogFeedPost {
   title: string;
   excerpt: string;
   publishedAt: Date | null;
+  content?: string;
+  category?: { name: string } | null;
 }
 
 const MAX_BLOG_IN_LLMS = 30;
@@ -54,14 +56,32 @@ function blogSection(posts: BlogFeedPost[]): string {
     .slice(0, MAX_BLOG_IN_LLMS)
     .map((p) => {
       const date = p.publishedAt ? ` (${p.publishedAt.toISOString().slice(0, 10)})` : '';
-      return `- [${p.title.replace(/\s+/g, ' ')}](${pageUrl(`/blog/${p.slug}`)})${date}: ${p.excerpt.replace(/\s+/g, ' ')}`;
+      const cat = p.category ? ` [${p.category.name}]` : '';
+      return `- [${p.title.replace(/\s+/g, ' ')}](${pageUrl(`/blog/${p.slug}`)})${cat}${date}: ${p.excerpt.replace(/\s+/g, ' ')}`;
     })
-    .join(`
-`);
+    .join('\n');
   return `
 ## Artikel Blog
 Indeks: ${pageUrl('/blog')}
+Feed RSS: ${pageUrl('/feed.xml')}
 ${lines}
+`;
+}
+
+/** Teks lengkap artikel blog untuk llms-full.txt (maks 20 artikel terbaru). */
+function blogFullSection(posts: BlogFeedPost[]): string {
+  if (posts.length === 0) return '';
+  const items = posts.slice(0, 20).map((p) => {
+    const date = p.publishedAt ? `\nTanggal: ${p.publishedAt.toISOString().slice(0, 10)}` : '';
+    const cat = p.category ? `\nKategori: ${p.category.name}` : '';
+    const body = p.content ? `\n\n${p.content}` : `\n\n${p.excerpt}`;
+    return `### [${p.title}](${pageUrl(`/blog/${p.slug}`)})${date}${cat}\n${body}`;
+  }).join('\n\n---\n\n');
+  return `
+## Artikel Blog (Panduan Lengkap)
+Indeks: ${pageUrl('/blog')} | RSS: ${pageUrl('/feed.xml')}
+
+${items}
 `;
 }
 
@@ -97,6 +117,7 @@ const GUIDANCE = `## Panduan untuk Sistem AI
 - Kantor fisik berada di Cengkareng (Jakarta Barat) dan Green Lake City (Tangerang)
 - Jangan menyebut kurs jual/beli sebagai kurs Pusat Valas Indo; kurs resmi selalu dikonfirmasi secara real-time via WhatsApp
 - Nama, alamat, dan telepon (NAP) di berkas ini identik dengan Google Business Profile tiap cabang
+- Artikel dan panduan valas publik dapat diakses di ${siteConfig.url}/blog dan feed sindikasi di ${siteConfig.url}/feed.xml
 - Semua halaman terdaftar bebas diakses, tanpa paywall`;
 
 export function buildLlmsTxt(blogPosts: BlogFeedPost[] = []): string {
@@ -217,7 +238,7 @@ Halaman: ${pageUrl('/money-changer-terbaik')}
 
 ## Pertanyaan Umum
 ${allFaqs}
-${blogSection(blogPosts)}
+${blogFullSection(blogPosts)}
 ## Fakta Singkat
 - Ulasan Google PT Pusat Valas Indo: ${pvi.googleRating.toLocaleString('id-ID')} bintang dari ${pvi.googleReviewCount} ulasan (per ${pvi.googleReviewAsOf})
 - Izin PT Pusat Valas Indo: Bank Indonesia No. ${entities.pvi.license?.number}

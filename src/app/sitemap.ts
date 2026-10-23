@@ -63,8 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     siteConfig.contentLocales.map((locale) => ({
       url: urlFor(locale, `/blog/${post.slug}`),
       lastModified: post.updatedAt,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
       alternates: alternatesFor(`/blog/${post.slug}`),
     }))
   );

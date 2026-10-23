@@ -31,12 +31,15 @@ import {
   IconCurrencyDollar,
   IconCoins,
   IconArticle,
-  type Icon,
+  IconArrowLeft,
+  IconCategory,
+  IconExternalLink,
+  IconPlus,
 } from "@tabler/icons-react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { NavMain } from "@/components/nav-main";
+import { NavMain, type NavItem } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -50,14 +53,7 @@ import {
 } from "@/components/ui/sidebar";
 import { allows, type AuthzSubject } from "@/lib/authz/resolve";
 import { slugifyRoleName } from "@/lib/kpi-utils";
-
-interface NavItem {
-  title: string;
-  url: string;
-  icon?: Icon;
-  exact?: boolean;
-  badge?: number;
-}
+import { usePathname } from "@src/i18n/routing";
 
 type SidebarUser = { name: string; email: string };
 
@@ -87,11 +83,14 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     throw new Error("AppSidebar requires a user but received undefined.");
   }
 
+  const pathname = usePathname();
+  const isBlog = pathname === "/dashboard/blog" || pathname.startsWith("/dashboard/blog/");
+
   /** Tampil kalau jabatan ini boleh membuka resource-nya, apa pun PT-nya. */
   const show = (resource: string, action: "view" | "write" = "view") =>
     allows(subject, resource, action);
 
-  const canReviewKpi = show("kpi.review") || show("kpi.review", "write");
+  const canReviewKpi = !isBlog && (show("kpi.review") || show("kpi.review", "write"));
 
   // Badge merah di "Penilaian & Persetujuan" — jumlah entri KPI yang masih
   // menunggu approve/reject, dibatasi PT si peninjau lewat endpoint yang sama
@@ -108,7 +107,7 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     refetchInterval: 60_000,
   });
 
-  const canReviewCorrection = show("correction");
+  const canReviewCorrection = !isBlog && show("correction");
 
   // Badge merah di "Persetujuan Koreksi" — jumlah pengajuan koreksi yang masih
   // menunggu approve/reject, dibatasi PT peninjau lewat endpoint yang sama
@@ -125,6 +124,64 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     refetchInterval: 60_000,
   });
 
+  // ════════════════════════════════════════════════════════════════════════════
+  // 1. KONTEN SIDEBAR KHUSUS BLOG
+  // ════════════════════════════════════════════════════════════════════════════
+  const navBlogBack: NavItem[] = [
+    {
+      title: "Dashboard Utama",
+      url: "/dashboard",
+      icon: IconArrowLeft,
+      exact: true,
+    },
+  ];
+
+  const navBlogOverview: NavItem[] = [
+    {
+      title: "Ringkasan & Analisis",
+      url: "/dashboard/blog",
+      icon: IconDashboard,
+      exact: true,
+    },
+  ];
+
+  const navBlogManage: NavItem[] = [];
+
+  if (show("blog", "write")) {
+    navBlogManage.push({
+      title: "Tulis Artikel Baru",
+      url: "/dashboard/blog/baru",
+      icon: IconPlus,
+      exact: true,
+    });
+  }
+
+  navBlogManage.push({
+    title: "Kategori",
+    url: "/dashboard/blog/kategori",
+    icon: IconCategory,
+  });
+
+  const navBlogPublic: NavItem[] = [
+    {
+      title: "Lihat Blog Publik",
+      url: "/blog",
+      icon: IconExternalLink,
+      target: "_blank",
+    },
+  ];
+
+  const navBlogSystem: NavItem[] = [
+    {
+      title: "Account",
+      url: "/dashboard/account",
+      icon: IconUserCircle,
+    },
+  ];
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // 2. KONTEN SIDEBAR BIASA (ERP / UTAMA)
+  // ════════════════════════════════════════════════════════════════════════════
   const navMain: NavItem[] = [
     {
       title: "Dashboard",
@@ -155,8 +212,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
   // ── Operational ────────────────────────────────────────────────────────────
   const navOperational: NavItem[] = [];
 
-  // Transaksi Valas adalah pencatatan operasional harian: dibuka per tanggal dan
-  // diisi hari itu. Kursnya berasal dari Harga Valas di Finance Management.
   if (show("valas.transaction")) {
     navOperational.push({
       title: "Transaksi Valas",
@@ -168,8 +223,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
   // ── KPI ────────────────────────────────────────────────────────────────────
   const navKPI: NavItem[] = [];
 
-  // Presensi karyawan duduk di section KPI karena kedisiplinan kehadiran adalah
-  // salah satu sumber skor KPI — koreksinya dilakukan orang yang sama.
   if (show("attendance.all") || show("attendance.all", "write")) {
     navKPI.push({
       title: "Presensi Karyawan",
@@ -187,8 +240,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // Resource tersendiri: Definisi KPI adalah daftar induk indikator, bisa
-  // didelegasikan tanpa ikut memberi akses ke bobot per jabatan.
   if (show("kpi.definitions")) {
     navKPI.push({
       title: "Definisi KPI",
@@ -197,8 +248,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // Halaman ini juga tempat menyetujui entri yang diisi sendiri karyawan, jadi
-  // atasan dengan KPI_APPROVE harus bisa masuk meski tidak punya KPI_VIEW_ALL.
   if (canReviewKpi) {
     navKPI.push({
       title: "Penilaian & Persetujuan",
@@ -257,7 +306,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
   // ── Ringkasan KPI (Analisis Kinerja & per jabatan) ────────────────────────
   const navKpiSummary: NavItem[] = [];
 
-  // Analisis Kinerja ditaruh sebagai menu utama di Ringkasan KPI
   if (show("kpi.analytics")) {
     navKpiSummary.push({
       title: "Analisis Kinerja",
@@ -302,8 +350,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // Harga Valas adalah harga final yang benar-benar dipakai (diisi manual),
-  // sedangkan Patokan Harga di atas hanya menyimpan aturan penyesuaiannya.
   if (show("currency.price")) {
     navFinanceManagement.push({
       title: "Harga Valas",
@@ -339,8 +385,6 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
     });
   }
 
-  // Dana Tertahan duduk di section input harian karena polanya sama: dibuka per
-  // tanggal dan diisi hari itu. Bedanya barisnya bertahan sampai dinyatakan lunas.
   if (show("finance.receivable")) {
     navFinanceDailyInput.push({
       title: "Dana Tertahan",
@@ -441,45 +485,67 @@ export function AppSidebar({ user, subject, hasBranch, kpiRoleNames, ...props }:
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none h-auto py-1 select-none">
-              <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <IconBrandTabler className="size-5" />
+              <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg shadow-xs">
+                {isBlog ? (
+                  <IconArticle className="size-5" />
+                ) : (
+                  <IconBrandTabler className="size-5" />
+                )}
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate text-sm font-semibold tracking-tight">
                   Pusat Valas Indo
                 </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  Enterprise Suite
+                  {isBlog ? "Blog & Konten" : "Enterprise Suite"}
                 </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navMain} />
-        {navSelf.length > 0 && <NavMain items={navSelf} label="Aktivitas Saya" />}
-        {navOperational.length > 0 && (
-          <NavMain items={navOperational} label="Operational" />
-        )}
-        {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
-        {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
-        {navFinanceManagement.length > 0 && (
-          <NavMain items={navFinanceManagement} label="Finance Management" />
-        )}
-        {navFinanceDailyInput.length > 0 && (
-          <NavMain items={navFinanceDailyInput} label="Finance Daily Input" />
-        )}
-        {navLaporan.length > 0 && <NavMain items={navLaporan} label="Laporan" />}
-        {navKonten.length > 0 && <NavMain items={navKonten} label="Konten" />}
-        {navKpiSummary.length > 0 && (
-          <NavMain items={navKpiSummary} label="Ringkasan KPI" />
-        )}
-        <NavMain items={navManagement} label="Management" />
-        <div className="mt-auto">
-          <NavMain items={navSecondary} label="System" />
-        </div>
-      </SidebarContent>
+
+      {isBlog ? (
+        /* ── Sidebar Khusus Blog (Lebih Clean & Terfokus) ───────────────── */
+        <SidebarContent>
+          <NavMain items={navBlogBack} />
+          <NavMain items={navBlogOverview} label="Dashboard" />
+          {navBlogManage.length > 0 && (
+            <NavMain items={navBlogManage} label="Kelola Konten" />
+          )}
+          <NavMain items={navBlogPublic} label="Situs Publik" />
+          <div className="mt-auto">
+            <NavMain items={navBlogSystem} label="System" />
+          </div>
+        </SidebarContent>
+      ) : (
+        /* ── Sidebar Biasa (ERP Utama) ──────────────────────────────────── */
+        <SidebarContent>
+          <NavMain items={navMain} />
+          {navSelf.length > 0 && <NavMain items={navSelf} label="Aktivitas Saya" />}
+          {navOperational.length > 0 && (
+            <NavMain items={navOperational} label="Operational" />
+          )}
+          {navKPI.length > 0 && <NavMain items={navKPI} label="KPI" />}
+          {navPayroll.length > 0 && <NavMain items={navPayroll} label="Payroll" />}
+          {navFinanceManagement.length > 0 && (
+            <NavMain items={navFinanceManagement} label="Finance Management" />
+          )}
+          {navFinanceDailyInput.length > 0 && (
+            <NavMain items={navFinanceDailyInput} label="Finance Daily Input" />
+          )}
+          {navLaporan.length > 0 && <NavMain items={navLaporan} label="Laporan" />}
+          {navKonten.length > 0 && <NavMain items={navKonten} label="Konten" />}
+          {navKpiSummary.length > 0 && (
+            <NavMain items={navKpiSummary} label="Ringkasan KPI" />
+          )}
+          <NavMain items={navManagement} label="Management" />
+          <div className="mt-auto">
+            <NavMain items={navSecondary} label="System" />
+          </div>
+        </SidebarContent>
+      )}
+
       <SidebarFooter className="border-t">
         <NavUser user={user} />
       </SidebarFooter>

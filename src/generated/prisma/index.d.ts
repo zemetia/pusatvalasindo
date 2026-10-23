@@ -106,6 +106,12 @@ export type BlogPostView = $Result.DefaultSelection<Prisma.$BlogPostViewPayload>
  */
 export type BlogPostSlugHistory = $Result.DefaultSelection<Prisma.$BlogPostSlugHistoryPayload>
 /**
+ * Model BlogPostVote
+ * Tanggapan pembaca ("Apakah artikel ini membantu?").
+ * Satu pengunjung (hash anonim) hanya punya 1 catatan per artikel (bisa upvote atau downvote, atau diubah/dibatalkan).
+ */
+export type BlogPostVote = $Result.DefaultSelection<Prisma.$BlogPostVotePayload>
+/**
  * Model Branch
  * 
  */
@@ -1161,6 +1167,16 @@ export class PrismaClient<
   get blogPostSlugHistory(): Prisma.BlogPostSlugHistoryDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.blogPostVote`: Exposes CRUD operations for the **BlogPostVote** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BlogPostVotes
+    * const blogPostVotes = await prisma.blogPostVote.findMany()
+    * ```
+    */
+  get blogPostVote(): Prisma.BlogPostVoteDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.branch`: Exposes CRUD operations for the **Branch** model.
     * Example usage:
     * ```ts
@@ -2068,6 +2084,7 @@ export namespace Prisma {
     BlogPost: 'BlogPost',
     BlogPostView: 'BlogPostView',
     BlogPostSlugHistory: 'BlogPostSlugHistory',
+    BlogPostVote: 'BlogPostVote',
     Branch: 'Branch',
     Company: 'Company',
     Currency: 'Currency',
@@ -2129,7 +2146,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "blogCategory" | "blogPost" | "blogPostView" | "blogPostSlugHistory" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "roleKpiCap" | "kpiGlobalSetting" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
+      modelProps: "publicHoliday" | "attendance" | "account" | "session" | "custom_role" | "user" | "verification" | "roleResourcePermission" | "bankAccount" | "bankMutation" | "dailyBankEntry" | "blogCategory" | "blogPost" | "blogPostView" | "blogPostSlugHistory" | "blogPostVote" | "branch" | "company" | "currency" | "currencyPrice" | "currencyPriceSyncSetting" | "priceBenchmark" | "smartdealRate" | "smartdealScrapeStatus" | "companyStockItem" | "kpiDefinition" | "roleKpi" | "roleKpiCap" | "kpiGlobalSetting" | "kpiEntry" | "kpiPeriod" | "kpiMonthlyResult" | "payrollRule" | "payrollRuleTier" | "payrollRun" | "payrollSlip" | "payrollSlipEntry" | "salaryComponent" | "userSalaryComponent" | "heldFund" | "refiningBatch" | "sample" | "shipmentProvider" | "shipment" | "shipmentStatusEvent" | "currencyStock" | "stockMutation" | "stockItem" | "dailyStockEntry" | "stockistPocket" | "stockistBalance" | "stockistMutation" | "stockistDailyCheck" | "kasPocket" | "kasDailyEntry" | "stockistHeadConfirmation" | "stockistTotalHeadConfirmation" | "kasHeadConfirmation" | "bankHeadConfirmation" | "companyHeadConfirmationTotal" | "correctionRequest" | "valasTransaction"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3240,6 +3257,80 @@ export namespace Prisma {
           count: {
             args: Prisma.BlogPostSlugHistoryCountArgs<ExtArgs>
             result: $Utils.Optional<BlogPostSlugHistoryCountAggregateOutputType> | number
+          }
+        }
+      }
+      BlogPostVote: {
+        payload: Prisma.$BlogPostVotePayload<ExtArgs>
+        fields: Prisma.BlogPostVoteFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BlogPostVoteFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BlogPostVoteFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          findFirst: {
+            args: Prisma.BlogPostVoteFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BlogPostVoteFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          findMany: {
+            args: Prisma.BlogPostVoteFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>[]
+          }
+          create: {
+            args: Prisma.BlogPostVoteCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          createMany: {
+            args: Prisma.BlogPostVoteCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BlogPostVoteCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>[]
+          }
+          delete: {
+            args: Prisma.BlogPostVoteDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          update: {
+            args: Prisma.BlogPostVoteUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          deleteMany: {
+            args: Prisma.BlogPostVoteDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BlogPostVoteUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BlogPostVoteUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>[]
+          }
+          upsert: {
+            args: Prisma.BlogPostVoteUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BlogPostVotePayload>
+          }
+          aggregate: {
+            args: Prisma.BlogPostVoteAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBlogPostVote>
+          }
+          groupBy: {
+            args: Prisma.BlogPostVoteGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BlogPostVoteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BlogPostVoteCountArgs<ExtArgs>
+            result: $Utils.Optional<BlogPostVoteCountAggregateOutputType> | number
           }
         }
       }
@@ -6770,6 +6861,7 @@ export namespace Prisma {
     blogPost?: BlogPostOmit
     blogPostView?: BlogPostViewOmit
     blogPostSlugHistory?: BlogPostSlugHistoryOmit
+    blogPostVote?: BlogPostVoteOmit
     branch?: BranchOmit
     company?: CompanyOmit
     currency?: CurrencyOmit
@@ -7246,11 +7338,13 @@ export namespace Prisma {
 
   export type BlogPostCountOutputType = {
     views: number
+    votes: number
     slugHistory: number
   }
 
   export type BlogPostCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     views?: boolean | BlogPostCountOutputTypeCountViewsArgs
+    votes?: boolean | BlogPostCountOutputTypeCountVotesArgs
     slugHistory?: boolean | BlogPostCountOutputTypeCountSlugHistoryArgs
   }
 
@@ -7270,6 +7364,13 @@ export namespace Prisma {
    */
   export type BlogPostCountOutputTypeCountViewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BlogPostViewWhereInput
+  }
+
+  /**
+   * BlogPostCountOutputType without action
+   */
+  export type BlogPostCountOutputTypeCountVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BlogPostVoteWhereInput
   }
 
   /**
@@ -22827,11 +22928,15 @@ export namespace Prisma {
   export type BlogPostAvgAggregateOutputType = {
     readingMinutes: number | null
     viewCount: number | null
+    upvoteCount: number | null
+    downvoteCount: number | null
   }
 
   export type BlogPostSumAggregateOutputType = {
     readingMinutes: number | null
     viewCount: number | null
+    upvoteCount: number | null
+    downvoteCount: number | null
   }
 
   export type BlogPostMinAggregateOutputType = {
@@ -22848,6 +22953,8 @@ export namespace Prisma {
     publishedAt: Date | null
     readingMinutes: number | null
     viewCount: number | null
+    upvoteCount: number | null
+    downvoteCount: number | null
     categoryId: string | null
     authorId: string | null
     createdAt: Date | null
@@ -22868,6 +22975,8 @@ export namespace Prisma {
     publishedAt: Date | null
     readingMinutes: number | null
     viewCount: number | null
+    upvoteCount: number | null
+    downvoteCount: number | null
     categoryId: string | null
     authorId: string | null
     createdAt: Date | null
@@ -22888,6 +22997,8 @@ export namespace Prisma {
     publishedAt: number
     readingMinutes: number
     viewCount: number
+    upvoteCount: number
+    downvoteCount: number
     categoryId: number
     authorId: number
     createdAt: number
@@ -22899,11 +23010,15 @@ export namespace Prisma {
   export type BlogPostAvgAggregateInputType = {
     readingMinutes?: true
     viewCount?: true
+    upvoteCount?: true
+    downvoteCount?: true
   }
 
   export type BlogPostSumAggregateInputType = {
     readingMinutes?: true
     viewCount?: true
+    upvoteCount?: true
+    downvoteCount?: true
   }
 
   export type BlogPostMinAggregateInputType = {
@@ -22920,6 +23035,8 @@ export namespace Prisma {
     publishedAt?: true
     readingMinutes?: true
     viewCount?: true
+    upvoteCount?: true
+    downvoteCount?: true
     categoryId?: true
     authorId?: true
     createdAt?: true
@@ -22940,6 +23057,8 @@ export namespace Prisma {
     publishedAt?: true
     readingMinutes?: true
     viewCount?: true
+    upvoteCount?: true
+    downvoteCount?: true
     categoryId?: true
     authorId?: true
     createdAt?: true
@@ -22960,6 +23079,8 @@ export namespace Prisma {
     publishedAt?: true
     readingMinutes?: true
     viewCount?: true
+    upvoteCount?: true
+    downvoteCount?: true
     categoryId?: true
     authorId?: true
     createdAt?: true
@@ -23067,6 +23188,8 @@ export namespace Prisma {
     publishedAt: Date | null
     readingMinutes: number
     viewCount: number
+    upvoteCount: number
+    downvoteCount: number
     categoryId: string | null
     authorId: string | null
     createdAt: Date
@@ -23106,6 +23229,8 @@ export namespace Prisma {
     publishedAt?: boolean
     readingMinutes?: boolean
     viewCount?: boolean
+    upvoteCount?: boolean
+    downvoteCount?: boolean
     categoryId?: boolean
     authorId?: boolean
     createdAt?: boolean
@@ -23113,6 +23238,7 @@ export namespace Prisma {
     category?: boolean | BlogPost$categoryArgs<ExtArgs>
     author?: boolean | BlogPost$authorArgs<ExtArgs>
     views?: boolean | BlogPost$viewsArgs<ExtArgs>
+    votes?: boolean | BlogPost$votesArgs<ExtArgs>
     slugHistory?: boolean | BlogPost$slugHistoryArgs<ExtArgs>
     _count?: boolean | BlogPostCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["blogPost"]>
@@ -23131,6 +23257,8 @@ export namespace Prisma {
     publishedAt?: boolean
     readingMinutes?: boolean
     viewCount?: boolean
+    upvoteCount?: boolean
+    downvoteCount?: boolean
     categoryId?: boolean
     authorId?: boolean
     createdAt?: boolean
@@ -23153,6 +23281,8 @@ export namespace Prisma {
     publishedAt?: boolean
     readingMinutes?: boolean
     viewCount?: boolean
+    upvoteCount?: boolean
+    downvoteCount?: boolean
     categoryId?: boolean
     authorId?: boolean
     createdAt?: boolean
@@ -23175,17 +23305,20 @@ export namespace Prisma {
     publishedAt?: boolean
     readingMinutes?: boolean
     viewCount?: boolean
+    upvoteCount?: boolean
+    downvoteCount?: boolean
     categoryId?: boolean
     authorId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BlogPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "title" | "excerpt" | "content" | "coverImageUrl" | "coverImageAlt" | "metaTitle" | "metaDescription" | "status" | "publishedAt" | "readingMinutes" | "viewCount" | "categoryId" | "authorId" | "createdAt" | "updatedAt", ExtArgs["result"]["blogPost"]>
+  export type BlogPostOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "slug" | "title" | "excerpt" | "content" | "coverImageUrl" | "coverImageAlt" | "metaTitle" | "metaDescription" | "status" | "publishedAt" | "readingMinutes" | "viewCount" | "upvoteCount" | "downvoteCount" | "categoryId" | "authorId" | "createdAt" | "updatedAt", ExtArgs["result"]["blogPost"]>
   export type BlogPostInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | BlogPost$categoryArgs<ExtArgs>
     author?: boolean | BlogPost$authorArgs<ExtArgs>
     views?: boolean | BlogPost$viewsArgs<ExtArgs>
+    votes?: boolean | BlogPost$votesArgs<ExtArgs>
     slugHistory?: boolean | BlogPost$slugHistoryArgs<ExtArgs>
     _count?: boolean | BlogPostCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -23204,6 +23337,7 @@ export namespace Prisma {
       category: Prisma.$BlogCategoryPayload<ExtArgs> | null
       author: Prisma.$userPayload<ExtArgs> | null
       views: Prisma.$BlogPostViewPayload<ExtArgs>[]
+      votes: Prisma.$BlogPostVotePayload<ExtArgs>[]
       slugHistory: Prisma.$BlogPostSlugHistoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -23231,6 +23365,8 @@ export namespace Prisma {
        * daftar & pengurutan tidak perlu meng-agregat jutaan baris.
        */
       viewCount: number
+      upvoteCount: number
+      downvoteCount: number
       categoryId: string | null
       authorId: string | null
       createdAt: Date
@@ -23632,6 +23768,7 @@ export namespace Prisma {
     category<T extends BlogPost$categoryArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$categoryArgs<ExtArgs>>): Prisma__BlogCategoryClient<$Result.GetResult<Prisma.$BlogCategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     author<T extends BlogPost$authorArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$authorArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     views<T extends BlogPost$viewsArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$viewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    votes<T extends BlogPost$votesArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$votesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     slugHistory<T extends BlogPost$slugHistoryArgs<ExtArgs> = {}>(args?: Subset<T, BlogPost$slugHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostSlugHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -23675,6 +23812,8 @@ export namespace Prisma {
     readonly publishedAt: FieldRef<"BlogPost", 'DateTime'>
     readonly readingMinutes: FieldRef<"BlogPost", 'Int'>
     readonly viewCount: FieldRef<"BlogPost", 'Int'>
+    readonly upvoteCount: FieldRef<"BlogPost", 'Int'>
+    readonly downvoteCount: FieldRef<"BlogPost", 'Int'>
     readonly categoryId: FieldRef<"BlogPost", 'String'>
     readonly authorId: FieldRef<"BlogPost", 'String'>
     readonly createdAt: FieldRef<"BlogPost", 'DateTime'>
@@ -24139,6 +24278,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BlogPostViewScalarFieldEnum | BlogPostViewScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPost.votes
+   */
+  export type BlogPost$votesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    where?: BlogPostVoteWhereInput
+    orderBy?: BlogPostVoteOrderByWithRelationInput | BlogPostVoteOrderByWithRelationInput[]
+    cursor?: BlogPostVoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BlogPostVoteScalarFieldEnum | BlogPostVoteScalarFieldEnum[]
   }
 
   /**
@@ -26284,6 +26447,1082 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: BlogPostSlugHistoryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BlogPostVote
+   */
+
+  export type AggregateBlogPostVote = {
+    _count: BlogPostVoteCountAggregateOutputType | null
+    _min: BlogPostVoteMinAggregateOutputType | null
+    _max: BlogPostVoteMaxAggregateOutputType | null
+  }
+
+  export type BlogPostVoteMinAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    visitorHash: string | null
+    isUpvote: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BlogPostVoteMaxAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    visitorHash: string | null
+    isUpvote: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BlogPostVoteCountAggregateOutputType = {
+    id: number
+    postId: number
+    visitorHash: number
+    isUpvote: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BlogPostVoteMinAggregateInputType = {
+    id?: true
+    postId?: true
+    visitorHash?: true
+    isUpvote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BlogPostVoteMaxAggregateInputType = {
+    id?: true
+    postId?: true
+    visitorHash?: true
+    isUpvote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BlogPostVoteCountAggregateInputType = {
+    id?: true
+    postId?: true
+    visitorHash?: true
+    isUpvote?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BlogPostVoteAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BlogPostVote to aggregate.
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPostVotes to fetch.
+     */
+    orderBy?: BlogPostVoteOrderByWithRelationInput | BlogPostVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BlogPostVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPostVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPostVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BlogPostVotes
+    **/
+    _count?: true | BlogPostVoteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BlogPostVoteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BlogPostVoteMaxAggregateInputType
+  }
+
+  export type GetBlogPostVoteAggregateType<T extends BlogPostVoteAggregateArgs> = {
+        [P in keyof T & keyof AggregateBlogPostVote]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBlogPostVote[P]>
+      : GetScalarType<T[P], AggregateBlogPostVote[P]>
+  }
+
+
+
+
+  export type BlogPostVoteGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BlogPostVoteWhereInput
+    orderBy?: BlogPostVoteOrderByWithAggregationInput | BlogPostVoteOrderByWithAggregationInput[]
+    by: BlogPostVoteScalarFieldEnum[] | BlogPostVoteScalarFieldEnum
+    having?: BlogPostVoteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BlogPostVoteCountAggregateInputType | true
+    _min?: BlogPostVoteMinAggregateInputType
+    _max?: BlogPostVoteMaxAggregateInputType
+  }
+
+  export type BlogPostVoteGroupByOutputType = {
+    id: string
+    postId: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: BlogPostVoteCountAggregateOutputType | null
+    _min: BlogPostVoteMinAggregateOutputType | null
+    _max: BlogPostVoteMaxAggregateOutputType | null
+  }
+
+  type GetBlogPostVoteGroupByPayload<T extends BlogPostVoteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BlogPostVoteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BlogPostVoteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BlogPostVoteGroupByOutputType[P]>
+            : GetScalarType<T[P], BlogPostVoteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BlogPostVoteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    visitorHash?: boolean
+    isUpvote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["blogPostVote"]>
+
+  export type BlogPostVoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    visitorHash?: boolean
+    isUpvote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["blogPostVote"]>
+
+  export type BlogPostVoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    visitorHash?: boolean
+    isUpvote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["blogPostVote"]>
+
+  export type BlogPostVoteSelectScalar = {
+    id?: boolean
+    postId?: boolean
+    visitorHash?: boolean
+    isUpvote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BlogPostVoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "visitorHash" | "isUpvote" | "createdAt" | "updatedAt", ExtArgs["result"]["blogPostVote"]>
+  export type BlogPostVoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }
+  export type BlogPostVoteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }
+  export type BlogPostVoteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | BlogPostDefaultArgs<ExtArgs>
+  }
+
+  export type $BlogPostVotePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BlogPostVote"
+    objects: {
+      post: Prisma.$BlogPostPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      postId: string
+      visitorHash: string
+      isUpvote: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["blogPostVote"]>
+    composites: {}
+  }
+
+  type BlogPostVoteGetPayload<S extends boolean | null | undefined | BlogPostVoteDefaultArgs> = $Result.GetResult<Prisma.$BlogPostVotePayload, S>
+
+  type BlogPostVoteCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BlogPostVoteFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BlogPostVoteCountAggregateInputType | true
+    }
+
+  export interface BlogPostVoteDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BlogPostVote'], meta: { name: 'BlogPostVote' } }
+    /**
+     * Find zero or one BlogPostVote that matches the filter.
+     * @param {BlogPostVoteFindUniqueArgs} args - Arguments to find a BlogPostVote
+     * @example
+     * // Get one BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BlogPostVoteFindUniqueArgs>(args: SelectSubset<T, BlogPostVoteFindUniqueArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BlogPostVote that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BlogPostVoteFindUniqueOrThrowArgs} args - Arguments to find a BlogPostVote
+     * @example
+     * // Get one BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BlogPostVoteFindUniqueOrThrowArgs>(args: SelectSubset<T, BlogPostVoteFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BlogPostVote that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteFindFirstArgs} args - Arguments to find a BlogPostVote
+     * @example
+     * // Get one BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BlogPostVoteFindFirstArgs>(args?: SelectSubset<T, BlogPostVoteFindFirstArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BlogPostVote that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteFindFirstOrThrowArgs} args - Arguments to find a BlogPostVote
+     * @example
+     * // Get one BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BlogPostVoteFindFirstOrThrowArgs>(args?: SelectSubset<T, BlogPostVoteFindFirstOrThrowArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BlogPostVotes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BlogPostVotes
+     * const blogPostVotes = await prisma.blogPostVote.findMany()
+     * 
+     * // Get first 10 BlogPostVotes
+     * const blogPostVotes = await prisma.blogPostVote.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const blogPostVoteWithIdOnly = await prisma.blogPostVote.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BlogPostVoteFindManyArgs>(args?: SelectSubset<T, BlogPostVoteFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BlogPostVote.
+     * @param {BlogPostVoteCreateArgs} args - Arguments to create a BlogPostVote.
+     * @example
+     * // Create one BlogPostVote
+     * const BlogPostVote = await prisma.blogPostVote.create({
+     *   data: {
+     *     // ... data to create a BlogPostVote
+     *   }
+     * })
+     * 
+     */
+    create<T extends BlogPostVoteCreateArgs>(args: SelectSubset<T, BlogPostVoteCreateArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BlogPostVotes.
+     * @param {BlogPostVoteCreateManyArgs} args - Arguments to create many BlogPostVotes.
+     * @example
+     * // Create many BlogPostVotes
+     * const blogPostVote = await prisma.blogPostVote.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BlogPostVoteCreateManyArgs>(args?: SelectSubset<T, BlogPostVoteCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BlogPostVotes and returns the data saved in the database.
+     * @param {BlogPostVoteCreateManyAndReturnArgs} args - Arguments to create many BlogPostVotes.
+     * @example
+     * // Create many BlogPostVotes
+     * const blogPostVote = await prisma.blogPostVote.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BlogPostVotes and only return the `id`
+     * const blogPostVoteWithIdOnly = await prisma.blogPostVote.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BlogPostVoteCreateManyAndReturnArgs>(args?: SelectSubset<T, BlogPostVoteCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BlogPostVote.
+     * @param {BlogPostVoteDeleteArgs} args - Arguments to delete one BlogPostVote.
+     * @example
+     * // Delete one BlogPostVote
+     * const BlogPostVote = await prisma.blogPostVote.delete({
+     *   where: {
+     *     // ... filter to delete one BlogPostVote
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BlogPostVoteDeleteArgs>(args: SelectSubset<T, BlogPostVoteDeleteArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BlogPostVote.
+     * @param {BlogPostVoteUpdateArgs} args - Arguments to update one BlogPostVote.
+     * @example
+     * // Update one BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BlogPostVoteUpdateArgs>(args: SelectSubset<T, BlogPostVoteUpdateArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BlogPostVotes.
+     * @param {BlogPostVoteDeleteManyArgs} args - Arguments to filter BlogPostVotes to delete.
+     * @example
+     * // Delete a few BlogPostVotes
+     * const { count } = await prisma.blogPostVote.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BlogPostVoteDeleteManyArgs>(args?: SelectSubset<T, BlogPostVoteDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BlogPostVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BlogPostVotes
+     * const blogPostVote = await prisma.blogPostVote.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BlogPostVoteUpdateManyArgs>(args: SelectSubset<T, BlogPostVoteUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BlogPostVotes and returns the data updated in the database.
+     * @param {BlogPostVoteUpdateManyAndReturnArgs} args - Arguments to update many BlogPostVotes.
+     * @example
+     * // Update many BlogPostVotes
+     * const blogPostVote = await prisma.blogPostVote.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BlogPostVotes and only return the `id`
+     * const blogPostVoteWithIdOnly = await prisma.blogPostVote.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BlogPostVoteUpdateManyAndReturnArgs>(args: SelectSubset<T, BlogPostVoteUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BlogPostVote.
+     * @param {BlogPostVoteUpsertArgs} args - Arguments to update or create a BlogPostVote.
+     * @example
+     * // Update or create a BlogPostVote
+     * const blogPostVote = await prisma.blogPostVote.upsert({
+     *   create: {
+     *     // ... data to create a BlogPostVote
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BlogPostVote we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BlogPostVoteUpsertArgs>(args: SelectSubset<T, BlogPostVoteUpsertArgs<ExtArgs>>): Prisma__BlogPostVoteClient<$Result.GetResult<Prisma.$BlogPostVotePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BlogPostVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteCountArgs} args - Arguments to filter BlogPostVotes to count.
+     * @example
+     * // Count the number of BlogPostVotes
+     * const count = await prisma.blogPostVote.count({
+     *   where: {
+     *     // ... the filter for the BlogPostVotes we want to count
+     *   }
+     * })
+    **/
+    count<T extends BlogPostVoteCountArgs>(
+      args?: Subset<T, BlogPostVoteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BlogPostVoteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BlogPostVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BlogPostVoteAggregateArgs>(args: Subset<T, BlogPostVoteAggregateArgs>): Prisma.PrismaPromise<GetBlogPostVoteAggregateType<T>>
+
+    /**
+     * Group by BlogPostVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BlogPostVoteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BlogPostVoteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BlogPostVoteGroupByArgs['orderBy'] }
+        : { orderBy?: BlogPostVoteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BlogPostVoteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBlogPostVoteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BlogPostVote model
+   */
+  readonly fields: BlogPostVoteFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BlogPostVote.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BlogPostVoteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    post<T extends BlogPostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BlogPostDefaultArgs<ExtArgs>>): Prisma__BlogPostClient<$Result.GetResult<Prisma.$BlogPostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BlogPostVote model
+   */
+  interface BlogPostVoteFieldRefs {
+    readonly id: FieldRef<"BlogPostVote", 'String'>
+    readonly postId: FieldRef<"BlogPostVote", 'String'>
+    readonly visitorHash: FieldRef<"BlogPostVote", 'String'>
+    readonly isUpvote: FieldRef<"BlogPostVote", 'Boolean'>
+    readonly createdAt: FieldRef<"BlogPostVote", 'DateTime'>
+    readonly updatedAt: FieldRef<"BlogPostVote", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BlogPostVote findUnique
+   */
+  export type BlogPostVoteFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPostVote to fetch.
+     */
+    where: BlogPostVoteWhereUniqueInput
+  }
+
+  /**
+   * BlogPostVote findUniqueOrThrow
+   */
+  export type BlogPostVoteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPostVote to fetch.
+     */
+    where: BlogPostVoteWhereUniqueInput
+  }
+
+  /**
+   * BlogPostVote findFirst
+   */
+  export type BlogPostVoteFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPostVote to fetch.
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPostVotes to fetch.
+     */
+    orderBy?: BlogPostVoteOrderByWithRelationInput | BlogPostVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BlogPostVotes.
+     */
+    cursor?: BlogPostVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPostVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPostVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPostVotes.
+     */
+    distinct?: BlogPostVoteScalarFieldEnum | BlogPostVoteScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPostVote findFirstOrThrow
+   */
+  export type BlogPostVoteFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPostVote to fetch.
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPostVotes to fetch.
+     */
+    orderBy?: BlogPostVoteOrderByWithRelationInput | BlogPostVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BlogPostVotes.
+     */
+    cursor?: BlogPostVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPostVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPostVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPostVotes.
+     */
+    distinct?: BlogPostVoteScalarFieldEnum | BlogPostVoteScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPostVote findMany
+   */
+  export type BlogPostVoteFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which BlogPostVotes to fetch.
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BlogPostVotes to fetch.
+     */
+    orderBy?: BlogPostVoteOrderByWithRelationInput | BlogPostVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BlogPostVotes.
+     */
+    cursor?: BlogPostVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BlogPostVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BlogPostVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BlogPostVotes.
+     */
+    distinct?: BlogPostVoteScalarFieldEnum | BlogPostVoteScalarFieldEnum[]
+  }
+
+  /**
+   * BlogPostVote create
+   */
+  export type BlogPostVoteCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BlogPostVote.
+     */
+    data: XOR<BlogPostVoteCreateInput, BlogPostVoteUncheckedCreateInput>
+  }
+
+  /**
+   * BlogPostVote createMany
+   */
+  export type BlogPostVoteCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BlogPostVotes.
+     */
+    data: BlogPostVoteCreateManyInput | BlogPostVoteCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BlogPostVote createManyAndReturn
+   */
+  export type BlogPostVoteCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * The data used to create many BlogPostVotes.
+     */
+    data: BlogPostVoteCreateManyInput | BlogPostVoteCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BlogPostVote update
+   */
+  export type BlogPostVoteUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BlogPostVote.
+     */
+    data: XOR<BlogPostVoteUpdateInput, BlogPostVoteUncheckedUpdateInput>
+    /**
+     * Choose, which BlogPostVote to update.
+     */
+    where: BlogPostVoteWhereUniqueInput
+  }
+
+  /**
+   * BlogPostVote updateMany
+   */
+  export type BlogPostVoteUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BlogPostVotes.
+     */
+    data: XOR<BlogPostVoteUpdateManyMutationInput, BlogPostVoteUncheckedUpdateManyInput>
+    /**
+     * Filter which BlogPostVotes to update
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * Limit how many BlogPostVotes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BlogPostVote updateManyAndReturn
+   */
+  export type BlogPostVoteUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * The data used to update BlogPostVotes.
+     */
+    data: XOR<BlogPostVoteUpdateManyMutationInput, BlogPostVoteUncheckedUpdateManyInput>
+    /**
+     * Filter which BlogPostVotes to update
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * Limit how many BlogPostVotes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BlogPostVote upsert
+   */
+  export type BlogPostVoteUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BlogPostVote to update in case it exists.
+     */
+    where: BlogPostVoteWhereUniqueInput
+    /**
+     * In case the BlogPostVote found by the `where` argument doesn't exist, create a new BlogPostVote with this data.
+     */
+    create: XOR<BlogPostVoteCreateInput, BlogPostVoteUncheckedCreateInput>
+    /**
+     * In case the BlogPostVote was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BlogPostVoteUpdateInput, BlogPostVoteUncheckedUpdateInput>
+  }
+
+  /**
+   * BlogPostVote delete
+   */
+  export type BlogPostVoteDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
+    /**
+     * Filter which BlogPostVote to delete.
+     */
+    where: BlogPostVoteWhereUniqueInput
+  }
+
+  /**
+   * BlogPostVote deleteMany
+   */
+  export type BlogPostVoteDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BlogPostVotes to delete
+     */
+    where?: BlogPostVoteWhereInput
+    /**
+     * Limit how many BlogPostVotes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BlogPostVote without action
+   */
+  export type BlogPostVoteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BlogPostVote
+     */
+    select?: BlogPostVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BlogPostVote
+     */
+    omit?: BlogPostVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BlogPostVoteInclude<ExtArgs> | null
   }
 
 
@@ -37439,6 +38678,7 @@ export namespace Prisma {
       objective: string | null
       /**
        * Penjelasan aturan mainnya untuk karyawan, mis. "-3 poin setiap kesalahan hitung".
+       * Dibatasi VarChar(10000) — cukup untuk uraian panjang tanpa jadi TEXT tak terbatas.
        */
       description: string | null
       scoringType: $Enums.KpiScoringType
@@ -82483,6 +83723,8 @@ export namespace Prisma {
     publishedAt: 'publishedAt',
     readingMinutes: 'readingMinutes',
     viewCount: 'viewCount',
+    upvoteCount: 'upvoteCount',
+    downvoteCount: 'downvoteCount',
     categoryId: 'categoryId',
     authorId: 'authorId',
     createdAt: 'createdAt',
@@ -82510,6 +83752,18 @@ export namespace Prisma {
   };
 
   export type BlogPostSlugHistoryScalarFieldEnum = (typeof BlogPostSlugHistoryScalarFieldEnum)[keyof typeof BlogPostSlugHistoryScalarFieldEnum]
+
+
+  export const BlogPostVoteScalarFieldEnum: {
+    id: 'id',
+    postId: 'postId',
+    visitorHash: 'visitorHash',
+    isUpvote: 'isUpvote',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BlogPostVoteScalarFieldEnum = (typeof BlogPostVoteScalarFieldEnum)[keyof typeof BlogPostVoteScalarFieldEnum]
 
 
   export const BranchScalarFieldEnum: {
@@ -85110,6 +86364,8 @@ export namespace Prisma {
     publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
     readingMinutes?: IntFilter<"BlogPost"> | number
     viewCount?: IntFilter<"BlogPost"> | number
+    upvoteCount?: IntFilter<"BlogPost"> | number
+    downvoteCount?: IntFilter<"BlogPost"> | number
     categoryId?: StringNullableFilter<"BlogPost"> | string | null
     authorId?: StringNullableFilter<"BlogPost"> | string | null
     createdAt?: DateTimeFilter<"BlogPost"> | Date | string
@@ -85117,6 +86373,7 @@ export namespace Prisma {
     category?: XOR<BlogCategoryNullableScalarRelationFilter, BlogCategoryWhereInput> | null
     author?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     views?: BlogPostViewListRelationFilter
+    votes?: BlogPostVoteListRelationFilter
     slugHistory?: BlogPostSlugHistoryListRelationFilter
   }
 
@@ -85134,6 +86391,8 @@ export namespace Prisma {
     publishedAt?: SortOrderInput | SortOrder
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
     categoryId?: SortOrderInput | SortOrder
     authorId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -85141,6 +86400,7 @@ export namespace Prisma {
     category?: BlogCategoryOrderByWithRelationInput
     author?: userOrderByWithRelationInput
     views?: BlogPostViewOrderByRelationAggregateInput
+    votes?: BlogPostVoteOrderByRelationAggregateInput
     slugHistory?: BlogPostSlugHistoryOrderByRelationAggregateInput
   }
 
@@ -85161,6 +86421,8 @@ export namespace Prisma {
     publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
     readingMinutes?: IntFilter<"BlogPost"> | number
     viewCount?: IntFilter<"BlogPost"> | number
+    upvoteCount?: IntFilter<"BlogPost"> | number
+    downvoteCount?: IntFilter<"BlogPost"> | number
     categoryId?: StringNullableFilter<"BlogPost"> | string | null
     authorId?: StringNullableFilter<"BlogPost"> | string | null
     createdAt?: DateTimeFilter<"BlogPost"> | Date | string
@@ -85168,6 +86430,7 @@ export namespace Prisma {
     category?: XOR<BlogCategoryNullableScalarRelationFilter, BlogCategoryWhereInput> | null
     author?: XOR<UserNullableScalarRelationFilter, userWhereInput> | null
     views?: BlogPostViewListRelationFilter
+    votes?: BlogPostVoteListRelationFilter
     slugHistory?: BlogPostSlugHistoryListRelationFilter
   }, "id" | "slug">
 
@@ -85185,6 +86448,8 @@ export namespace Prisma {
     publishedAt?: SortOrderInput | SortOrder
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
     categoryId?: SortOrderInput | SortOrder
     authorId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -85213,6 +86478,8 @@ export namespace Prisma {
     publishedAt?: DateTimeNullableWithAggregatesFilter<"BlogPost"> | Date | string | null
     readingMinutes?: IntWithAggregatesFilter<"BlogPost"> | number
     viewCount?: IntWithAggregatesFilter<"BlogPost"> | number
+    upvoteCount?: IntWithAggregatesFilter<"BlogPost"> | number
+    downvoteCount?: IntWithAggregatesFilter<"BlogPost"> | number
     categoryId?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
     authorId?: StringNullableWithAggregatesFilter<"BlogPost"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"BlogPost"> | Date | string
@@ -85317,6 +86584,67 @@ export namespace Prisma {
     slug?: StringWithAggregatesFilter<"BlogPostSlugHistory"> | string
     postId?: StringWithAggregatesFilter<"BlogPostSlugHistory"> | string
     createdAt?: DateTimeWithAggregatesFilter<"BlogPostSlugHistory"> | Date | string
+  }
+
+  export type BlogPostVoteWhereInput = {
+    AND?: BlogPostVoteWhereInput | BlogPostVoteWhereInput[]
+    OR?: BlogPostVoteWhereInput[]
+    NOT?: BlogPostVoteWhereInput | BlogPostVoteWhereInput[]
+    id?: StringFilter<"BlogPostVote"> | string
+    postId?: StringFilter<"BlogPostVote"> | string
+    visitorHash?: StringFilter<"BlogPostVote"> | string
+    isUpvote?: BoolFilter<"BlogPostVote"> | boolean
+    createdAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+    post?: XOR<BlogPostScalarRelationFilter, BlogPostWhereInput>
+  }
+
+  export type BlogPostVoteOrderByWithRelationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    visitorHash?: SortOrder
+    isUpvote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    post?: BlogPostOrderByWithRelationInput
+  }
+
+  export type BlogPostVoteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    postId_visitorHash?: BlogPostVotePostIdVisitorHashCompoundUniqueInput
+    AND?: BlogPostVoteWhereInput | BlogPostVoteWhereInput[]
+    OR?: BlogPostVoteWhereInput[]
+    NOT?: BlogPostVoteWhereInput | BlogPostVoteWhereInput[]
+    postId?: StringFilter<"BlogPostVote"> | string
+    visitorHash?: StringFilter<"BlogPostVote"> | string
+    isUpvote?: BoolFilter<"BlogPostVote"> | boolean
+    createdAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+    post?: XOR<BlogPostScalarRelationFilter, BlogPostWhereInput>
+  }, "id" | "postId_visitorHash">
+
+  export type BlogPostVoteOrderByWithAggregationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    visitorHash?: SortOrder
+    isUpvote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BlogPostVoteCountOrderByAggregateInput
+    _max?: BlogPostVoteMaxOrderByAggregateInput
+    _min?: BlogPostVoteMinOrderByAggregateInput
+  }
+
+  export type BlogPostVoteScalarWhereWithAggregatesInput = {
+    AND?: BlogPostVoteScalarWhereWithAggregatesInput | BlogPostVoteScalarWhereWithAggregatesInput[]
+    OR?: BlogPostVoteScalarWhereWithAggregatesInput[]
+    NOT?: BlogPostVoteScalarWhereWithAggregatesInput | BlogPostVoteScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BlogPostVote"> | string
+    postId?: StringWithAggregatesFilter<"BlogPostVote"> | string
+    visitorHash?: StringWithAggregatesFilter<"BlogPostVote"> | string
+    isUpvote?: BoolWithAggregatesFilter<"BlogPostVote"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"BlogPostVote"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BlogPostVote"> | Date | string
   }
 
   export type BranchWhereInput = {
@@ -90832,11 +92160,14 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     category?: BlogCategoryCreateNestedOneWithoutPostsInput
     author?: userCreateNestedOneWithoutBlogPostsInput
     views?: BlogPostViewCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryCreateNestedManyWithoutPostInput
   }
 
@@ -90854,11 +92185,14 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     authorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     views?: BlogPostViewUncheckedCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteUncheckedCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput
   }
 
@@ -90876,11 +92210,14 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: BlogCategoryUpdateOneWithoutPostsNestedInput
     author?: userUpdateOneWithoutBlogPostsNestedInput
     views?: BlogPostViewUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUpdateManyWithoutPostNestedInput
   }
 
@@ -90898,11 +92235,14 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     views?: BlogPostViewUncheckedUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput
   }
 
@@ -90920,6 +92260,8 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     authorId?: string | null
     createdAt?: Date | string
@@ -90940,6 +92282,8 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -90958,6 +92302,8 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -91058,6 +92404,68 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostVoteCreateInput = {
+    id?: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    post: BlogPostCreateNestedOneWithoutVotesInput
+  }
+
+  export type BlogPostVoteUncheckedCreateInput = {
+    id?: string
+    postId: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostVoteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: BlogPostUpdateOneRequiredWithoutVotesNestedInput
+  }
+
+  export type BlogPostVoteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostVoteCreateManyInput = {
+    id?: string
+    postId: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostVoteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostVoteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BranchCreateInput = {
@@ -96906,6 +98314,12 @@ export namespace Prisma {
     none?: BlogPostViewWhereInput
   }
 
+  export type BlogPostVoteListRelationFilter = {
+    every?: BlogPostVoteWhereInput
+    some?: BlogPostVoteWhereInput
+    none?: BlogPostVoteWhereInput
+  }
+
   export type BlogPostSlugHistoryListRelationFilter = {
     every?: BlogPostSlugHistoryWhereInput
     some?: BlogPostSlugHistoryWhereInput
@@ -96913,6 +98327,10 @@ export namespace Prisma {
   }
 
   export type BlogPostViewOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BlogPostVoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -96934,6 +98352,8 @@ export namespace Prisma {
     publishedAt?: SortOrder
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
     categoryId?: SortOrder
     authorId?: SortOrder
     createdAt?: SortOrder
@@ -96943,6 +98363,8 @@ export namespace Prisma {
   export type BlogPostAvgOrderByAggregateInput = {
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
   }
 
   export type BlogPostMaxOrderByAggregateInput = {
@@ -96959,6 +98381,8 @@ export namespace Prisma {
     publishedAt?: SortOrder
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
     categoryId?: SortOrder
     authorId?: SortOrder
     createdAt?: SortOrder
@@ -96979,6 +98403,8 @@ export namespace Prisma {
     publishedAt?: SortOrder
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
     categoryId?: SortOrder
     authorId?: SortOrder
     createdAt?: SortOrder
@@ -96988,6 +98414,8 @@ export namespace Prisma {
   export type BlogPostSumOrderByAggregateInput = {
     readingMinutes?: SortOrder
     viewCount?: SortOrder
+    upvoteCount?: SortOrder
+    downvoteCount?: SortOrder
   }
 
   export type EnumBlogPostStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -97045,6 +98473,38 @@ export namespace Prisma {
     slug?: SortOrder
     postId?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type BlogPostVotePostIdVisitorHashCompoundUniqueInput = {
+    postId: string
+    visitorHash: string
+  }
+
+  export type BlogPostVoteCountOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    visitorHash?: SortOrder
+    isUpvote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BlogPostVoteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    visitorHash?: SortOrder
+    isUpvote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BlogPostVoteMinOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    visitorHash?: SortOrder
+    isUpvote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -102145,6 +103605,13 @@ export namespace Prisma {
     connect?: BlogPostViewWhereUniqueInput | BlogPostViewWhereUniqueInput[]
   }
 
+  export type BlogPostVoteCreateNestedManyWithoutPostInput = {
+    create?: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput> | BlogPostVoteCreateWithoutPostInput[] | BlogPostVoteUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: BlogPostVoteCreateOrConnectWithoutPostInput | BlogPostVoteCreateOrConnectWithoutPostInput[]
+    createMany?: BlogPostVoteCreateManyPostInputEnvelope
+    connect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+  }
+
   export type BlogPostSlugHistoryCreateNestedManyWithoutPostInput = {
     create?: XOR<BlogPostSlugHistoryCreateWithoutPostInput, BlogPostSlugHistoryUncheckedCreateWithoutPostInput> | BlogPostSlugHistoryCreateWithoutPostInput[] | BlogPostSlugHistoryUncheckedCreateWithoutPostInput[]
     connectOrCreate?: BlogPostSlugHistoryCreateOrConnectWithoutPostInput | BlogPostSlugHistoryCreateOrConnectWithoutPostInput[]
@@ -102157,6 +103624,13 @@ export namespace Prisma {
     connectOrCreate?: BlogPostViewCreateOrConnectWithoutPostInput | BlogPostViewCreateOrConnectWithoutPostInput[]
     createMany?: BlogPostViewCreateManyPostInputEnvelope
     connect?: BlogPostViewWhereUniqueInput | BlogPostViewWhereUniqueInput[]
+  }
+
+  export type BlogPostVoteUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput> | BlogPostVoteCreateWithoutPostInput[] | BlogPostVoteUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: BlogPostVoteCreateOrConnectWithoutPostInput | BlogPostVoteCreateOrConnectWithoutPostInput[]
+    createMany?: BlogPostVoteCreateManyPostInputEnvelope
+    connect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
   }
 
   export type BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput = {
@@ -102204,6 +103678,20 @@ export namespace Prisma {
     deleteMany?: BlogPostViewScalarWhereInput | BlogPostViewScalarWhereInput[]
   }
 
+  export type BlogPostVoteUpdateManyWithoutPostNestedInput = {
+    create?: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput> | BlogPostVoteCreateWithoutPostInput[] | BlogPostVoteUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: BlogPostVoteCreateOrConnectWithoutPostInput | BlogPostVoteCreateOrConnectWithoutPostInput[]
+    upsert?: BlogPostVoteUpsertWithWhereUniqueWithoutPostInput | BlogPostVoteUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: BlogPostVoteCreateManyPostInputEnvelope
+    set?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    disconnect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    delete?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    connect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    update?: BlogPostVoteUpdateWithWhereUniqueWithoutPostInput | BlogPostVoteUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: BlogPostVoteUpdateManyWithWhereWithoutPostInput | BlogPostVoteUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: BlogPostVoteScalarWhereInput | BlogPostVoteScalarWhereInput[]
+  }
+
   export type BlogPostSlugHistoryUpdateManyWithoutPostNestedInput = {
     create?: XOR<BlogPostSlugHistoryCreateWithoutPostInput, BlogPostSlugHistoryUncheckedCreateWithoutPostInput> | BlogPostSlugHistoryCreateWithoutPostInput[] | BlogPostSlugHistoryUncheckedCreateWithoutPostInput[]
     connectOrCreate?: BlogPostSlugHistoryCreateOrConnectWithoutPostInput | BlogPostSlugHistoryCreateOrConnectWithoutPostInput[]
@@ -102230,6 +103718,20 @@ export namespace Prisma {
     update?: BlogPostViewUpdateWithWhereUniqueWithoutPostInput | BlogPostViewUpdateWithWhereUniqueWithoutPostInput[]
     updateMany?: BlogPostViewUpdateManyWithWhereWithoutPostInput | BlogPostViewUpdateManyWithWhereWithoutPostInput[]
     deleteMany?: BlogPostViewScalarWhereInput | BlogPostViewScalarWhereInput[]
+  }
+
+  export type BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput> | BlogPostVoteCreateWithoutPostInput[] | BlogPostVoteUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: BlogPostVoteCreateOrConnectWithoutPostInput | BlogPostVoteCreateOrConnectWithoutPostInput[]
+    upsert?: BlogPostVoteUpsertWithWhereUniqueWithoutPostInput | BlogPostVoteUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: BlogPostVoteCreateManyPostInputEnvelope
+    set?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    disconnect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    delete?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    connect?: BlogPostVoteWhereUniqueInput | BlogPostVoteWhereUniqueInput[]
+    update?: BlogPostVoteUpdateWithWhereUniqueWithoutPostInput | BlogPostVoteUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: BlogPostVoteUpdateManyWithWhereWithoutPostInput | BlogPostVoteUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: BlogPostVoteScalarWhereInput | BlogPostVoteScalarWhereInput[]
   }
 
   export type BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput = {
@@ -102272,6 +103774,20 @@ export namespace Prisma {
     upsert?: BlogPostUpsertWithoutSlugHistoryInput
     connect?: BlogPostWhereUniqueInput
     update?: XOR<XOR<BlogPostUpdateToOneWithWhereWithoutSlugHistoryInput, BlogPostUpdateWithoutSlugHistoryInput>, BlogPostUncheckedUpdateWithoutSlugHistoryInput>
+  }
+
+  export type BlogPostCreateNestedOneWithoutVotesInput = {
+    create?: XOR<BlogPostCreateWithoutVotesInput, BlogPostUncheckedCreateWithoutVotesInput>
+    connectOrCreate?: BlogPostCreateOrConnectWithoutVotesInput
+    connect?: BlogPostWhereUniqueInput
+  }
+
+  export type BlogPostUpdateOneRequiredWithoutVotesNestedInput = {
+    create?: XOR<BlogPostCreateWithoutVotesInput, BlogPostUncheckedCreateWithoutVotesInput>
+    connectOrCreate?: BlogPostCreateOrConnectWithoutVotesInput
+    upsert?: BlogPostUpsertWithoutVotesInput
+    connect?: BlogPostWhereUniqueInput
+    update?: XOR<XOR<BlogPostUpdateToOneWithWhereWithoutVotesInput, BlogPostUpdateWithoutVotesInput>, BlogPostUncheckedUpdateWithoutVotesInput>
   }
 
   export type CompanyCreateNestedOneWithoutBranchesInput = {
@@ -108892,10 +110408,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     category?: BlogCategoryCreateNestedOneWithoutPostsInput
     views?: BlogPostViewCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryCreateNestedManyWithoutPostInput
   }
 
@@ -108913,10 +110432,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     views?: BlogPostViewUncheckedCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteUncheckedCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput
   }
 
@@ -109573,6 +111095,8 @@ export namespace Prisma {
     publishedAt?: DateTimeNullableFilter<"BlogPost"> | Date | string | null
     readingMinutes?: IntFilter<"BlogPost"> | number
     viewCount?: IntFilter<"BlogPost"> | number
+    upvoteCount?: IntFilter<"BlogPost"> | number
+    downvoteCount?: IntFilter<"BlogPost"> | number
     categoryId?: StringNullableFilter<"BlogPost"> | string | null
     authorId?: StringNullableFilter<"BlogPost"> | string | null
     createdAt?: DateTimeFilter<"BlogPost"> | Date | string
@@ -110442,10 +111966,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     author?: userCreateNestedOneWithoutBlogPostsInput
     views?: BlogPostViewCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryCreateNestedManyWithoutPostInput
   }
 
@@ -110463,10 +111990,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     authorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     views?: BlogPostViewUncheckedCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteUncheckedCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput
   }
 
@@ -110621,6 +112151,32 @@ export namespace Prisma {
 
   export type BlogPostViewCreateManyPostInputEnvelope = {
     data: BlogPostViewCreateManyPostInput | BlogPostViewCreateManyPostInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BlogPostVoteCreateWithoutPostInput = {
+    id?: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostVoteUncheckedCreateWithoutPostInput = {
+    id?: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BlogPostVoteCreateOrConnectWithoutPostInput = {
+    where: BlogPostVoteWhereUniqueInput
+    create: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput>
+  }
+
+  export type BlogPostVoteCreateManyPostInputEnvelope = {
+    data: BlogPostVoteCreateManyPostInput | BlogPostVoteCreateManyPostInput[]
     skipDuplicates?: boolean
   }
 
@@ -110787,6 +112343,34 @@ export namespace Prisma {
     referrerHost?: StringNullableFilter<"BlogPostView"> | string | null
   }
 
+  export type BlogPostVoteUpsertWithWhereUniqueWithoutPostInput = {
+    where: BlogPostVoteWhereUniqueInput
+    update: XOR<BlogPostVoteUpdateWithoutPostInput, BlogPostVoteUncheckedUpdateWithoutPostInput>
+    create: XOR<BlogPostVoteCreateWithoutPostInput, BlogPostVoteUncheckedCreateWithoutPostInput>
+  }
+
+  export type BlogPostVoteUpdateWithWhereUniqueWithoutPostInput = {
+    where: BlogPostVoteWhereUniqueInput
+    data: XOR<BlogPostVoteUpdateWithoutPostInput, BlogPostVoteUncheckedUpdateWithoutPostInput>
+  }
+
+  export type BlogPostVoteUpdateManyWithWhereWithoutPostInput = {
+    where: BlogPostVoteScalarWhereInput
+    data: XOR<BlogPostVoteUpdateManyMutationInput, BlogPostVoteUncheckedUpdateManyWithoutPostInput>
+  }
+
+  export type BlogPostVoteScalarWhereInput = {
+    AND?: BlogPostVoteScalarWhereInput | BlogPostVoteScalarWhereInput[]
+    OR?: BlogPostVoteScalarWhereInput[]
+    NOT?: BlogPostVoteScalarWhereInput | BlogPostVoteScalarWhereInput[]
+    id?: StringFilter<"BlogPostVote"> | string
+    postId?: StringFilter<"BlogPostVote"> | string
+    visitorHash?: StringFilter<"BlogPostVote"> | string
+    isUpvote?: BoolFilter<"BlogPostVote"> | boolean
+    createdAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+    updatedAt?: DateTimeFilter<"BlogPostVote"> | Date | string
+  }
+
   export type BlogPostSlugHistoryUpsertWithWhereUniqueWithoutPostInput = {
     where: BlogPostSlugHistoryWhereUniqueInput
     update: XOR<BlogPostSlugHistoryUpdateWithoutPostInput, BlogPostSlugHistoryUncheckedUpdateWithoutPostInput>
@@ -110826,10 +112410,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     category?: BlogCategoryCreateNestedOneWithoutPostsInput
     author?: userCreateNestedOneWithoutBlogPostsInput
+    votes?: BlogPostVoteCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryCreateNestedManyWithoutPostInput
   }
 
@@ -110847,10 +112434,13 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     authorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    votes?: BlogPostVoteUncheckedCreateNestedManyWithoutPostInput
     slugHistory?: BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput
   }
 
@@ -110884,10 +112474,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: BlogCategoryUpdateOneWithoutPostsNestedInput
     author?: userUpdateOneWithoutBlogPostsNestedInput
+    votes?: BlogPostVoteUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUpdateManyWithoutPostNestedInput
   }
 
@@ -110905,10 +112498,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    votes?: BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput
   }
 
@@ -110926,11 +112522,14 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     category?: BlogCategoryCreateNestedOneWithoutPostsInput
     author?: userCreateNestedOneWithoutBlogPostsInput
     views?: BlogPostViewCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteCreateNestedManyWithoutPostInput
   }
 
   export type BlogPostUncheckedCreateWithoutSlugHistoryInput = {
@@ -110947,11 +112546,14 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     authorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     views?: BlogPostViewUncheckedCreateNestedManyWithoutPostInput
+    votes?: BlogPostVoteUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type BlogPostCreateOrConnectWithoutSlugHistoryInput = {
@@ -110984,11 +112586,14 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: BlogCategoryUpdateOneWithoutPostsNestedInput
     author?: userUpdateOneWithoutBlogPostsNestedInput
     views?: BlogPostViewUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUpdateManyWithoutPostNestedInput
   }
 
   export type BlogPostUncheckedUpdateWithoutSlugHistoryInput = {
@@ -111005,11 +112610,126 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     views?: BlogPostViewUncheckedUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput
+  }
+
+  export type BlogPostCreateWithoutVotesInput = {
+    id?: string
+    slug: string
+    title: string
+    excerpt: string
+    content: string
+    coverImageUrl?: string | null
+    coverImageAlt?: string | null
+    metaTitle?: string | null
+    metaDescription?: string | null
+    status?: $Enums.BlogPostStatus
+    publishedAt?: Date | string | null
+    readingMinutes?: number
+    viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    category?: BlogCategoryCreateNestedOneWithoutPostsInput
+    author?: userCreateNestedOneWithoutBlogPostsInput
+    views?: BlogPostViewCreateNestedManyWithoutPostInput
+    slugHistory?: BlogPostSlugHistoryCreateNestedManyWithoutPostInput
+  }
+
+  export type BlogPostUncheckedCreateWithoutVotesInput = {
+    id?: string
+    slug: string
+    title: string
+    excerpt: string
+    content: string
+    coverImageUrl?: string | null
+    coverImageAlt?: string | null
+    metaTitle?: string | null
+    metaDescription?: string | null
+    status?: $Enums.BlogPostStatus
+    publishedAt?: Date | string | null
+    readingMinutes?: number
+    viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
+    categoryId?: string | null
+    authorId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    views?: BlogPostViewUncheckedCreateNestedManyWithoutPostInput
+    slugHistory?: BlogPostSlugHistoryUncheckedCreateNestedManyWithoutPostInput
+  }
+
+  export type BlogPostCreateOrConnectWithoutVotesInput = {
+    where: BlogPostWhereUniqueInput
+    create: XOR<BlogPostCreateWithoutVotesInput, BlogPostUncheckedCreateWithoutVotesInput>
+  }
+
+  export type BlogPostUpsertWithoutVotesInput = {
+    update: XOR<BlogPostUpdateWithoutVotesInput, BlogPostUncheckedUpdateWithoutVotesInput>
+    create: XOR<BlogPostCreateWithoutVotesInput, BlogPostUncheckedCreateWithoutVotesInput>
+    where?: BlogPostWhereInput
+  }
+
+  export type BlogPostUpdateToOneWithWhereWithoutVotesInput = {
+    where?: BlogPostWhereInput
+    data: XOR<BlogPostUpdateWithoutVotesInput, BlogPostUncheckedUpdateWithoutVotesInput>
+  }
+
+  export type BlogPostUpdateWithoutVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    coverImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBlogPostStatusFieldUpdateOperationsInput | $Enums.BlogPostStatus
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    category?: BlogCategoryUpdateOneWithoutPostsNestedInput
+    author?: userUpdateOneWithoutBlogPostsNestedInput
+    views?: BlogPostViewUpdateManyWithoutPostNestedInput
+    slugHistory?: BlogPostSlugHistoryUpdateManyWithoutPostNestedInput
+  }
+
+  export type BlogPostUncheckedUpdateWithoutVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    excerpt?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    coverImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    coverImageAlt?: NullableStringFieldUpdateOperationsInput | string | null
+    metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBlogPostStatusFieldUpdateOperationsInput | $Enums.BlogPostStatus
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    readingMinutes?: IntFieldUpdateOperationsInput | number
+    viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    views?: BlogPostViewUncheckedUpdateManyWithoutPostNestedInput
+    slugHistory?: BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type CompanyCreateWithoutBranchesInput = {
@@ -122469,6 +124189,8 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     categoryId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -123445,10 +125167,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     category?: BlogCategoryUpdateOneWithoutPostsNestedInput
     views?: BlogPostViewUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUpdateManyWithoutPostNestedInput
   }
 
@@ -123466,10 +125191,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     views?: BlogPostViewUncheckedUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput
   }
 
@@ -123487,6 +125215,8 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -123789,6 +125519,8 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     readingMinutes?: number
     viewCount?: number
+    upvoteCount?: number
+    downvoteCount?: number
     authorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -123808,10 +125540,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     author?: userUpdateOneWithoutBlogPostsNestedInput
     views?: BlogPostViewUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUpdateManyWithoutPostNestedInput
   }
 
@@ -123829,10 +125564,13 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     views?: BlogPostViewUncheckedUpdateManyWithoutPostNestedInput
+    votes?: BlogPostVoteUncheckedUpdateManyWithoutPostNestedInput
     slugHistory?: BlogPostSlugHistoryUncheckedUpdateManyWithoutPostNestedInput
   }
 
@@ -123850,6 +125588,8 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     readingMinutes?: IntFieldUpdateOperationsInput | number
     viewCount?: IntFieldUpdateOperationsInput | number
+    upvoteCount?: IntFieldUpdateOperationsInput | number
+    downvoteCount?: IntFieldUpdateOperationsInput | number
     authorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -123860,6 +125600,14 @@ export namespace Prisma {
     viewedAt?: Date | string
     visitorHash: string
     referrerHost?: string | null
+  }
+
+  export type BlogPostVoteCreateManyPostInput = {
+    id?: string
+    visitorHash: string
+    isUpvote: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type BlogPostSlugHistoryCreateManyPostInput = {
@@ -123886,6 +125634,30 @@ export namespace Prisma {
     viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     visitorHash?: StringFieldUpdateOperationsInput | string
     referrerHost?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BlogPostVoteUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostVoteUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BlogPostVoteUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    visitorHash?: StringFieldUpdateOperationsInput | string
+    isUpvote?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BlogPostSlugHistoryUpdateWithoutPostInput = {

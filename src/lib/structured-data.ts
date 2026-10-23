@@ -205,6 +205,9 @@ export interface WebPageSchemaOptions {
   /** ISO 8601, e.g. '2024-01-01' */
   datePublished?: string;
   dateModified?: string;
+  speakable?: {
+    cssSelector: string[];
+  };
 }
 
 /** WebPage schema — attach to every public page. */
@@ -221,6 +224,14 @@ export function webPageSchema(opts: WebPageSchemaOptions): WithContext<unknown> 
     ...(opts.datePublished ? { datePublished: opts.datePublished } : {}),
     ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
     inLanguage: 'id-ID',
+    ...(opts.speakable
+      ? {
+          speakable: {
+            '@type': 'SpeakableSpecification',
+            cssSelector: opts.speakable.cssSelector,
+          },
+        }
+      : {}),
   };
 }
 
@@ -312,6 +323,7 @@ export interface BlogPostingSchemaOptions {
   image?: string;
   section?: string;
   wordCount?: number;
+  keywords?: string[];
 }
 
 /**
@@ -331,12 +343,41 @@ export function blogPostingSchema(opts: BlogPostingSchemaOptions): WithContext<u
     datePublished: opts.datePublished,
     dateModified: opts.dateModified,
     inLanguage: 'id-ID',
-    author: { '@id': ORG_ID },
-    publisher: { '@id': ORG_ID },
+    author: {
+      '@type': 'Organization',
+      '@id': ORG_ID,
+      name: siteConfig.company.legalName,
+      url: siteConfig.url,
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': ORG_ID,
+      name: siteConfig.company.legalName,
+      url: siteConfig.url,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteConfig.url}/images/logo/logo-red.png`,
+      },
+    },
     image: opts.image ?? `${siteConfig.url}${siteConfig.ogImage}`,
     isPartOf: { '@id': WEBSITE_ID },
+    contentLocation: {
+      '@type': 'Place',
+      name: 'DKI Jakarta & Tangerang, Indonesia',
+    },
+    spatialCoverage: [
+      'DKI Jakarta',
+      'Jakarta Barat',
+      'Jakarta Selatan',
+      'Jakarta Pusat',
+      'Jakarta Utara',
+      'Jakarta Timur',
+      'Tangerang',
+      'Indonesia',
+    ],
     ...(opts.section ? { articleSection: opts.section } : {}),
     ...(opts.wordCount ? { wordCount: opts.wordCount } : {}),
+    ...(opts.keywords && opts.keywords.length > 0 ? { keywords: opts.keywords } : {}),
   };
 }
 

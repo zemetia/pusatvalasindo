@@ -13,6 +13,7 @@ import {
   type BlogCategoryRow,
 } from "@/backend/repositories/blog-category.repository";
 import { blogViewRepository } from "@/backend/repositories/blog-view.repository";
+import { blogVoteRepository, type VoteStatus } from "@/backend/repositories/blog-vote.repository";
 import type { ReferrerRow, TopPostRow } from "@/backend/repositories/blog-analytics.queries";
 import type { Prisma } from "@src/generated/prisma/client";
 import { readingMinutes } from "@/lib/blog/content";
@@ -44,10 +45,12 @@ export const PUBLIC_PAGE_SIZE = 12;
  */
 function revalidateBlog(): void {
   try {
+    revalidatePath("/[locale]", "page");
     revalidatePath("/[locale]/blog", "page");
     revalidatePath("/[locale]/blog/kategori/[slug]", "page");
     revalidatePath("/[locale]/blog/[slug]", "page");
     revalidatePath("/sitemap.xml");
+    revalidatePath("/feed.xml");
     revalidatePath("/llms.txt");
     revalidatePath("/llms-full.txt");
   } catch (e) {
@@ -428,12 +431,20 @@ export const blogService = {
     return { category, ...(await blogService.listLivePosts(page, now, category.id)) };
   },
 
+  listRecentPosts(limit = 5, now: Date = new Date()): Promise<BlogPostPublicRow[]> {
+    return blogPostRepository.listLive({ limit, offset: 0, now });
+  },
+
   getRelatedPosts(postId: string, categoryId: string | null, limit = 3, now: Date = new Date()) {
     return blogPostRepository.listRelated(postId, categoryId, limit, now);
   },
 
   listForFeeds(now: Date = new Date()) {
     return blogPostRepository.listLiveForFeeds(now);
+  },
+
+  listForFullFeeds(limit = 20, now: Date = new Date()) {
+    return blogPostRepository.listLiveForFullFeeds(limit, now);
   },
 
   /**
@@ -467,5 +478,60 @@ export const blogService = {
       now
     );
     return "counted";
+  },
+
+  /**
+   * Mencatat tanggapan pembaca ("Apakah artikel ini membantu?").
+   * Bot diabaikan, artikel harus tayang.
+   */
+  async recordVote(
+    input: {
+      postId: string;
+      vote: VoteStatus;
+      ip: string;
+      userAgent: string;
+    },
+    now: Date = new Date()
+  ): Promise<{
+    status: "counted" | "bot" | "not_found";
+    data?: { upvoteCount: number; downvoteCount: number; userVote: VoteStatus };
+  }> {
+    if (isBotUserAgent(input.userAgent)) return { status: "bot" };
+    const post = await blogPostRepository.findLiveId(input.postId, now);
+    if (!post) return { status: "not_found" };
+
+    const secret = process.env.BETTER_AUTH_SECRET ?? "pvi-blog-votes";
+    const hash = visitorHash(input.ip, input.userAgent, "feedback-vote", secret);
+    const data = await blogVoteRepository.recordVote(post.id, hash, input.vote);
+    return { status: "counted", data };
+  },
+
+  /** Mengambil status vote dan jumlah terkini untuk artikel tayang. */
+  async getVoteStatus(
+    postId: string,
+    ip: string,
+    userAgent: string,
+    now: Date = new Date()
+  ): Promise<{
+    status: "ok" | "not_found";
+    data?: { upvoteCount: number; downvoteCount: number; userVote: VoteStatus };
+  }> {
+    const post = await blogPostRepository.findLiveId(postId, now);
+    if (!post) return { status: "not_found" };
+
+    const secret = process.env.BETTER_AUTH_SECRET ?? "pvi-blog-votes";
+    const hash = visitorHash(ip, userAgent, "feedback-vote", secret);
+    const [counts, userVote] = await Promise.all([
+      blogVoteRepository.getCounts(post.id),
+      blogVoteRepository.findUserVote(post.id, hash),
+    ]);
+    return {
+      status: "ok",
+      data: {
+        upvoteCount: counts.upvoteCount,
+        downvoteCount: counts.downvoteCount,
+        userVote,
+      },
+    };
   },
 };

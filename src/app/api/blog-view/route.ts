@@ -4,6 +4,7 @@ import { ok } from "@/backend/helpers/api-response";
 import { handleError } from "@/backend/helpers/handle-error";
 import { ValidationError } from "@/backend/errors/app-error";
 import { blogService } from "@/backend/services/blog.service";
+import { blogPostRepository } from "@/backend/repositories/blog-post.repository";
 import { siteConfig } from "@/config/site";
 import { blogViewSchema } from "@/lib/validations/blog";
 
@@ -40,7 +41,13 @@ export async function POST(req: NextRequest) {
       referrer: parsed.data.referrer ?? null,
       ownHosts: [new URL(siteConfig.url).host, req.headers.get("host")],
     });
-    return NextResponse.json(ok({ counted: result === "counted" }));
+    let viewCount: number | undefined;
+    if (result === "counted") {
+      const live = await blogPostRepository.findLiveId(parsed.data.postId);
+      if (live) viewCount = live.viewCount;
+    }
+
+    return NextResponse.json(ok({ counted: result === "counted", viewCount }));
   } catch (e) {
     return handleError(e);
   }

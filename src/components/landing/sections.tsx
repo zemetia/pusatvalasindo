@@ -518,3 +518,6 @@ export function FinalCta() {
     </Section>
   );
 }
+
+
+export { LatestNews } from './latest-news';

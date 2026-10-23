@@ -23,17 +23,20 @@ function formatBadgeCount(count: number) {
   return count > 99 ? "99+" : String(count);
 }
 
+export interface NavItem {
+  title: string;
+  url: string;
+  icon?: Icon;
+  exact?: boolean;
+  badge?: number;
+  target?: string;
+}
+
 function NavMenu({
   items,
   pathname,
 }: {
-  items: {
-    title: string;
-    url: string;
-    icon?: Icon;
-    exact?: boolean;
-    badge?: number;
-  }[];
+  items: NavItem[];
   pathname: string;
 }) {
   return (
@@ -45,7 +48,12 @@ function NavMenu({
 
         return (
           <SidebarMenuItem key={item.title}>
-            <Link href={item.url} className="w-full">
+            <Link
+              href={item.url}
+              target={item.target}
+              rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+              className="w-full"
+            >
               {/* Item aktif ditandai lewat latar lembut + ikon merah brand.
                   Tidak ada geser/bold saat hover — di daftar sepanjang ini
                   gerakan per item justru membuat sidebar terasa gelisah. */}
@@ -79,13 +87,7 @@ export function NavMain({
   items,
   label,
 }: {
-  items: {
-    title: string;
-    url: string;
-    icon?: Icon;
-    exact?: boolean;
-    badge?: number;
-  }[];
+  items: NavItem[];
   label?: string;
 }) {
   const pathname = usePathname();

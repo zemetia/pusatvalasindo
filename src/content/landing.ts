@@ -6,12 +6,59 @@ import { entities, type Branch } from '@/config/group';
  */
 
 /** Tautan nyata (bukan anchor) supaya menu berfungsi di semua halaman dan menjadi tautan internal. */
+export const groupNavItems = [
+  {
+    code: 'PVI',
+    name: 'PT Pusat Valas Indo',
+    tag: 'Money Changer Berizin BI',
+    badge: 'Izin BI',
+    desc: 'Layanan jual beli valuta asing resmi berizin Bank Indonesia.',
+    href: '/pusat-valas-indo',
+  },
+  {
+    code: 'PKD',
+    name: 'PT Pusat Kirim Duit',
+    tag: 'Remitansi Internasional',
+    badge: 'Remitansi',
+    desc: 'Transfer dana ke luar negeri untuk bisnis & personal.',
+    href: '/pusat-kirim-duit',
+  },
+  {
+    code: 'PTU',
+    name: 'PT Pusat Tukar Uang',
+    tag: 'Afiliasi Satu Kantor',
+    badge: 'Afiliasi',
+    desc: 'Money changer rekanan satu atap di cabang operasional PVI.',
+    href: '/#grup',
+  },
+] as const;
+
+export const branchNavItems = [
+  {
+    slug: 'cengkareng',
+    name: 'Cabang Cengkareng',
+    badge: 'Kantor Pusat',
+    area: 'Jakarta Barat',
+    address: 'Ruko Mutiara Taman Palem A5-27, Cengkareng Timur',
+    hours: 'Sen–Jum 08:00–16:30 · Sab 08:00–14:00',
+    whatsapp: '0817-7009-9920',
+    href: '/lokasi/cengkareng',
+  },
+  {
+    slug: 'tangerang',
+    name: 'Cabang Tangerang',
+    badge: 'Green Lake City',
+    area: 'Kota Tangerang',
+    address: 'Jl. Green Lake City Boulevard, Rukan Wallstreet A No. 16',
+    hours: 'Sen–Jum 08:00–16:30 · Sab 08:00–14:00',
+    whatsapp: '0823-3380-0080',
+    href: '/lokasi/tangerang',
+  },
+] as const;
+
 export const nav = [
-  { href: '/pusat-valas-indo', label: 'Tukar Valas' },
-  { href: '/pusat-kirim-duit', label: 'Kirim Uang' },
-  { href: '/lokasi/cengkareng', label: 'Cengkareng' },
-  { href: '/lokasi/tangerang', label: 'Tangerang' },
-  { href: '/money-changer-terbaik', label: 'Cara Memilih' },
+  { href: '/#grup', label: 'Group' },
+  { href: '/#lokasi', label: 'Cabang' },
   { href: '/blog', label: 'Blog' },
   { href: '/#faq', label: 'FAQ' },
 ];
@@ -27,6 +74,7 @@ export const internalLinks = [
   { href: '/lokasi/cengkareng', label: 'Money changer Cengkareng, Jakarta Barat', desc: 'Alamat, jam buka, dan petunjuk ke Taman Palem.' },
   { href: '/lokasi/tangerang', label: 'Money changer Tangerang, Green Lake City', desc: 'Alamat Rukan Wallstreet, jam buka, dan WhatsApp.' },
   { href: '/money-changer-terbaik', label: 'Cara memilih money changer terbaik', desc: 'Enam kriteria yang bisa Anda periksa sendiri.' },
+  { href: '/blog', label: 'Blog & panduan kurs valuta asing', desc: 'Tips tukar uang, panduan kurs valas, dan kirim uang ke luar negeri.' },
 ] as const;
 
 export function relatedLinks(currentPath: string) {

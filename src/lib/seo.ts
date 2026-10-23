@@ -21,6 +21,8 @@ export interface BuildMetadataOptions {
   ogImage?: string;
   /** Set true for noindex/nofollow (e.g. private/auth pages) */
   noIndex?: boolean;
+  /** Optional keywords for topic categorization */
+  keywords?: string[];
 }
 
 /** Build hreflang alternate map for all supported locales. */
@@ -56,6 +58,7 @@ export function buildMetadata({
   locale,
   ogImage,
   noIndex = false,
+  keywords,
 }: BuildMetadataOptions): Metadata {
   const resolvedTitle = title ?? siteConfig.seo.defaultTitle;
   const resolvedDescription = description ?? siteConfig.description;
@@ -71,6 +74,7 @@ export function buildMetadata({
       ? { template: siteConfig.seo.titleTemplate, default: title }
       : siteConfig.seo.defaultTitle,
     description: resolvedDescription,
+    ...(keywords && keywords.length > 0 ? { keywords } : {}),
     metadataBase: new URL(siteConfig.url),
 
     icons: {
@@ -85,6 +89,9 @@ export function buildMetadata({
     alternates: {
       canonical: canonicalUrl,
       languages: buildAlternates(path),
+      types: {
+        'application/rss+xml': `${siteConfig.url}/feed.xml`,
+      },
     },
 
     openGraph: {

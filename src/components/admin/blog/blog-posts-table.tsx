@@ -9,6 +9,8 @@ import {
   IconExternalLink,
   IconEye,
   IconEyeOff,
+  IconLock,
+  IconX,
   IconPencil,
   IconPlus,
   IconTrash,
@@ -18,6 +20,7 @@ import { EmptyState, SectionCard, ToolbarSpacer } from "@/components/admin/page-
 import { SearchInput } from "@/components/admin/search-input";
 import { SegmentedFilter } from "@/components/admin/segmented-filter";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,18 +70,53 @@ export function BlogPostsTable({
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [categoryId, setCategoryId] = useState("ALL");
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<BlogPostRowDTO | null>(null);
+  const [sort, setSort] = useState<"recent" | "views">("recent");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  // Artikel yang akan dihapus (satu dari menu baris, atau banyak dari aksi massal).
+  const [deleteTargets, setDeleteTargets] = useState<BlogPostRowDTO[]>([]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return posts.filter((p) => {
+    const rows = posts.filter((p) => {
       if (status !== "ALL" && p.status !== status) return false;
       if (categoryId === "none" && p.category) return false;
       if (categoryId !== "ALL" && categoryId !== "none" && p.category?.id !== categoryId) return false;
       if (!q) return true;
       return p.title.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q);
     });
-  }, [posts, search, status, categoryId]);
+    return sort === "views" ? [...rows].sort((a, b) => b.rangeViews - a.rangeViews) : rows;
+  }, [posts, search, status, categoryId, sort]);
+
+  const visibleIds = filtered.map((p) => p.id);
+  const selectedVisible = visibleIds.filter((id) => selected.has(id));
+  const allSelected = visibleIds.length > 0 && selectedVisible.length === visibleIds.length;
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(visibleIds));
+  }
+
+  async function bulkStatus(next: "DRAFT" | "PUBLISHED" | "ARCHIVED", okMessage: string) {
+    const ids = selectedVisible;
+    setBulkBusy(true);
+    const results = await Promise.allSettled(
+      ids.map((id) => blogApi(`/api/blog/posts/${id}`, { method: "PATCH", body: JSON.stringify({ status: next }) }))
+    );
+    const failed = results.filter((r) => r.status === "rejected").length;
+    if (failed) toast.error(`${failed} dari ${ids.length} artikel gagal diubah`);
+    else toast.success(`${okMessage} (${ids.length})`);
+    setSelected(new Set());
+    setBulkBusy(false);
+    router.refresh();
+  }
 
   async function changeStatus(post: BlogPostRowDTO, next: "DRAFT" | "PUBLISHED" | "ARCHIVED", okMessage: string) {
     setBusyId(post.id);
@@ -94,19 +132,17 @@ export function BlogPostsTable({
   }
 
   async function confirmDelete() {
-    const target = deleteTarget;
-    if (!target) return;
-    setBusyId(target.id);
-    try {
-      await blogApi(`/api/blog/posts/${target.id}`, { method: "DELETE" });
-      toast.success("Artikel dihapus");
-      router.refresh();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gagal menghapus artikel");
-    } finally {
-      setBusyId(null);
-      setDeleteTarget(null);
-    }
+    const targets = deleteTargets;
+    if (targets.length === 0) return;
+    setBulkBusy(true);
+    const results = await Promise.allSettled(targets.map((t) => blogApi(`/api/blog/posts/${t.id}`, { method: "DELETE" })));
+    const failed = results.filter((r) => r.status === "rejected").length;
+    if (failed) toast.error(`${failed} dari ${targets.length} artikel gagal dihapus`);
+    else toast.success(targets.length > 1 ? `${targets.length} artikel dihapus` : "Artikel dihapus");
+    setSelected(new Set());
+    setBulkBusy(false);
+    setDeleteTargets([]);
+    router.refresh();
   }
 
   const statusOptions = [
@@ -146,6 +182,15 @@ export function BlogPostsTable({
               </select>
             )}
             <ToolbarSpacer />
+            <select
+              aria-label="Urutkan"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as "recent" | "views")}
+              className="border-input bg-background h-9 rounded-md border px-2 text-sm"
+            >
+              <option value="recent">Terbaru diperbarui</option>
+              <option value="views">Paling banyak dibaca</option>
+            </select>
           </>
         }
         footer={
@@ -170,10 +215,42 @@ export function BlogPostsTable({
         ) : filtered.length === 0 ? (
           <EmptyState title="Tidak ada artikel yang cocok" description="Ubah kata kunci atau filter di atas." />
         ) : (
+          <>
+          {canWrite && selectedVisible.length > 0 && (
+            <div className="bg-primary/5 flex flex-wrap items-center gap-2 border-b px-5 py-2.5 text-sm">
+              <span className="tabular mr-2 font-medium">{selectedVisible.length} dipilih</span>
+              <Button size="sm" variant="outline" disabled={bulkBusy} onClick={() => void bulkStatus("PUBLISHED", "Diterbitkan")}>
+                <IconEye className="size-4" /> Terbitkan
+              </Button>
+              <Button size="sm" variant="outline" disabled={bulkBusy} onClick={() => void bulkStatus("DRAFT", "Dijadikan privat")}>
+                <IconLock className="size-4" /> Jadikan privat
+              </Button>
+              <Button size="sm" variant="outline" disabled={bulkBusy} onClick={() => void bulkStatus("ARCHIVED", "Diarsipkan")}>
+                <IconArchive className="size-4" /> Arsipkan
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-destructive"
+                disabled={bulkBusy}
+                onClick={() => setDeleteTargets(filtered.filter((p) => selected.has(p.id)))}
+              >
+                <IconTrash className="size-4" /> Hapus
+              </Button>
+              <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setSelected(new Set())}>
+                <IconX className="size-4" /> Batal
+              </Button>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-muted-foreground pl-5 text-xs font-medium tracking-wide uppercase">Artikel</TableHead>
+                {canWrite && (
+                  <TableHead className="w-10 pl-5">
+                    <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Pilih semua artikel" />
+                  </TableHead>
+                )}
+                <TableHead className={`text-muted-foreground text-xs font-medium tracking-wide uppercase ${canWrite ? "" : "pl-5"}`}>Artikel</TableHead>
                 <TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">Status</TableHead>
                 <TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
                   Tampilan
@@ -194,8 +271,13 @@ export function BlogPostsTable({
               {filtered.map((p) => {
                 const busy = busyId === p.id;
                 return (
-                  <TableRow key={p.id} className={busy ? "opacity-60" : undefined}>
-                    <TableCell className="max-w-[28rem] pl-5">
+                  <TableRow key={p.id} data-state={selected.has(p.id) ? "selected" : undefined} className={busy ? "opacity-60" : undefined}>
+                    {canWrite && (
+                      <TableCell className="w-10 pl-5">
+                        <Checkbox checked={selected.has(p.id)} onCheckedChange={() => toggle(p.id)} aria-label={`Pilih ${p.title}`} />
+                      </TableCell>
+                    )}
+                    <TableCell className={`max-w-[28rem] ${canWrite ? "" : "pl-5"}`}>
                       <Link
                         href={`/dashboard/blog/${p.id}`}
                         className="block truncate text-sm font-medium hover:underline"
@@ -259,8 +341,8 @@ export function BlogPostsTable({
                                 </DropdownMenuItem>
                               )}
                               {(p.status === "PUBLISHED" || p.status === "SCHEDULED") && (
-                                <DropdownMenuItem onSelect={() => void changeStatus(p, "DRAFT", "Dikembalikan ke draft")}>
-                                  <IconEyeOff className="size-4" /> Kembalikan ke draft
+                                <DropdownMenuItem onSelect={() => void changeStatus(p, "DRAFT", "Artikel dijadikan privat")}>
+                                  <IconEyeOff className="size-4" /> Jadikan privat (draft)
                                 </DropdownMenuItem>
                               )}
                               {p.status !== "ARCHIVED" && (
@@ -269,7 +351,7 @@ export function BlogPostsTable({
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteTarget(p)}>
+                              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteTargets([p])}>
                                 <IconTrash className="size-4" /> Hapus
                               </DropdownMenuItem>
                             </>
@@ -282,21 +364,24 @@ export function BlogPostsTable({
               })}
             </TableBody>
           </Table>
+          </>
         )}
       </SectionCard>
 
-      <AlertDialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+      <AlertDialog open={deleteTargets.length > 0} onOpenChange={(open) => !open && !bulkBusy && setDeleteTargets([])}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus artikel ini permanen?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {deleteTargets.length > 1 ? `Hapus ${deleteTargets.length} artikel permanen?` : "Hapus artikel ini permanen?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              “{deleteTarget?.title}” beserta seluruh riwayat tampilannya akan dihapus dan tidak bisa dikembalikan. URL-nya
-              akan menjadi 404. Untuk menyembunyikan tanpa kehilangan data, gunakan <strong>Arsipkan</strong>.
+              {deleteTargets.length > 1 ? `${deleteTargets.length} artikel terpilih` : `“${deleteTargets[0]?.title ?? ""}”`} beserta
+              seluruh riwayat tampilannya akan dihapus dan tidak bisa dikembalikan. URL-nya akan menjadi 404. Untuk menyembunyikan tanpa kehilangan data, gunakan <strong>Arsipkan</strong>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={() => void confirmDelete()}>
+            <AlertDialogAction className={buttonVariants({ variant: "destructive" })} disabled={bulkBusy} onClick={() => void confirmDelete()}>
               Hapus permanen
             </AlertDialogAction>
           </AlertDialogFooter>

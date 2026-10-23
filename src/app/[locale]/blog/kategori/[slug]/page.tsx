@@ -50,6 +50,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       `Kumpulan artikel dan panduan ${category.name.toLowerCase()} dari ${siteConfig.name}, money changer berizin Bank Indonesia di Jakarta & Tangerang.`,
     path: data.page > 1 ? `${path}?halaman=${data.page}` : path,
     locale,
+    keywords: [category.name, 'blog valas', 'tips tukar valas', 'money changer jakarta'],
     noIndex: !siteConfig.contentLocales.includes(locale),
   });
 }

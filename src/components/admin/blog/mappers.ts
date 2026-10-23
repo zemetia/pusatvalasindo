@@ -22,6 +22,8 @@ export function toRowDTO(p: BlogPostRow): BlogPostRowDTO {
     rangeViews: p.rangeViews,
     rangeVisitors: p.rangeVisitors,
     viewCount: p.viewCount,
+    upvoteCount: p.upvoteCount,
+    downvoteCount: p.downvoteCount,
     readingMinutes: p.readingMinutes,
   };
 }

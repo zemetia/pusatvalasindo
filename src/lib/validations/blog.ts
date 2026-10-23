@@ -70,3 +70,11 @@ export const blogViewSchema = z.object({
   postId: z.string().trim().min(1).max(40),
   referrer: z.string().max(500).nullable().optional(),
 });
+
+/** Endpoint publik tanggapan artikel (upvote / downvote "Apakah artikel ini membantu?"). */
+export const blogVoteSchema = z.object({
+  postId: z.string().trim().min(1).max(40),
+  vote: z.enum(["up", "down"]).nullable(),
+});
+
+export type BlogVoteInput = z.infer<typeof blogVoteSchema>;

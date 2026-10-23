@@ -19,6 +19,10 @@ function textOf(node: ReactNode): string {
 
 const isInternal = (href: string) => href.startsWith("/") && !href.startsWith("//");
 
+const H2 = "mt-14 scroll-mt-24 font-display text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-lp-ink sm:text-[1.875rem]";
+const H3 = "mt-10 scroll-mt-24 font-display text-xl font-bold leading-snug tracking-[-0.01em] text-lp-ink sm:text-[1.375rem]";
+const BODY = "text-[1.0625rem] leading-[1.85] text-lp-ink-soft";
+
 /**
  * Peta elemen → gaya situs publik.
  *
@@ -28,24 +32,25 @@ const isInternal = (href: string) => href.startsWith("/") && !href.startsWith("/
  */
 const components: Components = {
   h1: ({ children }) => (
-    <h2 id={slugify(textOf(children)) || undefined} className="mt-12 scroll-mt-24 font-display text-2xl font-bold tracking-tight text-lp-ink sm:text-3xl">
+    <h2 id={slugify(textOf(children)) || undefined} className={H2}>
       {children}
     </h2>
   ),
   h2: ({ children }) => (
-    <h2 id={slugify(textOf(children)) || undefined} className="mt-12 scroll-mt-24 font-display text-2xl font-bold tracking-tight text-lp-ink sm:text-3xl">
+    <h2 id={slugify(textOf(children)) || undefined} className={H2}>
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 id={slugify(textOf(children)) || undefined} className="mt-8 scroll-mt-24 font-display text-xl font-bold tracking-tight text-lp-ink sm:text-2xl">
+    <h3 id={slugify(textOf(children)) || undefined} className={H3}>
       {children}
     </h3>
   ),
-  h4: ({ children }) => <h4 className="mt-6 text-lg font-semibold text-lp-ink">{children}</h4>,
-  p: ({ children }) => <p className="mt-5 text-[1.0625rem] leading-8 text-lp-ink-soft">{children}</p>,
+  h4: ({ children }) => <h4 className="mt-8 text-lg font-semibold text-lp-ink">{children}</h4>,
+  p: ({ children }) => <p className={cn("mt-6", BODY)}>{children}</p>,
   a: ({ href, children }) => {
-    const cls = "font-medium text-lp-red-700 underline underline-offset-4 hover:text-lp-red-800";
+    const cls =
+      "font-medium text-lp-red-700 underline decoration-lp-red-200 decoration-2 underline-offset-[5px] transition-colors hover:decoration-lp-red-700";
     if (!href) return <span>{children}</span>;
     if (isInternal(href)) {
       return (
@@ -67,33 +72,76 @@ const components: Components = {
       </a>
     );
   },
-  ul: ({ children }) => <ul className="mt-5 list-disc space-y-2 pl-6 text-[1.0625rem] leading-8 text-lp-ink-soft marker:text-lp-red-700">{children}</ul>,
-  ol: ({ children }) => <ol className="mt-5 list-decimal space-y-2 pl-6 text-[1.0625rem] leading-8 text-lp-ink-soft marker:font-semibold marker:text-lp-red-700">{children}</ol>,
-  li: ({ children }) => <li className="pl-1">{children}</li>,
-  blockquote: ({ children }) => (
-    <blockquote className="mt-6 border-l-4 border-lp-red-700 bg-lp-paper-2 py-1 pl-5 pr-4 text-lp-ink-soft [&>p]:mt-3">{children}</blockquote>
+  ul: ({ children, className }) => (
+    <ul
+      className={cn(
+        "mt-6 space-y-2.5",
+        BODY,
+        className?.includes("contains-task-list") ? "list-none pl-0" : "list-disc pl-6 marker:text-lp-red-700"
+      )}
+    >
+      {children}
+    </ul>
   ),
-  hr: () => <hr className="my-10 border-lp-line" />,
+  ol: ({ children }) => (
+    <ol className={cn("mt-6 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-lp-red-700", BODY)}>{children}</ol>
+  ),
+  li: ({ children, className }) => (
+    <li className={cn("pl-1 [&>ol]:mt-2.5 [&>p]:mt-0 [&>ul]:mt-2.5", className?.includes("task-list-item") && "flex items-start gap-2.5 pl-0")}>
+      {children}
+    </li>
+  ),
+  input: ({ checked }) => (
+    <span
+      aria-hidden
+      className={cn(
+        "mt-[0.55rem] flex size-4 shrink-0 items-center justify-center rounded border text-[10px] leading-none",
+        checked ? "border-lp-red-700 bg-lp-red-700 text-white" : "border-lp-ink-mute bg-white"
+      )}
+    >
+      {checked ? "✓" : ""}
+    </span>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="mt-8 rounded-r-xl border-l-[3px] border-lp-red-700 bg-lp-paper-2 px-6 py-1 font-display text-lg leading-8 text-lp-ink [&>p]:mt-4 [&>p]:mb-4 [&>p]:text-lp-ink [&>p]:text-lg [&>p]:leading-8">
+      {children}
+    </blockquote>
+  ),
+  hr: () => <hr className="my-12 border-lp-line" />,
   strong: ({ children }) => <strong className="font-semibold text-lp-ink">{children}</strong>,
   img: ({ src, alt }) => (
     // Gambar di dalam isi artikel bisa dari host mana pun, sehingga tidak bisa lewat next/image
-    // (remotePatterns kosong). Dimensi tidak diketahui → h-auto + lazy.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" decoding="async" className="mt-6 h-auto w-full rounded-xl border border-lp-line" />
+    // (remotePatterns kosong). Dimensi tidak diketahui → h-auto + lazy. Pakai <span> (bukan <figure>)
+    // karena Markdown membungkus gambar dalam <p>.
+    <span className="mt-8 block">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={typeof src === "string" ? src : undefined}
+        alt={alt ?? ""}
+        loading="lazy"
+        decoding="async"
+        className="h-auto w-full rounded-2xl border border-lp-line bg-lp-paper-2"
+      />
+      {alt && <span className="mt-3 block text-center text-sm text-lp-ink-mute">{alt}</span>}
+    </span>
   ),
   table: ({ children }) => (
-    <div className="mt-6 overflow-x-auto rounded-xl border border-lp-line">
+    <div className="mt-8 overflow-x-auto rounded-2xl border border-lp-line">
       <table className="w-full min-w-[32rem] border-collapse text-left text-[0.9375rem]">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-lp-paper-2 text-lp-ink">{children}</thead>,
+  thead: ({ children }) => <thead className="bg-lp-paper-2 text-xs uppercase tracking-wide text-lp-ink-soft">{children}</thead>,
   th: ({ children }) => <th className="border-b border-lp-line px-4 py-3 font-semibold">{children}</th>,
-  td: ({ children }) => <td className="border-b border-lp-line px-4 py-3 text-lp-ink-soft">{children}</td>,
+  td: ({ children }) => <td className="border-b border-lp-line px-4 py-3 text-lp-ink-soft [tr:last-child>&]:border-b-0">{children}</td>,
   pre: ({ children }) => (
-    <pre className="mt-6 overflow-x-auto rounded-xl bg-lp-night p-4 text-sm leading-7 text-white [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit">{children}</pre>
+    <pre className="mt-8 overflow-x-auto rounded-2xl bg-lp-night p-5 text-sm leading-7 text-white/90 [&>code]:border-0 [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit">
+      {children}
+    </pre>
   ),
   code: ({ children, className }) => (
-    <code className={cn("rounded bg-lp-paper-2 px-1.5 py-0.5 font-mono text-[0.9em] text-lp-ink", className)}>{children}</code>
+    <code className={cn("rounded-md border border-lp-line bg-lp-paper-2 px-1.5 py-0.5 font-mono text-[0.88em] text-lp-ink", className)}>
+      {children}
+    </code>
   ),
 };
 
@@ -105,7 +153,7 @@ const components: Components = {
  */
 export function Markdown({ content, className }: { content: string; className?: string }) {
   return (
-    <div className={cn("min-w-0 [&>*:first-child]:mt-0", className)}>
+    <div className={cn("article-body markdown-content min-w-0 [&>*:first-child]:mt-0", className)}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>

@@ -17,6 +17,8 @@ const LIST_SELECT = {
   publishedAt: true,
   readingMinutes: true,
   viewCount: true,
+  upvoteCount: true,
+  downvoteCount: true,
   categoryId: true,
   createdAt: true,
   updatedAt: true,
@@ -35,6 +37,9 @@ const PUBLIC_LIST_SELECT = {
   publishedAt: true,
   updatedAt: true,
   readingMinutes: true,
+  viewCount: true,
+  upvoteCount: true,
+  downvoteCount: true,
   category: CATEGORY,
 } satisfies Prisma.BlogPostSelect;
 
@@ -275,16 +280,17 @@ export const blogPostRepository = {
     return [...same, ...filler];
   },
 
-  /** Untuk sitemap & llms.txt. */
+  /** Untuk sitemap, feed RSS, & llms.txt. */
   listLiveForFeeds(
     now: Date = new Date()
-  ): Promise<Array<{ slug: string; title: string; excerpt: string; publishedAt: Date | null; updatedAt: Date; category?: { name: string; slug: string } | null }>> {
+  ): Promise<Array<{ slug: string; title: string; excerpt: string; coverImageUrl?: string | null; publishedAt: Date | null; updatedAt: Date; category?: { name: string; slug: string } | null }>> {
     return prisma.blogPost.findMany({
       where: liveWhere(now),
       select: {
         slug: true,
         title: true,
         excerpt: true,
+        coverImageUrl: true,
         publishedAt: true,
         updatedAt: true,
         category: { select: { name: true, slug: true } },
@@ -294,8 +300,29 @@ export const blogPostRepository = {
     });
   },
 
+  /** Untuk llms-full.txt: memuat konten Markdown lengkap artikel terbaru. */
+  listLiveForFullFeeds(
+    limit = 20,
+    now: Date = new Date()
+  ): Promise<Array<{ slug: string; title: string; excerpt: string; content: string; publishedAt: Date | null; updatedAt: Date; category?: { name: string } | null }>> {
+    return prisma.blogPost.findMany({
+      where: liveWhere(now),
+      select: {
+        slug: true,
+        title: true,
+        excerpt: true,
+        content: true,
+        publishedAt: true,
+        updatedAt: true,
+        category: { select: { name: true } },
+      },
+      orderBy: { publishedAt: "desc" },
+      take: limit,
+    });
+  },
+
   /** Tampil untuk pencatat view: hanya id artikel yang sedang tayang. */
-  findLiveId(id: string, now: Date = new Date()): Promise<{ id: string } | null> {
-    return prisma.blogPost.findFirst({ where: { id, ...liveWhere(now) }, select: { id: true } });
+  findLiveId(id: string, now: Date = new Date()): Promise<{ id: string; viewCount: number } | null> {
+    return prisma.blogPost.findFirst({ where: { id, ...liveWhere(now) }, select: { id: true, viewCount: true } });
   },
 };

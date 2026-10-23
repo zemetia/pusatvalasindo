@@ -37,6 +37,11 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/logo PVI.png',
   },
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
   ...(process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]
     ? { verification: { google: process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"] } }
     : {}),

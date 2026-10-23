@@ -44,8 +44,28 @@ describe("blogPostingSchema", () => {
       dateModified: "2026-10-21T00:00:00.000Z",
     }) as Record<string, unknown>;
     expect(s["@type"]).toBe("BlogPosting");
-    expect(s.author).toEqual({ "@id": expect.stringContaining("#organization") });
-    expect(s.publisher).toEqual(s.author);
+    expect(s.author).toMatchObject({
+      "@type": "Organization",
+      "@id": expect.stringContaining("#organization"),
+    });
+    expect(s.publisher).toMatchObject({
+      "@type": "Organization",
+      "@id": expect.stringContaining("#organization"),
+    });
     expect(s.mainEntityOfPage).toEqual({ "@type": "WebPage", "@id": "https://pusatvalasindo.com/blog/judul" });
+    expect(s.contentLocation).toBeDefined();
+    expect(s.spatialCoverage).toBeInstanceOf(Array);
+  });
+
+  it("menyertakan keywords jika diberikan", () => {
+    const s = blogPostingSchema({
+      headline: "Judul",
+      description: "Deskripsi",
+      url: "https://pusatvalasindo.com/blog/judul",
+      datePublished: "2026-10-20T00:00:00.000Z",
+      dateModified: "2026-10-21T00:00:00.000Z",
+      keywords: ["tukar valas", "dolar"],
+    }) as Record<string, unknown>;
+    expect(s.keywords).toEqual(["tukar valas", "dolar"]);
   });
 });

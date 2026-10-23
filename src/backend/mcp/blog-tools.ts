@@ -231,6 +231,14 @@ export const BLOG_TOOLS: BlogTool[] = [
     handler: async (args) => {
       const id = requireId(args);
       const input = parse(updateBlogPostSchema, postArgs({ status: args.status, published_at: args.published_at }));
+      if (input.status === "PUBLISHED" && input.publishedAt === undefined) {
+        // Tanggal lama yang tersisa di masa depan (jadwal yang dibatalkan, atau artikel
+        // terjadwal) tidak boleh membuat "terbitkan" diam-diam menjadi terjadwal.
+        const existing = await blogService.getPost(id);
+        if (existing.publishedAt && existing.publishedAt.getTime() > Date.now()) {
+          input.publishedAt = new Date().toISOString();
+        }
+      }
       const post = await blogService.updatePost(id, input);
       return { id: post.id, slug: post.slug, url: postUrl(post.slug), status: post.displayStatus, published_at: post.publishedAt };
     },

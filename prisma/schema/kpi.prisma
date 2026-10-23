@@ -24,7 +24,8 @@ model KpiDefinition {
   /// Kolom "Objective" pada sheet KPI, mis. "Meningkatkan Pelayanan Kepada Customer".
   objective   String?
   /// Penjelasan aturan mainnya untuk karyawan, mis. "-3 poin setiap kesalahan hitung".
-  description String?
+  /// Dibatasi VarChar(10000) — cukup untuk uraian panjang tanpa jadi TEXT tak terbatas.
+  description String? @db.VarChar(10000)
 
   scoringType KpiScoringType
   unit        KpiUnit        @default(OCCURRENCE)

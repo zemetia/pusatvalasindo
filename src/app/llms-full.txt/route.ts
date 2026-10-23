@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 async function blogPosts(): Promise<BlogFeedPost[]> {
   try {
-    return await blogService.listForFeeds();
+    return await blogService.listForFullFeeds();
   } catch (error) {
     console.error('[llms-full.txt] gagal membaca artikel blog:', error instanceof Error ? error.message : error);
     return [];

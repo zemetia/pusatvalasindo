@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { slugify, isValidSlug } from "./slug";
-import { countWords, readingMinutes, stripMarkdown } from "./content";
+import { countWords, extractFaqs, readingMinutes, stripMarkdown } from "./content";
 import { isBotUserAgent, jakartaDay, normalizeReferrerHost, visitorHash } from "./tracking";
 import {
   fillDailySeries,
@@ -49,6 +49,42 @@ describe("content", () => {
     expect(readingMinutes("")).toBe(1);
     expect(readingMinutes("kata ".repeat(200))).toBe(1);
     expect(readingMinutes("kata ".repeat(201))).toBe(2);
+  });
+  it("extractFaqs: kosong jika tidak ada bagian FAQ", () => {
+    expect(extractFaqs("# Judul\n\nIsi artikel biasa tanpa tanya jawab.")).toEqual([]);
+  });
+  it("extractFaqs: mengekstrak Q&A dari heading FAQ dan berhenti di heading H2 berikutnya", () => {
+    const md = `
+# Panduan Valas
+
+Teks pendahuluan.
+
+## Pertanyaan Umum
+
+### Apakah bisa tukar uang lewat kurir?
+Bisa! Kami menyediakan **layanan antar kurir** di Jakarta & Tangerang.
+
+### Berapa batas minimal penukaran?
+Tidak ada minimum nominal untuk transaksi di kantor.
+
+## Kesimpulan
+Selesai.
+    `.trim();
+
+    const faqs = extractFaqs(md);
+    expect(faqs).toHaveLength(2);
+    expect(faqs[0].question).toBe("Apakah bisa tukar uang lewat kurir?");
+    expect(faqs[0].answer).toBe("Bisa! Kami menyediakan layanan antar kurir di Jakarta & Tangerang.");
+    expect(faqs[1].question).toBe("Berapa batas minimal penukaran?");
+    expect(faqs[1].answer).toBe("Tidak ada minimum nominal untuk transaksi di kantor.");
+  });
+
+  it("extractFaqs: mendukung format CRLF dan heading # FAQ", () => {
+    const md = "# FAQ\r\n\r\n### Kurs apa saja yang tersedia?\r\nUSD, SGD, EUR.\r\n\r\n# Bagian Lain\r\nSelesai.";
+    const faqs = extractFaqs(md);
+    expect(faqs).toHaveLength(1);
+    expect(faqs[0].question).toBe("Kurs apa saja yang tersedia?");
+    expect(faqs[0].answer).toBe("USD, SGD, EUR.");
   });
 });
 

@@ -115,6 +115,19 @@ describe("update_blog_post / set_blog_post_status", () => {
     );
     expect(svc.updatePost).toHaveBeenCalledWith("p1", { status: "PUBLISHED", publishedAt: "2026-11-01T08:00:00+07:00" });
   });
+  it("set status PUBLISHED tanpa tanggal: tanggal lama di masa depan diganti 'sekarang', tanggal lampau dipertahankan", async () => {
+    svc.updatePost.mockResolvedValue({ id: "p1", slug: "s", displayStatus: "PUBLISHED", publishedAt: null });
+
+    svc.getPost.mockResolvedValueOnce({ id: "p1", publishedAt: new Date(Date.now() + 86_400_000) });
+    await tool("set_blog_post_status").handler({ id: "p1", status: "PUBLISHED" }, owner);
+    const sent = svc.updatePost.mock.calls[0][1] as { publishedAt: string };
+    expect(Math.abs(new Date(sent.publishedAt).getTime() - Date.now())).toBeLessThan(5_000);
+
+    svc.updatePost.mockClear();
+    svc.getPost.mockResolvedValueOnce({ id: "p1", publishedAt: new Date("2026-01-01") });
+    await tool("set_blog_post_status").handler({ id: "p1", status: "PUBLISHED" }, owner);
+    expect(svc.updatePost).toHaveBeenCalledWith("p1", { status: "PUBLISHED" });
+  });
   it("status di luar DRAFT/PUBLISHED/ARCHIVED ditolak", async () => {
     await expect(tool("set_blog_post_status").handler({ id: "p1", status: "SCHEDULED" }, owner)).rejects.toBeInstanceOf(ValidationError);
   });

@@ -254,7 +254,8 @@ export function KpiDefinitionSheet({ definition, trigger, onSaved }: Props) {
             Aturan Penilaian (dibaca karyawan)
           </Label>
           <Textarea
-            rows={2}
+            rows={6}
+            maxLength={10000}
             placeholder="Contoh: 3 poin minus setiap kali ada kesalahan hitung."
             value={form.description}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>

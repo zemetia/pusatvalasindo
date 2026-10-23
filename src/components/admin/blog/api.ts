@@ -12,6 +12,8 @@ export type BlogPostRowDTO = {
   rangeViews: number;
   rangeVisitors: number;
   viewCount: number;
+  upvoteCount?: number;
+  downvoteCount?: number;
   readingMinutes: number;
 };
 

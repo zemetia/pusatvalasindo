@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 
-import { Entities, Faq, FinalCta, Hero, Locations, Pkd, Reviews, Services, Steps, Trust } from '@/components/landing/sections';
+import { blogService } from '@/backend/services/blog.service';
+import {
+  Entities,
+  Faq,
+  FinalCta,
+  Hero,
+  LatestNews,
+  Locations,
+  Pkd,
+  Reviews,
+  Services,
+  Steps,
+  Trust,
+} from '@/components/landing/sections';
 import { RelatedLinks } from '@/components/landing/page-sections';
 import { SiteFooter } from '@/components/landing/site-footer';
 import { SiteHeader } from '@/components/landing/site-header';
@@ -33,8 +46,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   const page = siteConfig.pages['home'];
+  const recentPosts = await blogService.listRecentPosts(5);
+
   const schemas = [
     organizationSchema(),
     websiteSchema(),
@@ -60,8 +75,9 @@ export default function HomePage() {
         <Locations />
         <Trust />
         <Reviews />
-        <Faq />
-        <RelatedLinks currentPath="/" />
+        <LatestNews posts={recentPosts} />
+        <Faq tone="paper" />
+        <RelatedLinks currentPath="/" tone="paper2" />
         <FinalCta />
       </main>
       <SiteFooter />
