@@ -7,18 +7,18 @@ import {
   IconArrowLeft,
   IconDeviceFloppy,
   IconExternalLink,
+  IconEyeOff,
   IconLoader2,
   IconSend,
 } from "@tabler/icons-react";
 
-import { MarkdownEditor } from "./markdown-editor";
+import { RichEditorLazy } from "./rich-editor-lazy";
 import { MetricInline, PageHeader, PageShell, SectionCard } from "@/components/admin/page-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Link, useRouter } from "@/i18n/routing";
-import { countWords, readingMinutes } from "@/lib/blog/content";
 import { formatDateLong, formatInt, fromWibInputValue, toWibInputValue } from "@/lib/blog/format";
 import { slugify } from "@/lib/blog/slug";
 import type { BlogDisplayStatus } from "@/lib/blog/status";
@@ -218,7 +218,7 @@ export function BlogPostEditor({
         const messages: Record<Action, string> = {
           save: "Perubahan disimpan",
           publish: next.status === "SCHEDULED" ? "Artikel dijadwalkan" : "Artikel diterbitkan",
-          draft: "Dikembalikan ke draft",
+          draft: "Artikel dijadikan privat",
           archive: "Artikel diarsipkan",
         };
         toast.success(messages[action]);
@@ -245,7 +245,6 @@ export function BlogPostEditor({
     return () => window.removeEventListener("keydown", onKey);
   }, [submit]);
 
-  const words = countWords(form.content);
   const publishDateIso = fromWibInputValue(form.publishAt);
   const isFuture = publishDateIso ? new Date(publishDateIso).getTime() > now : false;
   const slugChangedOnLive = live && postId !== null && form.slug !== saved.slug;
@@ -298,15 +297,17 @@ export function BlogPostEditor({
         <div className="min-w-0 space-y-5">
           <SectionCard>
             <div>
-              <Label htmlFor="blog-title">Judul</Label>
-              <Input
+              <Label htmlFor="blog-title" className="sr-only">
+                Judul
+              </Label>
+              <input
                 id="blog-title"
                 value={form.title}
                 onChange={(e) => onTitleChange(e.target.value)}
-                placeholder="Mis. Cara Tukar Dolar Aman di Jakarta"
+                placeholder="Judul artikel"
                 maxLength={160}
                 disabled={readOnly}
-                className={`${FIELD_CLS} h-11 text-base font-semibold`}
+                className="placeholder:text-muted-foreground/50 w-full bg-transparent text-3xl font-bold tracking-tight outline-none disabled:opacity-60 sm:text-4xl"
               />
             </div>
 
@@ -353,12 +354,8 @@ export function BlogPostEditor({
             </div>
           </SectionCard>
 
-          <SectionCard
-            title="Isi artikel"
-            description={`${formatInt(words)} kata · sekitar ${readingMinutes(form.content)} menit baca`}
-            padded={false}
-          >
-            <MarkdownEditor value={form.content} onChange={(v) => set("content", v)} disabled={readOnly} />
+          <SectionCard title="Isi artikel" padded={false}>
+            <RichEditorLazy value={form.content} onChange={(v) => set("content", v)} disabled={readOnly} />
           </SectionCard>
         </div>
 
@@ -395,7 +392,7 @@ export function BlogPostEditor({
                         {savingLabel("save", "Simpan perubahan", <IconDeviceFloppy className="size-4" />)}
                       </Button>
                       <Button variant="outline" onClick={() => void submit("draft")} disabled={busy !== null}>
-                        {savingLabel("draft", "Kembalikan ke draft", <IconDeviceFloppy className="size-4" />)}
+                        {savingLabel("draft", "Jadikan privat (draft)", <IconEyeOff className="size-4" />)}
                       </Button>
                     </>
                   ) : (
