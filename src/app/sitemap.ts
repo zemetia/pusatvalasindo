@@ -37,7 +37,7 @@ async function livePosts() {
  * dengan alternates hreflang. `lastModified` diambil dari tanggal edit konten nyata di
  * `siteConfig.pages[*].lastModified` — jangan pakai new Date() (sinyal palsu tiap request).
  *
- * Blog: indeks `/blog` hanya masuk bila sudah ada artikel terbit, dengan lastModified =
+ * Blog: kategori yang punya artikel tayang masuk sebagai `/blog/kategori/<slug>`; indeks `/blog` hanya masuk bila sudah ada artikel terbit, dengan lastModified =
  * artikel yang terakhir berubah; tiap artikel masuk dengan `updatedAt`-nya sendiri.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -69,5 +69,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  return [...pageEntries, ...postEntries];
+  // Halaman kategori: hanya kategori yang punya artikel tayang (ikut dari `posts`, jadi tanpa query tambahan).
+  // lastModified = artikel terakhir berubah di kategori itu.
+  const categoryChanges = new Map<string, Date>();
+  for (const post of posts) {
+    if (!post.category) continue;
+    const seen = categoryChanges.get(post.category.slug);
+    if (!seen || post.updatedAt > seen) categoryChanges.set(post.category.slug, post.updatedAt);
+  }
+  const categoryEntries = Array.from(categoryChanges, ([slug, lastModified]) =>
+    siteConfig.contentLocales.map((locale) => ({
+      url: urlFor(locale, `/blog/kategori/${slug}`),
+      lastModified,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+      alternates: alternatesFor(`/blog/kategori/${slug}`),
+    }))
+  ).flat();
+
+  return [...pageEntries, ...categoryEntries, ...postEntries];
 }

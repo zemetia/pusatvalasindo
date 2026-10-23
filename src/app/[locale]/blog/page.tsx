@@ -7,6 +7,7 @@ import { FinalCta } from '@/components/landing/sections';
 import { PageIntro } from '@/components/landing/page-intro';
 import { InnerPage } from '@/components/landing/page-sections';
 import { Section } from '@/components/landing/ui';
+import { CategoryNav } from '@/components/blog/category-nav';
 import { PostCard } from '@/components/blog/post-card';
 import { Link } from '@/i18n/routing';
 import { buildMetadata } from '@/lib/seo';
@@ -42,7 +43,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 }
 
 export default async function BlogIndexPage({ searchParams }: Props) {
-  const { items, total, page: current, totalPages } = await getPosts(pageNumber((await searchParams).halaman));
+  const [{ items, total, page: current, totalPages }, categories] = await Promise.all([
+    getPosts(pageNumber((await searchParams).halaman)),
+    blogService.listLiveCategories(),
+  ]);
 
   const url = `${siteConfig.url}${page.path}`;
   const schemas = [
@@ -79,6 +83,10 @@ export default async function BlogIndexPage({ searchParams }: Props) {
           </p>
         ) : (
           <>
+            <CategoryNav
+              className="mb-10"
+              categories={categories.map((c) => ({ slug: c.slug, name: c.name, count: c._count.posts }))}
+            />
             <p className="mb-8 text-sm text-lp-ink-mute">
               {total} artikel{totalPages > 1 ? ` · halaman ${current} dari ${totalPages}` : ''}
             </p>

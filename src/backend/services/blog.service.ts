@@ -3,6 +3,7 @@ import { ConflictError, NotFoundError, ValidationError } from "@/backend/errors/
 import {
   blogPostRepository,
   type BlogListParams,
+  type BlogLiveCategoryRow,
   type BlogPostFull,
   type BlogPostListRow,
   type BlogPostPublicRow,
@@ -44,6 +45,7 @@ export const PUBLIC_PAGE_SIZE = 12;
 function revalidateBlog(): void {
   try {
     revalidatePath("/[locale]/blog", "page");
+    revalidatePath("/[locale]/blog/kategori/[slug]", "page");
     revalidatePath("/[locale]/blog/[slug]", "page");
     revalidatePath("/sitemap.xml");
     revalidatePath("/llms.txt");
@@ -386,17 +388,44 @@ export const blogService = {
 
   async listLivePosts(
     page: number,
-    now: Date = new Date()
+    now: Date = new Date(),
+    categoryId?: string
   ): Promise<{ items: BlogPostPublicRow[]; total: number; page: number; totalPages: number }> {
-    const total = await blogPostRepository.countLive(now);
+    const total = await blogPostRepository.countLive(now, categoryId);
     const totalPages = Math.max(1, Math.ceil(total / PUBLIC_PAGE_SIZE));
     const safePage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
     const items = await blogPostRepository.listLive({
       limit: PUBLIC_PAGE_SIZE,
       offset: (safePage - 1) * PUBLIC_PAGE_SIZE,
+      categoryId,
       now,
     });
     return { items, total, page: safePage, totalPages };
+  },
+
+  /** Kategori yang punya artikel tayang — untuk navigasi kategori & sitemap. */
+  listLiveCategories(now: Date = new Date()): Promise<BlogLiveCategoryRow[]> {
+    return blogPostRepository.listLiveCategories(now);
+  },
+
+  /**
+   * Halaman kategori publik. `null` bila slug tidak ada atau kategorinya belum punya
+   * artikel tayang — halaman kosong = thin content, jadi diperlakukan 404.
+   */
+  async listLivePostsByCategory(
+    slug: string,
+    page: number,
+    now: Date = new Date()
+  ): Promise<{
+    category: BlogLiveCategoryRow;
+    items: BlogPostPublicRow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  } | null> {
+    const category = await blogPostRepository.findLiveCategoryBySlug(slug, now);
+    if (!category) return null;
+    return { category, ...(await blogService.listLivePosts(page, now, category.id)) };
   },
 
   getRelatedPosts(postId: string, categoryId: string | null, limit = 3, now: Date = new Date()) {

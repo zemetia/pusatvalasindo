@@ -44,6 +44,26 @@ export type BlogPostListRow = Prisma.BlogPostGetPayload<{ select: typeof LIST_SE
 export type BlogPostPublicRow = Prisma.BlogPostGetPayload<{ select: typeof PUBLIC_LIST_SELECT }>;
 export type BlogPostFull = Prisma.BlogPostGetPayload<{ include: typeof FULL_INCLUDE }>;
 
+/** Kategori untuk situs publik; `_count.posts` hanya menghitung artikel yang sedang tayang. */
+export type BlogLiveCategoryRow = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  updatedAt: Date;
+  _count: { posts: number };
+};
+
+const liveCategorySelect = (live: Prisma.BlogPostWhereInput) =>
+  ({
+    id: true,
+    slug: true,
+    name: true,
+    description: true,
+    updatedAt: true,
+    _count: { select: { posts: { where: live } } },
+  }) satisfies Prisma.BlogCategorySelect;
+
 export type BlogListParams = {
   status?: BlogDisplayStatus;
   search?: string;
@@ -196,9 +216,9 @@ export const blogPostRepository = {
     return post.slug;
   },
 
-  listLive(opts: { limit: number; offset: number; now?: Date }): Promise<BlogPostPublicRow[]> {
+  listLive(opts: { limit: number; offset: number; categoryId?: string; now?: Date }): Promise<BlogPostPublicRow[]> {
     return prisma.blogPost.findMany({
-      where: liveWhere(opts.now ?? new Date()),
+      where: { ...liveWhere(opts.now ?? new Date()), ...(opts.categoryId ? { categoryId: opts.categoryId } : {}) },
       select: PUBLIC_LIST_SELECT,
       orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
       take: opts.limit,
@@ -206,8 +226,27 @@ export const blogPostRepository = {
     });
   },
 
-  countLive(now: Date = new Date()): Promise<number> {
-    return prisma.blogPost.count({ where: liveWhere(now) });
+  countLive(now: Date = new Date(), categoryId?: string): Promise<number> {
+    return prisma.blogPost.count({ where: { ...liveWhere(now), ...(categoryId ? { categoryId } : {}) } });
+  },
+
+  /** Kategori yang punya minimal satu artikel tayang, dengan jumlah artikel tayangnya. Kategori kosong tidak ikut. */
+  listLiveCategories(now: Date = new Date()): Promise<BlogLiveCategoryRow[]> {
+    const live = liveWhere(now);
+    return prisma.blogCategory.findMany({
+      where: { posts: { some: live } },
+      select: liveCategorySelect(live),
+      orderBy: { name: "asc" },
+    });
+  },
+
+  /** Satu kategori by slug, hanya bila punya artikel tayang (kategori kosong = 404 di situs publik). */
+  findLiveCategoryBySlug(slug: string, now: Date = new Date()): Promise<BlogLiveCategoryRow | null> {
+    const live = liveWhere(now);
+    return prisma.blogCategory.findFirst({
+      where: { slug, posts: { some: live } },
+      select: liveCategorySelect(live),
+    });
   },
 
   /** Artikel terkait: sekategori dulu, sisanya diisi artikel terbaru lain. */
@@ -239,10 +278,17 @@ export const blogPostRepository = {
   /** Untuk sitemap & llms.txt. */
   listLiveForFeeds(
     now: Date = new Date()
-  ): Promise<Array<{ slug: string; title: string; excerpt: string; publishedAt: Date | null; updatedAt: Date }>> {
+  ): Promise<Array<{ slug: string; title: string; excerpt: string; publishedAt: Date | null; updatedAt: Date; category?: { name: string; slug: string } | null }>> {
     return prisma.blogPost.findMany({
       where: liveWhere(now),
-      select: { slug: true, title: true, excerpt: true, publishedAt: true, updatedAt: true },
+      select: {
+        slug: true,
+        title: true,
+        excerpt: true,
+        publishedAt: true,
+        updatedAt: true,
+        category: { select: { name: true, slug: true } },
+      },
       orderBy: { publishedAt: "desc" },
       take: 1000,
     });

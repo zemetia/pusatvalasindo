@@ -11,7 +11,7 @@ import { Container, Eyebrow, H2, Section } from '@/components/landing/ui';
 import { Markdown } from '@/components/blog/markdown';
 import { PostCard } from '@/components/blog/post-card';
 import { ViewTracker } from '@/components/blog/view-tracker';
-import { routing } from '@/i18n/routing';
+import { Link, routing } from '@/i18n/routing';
 import { countWords } from '@/lib/blog/content';
 import { formatDateLong } from '@/lib/blog/format';
 import { buildMetadata } from '@/lib/seo';
@@ -113,7 +113,13 @@ export default async function BlogPostPage({ params }: Props) {
               items={[{ name: 'Beranda', href: '/' }, { name: 'Blog', href: '/blog' }, { name: post.title }]}
             />
             <div className="lp-rise mt-10 max-w-3xl">
-              {post.category && <Eyebrow>{post.category.name}</Eyebrow>}
+              {post.category && (
+                <Eyebrow>
+                  <Link href={`/blog/kategori/${post.category.slug}`} className="underline-offset-4 hover:underline">
+                    {post.category.name}
+                  </Link>
+                </Eyebrow>
+              )}
               <h1 className="mt-4 font-display text-[clamp(2rem,1.2rem+3vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-balance">
                 {post.title}
               </h1>

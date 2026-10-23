@@ -10,6 +10,9 @@ const { post, category, view } = vi.hoisted(() => ({
     update: vi.fn(),
     delete: vi.fn(),
     findLiveId: vi.fn(),
+    countLive: vi.fn(),
+    listLive: vi.fn(),
+    findLiveCategoryBySlug: vi.fn(),
   },
   category: { findById: vi.fn(), findBySlug: vi.fn(), create: vi.fn() },
   view: { hasViewSince: vi.fn(), record: vi.fn() },
@@ -255,5 +258,43 @@ describe("recordView", () => {
     expect(hash).not.toContain("1.2.3.4");
     expect(ref).toBe("google.com");
     expect(at).toEqual(NOW);
+  });
+});
+
+describe("listLivePostsByCategory", () => {
+  const cat = { id: "c1", slug: "kurs", name: "Kurs", description: null, updatedAt: NOW, _count: { posts: 13 } };
+  beforeEach(() => {
+    post.findLiveCategoryBySlug.mockReset();
+    post.countLive.mockReset();
+    post.listLive.mockReset();
+  });
+
+  it("mengembalikan null untuk slug yang tidak ada atau kategori tanpa artikel tayang", async () => {
+    post.findLiveCategoryBySlug.mockResolvedValue(null);
+    expect(await blogService.listLivePostsByCategory("hantu", 1, NOW)).toBeNull();
+    expect(post.countLive).not.toHaveBeenCalled();
+  });
+
+  it("memfilter hitungan & daftar dengan id kategori", async () => {
+    post.findLiveCategoryBySlug.mockResolvedValue(cat);
+    post.countLive.mockResolvedValue(13);
+    post.listLive.mockResolvedValue([{ id: "p1" }]);
+
+    const res = await blogService.listLivePostsByCategory("kurs", 1, NOW);
+
+    expect(post.countLive).toHaveBeenCalledWith(NOW, "c1");
+    expect(post.listLive).toHaveBeenCalledWith({ limit: 12, offset: 0, categoryId: "c1", now: NOW });
+    expect(res).toMatchObject({ category: cat, total: 13, page: 1, totalPages: 2 });
+  });
+
+  it("menjepit halaman di luar rentang ke halaman terakhir", async () => {
+    post.findLiveCategoryBySlug.mockResolvedValue(cat);
+    post.countLive.mockResolvedValue(13);
+    post.listLive.mockResolvedValue([]);
+
+    const res = await blogService.listLivePostsByCategory("kurs", 99, NOW);
+
+    expect(res?.page).toBe(2);
+    expect(post.listLive).toHaveBeenCalledWith(expect.objectContaining({ offset: 12 }));
   });
 });
